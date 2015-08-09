@@ -1,0 +1,15 @@
+photos/
+thumbs/
+node_modules/
+
+npm-debug.log
+db.sqlite
+
+# VIM related files
+*.swo
+*.swp
+*.swn
+*.swm
+
+*.old
+*~

@@ -1,0 +1,16 @@
+{
+  "name": "ansel",
+  "version": "0.0.0",
+  "description": "",
+  "main": "browser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/.bin/electron ."
+  },
+  "author": "Loïc Nogues <nogues.loic@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "electron-prebuilt": "^0.30.3",
+    "walk": "^2.3.9"
+  }
+}
