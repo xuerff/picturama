@@ -2,6 +2,8 @@ var fs = require('fs');
 var Walk = require('walk');
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
+var path = __dirname + '/photos/';
+var thumbsPath = __dirname + '/thumbs/';
 
 var Library = function() {
   console.log('CONSTRUCT');
@@ -11,11 +13,29 @@ var Library = function() {
 
 Library.prototype.walk = function(root, fileStat, next) {
   var allowed = new RegExp(acceptedRawFormats.join("|") + '$', "i");
+  var extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
+  var spawn = require('child_process').spawn;
 
-  if (fileStat.name.match(allowed))
-    console.log(fileStat);
+  if (fileStat.name.match(allowed)) {
+    var filename = fileStat.name.match(extract)[1];
+    var cmd  = spawn('dcraw', [ '-e', path + fileStat.name ]);
 
-  next();
+    cmd.stdout.on('data', function(data) {
+      console.log('stdout: ' + data);
+    });
+
+    cmd.stderr.on('data', function(data) {
+      console.log('stderr: ' + data);
+    });
+
+    cmd.on('exit', function(code) {
+      console.log('exit code: ' + code);
+      fs.rename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg',
+        function(err) {
+          next();
+        });
+    });
+  }
 };
 
 Library.prototype.scan = function() {

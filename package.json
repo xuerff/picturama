@@ -10,7 +10,11 @@
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^2.9.34",
+    "bookshelf": "^0.8.1",
     "electron-prebuilt": "^0.30.3",
+    "knex": "^0.8.6",
+    "sqlite3": "^3.0.10",
     "walk": "^2.3.9"
   }
 }
