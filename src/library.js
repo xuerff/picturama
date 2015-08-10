@@ -1,15 +1,16 @@
-var fs = require('fs');
+var Promise = require('bluebird');
+var fs = require("fs");
 var Walk = require('walk');
 var Photo = require('./models/photo');
+var ExifImage = require('exif').ExifImage;
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
 var path = __dirname + '/../photos/';
 var thumbsPath = __dirname + '/../thumbs/';
 
+var fsRename = Promise.promisify(fs.rename);
+
 var Library = function() {
-  console.log('CONSTRUCT');
-  //this.path = __dirname + '/photos/';
-  //this.thumbsPath = __dirname + '/thumbs/';
 };
 
 Library.prototype.walk = function(root, fileStat, next) {
@@ -19,6 +20,8 @@ Library.prototype.walk = function(root, fileStat, next) {
 
   if (fileStat.name.match(allowed)) {
     var filename = fileStat.name.match(extract)[1];
+
+
     var cmd  = spawn('dcraw', [ '-e', path + fileStat.name ]);
 
     cmd.stdout.on('data', function(data) {
@@ -30,19 +33,23 @@ Library.prototype.walk = function(root, fileStat, next) {
     });
 
     cmd.on('exit', function(code) {
-      console.log('exit code: ' + code);
-      fs.rename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg',
-        function(err) {
-          // TODO: Store photo
-          Photo.forge({
-            title: filename,
-            master: path + filename + '.thumb.jpg',
-            thumb: thumbsPath + filename + '.thumbs.jpg'
-          }).save().then(function(photo) {
+      new ExifImage({ image: path + filename + '.thumb.jpg' }, function(err, exifData) {
+        var orientation = exifData.image.Orientation;
+
+        fsRename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg')
+          .then(function() {
+             return Photo.forge({
+              title: filename,
+              orientation: orientation,
+              master: path + filename + '.thumb.jpg',
+              thumb: thumbsPath + filename + '.thumbs.jpg'
+            }).save();
+          })
+          .then(function(photo) {
             console.log('new photo', photo);
             next();
           });
-        });
+      });
     });
   }
 };
