@@ -1,0 +1,24 @@
+@blue-grey-900: #263238;
+@blue-grey-800: #37474f;
+@white: #ffffff;
+
+html, body, #app, #ansel, #sidebar, #container {
+  height: 100%;
+}
+body {
+  margin: 0;
+}
+
+#sidebar {
+  float: left;
+  width: 300px;
+  background: @blue-grey-900;
+  color: #fff;
+}
+
+#container {
+  float: left;
+  width: ~"calc(100% - 300px)";
+  background: @blue-grey-800;
+  color: @white;
+}

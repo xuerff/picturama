@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/browser.js",
   "scripts": {
+    "bundle": "lessc src/source.less static/bundle.css",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/.bin/electron .",
     "postinstall": "npm run rebuild-sqlite3",
