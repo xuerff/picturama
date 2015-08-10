@@ -16,6 +16,8 @@
     "bookshelf": "^0.8.1",
     "electron-prebuilt": "^0.30.3",
     "knex": "^0.8.6",
+    "node-jsx": "^0.13.3",
+    "react": "^0.13.3",
     "sqlite3": "^3.0.10",
     "walk": "^2.3.9"
   },
