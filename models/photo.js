@@ -1,7 +1,10 @@
+var path = require('path');
+var dbFile = path.join(__dirname, '../db.sqlite3');
+console.log('db file', dbFile);
 var knex = require('knex')({
   client: 'sqlite3',
   connection: {
-    filename: "./db.sqlite"
+    filename: dbFile
   }
 });
 
