@@ -3,13 +3,13 @@ var Walk = require('walk');
 var Photo = require('./models/photo');
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
-var path = __dirname + '/photos/';
-var thumbsPath = __dirname + '/thumbs/';
+var path = __dirname + '/../photos/';
+var thumbsPath = __dirname + '/../thumbs/';
 
 var Library = function() {
   console.log('CONSTRUCT');
-  this.path = __dirname + '/photos/';
-  this.thumbsPath = __dirname + '/thumbs/';
+  //this.path = __dirname + '/photos/';
+  //this.thumbsPath = __dirname + '/thumbs/';
 };
 
 Library.prototype.walk = function(root, fileStat, next) {
@@ -48,8 +48,8 @@ Library.prototype.walk = function(root, fileStat, next) {
 };
 
 Library.prototype.scan = function() {
-  console.log('SCAN', this.path);
-  var walker = Walk.walk(this.path, { followLinks: false });
+  console.log('SCAN', path);
+  var walker = Walk.walk(path, { followLinks: false });
 
   walker.on("file", this.walk);
 
