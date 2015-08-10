@@ -1,5 +1,6 @@
 var fs = require('fs');
 var Walk = require('walk');
+var Photo = require('./models/photo');
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
 var path = __dirname + '/photos/';
@@ -32,7 +33,15 @@ Library.prototype.walk = function(root, fileStat, next) {
       console.log('exit code: ' + code);
       fs.rename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg',
         function(err) {
-          next();
+          // TODO: Store photo
+          Photo.forge({
+            title: filename,
+            master: path + filename + '.thumb.jpg',
+            thumb: thumbsPath + filename + '.thumbs.jpg'
+          }).save().then(function(photo) {
+            console.log('new photo', photo);
+            next();
+          });
         });
     });
   }
