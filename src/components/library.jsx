@@ -1,10 +1,17 @@
 var React = require('react');
 var Photo = require('./../models/photo');
 var Picture = require('./picture.jsx');
+var PictureDetail = require('./picture-detail.jsx');
 
 var Library = React.createClass({
+  handleCurrent: function(photo) {
+    var state = this.state;
+    state.current = photo;
+    this.setState(state);
+  },
+
   getInitialState: function() {
-    return { photos: [] };
+    return { photos: [], current: null };
   },
 
   componentDidMount: function() {
@@ -17,15 +24,22 @@ var Library = React.createClass({
   },
 
   render: function() {
-    var pictures = this.state.photos.map(function(photo) {
-      return (
-        <Picture photo={photo} />
-      );
-    });
+    var currentView;
+    var handleCurrent = this.handleCurrent;
+    console.log('current photo', this.state.current);
+
+    if (!this.state.current)
+      currentView = this.state.photos.map(function(photo) {
+        return (
+          <Picture photo={photo} setCurrent={handleCurrent} />
+        );
+      });
+    else
+      currentView = <PictureDetail photo={this.state.current} />;
 
     return (
       <div id="library">
-        {pictures}
+        {currentView}
       </div>
     );
   }
