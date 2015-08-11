@@ -35,7 +35,7 @@ var Library = React.createClass({
         );
       });
     else
-      currentView = <PictureDetail photo={this.state.current} />;
+      currentView = <PictureDetail photo={this.state.current} setCurrent={handleCurrent} />;
 
     return (
       <div id="library">
