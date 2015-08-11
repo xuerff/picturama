@@ -21,7 +21,6 @@ Library.prototype.walk = function(root, fileStat, next) {
   if (fileStat.name.match(allowed)) {
     var filename = fileStat.name.match(extract)[1];
 
-
     var cmd  = spawn('dcraw', [ '-e', path + fileStat.name ]);
 
     cmd.stdout.on('data', function(data) {
@@ -35,18 +34,30 @@ Library.prototype.walk = function(root, fileStat, next) {
     cmd.on('exit', function(code) {
       new ExifImage({ image: path + filename + '.thumb.jpg' }, function(err, exifData) {
         var orientation = exifData.image.Orientation;
+        var createdAt = exifData.image.ModifyDate;
 
         fsRename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg')
           .then(function() {
-             return Photo.forge({
-              title: filename,
-              orientation: orientation,
-              master: path + filename + '.thumb.jpg',
-              thumb: thumbsPath + filename + '.thumbs.jpg'
-            }).save();
+            return new Photo({ title: filename, created_at: createdAt }).fetch();
           })
           .then(function(photo) {
-            console.log('new photo', photo);
+            console.log('find photo', photo);
+            if (photo)
+              throw 'alredy-existing';
+            else
+              return Photo.forge({
+                title: filename,
+                orientation: orientation,
+                created_at: createdAt,
+                master: path + filename + '.thumb.jpg',
+                thumb: thumbsPath + filename + '.thumbs.jpg'
+              }).save();
+          })
+          .then(function(photo) {
+            next();
+          })
+          .catch(function(err) {
+            console.log('err', err);
             next();
           });
       });
