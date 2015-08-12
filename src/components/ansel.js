@@ -1,6 +1,6 @@
 var React = require('react');
-var Sidebar = require('./sidebar.jsx');
-var Container = require('./container.jsx');
+var Sidebar = require('./sidebar');
+var Container = require('./container');
 
 var Ansel = React.createClass({
   render: function() {

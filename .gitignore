@@ -2,6 +2,7 @@ photos/
 thumbs/
 node_modules/
 static/bundle.css
+dist/
 
 npm-debug.log
 db.sqlite

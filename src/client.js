@@ -1,12 +1,6 @@
 'use strict';
-require('node-jsx').install({ harmony: true, extension: '.jsx' });
 
-(function() {
-  var React = require('react');
-  var Ansel = require('./components/ansel.jsx');
+import React from 'react';
+import Ansel from './../dist/components/ansel';
 
-  React.render(
-    React.createElement(Ansel, null),
-    document.getElementById('app')
-  );
-})();
+React.render(<Ansel />, document.getElementById('app'));

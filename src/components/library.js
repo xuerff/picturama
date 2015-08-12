@@ -1,7 +1,7 @@
 var React = require('react');
 var Photo = require('./../models/photo');
-var Picture = require('./picture.jsx');
-var PictureDetail = require('./picture-detail.jsx');
+var Picture = require('./picture');
+var PictureDetail = require('./picture-detail');
 
 var Library = React.createClass({
   handleCurrent: function(photo) {

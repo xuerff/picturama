@@ -2,11 +2,10 @@
   "name": "ansel",
   "version": "0.0.0",
   "description": "",
-  "main": "src/browser.js",
+  "main": "dist/browser.js",
   "scripts": {
-    "bundle": "lessc src/source.less static/bundle.css",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/electron .",
+    "start": "gulp && ./node_modules/.bin/electron .",
     "postinstall": "npm run rebuild-sqlite3",
     "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/node-v44-linux-x64 && node-gyp rebuild --target=0.30.3 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/node-v44-linux-x64"
   },
@@ -24,6 +23,9 @@
     "walk": "^2.3.9"
   },
   "devDependencies": {
-    "electron-rebuild": "^0.2.5"
+    "electron-rebuild": "^0.2.5",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.0",
+    "gulp-less": "^3.0.3"
   }
 }
