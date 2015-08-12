@@ -1,20 +1,24 @@
-var React = require('react');
+import React from 'react';
 
 var rotation = {};
 rotation[1] = '';
 rotation[8] = 'minus-ninety';
 
-var PictureDetail = React.createClass({
-  componentDidMount: function() {
+class PictureDetail extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
     var setCurrent = this.props.setCurrent;
 
     document.onkeyup = function(e) {
       if (e.keyCode == 27)
         setCurrent(null);
     };
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <div className="picture-detail">
         <img
@@ -24,6 +28,6 @@ var PictureDetail = React.createClass({
       </div>
     );
   }
-});
+}
 
-module.exports = PictureDetail;
+export default PictureDetail;
