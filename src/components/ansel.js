@@ -1,16 +1,16 @@
-var React = require('react');
-var Sidebar = require('./sidebar');
-var Container = require('./container');
+import React from 'react';
+import Sidebar from './sidebar';
+import Container from './container';
 
-var Ansel = React.createClass({
-  render: function() {
-    return (
+class Ansel extends React.Component {
+  render() {
+   return (
       <div id="ansel">
         <Sidebar />
         <Container />
       </div>
     );
   }
-});
+}
 
-module.exports = Ansel;
+export default Ansel;

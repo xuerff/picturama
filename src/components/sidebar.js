@@ -1,13 +1,13 @@
-var React = require('react');
+import React from 'react';
 
-var Sidebar = React.createClass({
-  render: function() {
+class Sidebar extends React.Component {
+  render() {
     return (
       <div id="sidebar">
         This is the sidebar
       </div>
     );
   }
-});
+}
 
-module.exports = Sidebar;
+export default Sidebar;

@@ -1,18 +1,24 @@
-var React = require('react');
+import React from 'react';
 
 var rotation = {};
 rotation[1] = '';
 rotation[8] = 'minus-ninety';
 
-var Picture = React.createClass({
-  handleClick: function() {
+class Picture extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  handleClick() {
+    console.log('this', this);
     console.log('this props', this.props);
     this.props.setCurrent(this.props.photo);
-  },
+  }
 
-  render: function() {
+  render() {
     return (
-      <a className="picture" onClick={this.handleClick}>
+      <a className="picture" onClick={this.handleClick.bind(this)}>
         <img
           src={this.props.photo.thumb} 
           width="250px" 
@@ -20,6 +26,6 @@ var Picture = React.createClass({
       </a>
     );
   }
-});
+}
 
-module.exports = Picture;
+export default Picture;

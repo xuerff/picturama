@@ -1,14 +1,14 @@
-var React = require('react');
-var Library = require('./library');
+import React from 'react';
+import Library from './library';
 
-var Container = React.createClass({
-  render: function() {
+class Container extends React.Component {
+  render() {
     return (
       <div id="container">
         <Library />
       </div>
     );
   }
-});
+}
 
-module.exports = Container
+export default Container;
