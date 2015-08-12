@@ -1,6 +1,7 @@
-var path = require('path');
+import path from 'path';
+
 var dbFile = path.join(__dirname, '../../db.sqlite3');
-console.log('db file', dbFile);
+
 var knex = require('knex')({
   client: 'sqlite3',
   connection: {
@@ -14,4 +15,4 @@ var Photo = bookshelf.Model.extend({
   tableName: 'photos'
 });
 
-module.exports = Photo;
+export default Photo;

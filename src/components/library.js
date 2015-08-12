@@ -1,31 +1,39 @@
-var React = require('react');
-var Photo = require('./../models/photo');
-var Picture = require('./picture');
-var PictureDetail = require('./picture-detail');
+import React from 'react';
 
-var Library = React.createClass({
-  handleCurrent: function(photo) {
+import Photo from './../models/photo';
+
+import Picture from './picture';
+import PictureDetail from './picture-detail';
+
+class Library extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = { photos: [], current: null };
+  }
+
+  handleCurrent(photo) {
     var state = this.state;
     state.current = photo;
     this.setState(state);
-  },
+  }
 
-  getInitialState: function() {
-    return { photos: [], current: null };
-  },
+  //getInitialState: function() {
+  //  return { photos: [], current: null };
+  //},
 
-  componentDidMount: function() {
+  componentDidMount() {
     var self = this;
 
     new Photo().fetchAll().then(function(photos) {
       console.log('photos', photos.toJSON());
       self.setState({ photos: photos.toJSON() });
     });
-  },
+  }
 
-  render: function() {
-    var currentView;
-    var handleCurrent = this.handleCurrent;
+  render() {
+    let currentView;
+    let handleCurrent = this.handleCurrent.bind(this);
     console.log('current photo', this.state.current);
 
     if (!this.state.current)
@@ -43,6 +51,6 @@ var Library = React.createClass({
       </div>
     );
   }
-});
+}
 
-module.exports = Library;
+export default Library;
