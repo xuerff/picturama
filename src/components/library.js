@@ -18,9 +18,18 @@ class Library extends React.Component {
     this.setState(state);
   }
 
-  //getInitialState: function() {
-  //  return { photos: [], current: null };
-  //},
+  handleLeftCurrent() {
+    console.log('handle left');
+    var state = this.state;
+    state.current = state.photos[state.photos.indexOf(state.current) - 1];
+    this.setState(state);
+  }
+
+  handleRightCurrent() {
+    var state = this.state;
+    state.current = state.photos[state.photos.indexOf(state.current) + 1];
+    this.setState(state);
+  }
 
   componentDidMount() {
     var self = this;
@@ -34,16 +43,25 @@ class Library extends React.Component {
   render() {
     let currentView;
     let handleCurrent = this.handleCurrent.bind(this);
+    let handleLeftCurrent = this.handleLeftCurrent.bind(this);
+    let handleRightCurrent = this.handleRightCurrent.bind(this);
+
     console.log('current photo', this.state.current);
 
     if (!this.state.current)
       currentView = this.state.photos.map(function(photo) {
         return (
-          <Picture photo={photo} setCurrent={handleCurrent} />
+          <Picture
+            photo={photo}
+            setCurrent={handleCurrent} />
         );
       });
     else
-      currentView = <PictureDetail photo={this.state.current} setCurrent={handleCurrent} />;
+      currentView = <PictureDetail
+                      photo={this.state.current}
+                      setCurrent={handleCurrent}
+                      setLeft={handleLeftCurrent}
+                      setRight={handleRightCurrent} />
 
     return (
       <div id="library">

@@ -11,10 +11,20 @@ class PictureDetail extends React.Component {
 
   componentDidMount() {
     var setCurrent = this.props.setCurrent;
+    var setLeft = this.props.setLeft;
+    var setRight = this.props.setRight;
 
     document.onkeyup = function(e) {
-      if (e.keyCode == 27)
+      console.log('key code', e.keyCode);
+
+      if (e.keyCode == 27) // escape
         setCurrent(null);
+
+      else if (e.keyCode == 37) // Left
+        setLeft();
+
+      else if (e.keyCode == 39) // Left
+        setRight();
     };
   }
 
