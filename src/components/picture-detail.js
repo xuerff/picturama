@@ -9,23 +9,27 @@ class PictureDetail extends React.Component {
     super(props);
   }
 
+  keyboardListener(e) {
+    if (e.keyCode == 27) // escape
+      this.props.setCurrent(null);
+
+    else if (e.keyCode == 37) // Left
+      this.props.setLeft();
+
+    else if (e.keyCode == 39) // Left
+      this.props.setRight();
+  }
+
   componentDidMount() {
     var setCurrent = this.props.setCurrent;
     var setLeft = this.props.setLeft;
     var setRight = this.props.setRight;
 
-    document.onkeyup = function(e) {
-      console.log('key code', e.keyCode);
+    document.addEventListener('keyup', this.keyboardListener.bind(this));
+  }
 
-      if (e.keyCode == 27) // escape
-        setCurrent(null);
-
-      else if (e.keyCode == 37) // Left
-        setLeft();
-
-      else if (e.keyCode == 39) // Left
-        setRight();
-    };
+  componentWillUnmount() {
+    document.removeEventListener('keyup', this.keyboardListener.bind(this));
   }
 
   render() {
