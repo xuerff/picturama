@@ -20,6 +20,11 @@ class PictureDetail extends React.Component {
       this.props.setRight();
   }
 
+  shutterSpeed(exposureTime) {
+    var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
+    return '1/' + Math.pow(10, zeros);
+  }
+
   componentDidMount() {
     var setCurrent = this.props.setCurrent;
     var setLeft = this.props.setLeft;
@@ -33,12 +38,20 @@ class PictureDetail extends React.Component {
   }
 
   render() {
+    console.log('photo', this.props.photo);
     return (
       <div className="picture-detail">
         <img
           src={this.props.photo.thumb} 
           width="90%"
           className={rotation[this.props.photo.orientation]} />
+
+        <h3>{this.props.photo.title}</h3>
+
+        <p>
+          ISO: {this.props.photo.iso} - 
+          f/{this.props.photo.aperture} @ {this.shutterSpeed(this.props.photo.exposure_time)}
+        </p>
       </div>
     );
   }
