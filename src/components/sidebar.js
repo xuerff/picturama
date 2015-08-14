@@ -5,6 +5,7 @@ class Sidebar extends React.Component {
     return (
       <div id="sidebar">
         This is the sidebar
+        <i className="fa fa-anchor"></i>
       </div>
     );
   }
