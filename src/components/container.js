@@ -5,7 +5,7 @@ class Container extends React.Component {
   render() {
     return (
       <div id="container">
-        <Library />
+        <Library dateFilter={this.props.dateFilter}/>
       </div>
     );
   }

@@ -40,6 +40,20 @@ class Library extends React.Component {
     });
   }
 
+  updatePhotos(photos) {
+    if (photos)
+      this.setState({ photos: photos.toJSON() });
+  }
+
+  componentWillReceiveProps(props) {
+    //console.log('upd props', props);
+    if (props.hasOwnProperty('dateFilter'))
+      new Photo()
+        .where({ date: this.props.dateFilter })
+        .fetchAll()
+        .then(this.updatePhotos.bind(this));
+  }
+
   render() {
     let currentView;
     let handleCurrent = this.handleCurrent.bind(this);
