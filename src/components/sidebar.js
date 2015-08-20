@@ -23,6 +23,10 @@ class Sidebar extends React.Component {
     this.setState({ dates: dates });
   }
 
+	clearFilters() {
+		this.props.setDateFilter();
+	}
+
 	handleDate(date) {
 		this.props.setDateFilter(date);
 	}
@@ -38,7 +42,14 @@ class Sidebar extends React.Component {
 
     return (
       <div id="sidebar">
-				<ul>{datesList}</ul>
+				<h2>Library</h2>
+
+				<button onClick={this.clearFilters.bind(this)}>All content</button>
+
+				<div className="date">
+					<h3>Date Captured</h3>
+					<ul>{datesList}</ul>
+				</div>
       </div>
     );
   }

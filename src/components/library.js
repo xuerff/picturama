@@ -34,10 +34,7 @@ class Library extends React.Component {
   componentDidMount() {
     var self = this;
 
-    new Photo().fetchAll().then(function(photos) {
-      console.log('photos', photos.toJSON());
-      self.setState({ photos: photos.toJSON() });
-    });
+    new Photo().fetchAll().then(this.updatePhotos.bind(this));
   }
 
   updatePhotos(photos) {
@@ -46,12 +43,14 @@ class Library extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    //console.log('upd props', props);
-    if (props.hasOwnProperty('dateFilter'))
+    console.log('upd props', props);
+    if (props.hasOwnProperty('dateFilter') && props.dateFilter)
       new Photo()
         .where({ date: this.props.dateFilter })
         .fetchAll()
         .then(this.updatePhotos.bind(this));
+    else
+      new Photo().fetchAll().then(this.updatePhotos.bind(this));
   }
 
   render() {
@@ -59,8 +58,6 @@ class Library extends React.Component {
     let handleCurrent = this.handleCurrent.bind(this);
     let handleLeftCurrent = this.handleLeftCurrent.bind(this);
     let handleRightCurrent = this.handleRightCurrent.bind(this);
-
-    console.log('current photo', this.state.current);
 
     if (!this.state.current)
       currentView = this.state.photos.map(function(photo) {
