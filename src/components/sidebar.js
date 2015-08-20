@@ -1,6 +1,17 @@
 import React from 'react';
 
+import Photo from './../models/photo';
+
 class Sidebar extends React.Component {
+  componentDidMount() {
+    Photo.getByDate().then(function(photos) {
+      console.log('sidebar photos', photos);
+    })
+    .catch(function(err) {
+      console.log('err', err);
+    })
+  }
+
   render() {
     return (
       <div id="sidebar">

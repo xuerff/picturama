@@ -13,6 +13,10 @@ var bookshelf = require('bookshelf')(knex);
 
 var Photo = bookshelf.Model.extend({
   tableName: 'photos'
+}, {
+  getByDate: function() {
+    return this.query({ groupBy: 'created_at' }).fetchAll();
+  }
 });
 
 export default Photo;

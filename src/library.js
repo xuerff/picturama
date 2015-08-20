@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import fs from 'fs';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
+import moment from 'moment';
 
 import Photo from './models/photo';
 
@@ -31,12 +32,11 @@ class Library {
 
       cmd.on('exit', (code) => {
         new ExifImage({ image: path + filename + '.thumb.jpg' }, (err, exifData) => {
-          //console.log('exif', exifData);
-          var createdAt = exifData.image.ModifyDate;
+          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss')
 
           fsRename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg')
             .then(() => {
-              return new Photo({ title: filename, created_at: createdAt }).fetch();
+              return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             })
             .then((photo) => {
               if (photo)
@@ -45,7 +45,8 @@ class Library {
                 return Photo.forge({
                   title: filename,
                   orientation: exifData.image.Orientation,
-                  created_at: createdAt,
+                  date: createdAt.format('YYYY-MM-DD'),
+                  created_at: createdAt.toDate(),
                   exposure_time: exifData.exif.ExposureTime,
                   iso: exifData.exif.ISO,
                   aperture: exifData.exif.FNumber,
