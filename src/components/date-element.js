@@ -14,7 +14,7 @@ class DateElement extends React.Component {
     return (
       <li>
         <button onClick={this.handleClick.bind(this)}>
-          {this.props.date}
+          <i className="fa fa-calendar-o"></i> {this.props.date}
         </button>
       </li>
     )

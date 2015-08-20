@@ -38,6 +38,7 @@ class Library extends React.Component {
   }
 
   updatePhotos(photos) {
+    console.log('upd photos', photos);
     if (photos)
       this.setState({ photos: photos.toJSON() });
   }

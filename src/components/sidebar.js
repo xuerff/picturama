@@ -44,10 +44,12 @@ class Sidebar extends React.Component {
       <div id="sidebar">
 				<h2>Library</h2>
 
-				<button onClick={this.clearFilters.bind(this)}>All content</button>
+				<button onClick={this.clearFilters.bind(this)}>
+					<i className="fa fa-book"></i> All content
+				</button>
 
 				<div className="date">
-					<h3>Date Captured</h3>
+					<h3><i className="fa fa-calendar"></i> Date Captured</h3>
 					<ul>{datesList}</ul>
 				</div>
       </div>
