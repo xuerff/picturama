@@ -1,5 +1,9 @@
 import React from 'react';
 
+import remote from 'remote';
+var Menu = remote.require('menu');
+var MenuItem = remote.require('menu-item');
+
 var rotation = {};
 rotation[1] = '';
 rotation[8] = 'minus-ninety';
@@ -20,17 +24,29 @@ class PictureDetail extends React.Component {
       this.props.setRight();
   }
 
+  contextMenu(e) {
+    console.log('context menu', e);
+    e.preventDefault()
+    this.menu.popup(remote.getCurrentWindow());
+  }
+
   shutterSpeed(exposureTime) {
     var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
     return '1/' + Math.pow(10, zeros);
   }
 
   componentDidMount() {
-    var setCurrent = this.props.setCurrent;
-    var setLeft = this.props.setLeft;
-    var setRight = this.props.setRight;
+    //var setCurrent = this.props.setCurrent;
+    //var setLeft = this.props.setLeft;
+    //var setRight = this.props.setRight;
+
+    this.menu = new Menu();
+    this.menu.append(new MenuItem({ label: 'Quit', click: function(e) {
+      console.log('click')
+    } }));
 
     document.addEventListener('keyup', this.keyboardListener.bind(this));
+    document.addEventListener('contextmenu', this.contextMenu.bind(this));
   }
 
   componentWillUnmount() {

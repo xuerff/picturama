@@ -47,7 +47,7 @@ class Library extends React.Component {
     console.log('upd props', props);
     if (props.hasOwnProperty('dateFilter') && props.dateFilter)
       new Photo()
-        .where({ date: this.props.dateFilter })
+        .where({ date: props.dateFilter })
         .fetchAll()
         .then(this.updatePhotos.bind(this));
     else
