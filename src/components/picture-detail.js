@@ -1,8 +1,10 @@
 import React from 'react';
 
 import remote from 'remote';
+import shell from 'shell';
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
+var spawn = require('child_process').spawn;
 
 var rotation = {};
 rotation[1] = '';
@@ -36,14 +38,19 @@ class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
-    //var setCurrent = this.props.setCurrent;
-    //var setLeft = this.props.setLeft;
-    //var setRight = this.props.setRight;
-
     this.menu = new Menu();
-    this.menu.append(new MenuItem({ label: 'Quit', click: function(e) {
-      console.log('click')
-    } }));
+    var self = this;
+    let rawtherapeeCmd = spawn('which', ['rawtherapee']);
+
+    rawtherapeeCmd.stdout.on('data', (data) => {
+      console.log('stdout: ' + data);
+
+      this.menu.append(new MenuItem({ label: 'Open with Rawtherapee', click: function(e) {
+        console.log('click', self.props.photo.master);
+        shell.openExternal('rawtherapee');
+        let rawtherapee = spawn('rawtherapee', [ self.props.photo.master ]);
+      }}));
+    });
 
     document.addEventListener('keyup', this.keyboardListener.bind(this));
     document.addEventListener('contextmenu', this.contextMenu.bind(this));

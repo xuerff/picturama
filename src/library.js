@@ -51,7 +51,7 @@ class Library {
                   iso: exifData.exif.ISO,
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
-                  master: path + filename + '.thumb.jpg',
+                  master: path + fileStat.name,
                   thumb: thumbsPath + filename + '.thumbs.jpg'
                 }).save();
             })
