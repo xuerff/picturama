@@ -1,6 +1,8 @@
 import React from 'react';
 
-import Photo from './../models/photo';
+//import Photo from './../models/photo';
+import PhotoStore from './../stores/photo-store';
+import PhotoActions from './../actions/photo-actions';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
@@ -32,15 +34,17 @@ class Library extends React.Component {
   }
 
   componentDidMount() {
-    var self = this;
+    //var self = this;
 
-    new Photo().fetchAll().then(this.updatePhotos.bind(this));
+    //new Photo().fetchAll().then(this.updatePhotos.bind(this));
+    PhotoStore.listen(this.updatePhotos.bind(this));
+    PhotoActions.getPhotos();
   }
 
-  updatePhotos(photos) {
-    console.log('upd photos', photos);
-    if (photos)
-      this.setState({ photos: photos.toJSON() });
+  updatePhotos(store) {
+    console.log('upd photos', store.photos );
+    if (store.photos)
+      this.setState({ photos: store.photos });
   }
 
   componentWillReceiveProps(props) {

@@ -12,6 +12,7 @@
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "alt": "^0.17.1",
     "bluebird": "^2.9.34",
     "bookshelf": "^0.8.1",
     "electron-prebuilt": "^0.30.3",
