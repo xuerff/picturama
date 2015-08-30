@@ -14,11 +14,13 @@ var fsRename = Promise.promisify(fs.rename);
 
 class Library {
   walk(root, fileStat, next) {
-    let allowed = new RegExp(acceptedRawFormats.join("|") + '$', "i");
+    let allowed = new RegExp(acceptedRawFormats.join("$|") + '$', "i");
     let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
     let spawn = require('child_process').spawn;
 
+    //console.log('allowed', allowed, fileStat.name.match(allowed));
     if (fileStat.name.match(allowed)) {
+      console.log('file stat', fileStat.name);
       let filename = fileStat.name.match(extract)[1];
       let cmd  = spawn('dcraw', [ '-e', path + fileStat.name ]);
 
@@ -64,7 +66,7 @@ class Library {
             });
         });
       });
-    }
+    } else next();
   }
 
   scan() {
