@@ -7,6 +7,7 @@ class PhotoStore {
   constructor() {
     this.bindActions(PhotoActions);
     this.photos = [];
+    this.dates = [];
   }
 
   onGetPhotosSuccess(data) {
@@ -20,9 +21,6 @@ class PhotoStore {
   onSetDateFilterSuccess(photos) {
     this.photos = photos.toJSON();
   }
-
-  //onClearDateFilterSuccess(photos) {
-  //}
 
 }
 

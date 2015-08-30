@@ -1,6 +1,5 @@
 import React from 'react';
 
-//import Photo from './../models/photo';
 import PhotoStore from './../stores/photo-store';
 import PhotoActions from './../actions/photo-actions';
 

@@ -1,7 +1,11 @@
 import React from 'react';
 
+import VersionStore from './../stores/version-store';
+import VersionActions from './../actions/version-actions';
+
 import remote from 'remote';
 import shell from 'shell';
+
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
 var spawn = require('child_process').spawn;
@@ -37,20 +41,27 @@ class PictureDetail extends React.Component {
     return '1/' + Math.pow(10, zeros);
   }
 
+  openWithRawtherapee(e) {
+    // TODO: Version the photo (e.g "-v1" or unique ID "-xDqa2-v1")
+    shell.openExternal('rawtherapee');
+    let rawtherapee = spawn('rawtherapee', [ this.props.photo.master ]);
+  }
+
+  addRawtherapeeMenu(data) {
+    console.log('stdout: ' + data);
+
+    this.menu.append(new MenuItem({ 
+      label: 'Open with Rawtherapee', 
+      click: this.openWithRawtherapee.bind(this)
+    }));
+  }
+
   componentDidMount() {
     this.menu = new Menu();
     var self = this;
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
 
-    rawtherapeeCmd.stdout.on('data', (data) => {
-      console.log('stdout: ' + data);
-
-      this.menu.append(new MenuItem({ label: 'Open with Rawtherapee', click: function(e) {
-        console.log('click', self.props.photo.master);
-        shell.openExternal('rawtherapee');
-        let rawtherapee = spawn('rawtherapee', [ self.props.photo.master ]);
-      }}));
-    });
+    rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
 
     document.addEventListener('keyup', this.keyboardListener.bind(this));
     document.addEventListener('contextmenu', this.contextMenu.bind(this));
