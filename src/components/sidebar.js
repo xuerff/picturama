@@ -23,7 +23,7 @@ class Sidebar extends React.Component {
   }
 
   clearFilters() {
-    this.props.setDateFilter();
+    PhotoActions.getPhotos();
   }
 
   handleDate(date) {

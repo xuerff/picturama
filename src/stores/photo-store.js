@@ -21,6 +21,9 @@ class PhotoStore {
     this.photos = photos.toJSON();
   }
 
+  //onClearDateFilterSuccess(photos) {
+  //}
+
 }
 
 export default alt.createStore(PhotoStore);

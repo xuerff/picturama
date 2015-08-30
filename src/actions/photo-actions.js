@@ -9,6 +9,7 @@ class PhotoActions {
       'getPhotosSuccess',
       'getDatesSuccess',
       'setDateFilterSuccess'
+      //'clearDateFilterSuccess'
     );
   }
 
@@ -32,6 +33,10 @@ class PhotoActions {
         this.actions.setDateFilterSuccess(photos);
       });
   }
+
+  //clearDateFilter() {
+  //  this.actions.clearDateFilterSuccess([]);
+  //}
 }
 
 export default alt.createActions(PhotoActions);
