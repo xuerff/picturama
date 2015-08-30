@@ -34,9 +34,6 @@ class Library extends React.Component {
   }
 
   componentDidMount() {
-    //var self = this;
-
-    //new Photo().fetchAll().then(this.updatePhotos.bind(this));
     PhotoStore.listen(this.updatePhotos.bind(this));
     PhotoActions.getPhotos();
   }
@@ -45,17 +42,6 @@ class Library extends React.Component {
     console.log('upd photos', store.photos );
     if (store.photos)
       this.setState({ photos: store.photos });
-  }
-
-  componentWillReceiveProps(props) {
-    console.log('upd props', props);
-    if (props.hasOwnProperty('dateFilter') && props.dateFilter)
-      new Photo()
-        .where({ date: props.dateFilter })
-        .fetchAll()
-        .then(this.updatePhotos.bind(this));
-    else
-      new Photo().fetchAll().then(this.updatePhotos.bind(this));
   }
 
   render() {

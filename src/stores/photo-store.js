@@ -13,6 +13,14 @@ class PhotoStore {
     this.photos = data.toJSON();
   }
 
+  onGetDatesSuccess(data) {
+    this.dates = data;
+  }
+
+  onSetDateFilterSuccess(photos) {
+    this.photos = photos.toJSON();
+  }
+
 }
 
 export default alt.createStore(PhotoStore);

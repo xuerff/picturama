@@ -1,6 +1,8 @@
 import React from 'react';
 
-import Photo from './../models/photo';
+//import Photo from './../models/photo';
+import PhotoStore from './../stores/photo-store';
+import PhotoActions from './../actions/photo-actions';
 
 import DateElement from './date-element';
 
@@ -12,46 +14,43 @@ class Sidebar extends React.Component {
   }
 
   componentDidMount() {
-    Photo.getDates()
-      .then(this.appendDates.bind(this))
-      .catch(function(err) {
-        console.log('err', err);
-      });
+    PhotoActions.getDates();
+    PhotoStore.listen(this.appendDates.bind(this));
   }
 
-  appendDates(dates) {
-    this.setState({ dates: dates });
+  appendDates(data) {
+    this.setState({ dates: data.dates });
   }
 
-	clearFilters() {
-		this.props.setDateFilter();
-	}
+  clearFilters() {
+    this.props.setDateFilter();
+  }
 
-	handleDate(date) {
-		this.props.setDateFilter(date);
-	}
+  handleDate(date) {
+    PhotoActions.setDateFilter(date);
+  }
 
   render() {
-		var handleDate = this.handleDate.bind(this);
+    var handleDate = this.handleDate.bind(this);
 
     var datesList = this.state.dates.map(function(date) {
       return (
-				<DateElement date={date.date} setDate={handleDate} />
+        <DateElement date={date.date} setDate={handleDate} />
       )
     });
 
     return (
       <div id="sidebar">
-				<h2>Library</h2>
+        <h2>Library</h2>
 
-				<button onClick={this.clearFilters.bind(this)}>
-					<i className="fa fa-book"></i> All content
-				</button>
+        <button onClick={this.clearFilters.bind(this)}>
+          <i className="fa fa-book"></i> All content
+        </button>
 
-				<div className="date">
-					<h3><i className="fa fa-calendar"></i> Date Captured</h3>
-					<ul>{datesList}</ul>
-				</div>
+        <div className="date">
+          <h3><i className="fa fa-calendar"></i> Date Captured</h3>
+          <ul>{datesList}</ul>
+        </div>
       </div>
     );
   }
