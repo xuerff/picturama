@@ -2,6 +2,8 @@
 
 @blue-grey-900: #263238;
 @blue-grey-800: #37474f;
+@grey-900: #212121;
+@grey-800: #424242;
 @white: #ffffff;
 
 @font-face {
@@ -117,7 +119,7 @@ body {
   padding: 0 5px;
   float: left;
   width: 290px;
-  background: @blue-grey-900;
+  background: @grey-900;
   color: #fff;
 
   h2 {
@@ -138,22 +140,34 @@ body {
       margin: 2px 0;
     }
   }
+
+  button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
 }
 
 #container {
   float: left;
   width: ~"calc(100% - 300px)";
-  background: @blue-grey-800;
+  background: @grey-800;
   color: @white;
   overflow-y: scroll;
 
   #library {
     div.picture-detail {
       margin: 0 auto;
-      img { margin: auto; }
+
+      img { 
+        margin: auto; 
+        display: block;
+      }
 
       img.minus-ninety {
         transform: rotate(-90deg);
+        width: 80%;
       }
     }
 
