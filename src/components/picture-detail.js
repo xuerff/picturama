@@ -87,6 +87,7 @@ class PictureDetail extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('keyup', this.keyboardListener.bind(this));
+    delete this.menu;
   }
 
   render() {
