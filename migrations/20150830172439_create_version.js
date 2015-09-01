@@ -2,7 +2,6 @@ exports.up = function(knex, Promise) {
   return knex.schema.createTable('versions', function (t) {
     t.increments();
     t.string('type', 10);
-    t.string('original');
     t.string('master');
     t.string('output');
     t.integer('version');

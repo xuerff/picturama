@@ -1,3 +1,5 @@
+import {spawn} from 'child_process';
+
 import React from 'react';
 
 import VersionStore from './../stores/version-store';
@@ -8,7 +10,7 @@ import shell from 'shell';
 
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
-var spawn = require('child_process').spawn;
+//var spawn = require('child_process').spawn;
 
 var rotation = {};
 rotation[1] = '';
@@ -17,6 +19,10 @@ rotation[8] = 'minus-ninety';
 class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  updateVersion(store) {
+    if (store.version) this.setState(store);
   }
 
   keyboardListener(e) {
@@ -43,8 +49,10 @@ class PictureDetail extends React.Component {
 
   openWithRawtherapee(e) {
     // TODO: Version the photo (e.g "-v1" or unique ID "-xDqa2-v1")
-    shell.openExternal('rawtherapee');
-    let rawtherapee = spawn('rawtherapee', [ this.props.photo.master ]);
+    VersionActions.createVersionAndOpenWith(this.props.photo, 'rawtherapee');
+    //VersionActions.openWithRawtherapee(this.state.version);
+    console.log('state', this.state);
+    //let rawtherapee = spawn('rawtherapee', [ this.props.photo.master ]);
   }
 
   addRawtherapeeMenu(data) {
@@ -57,6 +65,8 @@ class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
+    VersionStore.listen(this.updateVersion.bind(this));
+
     this.menu = new Menu();
     var self = this;
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);

@@ -46,6 +46,7 @@ class Library {
               else
                 return Photo.forge({
                   title: filename,
+                  extension: fileStat.name.match(/\.(.+)$/i)[1],
                   orientation: exifData.image.Orientation,
                   date: createdAt.format('YYYY-MM-DD'),
                   created_at: createdAt.toDate(),

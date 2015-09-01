@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
     table.string('title');
     table.string('master');
     table.string('thumb');
+    table.string('extension', 10);
     table.timestamps();
   });
 };

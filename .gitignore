@@ -1,5 +1,6 @@
 photos/
 thumbs/
+versions/
 node_modules/
 static/bundle.css
 dist/

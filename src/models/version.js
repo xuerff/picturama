@@ -4,25 +4,32 @@ import Promise from 'bluebird';
 
 import Photo from './photo';
 
-//var dbFile = path.join(__dirname, '../../db.sqlite3');
+var copy = Promise.promisify(fs.copy);
 
-//var knex = require('knex')({
-//  client: 'sqlite3',
-//  connection: {
-//    filename: dbFile
-//  }
-//});
-
-//var bookshelf = require('bookshelf')(knex);
+var versionPath = process.env.PWD + '/versions/';
 
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
 
   initialize: function() {
     this.on('saving', function(model) {
-      new Photo({ id: model.get('photo_id') }).fetch().then(function(photo) {
-        console.log('photo', photo, photo.toJSON());
-        console.log('version model', model.get('original'));
+      return new Photo({ id: model.get('photo_id') }).fetch().then(function(photo) {
+        photo = photo.toJSON();
+
+        let fileName = [
+          photo.title,
+          photo.id,
+          model.get('version'),
+        ].join('-');
+
+        let fileNamePath = versionPath + fileName + '.' + photo.extension;
+
+        model.set('master', fileNamePath);
+
+        return copy(photo.master, fileNamePath);
+      })
+      .catch(function(err) {
+        console.log('ERR', err);
       });
     });
   }
