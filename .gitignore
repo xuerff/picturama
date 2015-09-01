@@ -1,6 +1,7 @@
 photos/
 thumbs/
 versions/
+cross-compilation/
 node_modules/
 static/bundle.css
 dist/
