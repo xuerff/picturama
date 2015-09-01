@@ -26,13 +26,15 @@ var Version = anselBookshelf.Model.extend({
           model.get('version'),
         ].join('-');
 
-        let fileNamePath = versionPath + fileName + '.' + photo.extension;
+        if (model.get('type') == 'RAW') {
+          let fileNamePath = versionPath + fileName + '.' + photo.extension;
+          model.set('master', fileNamePath);
 
-        model.set('master', fileNamePath);
-
-        if (model.get('type') == 'RAW')
           return copy(photo.master, fileNamePath);
-        else {
+        } else {
+          let fileNamePath = versionPath + fileName + '.ppm';
+          model.set('master', fileNamePath);
+
           return spawn('dcraw', [ '-q', '0', photo.master ]).then(function() {
             return copy(photosPath + photo.title + '.ppm', fileNamePath);
           });

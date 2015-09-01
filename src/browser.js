@@ -26,7 +26,9 @@ app.on('window-all-closed', () => {
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
   var library = new Library();
+
   library.scan();
+  library.watch();
 
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1280, height: 768 });

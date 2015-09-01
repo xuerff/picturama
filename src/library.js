@@ -4,11 +4,16 @@ import fs from 'fs';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
+import watchr from 'watchr';
 
 import Photo from './models/photo';
+import Version from './models/version';
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
-var path = process.env.PWD  + '/photos/';
+var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
+
+var path = process.env.PWD + '/photos/';
+var versionsPath = process.env.PWD + '/versions/';
 var thumbsPath = process.env.PWD  + '/thumbs/';
 
 var fsRename = Promise.promisify(fs.rename);
@@ -83,6 +88,28 @@ class Library {
     walker.on("end", () => {
       console.log('done');
     });
+  }
+
+  watch() {
+    //let allowed = new RegExp([
+    //  '([\w\d]+)-([\w\d]+)-\d+\.(',
+    //  acceptedImgFormats.join("|"),
+    //  ')$'
+    //].join(''), "i");
+
+    var allowed = /([\w\d]+)-([\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i
+
+    watchr.watch({
+      paths: [ path, versionsPath, thumbsPath ],
+
+      listener: (action, filePath) => {
+        console.log('listen now', action, filePath);
+
+        // on action:create then parse file and update version
+        if (action == 'create' && filePath.match(allowed))
+          console.log('match', filePath.match(allowed));
+      }
+    })
   }
 }
 

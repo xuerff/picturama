@@ -27,7 +27,8 @@
     "react": "^0.13.3",
     "shortid": "^2.2.2",
     "sqlite3": "^3.0.10",
-    "walk": "^2.3.9"
+    "walk": "^2.3.9",
+    "watchr": "^2.4.13"
   },
   "devDependencies": {
     "electron-rebuild": "^0.2.5",
