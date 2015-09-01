@@ -21,9 +21,9 @@ class VersionActions {
     });
   }
 
-  createVersionAndOpenWith(photo, targetSoftware) {
+  createVersionAndOpenWith(photo, type, targetSoftware) {
     new Version({
-      type: 'RAW',
+      type: type,
       version: '1',
       photo_id: photo.id
     }).save().then((version) => {

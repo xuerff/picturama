@@ -16,6 +16,7 @@
     "alt": "^0.17.1",
     "bluebird": "^2.9.34",
     "bookshelf": "^0.8.1",
+    "child-process-promise": "^1.1.0",
     "electron-prebuilt": "^0.30.3",
     "exif": "^0.4.0",
     "font-awesome": "^4.4.0",

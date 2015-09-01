@@ -1,3 +1,4 @@
+import {spawn} from 'child_process';
 import Promise from 'bluebird';
 import fs from 'fs';
 import Walk from 'walk';
@@ -7,8 +8,8 @@ import moment from 'moment';
 import Photo from './models/photo';
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
-var path = __dirname + '/../photos/';
-var thumbsPath = __dirname + '/../thumbs/';
+var path = process.env.PWD  + '/photos/';
+var thumbsPath = process.env.PWD  + '/thumbs/';
 
 var fsRename = Promise.promisify(fs.rename);
 

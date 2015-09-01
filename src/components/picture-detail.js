@@ -10,7 +10,6 @@ import shell from 'shell';
 
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
-//var spawn = require('child_process').spawn;
 
 var rotation = {};
 rotation[1] = '';
@@ -48,11 +47,11 @@ class PictureDetail extends React.Component {
   }
 
   openWithRawtherapee(e) {
-    // TODO: Version the photo (e.g "-v1" or unique ID "-xDqa2-v1")
-    VersionActions.createVersionAndOpenWith(this.props.photo, 'rawtherapee');
-    //VersionActions.openWithRawtherapee(this.state.version);
-    console.log('state', this.state);
-    //let rawtherapee = spawn('rawtherapee', [ this.props.photo.master ]);
+    VersionActions.createVersionAndOpenWith(this.props.photo, 'RAW', 'rawtherapee');
+  }
+
+  openWithGimp(e) {
+    VersionActions.createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
   }
 
   addRawtherapeeMenu(data) {
@@ -64,14 +63,23 @@ class PictureDetail extends React.Component {
     }));
   }
 
+  addGimpMenu(data) {
+   this.menu.append(new MenuItem({ 
+      label: 'Open with Gimp', 
+      click: this.openWithGimp.bind(this)
+    }));
+  }
+
   componentDidMount() {
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
     var self = this;
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
+    let gimpCmd = spawn('which', ['gimp']);
 
     rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
+    gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
     document.addEventListener('keyup', this.keyboardListener.bind(this));
     document.addEventListener('contextmenu', this.contextMenu.bind(this));
