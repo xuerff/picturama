@@ -2,15 +2,15 @@ import {spawn} from 'child-process-promise';
 import anselBookshelf from './ansel-bookshelf';
 import fs from 'fs.extra';
 import Promise from 'bluebird';
+import sharp from 'sharp';
 
 import Photo from './photo';
 
 var copy = Promise.promisify(fs.copy);
+var readFile = Promise.promisify(fs.readFile);
 
-//var acceptedRawFormats = [ 'RAF', 'CR2' ];
 var versionPath = process.env.PWD + '/versions/';
 var photosPath = process.env.PWD  + '/photos/';
-//var extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
 
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
@@ -32,12 +32,23 @@ var Version = anselBookshelf.Model.extend({
 
           return copy(photo.master, fileNamePath);
         } else {
-          let fileNamePath = versionPath + fileName + '.ppm';
+          let fileNamePath = versionPath + fileName + '.png';
           model.set('master', fileNamePath);
 
-          return spawn('dcraw', [ '-q', '0', photo.master ]).then(function() {
-            return copy(photosPath + photo.title + '.ppm', fileNamePath);
-          });
+          return spawn('dcraw', [ '-q', '0', photo.master ])
+            .then(function() {
+              return readFile(photosPath + photo.title + '.ppm');
+            })
+            .then(function(ppm) {
+              console.log('ppm #2');
+              return sharp(ppm)
+                .toFormat('png')
+                .compressionLevel(0)
+                .toFile(fileNamePath);
+            })
+            .catch(function(err) {
+              console.log('ERR', err);
+            });
         }
       })
       .catch(function(err) {

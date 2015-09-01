@@ -4,11 +4,6 @@ import ipc from 'ipc';
 
 import Library from './library';
 
-//var app = require('app');  // Module to control application life.
-//var BrowserWindow = require('browser-window');  // Module to create native browser window.
-//var ipc = require('ipc');
-//var Library = require('./library');
-
 // Report crashes to our server.
 require('crash-reporter').start();
 

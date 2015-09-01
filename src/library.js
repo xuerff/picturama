@@ -91,12 +91,6 @@ class Library {
   }
 
   watch() {
-    //let allowed = new RegExp([
-    //  '([\w\d]+)-([\w\d]+)-\d+\.(',
-    //  acceptedImgFormats.join("|"),
-    //  ')$'
-    //].join(''), "i");
-
     var allowed = /([\w\d]+)-([\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i
 
     watchr.watch({
