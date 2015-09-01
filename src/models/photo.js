@@ -1,18 +1,19 @@
-import path from 'path';
+import anselBookshelf from './ansel-bookshelf';
+//import path from 'path';
 import shortid from 'shortid';
 
-var dbFile = path.join(__dirname, '../../db.sqlite3');
+//var dbFile = path.join(__dirname, '../../db.sqlite3');
 
-var knex = require('knex')({
-  client: 'sqlite3',
-  connection: {
-    filename: dbFile
-  }
-});
+//var knex = require('knex')({
+//  client: 'sqlite3',
+//  connection: {
+//    filename: dbFile
+//  }
+//});
 
-var bookshelf = require('bookshelf')(knex);
+//var bookshelf = require('bookshelf')(knex);
 
-var Photo = bookshelf.Model.extend({
+var Photo = anselBookshelf.Model.extend({
   tableName: 'photos',
 
   initialize: function() {
