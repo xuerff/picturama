@@ -56,6 +56,20 @@ var Version = anselBookshelf.Model.extend({
       });
     });
   }
+}, {
+  updateImage: function(data) {
+    console.log('data', data);
+    return this.forge({ photo_id: data[2] }).save({ output: data.input })
+    //return this.query().where({ photo_id: data[2] }).then(function(versions) {
+    //  if (versions.length > 0) {
+    //    let version = versions[0];
+    //    version.output = data.input;
+    //  }
+    //})
+    .catch(function(err) {
+      console.log('err', err);
+    });
+  }
 });
 
 export default Version;

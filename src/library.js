@@ -100,10 +100,14 @@ class Library {
         console.log('listen now', action, filePath);
 
         // on action:create then parse file and update version
-        if (action == 'create' && filePath.match(allowed))
+        if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
           console.log('match', filePath.match(allowed));
+          Version.updateImage(filePath.match(allowed)).then(function(version) {
+            console.log('version done', version);
+          });
+        }
       }
-    })
+    });
   }
 }
 
