@@ -21,16 +21,21 @@ class Library extends React.Component {
   }
 
   handleLeftCurrent() {
-    console.log('handle left');
     var state = this.state;
-    state.current = state.photos[state.photos.indexOf(state.current) - 1];
-    this.setState(state);
+
+    if (state.photos.indexOf(state.current) >= 1) {
+      state.current = state.photos[state.photos.indexOf(state.current) - 1];
+      this.setState(state);
+    }
   }
 
   handleRightCurrent() {
     var state = this.state;
-    state.current = state.photos[state.photos.indexOf(state.current) + 1];
-    this.setState(state);
+
+    if (state.photos.length > state.photos.indexOf(state.current) + 1) {
+      state.current = state.photos[state.photos.indexOf(state.current) + 1];
+      this.setState(state);
+    }
   }
 
   componentDidMount() {
