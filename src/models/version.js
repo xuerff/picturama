@@ -15,6 +15,10 @@ var photosPath = process.env.PWD  + '/photos/';
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
 
+  photo: function() {
+    this.belongsTo(Photo);
+  },
+
   initialize: function() {
     this.on('creating', function(model) {
       console.log('ON CREATING');
@@ -60,13 +64,12 @@ var Version = anselBookshelf.Model.extend({
   }
 }, {
   updateImage: function(data) {
-    console.log('update image', data);
     return this.where({ photo_id: data[2], version: data[3] })
-      .fetch()
-      .save({ output: data.input }, { method: 'update' })
-      .catch(function(err) {
-        console.log('err', err);
-      });
+    .fetch()
+    .then(function(version) {
+      console.log('update img', version);
+      return version.save({ output: data.input }, { method: 'update' });
+    });
   }
 });
 

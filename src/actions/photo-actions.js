@@ -13,9 +13,11 @@ class PhotoActions {
   }
 
   getPhotos() {
-    new Photo().fetchAll().then((photos) => {
-      this.actions.getPhotosSuccess(photos);
-    });
+    new Photo()
+      .fetchAll({ withRelated: ['versions'] })
+      .then((photos) => {
+        this.actions.getPhotosSuccess(photos);
+      });
   }
 
   getDates() {

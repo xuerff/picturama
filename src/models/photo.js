@@ -1,8 +1,14 @@
 import anselBookshelf from './ansel-bookshelf';
 import shortid from 'shortid';
 
+import Version from './version';
+
 var Photo = anselBookshelf.Model.extend({
   tableName: 'photos',
+
+  versions: function() {
+    return this.hasMany(Version);
+  },
 
   initialize: function() {
     this.on('saving', (model) => {
