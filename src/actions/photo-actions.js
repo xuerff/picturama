@@ -1,5 +1,4 @@
 import alt from './../alt';
-import ipc from 'ipc';
 
 import Photo from './../models/photo';
 
@@ -9,14 +8,19 @@ class PhotoActions {
     this.generateActions(
       'getPhotosSuccess',
       'getDatesSuccess',
-      'setDateFilterSuccess'
+      'setDateFilterSuccess',
+      'updatedPhotoSuccess'
     );
-
-    ipc.on('new-version', this.updatePhoto.bind(this));
   }
 
-  updatePhoto(version) {
-    console.log('photo actions new version', version);
+  updatedPhoto(version) {
+    console.log('photo actions new version', version, this);
+
+    new Photo({ id: version.attributes.photo_id })
+      .fetch({ withRelated: ['versions'] })
+      .then((photo) => {
+        this.actions.updatedPhotoSuccess(photo);
+      });
   }
 
   getPhotos() {

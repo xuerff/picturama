@@ -11,6 +11,8 @@ class Library extends React.Component {
   constructor(props) {
     super(props);
     this.state = { photos: [], current: null };
+
+    this.updateCurrent = this.updateCurrent.bind(this);
   }
 
   handleCurrent(photo) {
@@ -42,10 +44,27 @@ class Library extends React.Component {
     PhotoActions.getPhotos();
   }
 
+  updateCurrent() {
+    var state = this.state;
+
+    state.photos.forEach(function(photo) {
+      if (photo.id == state.current.id) {
+        console.log('handle current');
+        state.current = photo;
+      }
+    });
+
+    this.setState(state);
+  }
+
   updatePhotos(store) {
     console.log('upd photos', store.photos );
-    if (store.photos)
+
+    if (store.photos) {
       this.setState({ photos: store.photos });
+
+      if (this.state.current) this.updateCurrent();
+    }
   }
 
   render() {

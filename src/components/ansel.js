@@ -1,4 +1,8 @@
 import React from 'react';
+import ipc from 'ipc';
+
+import PhotoActions from './../actions/photo-actions';
+
 import Sidebar from './sidebar';
 import Container from './container';
 
@@ -7,6 +11,8 @@ class Ansel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    ipc.on('new-version', PhotoActions.updatedPhoto);
   }
 
   handleDateFilter(date) {

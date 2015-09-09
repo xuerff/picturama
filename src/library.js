@@ -107,7 +107,9 @@ class Library {
         if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
           Version.updateImage(filePath.match(allowed)).then(function(version) {
             console.log('version done', version);
-            self.mainWindow.webContents.send('new-version', version);
+
+            if (version)
+              self.mainWindow.webContents.send('new-version', version);
           });
         }
       }
