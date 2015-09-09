@@ -19,6 +19,11 @@ var thumbsPath = process.env.PWD  + '/thumbs/';
 var fsRename = Promise.promisify(fs.rename);
 
 class Library {
+
+  constructor(mainWindow) {
+    this.mainWindow = mainWindow;
+  }
+
   walk(root, fileStat, next) {
     let allowed = new RegExp(acceptedRawFormats.join("$|") + '$', "i");
     let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
@@ -89,6 +94,7 @@ class Library {
   }
 
   watch() {
+    var self = this;
     var allowed = /([\w\d]+)-([\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i
 
     watchr.watch({
@@ -99,9 +105,9 @@ class Library {
 
         // on action:create then parse file and update version
         if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
-          console.log('match', filePath.match(allowed));
           Version.updateImage(filePath.match(allowed)).then(function(version) {
             console.log('version done', version);
+            self.mainWindow.webContents.send('new-version', version);
           });
         }
       }

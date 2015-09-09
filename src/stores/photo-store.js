@@ -13,8 +13,6 @@ class PhotoStore {
   onGetPhotosSuccess(data) {
     let photos = data.toJSON();
 
-    console.log('photos', this.photos);
-
     this.photos = photos.map(function(photo) {
       if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
         let lastVersion = photo.versions.pop();

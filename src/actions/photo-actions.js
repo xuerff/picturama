@@ -1,4 +1,5 @@
 import alt from './../alt';
+import ipc from 'ipc';
 
 import Photo from './../models/photo';
 
@@ -10,6 +11,12 @@ class PhotoActions {
       'getDatesSuccess',
       'setDateFilterSuccess'
     );
+
+    ipc.on('new-version', this.updatePhoto.bind(this));
+  }
+
+  updatePhoto(version) {
+    console.log('photo actions new version', version);
   }
 
   getPhotos() {

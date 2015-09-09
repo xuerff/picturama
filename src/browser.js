@@ -20,16 +20,16 @@ app.on('window-all-closed', () => {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
-  var library = new Library();
-
-  library.scan();
-  library.watch();
-
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1280, height: 768 });
 
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
+
+  var library = new Library(mainWindow);
+
+  library.scan();
+  library.watch();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

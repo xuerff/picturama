@@ -67,8 +67,12 @@ var Version = anselBookshelf.Model.extend({
     return this.where({ photo_id: data[2], version: data[3] })
     .fetch()
     .then(function(version) {
-      console.log('update img', version);
-      return version.save({ output: data.input }, { method: 'update' });
+      console.log('update img',{ photo_id: data[2], version: data[3] }, version);
+
+      if (version)
+        return version.save({ output: data.input }, { method: 'update' });
+      else
+        throw 'not-found';
     });
   }
 });
