@@ -16,7 +16,9 @@ var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
 
   initialize: function() {
-    this.on('saving', function(model) {
+    this.on('creating', function(model) {
+      console.log('ON CREATING');
+
       return new Photo({ id: model.get('photo_id') }).fetch().then(function(photo) {
         photo = photo.toJSON();
 
@@ -58,17 +60,13 @@ var Version = anselBookshelf.Model.extend({
   }
 }, {
   updateImage: function(data) {
-    console.log('data', data);
-    return this.forge({ photo_id: data[2] }).save({ output: data.input })
-    //return this.query().where({ photo_id: data[2] }).then(function(versions) {
-    //  if (versions.length > 0) {
-    //    let version = versions[0];
-    //    version.output = data.input;
-    //  }
-    //})
-    .catch(function(err) {
-      console.log('err', err);
-    });
+    console.log('update image', data);
+    return this.where({ photo_id: data[2], version: data[3] })
+      .fetch()
+      .save({ output: data.input }, { method: 'update' })
+      .catch(function(err) {
+        console.log('err', err);
+      });
   }
 });
 
