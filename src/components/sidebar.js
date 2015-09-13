@@ -42,7 +42,7 @@ class Sidebar extends React.Component {
       <div id="sidebar">
         <h2>Library</h2>
 
-        <button onClick={this.clearFilters.bind(this)}>
+        <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
           <i className="fa fa-book"></i> All content
         </button>
 

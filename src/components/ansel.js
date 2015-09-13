@@ -13,6 +13,7 @@ class Ansel extends React.Component {
     this.state = {};
 
     ipc.on('new-version', PhotoActions.updatedPhoto);
+    componentHandler.upgradeAllRegistered();
   }
 
   handleDateFilter(date) {
