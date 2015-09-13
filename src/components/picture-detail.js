@@ -96,7 +96,6 @@ class PictureDetail extends React.Component {
       <div className="picture-detail">
         <img
           src={this.props.photo.thumb} 
-          width="90%"
           className={rotation[this.props.photo.orientation]} />
 
         <h3>{this.props.photo.title}</h3>

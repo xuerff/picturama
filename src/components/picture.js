@@ -21,7 +21,6 @@ class Picture extends React.Component {
       <a className="picture" onClick={this.handleClick.bind(this)}>
         <img
           src={this.props.photo.thumb} 
-          width="250px" 
           className={rotation[this.props.photo.orientation]} />
       </a>
     );
