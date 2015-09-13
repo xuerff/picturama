@@ -91,19 +91,22 @@ class PictureDetail extends React.Component {
   }
 
   render() {
-    console.log('photo', this.props.photo);
+    var className = [ 'mdl-shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
+
     return (
       <div className="picture-detail">
         <img
           src={this.props.photo.thumb} 
-          className={rotation[this.props.photo.orientation]} />
+          className={className} />
 
-        <h3>{this.props.photo.title}</h3>
 
-        <p>
-          ISO: {this.props.photo.iso} - 
-          f/{this.props.photo.aperture} @ {this.shutterSpeed(this.props.photo.exposure_time)}
-        </p>
+        <div className="picture-info mdl-card mdl-shadow--2dp">
+          <h3>{this.props.photo.title}</h3>
+          <p>
+            ISO: {this.props.photo.iso} - 
+            f/{this.props.photo.aperture} @ {this.shutterSpeed(this.props.photo.exposure_time)}
+          </p>
+        </div>
       </div>
     );
   }

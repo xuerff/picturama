@@ -373,20 +373,41 @@ body {
   width: ~"calc(100% - 300px)";
   background: @grey-800;
   color: @white;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   #library {
     div.picture-detail {
       margin: 0 auto;
+      position: relative;
 
       img { 
-        margin: auto; 
+        margin: 20px auto 0; 
         display: block;
         width: 90%;
       }
 
       img.minus-ninety {
         width: 45%;
+      }
+
+      div.picture-info {
+        position: absolute;
+        top: -13px;
+        right: 10px;
+        background: rgba(30, 30, 30, 0.7);
+        padding: 10px 15px 0;
+        min-height: 84px;
+        width: 200px;
+
+        h3 {
+          font-size: 26px;
+          line-height: 26px;
+          font-weight: 200;
+        }
+
+        h3, p {
+          margin: 0;
+        }
       }
     }
 
@@ -400,7 +421,7 @@ body {
 
       img {
         margin-top: 17%;
-        width: 250px;
+        width: 240px;
       }
 
       img.minus-ninety {
