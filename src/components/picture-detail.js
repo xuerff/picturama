@@ -95,17 +95,19 @@ class PictureDetail extends React.Component {
 
     return (
       <div className="picture-detail">
-        <img
-          src={this.props.photo.thumb} 
-          className={className} />
-
+        <div className="v-align">
+          <img
+            src={this.props.photo.thumb} 
+            className={className} />
+        </div>
 
         <div className="picture-info mdl-card mdl-shadow--2dp">
-          <h3>{this.props.photo.title}</h3>
-          <p>
-            ISO: {this.props.photo.iso} - 
-            f/{this.props.photo.aperture} @ {this.shutterSpeed(this.props.photo.exposure_time)}
-          </p>
+          <ul>
+            <li className="title">{this.props.photo.title}</li>
+            <li>ISO: {this.props.photo.iso}</li>
+            <li>f/{this.props.photo.aperture}</li>
+            <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
+          </ul>
         </div>
       </div>
     );
