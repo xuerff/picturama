@@ -27,10 +27,10 @@ app.on('ready', () => {
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
 
-  let mainMenu = new MainMenu(mainWindow)
   let library = new Library(mainWindow);
+  let mainMenu = new MainMenu(mainWindow, library);
 
-  library.scan();
+  //library.scan();
   library.watch();
 
   // Emitted when the window is closed.

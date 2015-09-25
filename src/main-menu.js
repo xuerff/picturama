@@ -1,8 +1,9 @@
 import Menu from 'menu';
 
 class MainMenu {
-  constructor(mainWindow) {
+  constructor(mainWindow, library) {
     this.mainWindow = mainWindow;
+    this.library = library;
 
     this.template = [{
       label: 'File',
@@ -16,6 +17,24 @@ class MainMenu {
         accelerator: 'Ctrl+Q',
         click: this.close.bind(this)
       }]
+    },
+    {
+      label: 'View',
+      submenu: [{
+        label: 'Reload',
+        accelerator: 'Shift+Ctrl+R',
+        click: this.fullscreen.bind(this)
+      },
+      {
+        label: 'Enter Fullscreen',
+        accelerator: 'F11',
+        click: this.fullscreen.bind(this)
+      },
+      {
+        label: 'Toggle DevTools',
+        accelerator: 'Shift+Ctrl+I',
+        click: this.toggleDevTools.bind(this)
+      }]
     }];
 
     this.menu = Menu.buildFromTemplate(this.template);
@@ -23,11 +42,23 @@ class MainMenu {
   }
 
   scan() {
-    console.log('scan');
+    this.library.scan();
   }
 
   close() {
     this.mainWindow.close();
+  }
+
+  reload() {
+    this.mainWindow.restart();
+  }
+
+  fullscreen() {
+    this.mainWindow.setFullScreen((!this.mainWindow.isFullScreen()));
+  }
+
+  toggleDevTools() {
+    this.mainWindow.toggleDevTools();
   }
 }
 
