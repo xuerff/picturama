@@ -2,6 +2,7 @@ import app from 'app';
 import BrowserWindow from 'browser-window';
 import ipc from 'ipc';
 
+import MainMenu from './main-menu';
 import Library from './library';
 
 // Report crashes to our server.
@@ -21,12 +22,13 @@ app.on('window-all-closed', () => {
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1280, height: 768 });
+  mainWindow = new BrowserWindow({ width: 1356, height: 768 });
 
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
 
-  var library = new Library(mainWindow);
+  let mainMenu = new MainMenu(mainWindow)
+  let library = new Library(mainWindow);
 
   library.scan();
   library.watch();

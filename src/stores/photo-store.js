@@ -8,11 +8,13 @@ class PhotoStore {
     this.bindActions(PhotoActions);
     this.photos = [];
     this.dates = [];
+    this.importing = false;
   }
 
   onGetPhotosSuccess(data) {
     let photos = data.toJSON();
 
+    this.importing = false;
     this.photos = photos.map(function(photo) {
       if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
         let lastVersion = photo.versions.pop();
@@ -54,6 +56,9 @@ class PhotoStore {
     });
   }
 
+  onSetImport(value) {
+    this.importing = true;
+  }
 }
 
 export default alt.createStore(PhotoStore);

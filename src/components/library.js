@@ -46,14 +46,18 @@ class Library extends React.Component {
 
   updateCurrent() {
     var state = this.state;
+    var current = this.state.current;
+
+    this.state.current = null;
 
     state.photos.forEach(function(photo) {
-      if (photo.id == state.current.id) {
+      if (photo.id == current.id) {
         console.log('handle current');
         state.current = photo;
       }
     });
 
+    console.log('upd current', state);
     this.setState(state);
   }
 

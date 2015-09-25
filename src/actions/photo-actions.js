@@ -9,7 +9,8 @@ class PhotoActions {
       'getPhotosSuccess',
       'getDatesSuccess',
       'setDateFilterSuccess',
-      'updatedPhotoSuccess'
+      'updatedPhotoSuccess',
+      'setImporting'
     );
   }
 
@@ -24,6 +25,8 @@ class PhotoActions {
   }
 
   getPhotos() {
+    console.log('get photos');
+
     new Photo()
       .fetchAll({ withRelated: ['versions'] })
       .then((photos) => {
@@ -46,6 +49,10 @@ class PhotoActions {
       });
   }
 
+  startImport() {
+    console.log('start import');
+    this.actions.setImporting(true);
+  }
 }
 
 export default alt.createActions(PhotoActions);

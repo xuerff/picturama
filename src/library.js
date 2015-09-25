@@ -33,7 +33,6 @@ class Library {
       console.log('file stat', fileStat);
       let filename = fileStat.name.match(extract)[1];
 
-
       return spawn('dcraw', [ '-e', root + '/' + fileStat.name ]).then((data) => {
         new ExifImage({ image: root + '/' + filename + '.thumb.jpg' }, (err, exifData) => {
           var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss')
@@ -79,8 +78,10 @@ class Library {
   }
 
   scan() {
-    console.log('SCAN', path);
+    var self = this;
     var walker = Walk.walk(path, { followLinks: false });
+
+    self.mainWindow.webContents.send('start-import', true);
 
     walker.on("file", this.walk);
 
@@ -88,7 +89,7 @@ class Library {
     }); // plural
 
     walker.on("end", () => {
-      console.log('done');
+      self.mainWindow.webContents.send('finish-import', true);
     });
   }
 
