@@ -14,7 +14,7 @@ import Version from './models/version';
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
 var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
 
-var path = process.env.PWD + '/photos/';
+var path = process.env.PWD + '/photos';
 var versionsPath = process.env.PWD + '/versions/';
 var thumbsPath = process.env.PWD  + '/thumbs/';
 
@@ -29,15 +29,16 @@ class Library {
     let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
 
     if (fileStat.name.match(allowed)) {
+      console.log('root', root);
+      console.log('file stat', fileStat);
       let filename = fileStat.name.match(extract)[1];
 
 
-      return spawn('dcraw', [ '-e', path + fileStat.name ]).then((data) => {
-        new ExifImage({ image: path + filename + '.thumb.jpg' }, (err, exifData) => {
+      return spawn('dcraw', [ '-e', root + '/' + fileStat.name ]).then((data) => {
+        new ExifImage({ image: root + '/' + filename + '.thumb.jpg' }, (err, exifData) => {
           var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss')
-          console.log('created at', createdAt);
 
-          sharp(path + filename + '.thumb.jpg')
+          sharp(root + '/' + filename + '.thumb.jpg')
             .rotate()
             .toFile(thumbsPath + filename + '.thumb.jpg')
             .then((image) => {
@@ -57,7 +58,7 @@ class Library {
                   iso: exifData.exif.ISO,
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
-                  master: path + fileStat.name,
+                  master: root + '/' + fileStat.name,
                   thumb: thumbsPath + filename + '.thumb.jpg'
                 }).save();
             })
@@ -74,49 +75,6 @@ class Library {
         next();
       });
 
-      //cmd.stdout.on('data', (data) => {
-      //  console.log('stdout: ' + data);
-      //});
-
-      //cmd.stderr.on('data', (data) => {
-      //  console.log('stderr: ' + data);
-      //});
-
-      //cmd.on('exit', (code) => {
-      //  new ExifImage({ image: path + filename + '.thumb.jpg' }, (err, exifData) => {
-      //    var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss')
-
-      //    fsRename(path + filename + '.thumb.jpg', thumbsPath + filename + '.thumbs.jpg')
-      //      .then(() => {
-      //        return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
-      //      })
-      //      .then((photo) => {
-      //        if (photo)
-      //          throw 'alredy-existing';
-      //        else
-      //          return Photo.forge({
-      //            title: filename,
-      //            extension: fileStat.name.match(/\.(.+)$/i)[1],
-      //            orientation: exifData.image.Orientation,
-      //            date: createdAt.format('YYYY-MM-DD'),
-      //            created_at: createdAt.toDate(),
-      //            exposure_time: exifData.exif.ExposureTime,
-      //            iso: exifData.exif.ISO,
-      //            aperture: exifData.exif.FNumber,
-      //            focal_length: exifData.exif.FocalLength,
-      //            master: path + fileStat.name,
-      //            thumb: thumbsPath + filename + '.thumbs.jpg'
-      //          }).save();
-      //      })
-      //      .then((photo) => {
-      //        next();
-      //      })
-      //      .catch((err) => {
-      //        console.log('err', err);
-      //        next();
-      //      });
-      //  });
-      //});
     } else next();
   }
 
