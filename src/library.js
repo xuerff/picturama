@@ -17,6 +17,7 @@ var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
 var path = process.env.PWD + '/photos';
 var versionsPath = process.env.PWD + '/versions/';
 var thumbsPath = process.env.PWD  + '/thumbs/';
+var thumbs250Path = process.env.PWD  + '/thumbs-250/';
 
 class Library {
 
@@ -29,8 +30,6 @@ class Library {
     let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
 
     if (fileStat.name.match(allowed)) {
-      console.log('root', root);
-      console.log('file stat', fileStat);
       let filename = fileStat.name.match(extract)[1];
 
       return spawn('dcraw', [ '-e', root + '/' + fileStat.name ]).then((data) => {
@@ -40,6 +39,22 @@ class Library {
           sharp(root + '/' + filename + '.thumb.jpg')
             .rotate()
             .toFile(thumbsPath + filename + '.thumb.jpg')
+            .then((image) => {
+              var thumb = sharp(thumbsPath + filename + '.thumb.jpg');
+              return [ thumb, thumb.metadata() ];
+            })
+            .spread((thumb, metadata) => {
+              console.log('thumb', thumb);
+              console.log('metadata', metadata);
+
+              if (metadata.width > metadata.height)
+                return thumb.resize(250, null);
+              else
+                return thumb.resize(null, 250);
+            })
+            .then((thumb) => {
+              return thumb.toFile(thumbs250Path + filename + '.jpg');
+            })
             .then((image) => {
               return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             })
@@ -58,6 +73,7 @@ class Library {
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
                   master: root + '/' + fileStat.name,
+                  thumb_250: thumbs250Path + filename + '.jpg',
                   thumb: thumbsPath + filename + '.thumb.jpg'
                 }).save();
             })

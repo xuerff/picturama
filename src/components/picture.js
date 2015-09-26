@@ -20,7 +20,7 @@ class Picture extends React.Component {
     return (
       <a className="picture mdl-card mdl-shadow--2dp" onClick={this.handleClick.bind(this)}>
         <img
-          src={this.props.photo.thumb} 
+          src={this.props.photo.thumb_250} 
           className={rotation[this.props.photo.orientation]} />
       </a>
     );
