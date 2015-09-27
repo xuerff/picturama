@@ -40,21 +40,18 @@ class Library {
             .rotate()
             .toFile(thumbsPath + filename + '.thumb.jpg')
             .then((image) => {
-              var thumb = sharp(thumbsPath + filename + '.thumb.jpg');
-              return [ thumb, thumb.metadata() ];
+              return sharp(thumbsPath + filename + '.thumb.jpg')
+                .resize(250, 250)
+                .max()
+                .quality(100)
+                .toFile(thumbs250Path + filename + '.jpg');
             })
-            .spread((thumb, metadata) => {
-              console.log('thumb', thumb);
-              console.log('metadata', metadata);
-
-              if (metadata.width > metadata.height)
-                return thumb.resize(250, null);
-              else
-                return thumb.resize(null, 250);
-            })
-            .then((thumb) => {
-              return thumb.toFile(thumbs250Path + filename + '.jpg');
-            })
+            //.spread((thumb, metadata) => {
+            //  return thumb.resize(250, null).max();
+            //})
+            //.then((thumb) => {
+            //  return thumb.toFile(thumbs250Path + filename + '.jpg');
+            //})
             .then((image) => {
               return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             })
