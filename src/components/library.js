@@ -10,14 +10,21 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { photos: [], current: null };
+    this.state = { photos: [], current: null, scrollTop: 0 };
 
     this.updateCurrent = this.updateCurrent.bind(this);
   }
 
   handleCurrent(photo) {
-    var state = this.state;
+    let state = this.state;
+
     state.current = photo;
+
+    if (state.current)
+      state.scrollTop = React.findDOMNode(this).parentNode.scrollTop;
+    else
+      this.props.setScrollTop(state.scrollTop);
+
     this.setState(state);
   }
 
@@ -58,6 +65,8 @@ class Library extends React.Component {
     });
 
     console.log('upd current', state);
+    console.log('current', state.current);
+
     this.setState(state);
   }
 
@@ -85,6 +94,7 @@ class Library extends React.Component {
             setCurrent={handleCurrent} />
         );
       });
+
     else
       currentView = <PictureDetail
                       photo={this.state.current}
