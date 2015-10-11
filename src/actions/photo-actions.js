@@ -43,9 +43,10 @@ class PhotoActions {
   setDateFilter(date) {
     new Photo()
       .where({ date: date })
-      .fetchAll()
+      .fetchAll({ withRelated: ['versions'] })
       .then((photos) => {
-        this.actions.setDateFilterSuccess(photos);
+        this.actions.getPhotosSuccess(photos);
+        //this.actions.setDateFilterSuccess(photos);
       });
   }
 

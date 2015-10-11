@@ -3,6 +3,8 @@ import shortid from 'shortid';
 
 import Version from './version';
 
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$#');
+
 var Photo = anselBookshelf.Model.extend({
   tableName: 'photos',
 

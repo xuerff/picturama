@@ -14,44 +14,41 @@ import Version from './models/version';
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
 var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
 
-var path = process.env.PWD + '/photos';
-var versionsPath = process.env.PWD + '/versions/';
-var thumbsPath = process.env.PWD  + '/thumbs/';
-var thumbs250Path = process.env.PWD  + '/thumbs-250/';
-
 class Library {
 
-  constructor(mainWindow) {
+  constructor(mainWindow, path) {
+    console.log('PATH', path);
     this.mainWindow = mainWindow;
+
+    this.path = path + '/photos';
+    this.versionsPath = path + '/versions/';
+    this.thumbsPath = path + '/thumbs/';
+    this.thumbs250Path = path + '/thumbs-250/';
   }
 
   walk(root, fileStat, next) {
     let allowed = new RegExp(acceptedRawFormats.join("$|") + '$', "i");
     let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
 
+    console.log('walk', fileStat.name, this.thumbsPath);
+
     if (fileStat.name.match(allowed)) {
       let filename = fileStat.name.match(extract)[1];
 
       return spawn('dcraw', [ '-e', root + '/' + fileStat.name ]).then((data) => {
         new ExifImage({ image: root + '/' + filename + '.thumb.jpg' }, (err, exifData) => {
-          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss')
+          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
 
           sharp(root + '/' + filename + '.thumb.jpg')
             .rotate()
-            .toFile(thumbsPath + filename + '.thumb.jpg')
+            .toFile(this.thumbsPath + filename + '.thumb.jpg')
             .then((image) => {
-              return sharp(thumbsPath + filename + '.thumb.jpg')
+              return sharp(this.thumbsPath + filename + '.thumb.jpg')
                 .resize(250, 250)
                 .max()
                 .quality(100)
-                .toFile(thumbs250Path + filename + '.jpg');
+                .toFile(this.thumbs250Path + filename + '.jpg');
             })
-            //.spread((thumb, metadata) => {
-            //  return thumb.resize(250, null).max();
-            //})
-            //.then((thumb) => {
-            //  return thumb.toFile(thumbs250Path + filename + '.jpg');
-            //})
             .then((image) => {
               return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             })
@@ -70,8 +67,8 @@ class Library {
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
                   master: root + '/' + fileStat.name,
-                  thumb_250: thumbs250Path + filename + '.jpg',
-                  thumb: thumbsPath + filename + '.thumb.jpg'
+                  thumb_250: this.thumbs250Path + filename + '.jpg',
+                  thumb: this.thumbsPath + filename + '.thumb.jpg'
                 }).save();
             })
             .then((photo) => {
@@ -91,33 +88,35 @@ class Library {
   }
 
   scan() {
-    var self = this;
-    var walker = Walk.walk(path, { followLinks: false });
+    //var self = this;
+    let walker = Walk.walk(this.path, { followLinks: false });
 
-    self.mainWindow.webContents.send('start-import', true);
+    this.mainWindow.webContents.send('start-import', true);
 
-    walker.on("file", this.walk);
+    console.log('Start walk', this.path);
+
+    walker.on("file", this.walk.bind(this));
 
     walker.on("errors", (root, nodeStatsArray, next) => {
     }); // plural
 
     walker.on("end", () => {
-      self.mainWindow.webContents.send('finish-import', true);
+      this.mainWindow.webContents.send('finish-import', true);
     });
   }
 
   watch() {
-    var self = this;
-    var allowed = /([\w\d]+)-([\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i
+    let self = this;
+    let allowed = /([\$\#\w\d]+)-([\$\#\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i;
 
     watchr.watch({
-      paths: [ path, versionsPath, thumbsPath ],
+      paths: [ self.path, self.versionsPath, self.thumbsPath ],
 
       listener: (action, filePath) => {
-        console.log('listen now', action, filePath);
-
         // on action:create then parse file and update version
         if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
+          console.log('listen now', action, filePath);
+
           Version.updateImage(filePath.match(allowed)).then(function(version) {
             console.log('version done', version);
 

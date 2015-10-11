@@ -9,8 +9,9 @@ import Photo from './photo';
 var copy = Promise.promisify(fs.copy);
 var readFile = Promise.promisify(fs.readFile);
 
-var versionPath = process.env.PWD + '/versions/';
-var photosPath = process.env.PWD  + '/photos/';
+var versionPath = process.env.OLDPWD + '/versions/';
+var photosPath = process.env.OLDPWD  + '/photos/';
+var thumbs250Path = process.env.OLDPWD + '/thumbs-250/';
 
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
@@ -64,13 +65,30 @@ var Version = anselBookshelf.Model.extend({
   }
 }, {
   updateImage: function(data) {
-    return this.where({ photo_id: data[2], version: data[3] })
-      .fetch()
-      .then(function(version) {
-        console.log('update img',{ photo_id: data[2], version: data[3] }, version);
+    let filename = [data[1], data[2], data[3]].join('-');
+    console.log('fileName', filename);
+    let thumbPathName = thumbs250Path + filename + '.jpg';
+
+    console.log('before sharp', thumbPathName);
+
+    return sharp(data.input)
+      .resize(250, 250)
+      .max()
+      .quality(100)
+      .toFile(thumbPathName)
+      .then(() => {
+        console.log('after sharp');
+        return Version.where({ photo_id: data[2], version: data[3] })
+          .fetch();
+      })
+      .then((version) => {
+        console.log('update img', { photo_id: data[2], version: data[3] }, version);
 
         if (version)
-          return version.save({ output: data.input }, { method: 'update' });
+          return version.save(
+            { output: data.input, thumbnail: thumbPathName }, 
+            { method: 'update' }
+          );
         else
           throw 'not-found';
       })

@@ -19,6 +19,7 @@ class PhotoStore {
       if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
         let lastVersion = photo.versions.pop();
         photo.thumb = lastVersion.output;
+        photo.thumb_250 = lastVersion.thumbnail;
       }
 
       return photo;
@@ -46,9 +47,12 @@ class PhotoStore {
       if (photo.id == updatedPhoto.id) {
         photo = updatedPhoto;
 
-        console.log('last version', lastVersion);
 
-        if (lastVersion) photo.thumb = lastVersion.output;
+        if (lastVersion) {
+          photo.thumb = lastVersion.output;
+          photo.thumb_250 = lastVersion.thumbnail;
+        }
+
         console.log('updating photo', photo);
       }
 

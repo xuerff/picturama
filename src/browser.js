@@ -27,7 +27,7 @@ app.on('ready', () => {
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
 
-  let library = new Library(mainWindow);
+  let library = new Library(mainWindow, app.getAppPath());
   let mainMenu = new MainMenu(mainWindow, library);
 
   //library.scan();
