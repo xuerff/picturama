@@ -14,7 +14,11 @@ class Ansel extends React.Component {
 
     ipc.on('new-version', PhotoActions.updatedPhoto);
     ipc.on('start-import', PhotoActions.startImport);
-    ipc.on('finish-import', PhotoActions.getPhotos);
+
+    ipc.on('finish-import', () => {
+      PhotoActions.getPhotos();
+      PhotoActions.getDates();
+    });
 
     componentHandler.upgradeAllRegistered();
   }
