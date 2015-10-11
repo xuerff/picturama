@@ -50,6 +50,10 @@ class Sidebar extends React.Component {
           <h3><i className="fa fa-calendar"></i> Date Captured</h3>
           <ul>{datesList}</ul>
         </div>
+
+        <div className="date">
+          <h3><i className="fa fa-tags"></i> Tags</h3>
+        </div>
       </div>
     );
   }

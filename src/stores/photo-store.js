@@ -16,8 +16,13 @@ class PhotoStore {
 
     this.importing = false;
     this.photos = photos.map(function(photo) {
+      photo.versionNumber = 1;
+
       if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
+        photo.versionNumber = 1 + photo.versions.length;
+
         let lastVersion = photo.versions.pop();
+
         photo.thumb = lastVersion.output;
         photo.thumb_250 = lastVersion.thumbnail;
       }
@@ -44,15 +49,18 @@ class PhotoStore {
       lastVersion = updatedPhoto.versions.pop();
 
     this.photos = this.photos.map(function(photo) {
+      photo.versionNumber = 1;
+
       if (photo.id == updatedPhoto.id) {
         photo = updatedPhoto;
-
 
         if (lastVersion) {
           photo.thumb = lastVersion.output;
           photo.thumb_250 = lastVersion.thumbnail;
+          photo.versionNumber = 1 + lastVersion.versions.length;
         }
 
+        console.log('versions', photo.versions.length, photo.versions);
         console.log('updating photo', photo);
       }
 

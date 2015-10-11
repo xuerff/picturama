@@ -46,6 +46,15 @@ class PictureDetail extends React.Component {
     return '1/' + Math.pow(10, zeros);
   }
 
+  //getVersionNumber() {
+  //  var versionNumber = 1;
+
+  //  if (this.props.photo.hasOwnProperty('versions'))
+  //    versionNumber += this.props.photo.versions.length;
+
+  //  return versionNumber;
+  //}
+
   openWithRawtherapee(e) {
     VersionActions.createVersionAndOpenWith(this.props.photo, 'RAW', 'rawtherapee');
   }
@@ -107,6 +116,7 @@ class PictureDetail extends React.Component {
             <li>ISO: {this.props.photo.iso}</li>
             <li>f/{this.props.photo.aperture}</li>
             <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
+            <li>v#: {this.props.photo.versionNumber}</li>
           </ul>
         </div>
       </div>
