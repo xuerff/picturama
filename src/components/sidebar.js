@@ -3,13 +3,14 @@ import React from 'react';
 import PhotoStore from './../stores/photo-store';
 import PhotoActions from './../actions/photo-actions';
 
-import DateElement from './date-element';
+//import DateElement from './date-element';
+import DateYear from './date-year';
 
 class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { dates: [], currentDate: null };
+    this.state = { dates: { years: [] }, currentDate: null };
   }
 
   componentDidMount() {
@@ -49,14 +50,24 @@ class Sidebar extends React.Component {
     var handleDate = this.handleDate.bind(this);
     var isActive = this.isActive.bind(this);
 
-    var datesList = this.state.dates.map(function(date) {
-      return (
-        <DateElement
-          date={date.date}
-          active={isActive(date)}
-          setDate={handleDate} />
-      )
-    });
+
+    //var dateYearsList = <div>Hi</div>;
+
+    //console.log('dates state', this.state.dates);
+
+    //if (this.state.dates.years.length > 0)
+      var dateYearsList = this.state.dates.years.map(function(year) {
+        return <DateYear year={year} />;
+      });
+
+    //var datesList = this.state.dates.map(function(date) {
+    //  return (
+    //    <DateElement
+    //      date={date.date}
+    //      active={isActive(date)}
+    //      setDate={handleDate} />
+    //  )
+    //});
 
     return (
       <div id="sidebar">
@@ -75,7 +86,8 @@ class Sidebar extends React.Component {
             <h3>
               <i className="fa fa-calendar"></i> Date Captured <i class="fa fa-angle-down"></i>
             </h3>
-            <ul>{datesList}</ul>
+
+            <ul>{dateYearsList}</ul>
           </div>
 
           <div className="tags">
