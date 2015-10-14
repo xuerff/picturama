@@ -9,7 +9,7 @@ class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { dates: [] };
+    this.state = { dates: [], currentDate: null };
   }
 
   componentDidMount() {
@@ -18,23 +18,43 @@ class Sidebar extends React.Component {
   }
 
   appendDates(data) {
-    this.setState({ dates: data.dates });
+    let state = this.state;
+
+    state.dates = data.dates;
+    this.setState(state);
   }
 
   clearFilters() {
+    let state = this.state;
+
+    this.state.currentDate = null;
+    this.setState(state);
+
     PhotoActions.getPhotos();
   }
 
   handleDate(date) {
+    let state = this.state;
+
+    state.currentDate = date;
     PhotoActions.setDateFilter(date);
+    this.setState(state);
+  }
+
+  isActive(date) {
+    return (date.date == this.state.currentDate) ? 'active' : '';
   }
 
   render() {
     var handleDate = this.handleDate.bind(this);
+    var isActive = this.isActive.bind(this);
 
     var datesList = this.state.dates.map(function(date) {
       return (
-        <DateElement date={date.date} setDate={handleDate} />
+        <DateElement
+          date={date.date}
+          active={isActive(date)}
+          setDate={handleDate} />
       )
     });
 
@@ -44,6 +64,10 @@ class Sidebar extends React.Component {
 
         <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
           <i className="fa fa-book"></i> All content
+        </button>
+
+        <button className="mdl-button mdl-js-button flagged">
+          <i className="fa fa-flag"></i> Flagged
         </button>
 
         <div className="dates">
