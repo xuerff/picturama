@@ -46,7 +46,6 @@ class PhotoActions {
       .fetchAll({ withRelated: ['versions'] })
       .then((photos) => {
         this.actions.getPhotosSuccess(photos);
-        //this.actions.setDateFilterSuccess(photos);
       });
   }
 

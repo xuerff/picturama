@@ -8,6 +8,7 @@ class PhotoStore {
     this.bindActions(PhotoActions);
     this.photos = [];
     this.dates = [];
+    this.currentDate = null;
     this.importing = false;
   }
 
@@ -94,9 +95,9 @@ class PhotoStore {
     console.log('dates', dates);
   }
 
-  onSetDateFilterSuccess(photos) {
-    this.photos = photos.toJSON();
-  }
+  //onSetDateFilterSuccess(photos) {
+  //  this.photos = photos.toJSON();
+  //}
 
   onUpdatedPhotoSuccess(photo) {
     let updatedPhoto = photo.toJSON();

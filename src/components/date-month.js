@@ -27,8 +27,11 @@ class DateMonth extends React.Component {
 
     return (
       <li>
-        <div>{this.props.month.id}</div>
-        <ul>{dateElementsList}</ul>
+        <button className="month-dropdown">
+          <i className="fa fa-angle-down"></i> {this.props.month.id}
+        </button>
+
+        <ul className="date-elements">{dateElementsList}</ul>
       </li>
     )
   }

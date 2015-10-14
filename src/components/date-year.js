@@ -27,7 +27,10 @@ class DateYear extends React.Component {
 
     return (
       <li>
-        <div>{this.props.year.id}</div>
+        <button className="year-dropdown">
+          <i className="fa fa-angle-down"></i> {this.props.year.id}
+        </button>
+
         <ul>{dateMonthsList}</ul>
       </li>
     )
