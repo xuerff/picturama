@@ -14,11 +14,13 @@ class DateYear extends React.Component {
 
   render() {
     var handleDate = this.handleDate.bind(this);
+    var currentDate = this.props.currentDate;
 
     var dateMonthsList = this.props.year.months.map(function(month) {
       return (
         <DateMonth
           setDate={handleDate}
+          currentDate={currentDate}
           month={month} />
       );
     });

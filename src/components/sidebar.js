@@ -49,20 +49,17 @@ class Sidebar extends React.Component {
 
   render() {
     var handleDate = this.handleDate.bind(this);
-    var isActive = this.isActive.bind(this);
+    //var isActive = this.isActive.bind(this);
+    var currentDate = this.state.currentDate;
 
-    //var dateYearsList = <div>Hi</div>;
-
-    //console.log('dates state', this.state.dates);
-
-    //if (this.state.dates.years.length > 0)
-      var dateYearsList = this.state.dates.years.map(function(year) {
-        return (
-          <DateYear
-            year={year}
-            setDate={handleDate} />
-        );
-      });
+    var dateYearsList = this.state.dates.years.map(function(year) {
+      return (
+        <DateYear
+          year={year}
+          currentDate={currentDate}
+          setDate={handleDate} />
+      );
+    });
 
     //var datesList = this.state.dates.map(function(date) {
     //  return (
