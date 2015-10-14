@@ -8,10 +8,19 @@ class DateYear extends React.Component {
     super(props);
   }
 
+  handleDate(date) {
+    this.props.setDate(date);
+  }
+
   render() {
+    var handleDate = this.handleDate.bind(this);
+
     var dateMonthsList = this.props.year.months.map(function(month) {
-      console.log('month', month);
-      return <DateMonth month={month} />;
+      return (
+        <DateMonth
+          setDate={handleDate}
+          month={month} />
+      );
     });
 
     return (

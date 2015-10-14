@@ -35,6 +35,7 @@ class Sidebar extends React.Component {
   }
 
   handleDate(date) {
+    console.log(date);
     let state = this.state;
 
     state.currentDate = date;
@@ -50,14 +51,17 @@ class Sidebar extends React.Component {
     var handleDate = this.handleDate.bind(this);
     var isActive = this.isActive.bind(this);
 
-
     //var dateYearsList = <div>Hi</div>;
 
     //console.log('dates state', this.state.dates);
 
     //if (this.state.dates.years.length > 0)
       var dateYearsList = this.state.dates.years.map(function(year) {
-        return <DateYear year={year} />;
+        return (
+          <DateYear
+            year={year}
+            setDate={handleDate} />
+        );
       });
 
     //var datesList = this.state.dates.map(function(date) {

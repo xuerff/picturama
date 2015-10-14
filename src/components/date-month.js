@@ -8,11 +8,18 @@ class DateMonth extends React.Component {
     super(props);
   }
 
+  handleDate(date) {
+    this.props.setDate(date);
+  }
+
   render() {
+    var handleDate = this.handleDate.bind(this);
+
     var dateElementsList = this.props.month.days.map(function(date) {
       return (
         <DateElement
-          date={date} />
+          setDate={handleDate}
+          date={date.id} />
       )
     });
 
