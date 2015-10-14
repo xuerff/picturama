@@ -60,23 +60,27 @@ class Sidebar extends React.Component {
 
     return (
       <div id="sidebar">
-        <h2>Library</h2>
+        <h2><i className="fa fa-camera-retro"></i> Library</h2>
 
-        <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
-          <i className="fa fa-book"></i> All content
-        </button>
+        <div className="sidebar-content">
+          <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
+            <i className="fa fa-book"></i> All content
+          </button>
 
-        <button className="mdl-button mdl-js-button flagged">
-          <i className="fa fa-flag"></i> Flagged
-        </button>
+          <button className="mdl-button mdl-js-button flagged">
+            <i className="fa fa-flag"></i> Flagged
+          </button>
 
-        <div className="dates">
-          <h3><i className="fa fa-calendar"></i> Date Captured</h3>
-          <ul>{datesList}</ul>
-        </div>
+          <div className="dates">
+            <h3>
+              <i className="fa fa-calendar"></i> Date Captured <i class="fa fa-angle-down"></i>
+            </h3>
+            <ul>{datesList}</ul>
+          </div>
 
-        <div className="tags">
-          <h3><i className="fa fa-tags"></i> Tags</h3>
+          <div className="tags">
+            <h3><i className="fa fa-tags"></i> Tags</h3>
+          </div>
         </div>
       </div>
     );
