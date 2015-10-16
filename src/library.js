@@ -7,6 +7,7 @@ import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
 import exifJs from 'exif-js';
+import notifier from 'node-notifier';
 
 import Photo from './models/photo';
 import Version from './models/version';
@@ -93,6 +94,11 @@ class Library {
 
     this.mainWindow.webContents.send('start-import', true);
 
+    notifier.notify({
+      'title': 'Ansel',
+      'message': 'Start import'
+    });
+
     console.log('Start walk', this.path);
 
     walker.on("file", this.walk.bind(this));
@@ -102,6 +108,11 @@ class Library {
 
     walker.on("end", () => {
       this.mainWindow.webContents.send('finish-import', true);
+
+      notifier.notify({
+        'title': 'Ansel',
+        'message': 'Finish import'
+      });
     });
   }
 
