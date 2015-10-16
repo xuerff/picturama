@@ -30,7 +30,6 @@ class DateYear extends React.Component {
   }
 
   getBtnClasses() {
-    //console.log('show dropdown', this.state.showDropdown);
     return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
   }
 

@@ -16,8 +16,16 @@ rotation[1] = '';
 rotation[8] = 'minus-ninety';
 
 class PictureDetail extends React.Component {
+
   constructor(props) {
     super(props);
+
+    //this.state = { loading: false };
+
+    this.keyboardListener = this.keyboardListener.bind(this);
+    this.contextMenu = this.contextMenu.bind(this);
+    this.bindEventListeners = this.bindEventListeners.bind(this);
+    this.unbindEventListeners = this.unbindEventListeners.bind(this);
   }
 
   updateVersion(store) {
@@ -25,13 +33,15 @@ class PictureDetail extends React.Component {
   }
 
   keyboardListener(e) {
+    this.unbindEventListeners();
+
     if (e.keyCode == 27) // escape
       this.props.setCurrent(null);
 
     else if (e.keyCode == 37) // Left
       this.props.setLeft();
 
-    else if (e.keyCode == 39) // Left
+    else if (e.keyCode == 39) // Right
       this.props.setRight();
   }
 
@@ -46,15 +56,6 @@ class PictureDetail extends React.Component {
     return '1/' + Math.pow(10, zeros);
   }
 
-  //getVersionNumber() {
-  //  var versionNumber = 1;
-
-  //  if (this.props.photo.hasOwnProperty('versions'))
-  //    versionNumber += this.props.photo.versions.length;
-
-  //  return versionNumber;
-  //}
-
   openWithRawtherapee(e) {
     VersionActions.createVersionAndOpenWith(this.props.photo, 'RAW', 'rawtherapee');
   }
@@ -64,8 +65,6 @@ class PictureDetail extends React.Component {
   }
 
   addRawtherapeeMenu(data) {
-    console.log('stdout: ' + data);
-
     this.menu.append(new MenuItem({ 
       label: 'Open with Rawtherapee', 
       click: this.openWithRawtherapee.bind(this)
@@ -90,13 +89,27 @@ class PictureDetail extends React.Component {
     rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
     gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
-    document.addEventListener('keyup', this.keyboardListener.bind(this));
-    document.addEventListener('contextmenu', this.contextMenu.bind(this));
+    this.bindEventListeners();
+  }
+
+  componentWillReceiveProps() {
+    this.bindEventListeners();
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keyup', this.keyboardListener.bind(this));
+    this.unbindEventListeners();
+
     delete this.menu;
+  }
+
+  bindEventListeners() {
+    document.addEventListener('keyup', this.keyboardListener);
+    document.addEventListener('contextmenu', this.contextMenu);
+  }
+
+  unbindEventListeners() {
+    document.removeEventListener('keyup', this.keyboardListener);
+    document.removeEventListener('contextmenu', this.contextMenu);
   }
 
   render() {
