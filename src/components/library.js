@@ -58,21 +58,14 @@ class Library extends React.Component {
     this.state.current = null;
 
     state.photos.forEach(function(photo) {
-      if (photo.id == current.id) {
-        console.log('handle current');
+      if (photo.id == current.id)
         state.current = photo;
-      }
     });
-
-    console.log('upd current', state);
-    console.log('current', state.current);
 
     this.setState(state);
   }
 
   updatePhotos(store) {
-    console.log('upd photos', store.photos );
-
     if (store.photos) {
       this.setState({ photos: store.photos });
 
@@ -82,8 +75,6 @@ class Library extends React.Component {
 
   isLast() {
     let state = this.state;
-
-    console.log('current pos', state.photos.indexOf(state.current));
 
     if (state.photos.length == state.photos.indexOf(state.current) + 1)
       return true;

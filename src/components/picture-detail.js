@@ -49,8 +49,7 @@ class PictureDetail extends React.Component {
   }
 
   contextMenu(e) {
-    console.log('context menu', e);
-    e.preventDefault()
+    e.preventDefault();
     this.menu.popup(remote.getCurrentWindow());
   }
 
