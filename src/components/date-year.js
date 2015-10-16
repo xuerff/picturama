@@ -6,10 +6,32 @@ class DateYear extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.toggleDropdown = this.toggleDropdown.bind(this);
+    this.getClasses = this.getClasses.bind(this);
+    this.getBtnClasses = this.getBtnClasses.bind(this);
+
+    this.state = { showDropdown: false };
   }
 
   handleDate(date) {
     this.props.setDate(date);
+  }
+
+  toggleDropdown() {
+    this.setState({
+      showDropdown: (!this.state.showDropdown)
+    });
+  }
+
+  getClasses() {
+    console.log('get class', this.state.showDropdown);
+    return (this.state.showDropdown) ? '' : 'hide';
+  }
+
+  getBtnClasses() {
+    //console.log('show dropdown', this.state.showDropdown);
+    return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
   }
 
   render() {
@@ -27,11 +49,11 @@ class DateYear extends React.Component {
 
     return (
       <li>
-        <button className="year-dropdown">
-          <i className="fa fa-angle-down"></i> {this.props.year.id}
+        <button className="year-dropdown" onClick={this.toggleDropdown}>
+          <i className={this.getBtnClasses()}></i> {this.props.year.id}
         </button>
 
-        <ul>{dateMonthsList}</ul>
+        <ul className={this.getClasses()}>{dateMonthsList}</ul>
       </li>
     )
   }

@@ -19,7 +19,6 @@ class DateMonth extends React.Component {
   }
 
   toggleDropdown() {
-    //console.log('toggle dropdown', (!this.state.showDropdown));
     this.setState({
       showDropdown: (!this.state.showDropdown)
     });

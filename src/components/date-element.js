@@ -13,7 +13,6 @@ class DateElement extends React.Component {
   }
 
   isActive(date) {
-    console.log('element', date, this.props.currentDate);
     return (date == this.props.currentDate) ? 'active' : '';
   }
 
