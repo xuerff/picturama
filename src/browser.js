@@ -1,6 +1,9 @@
 import app from 'app';
 import BrowserWindow from 'browser-window';
 import ipc from 'ipc';
+//import dbus from 'dbus-native';
+//import udev from 'udev';
+import usbDetect from 'usb-detection';
 
 import MainMenu from './main-menu';
 import Library from './library';
@@ -32,6 +35,58 @@ app.on('ready', () => {
 
   //library.scan();
   library.watch();
+
+  //var bus = dbus.systemBus();
+  //var udservice = bus.getService('org.freedesktop.UDisks');
+
+  //udservice.getInterface(
+  //  '/org/freedesktop/UDisks',
+  //  'org.freedesktop.UDisks', 
+  //  function(err, ud) {
+  //    console.log('dbus', err, ud);
+
+  //    ud.on('DeviceAdded', function(deviceObjectPath) {
+  //      console.log('DeviceAdded', deviceObjectPath);
+  //    });
+
+  //    ud.on('DeviceRemoved', function(deviceObjectPath) {
+  //      console.log('DeviceRemoved', deviceObjectPath);
+  //    });
+  //  }
+  //);
+
+  //console.log(udev.list()); // this is a long list :)
+
+  //var monitor = udev.monitor();
+  //monitor.on('add', function (device) {
+  //    console.log('added ' + device);
+  //    monitor.close() // this closes the monitor.
+  //});
+  //monitor.on('remove', function (device) {
+  //    console.log('removed ' + device);
+  //});
+  //monitor.on('change', function (device) {
+  //    console.log('changed ' + device);
+  //});
+  // Detect add/insert 
+  usbDetect.on('add', function(device) { console.log('add', device); });
+  usbDetect.on('add:vid', function(device) { console.log('add', device); });
+  usbDetect.on('add:vid:pid', function(device) { console.log('add', device); });
+   
+  // Detect remove 
+  usbDetect.on('remove', function(device) { console.log('remove', device); });
+  usbDetect.on('remove:vid', function(device) { console.log('remove', device); });
+  usbDetect.on('remove:vid:pid', function(device) { console.log('remove', device); });
+   
+  // Detect add or remove (change) 
+  usbDetect.on('change', function(device) { console.log('change', device); });
+  usbDetect.on('change:vid', function(device) { console.log('change', device); });
+  usbDetect.on('change:vid:pid', function(device) { console.log('change', device); });
+   
+  // Get a list of USB devices on your system, optionally filtered by `vid` or `pid` 
+  //usbDetect.find(function(err, devices) { console.log('find', devices, err); });
+  //usbDetect.find(vid, function(err, devices) { console.log('find', devices, err); });
+  //usbDetect.find(vid, pid, function(err, devices) { console.log('find', devices, err); });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
