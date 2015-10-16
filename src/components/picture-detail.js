@@ -20,7 +20,7 @@ class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    //this.state = { loading: false };
+    this.state = { binded: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
@@ -43,6 +43,9 @@ class PictureDetail extends React.Component {
 
     else if (e.keyCode == 39) // Right
       this.props.setRight();
+
+    if (this.props.isLast() && !this.state.binded)
+      this.bindEventListeners();
   }
 
   contextMenu(e) {
@@ -103,17 +106,28 @@ class PictureDetail extends React.Component {
   }
 
   bindEventListeners() {
+    let state = this.state;
+    state.binded = true;
+    this.setState(state);
+
     document.addEventListener('keyup', this.keyboardListener);
     document.addEventListener('contextmenu', this.contextMenu);
   }
 
   unbindEventListeners() {
+    let state = this.state;
+    state.binded = false;
+    this.setState(state);
+
     document.removeEventListener('keyup', this.keyboardListener);
     document.removeEventListener('contextmenu', this.contextMenu);
   }
 
   render() {
     var className = [ 'mdl-shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
+
+    //if (this.props.isLast() && !this.state.binded)
+    //  this.bindEventListeners();
 
     return (
       <div className="picture-detail">

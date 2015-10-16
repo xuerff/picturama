@@ -80,11 +80,25 @@ class Library extends React.Component {
     }
   }
 
+  isLast() {
+    let state = this.state;
+
+    console.log('current pos', state.photos.indexOf(state.current));
+
+    if (state.photos.length == state.photos.indexOf(state.current) + 1)
+      return true;
+    else if (state.photos.indexOf(state.current) == 0)
+      return true;
+    else
+      return false;
+  }
+
   render() {
     let currentView;
     let handleCurrent = this.handleCurrent.bind(this);
     let handleLeftCurrent = this.handleLeftCurrent.bind(this);
     let handleRightCurrent = this.handleRightCurrent.bind(this);
+    let isLast = this.isLast.bind(this);
 
     if (!this.state.current)
       currentView = this.state.photos.map(function(photo) {
@@ -99,6 +113,7 @@ class Library extends React.Component {
       currentView = <PictureDetail
                       photo={this.state.current}
                       setCurrent={handleCurrent}
+                      isLast={isLast}
                       setLeft={handleLeftCurrent}
                       setRight={handleRightCurrent} />
 
