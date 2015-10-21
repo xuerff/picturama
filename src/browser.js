@@ -36,42 +36,14 @@ app.on('ready', () => {
   //library.scan();
   library.watch();
 
-  //var bus = dbus.systemBus();
-  //var udservice = bus.getService('org.freedesktop.UDisks');
-
-  //udservice.getInterface(
-  //  '/org/freedesktop/UDisks',
-  //  'org.freedesktop.UDisks', 
-  //  function(err, ud) {
-  //    console.log('dbus', err, ud);
-
-  //    ud.on('DeviceAdded', function(deviceObjectPath) {
-  //      console.log('DeviceAdded', deviceObjectPath);
-  //    });
-
-  //    ud.on('DeviceRemoved', function(deviceObjectPath) {
-  //      console.log('DeviceRemoved', deviceObjectPath);
-  //    });
-  //  }
-  //);
-
-  //console.log(udev.list()); // this is a long list :)
-
-  //var monitor = udev.monitor();
-  //monitor.on('add', function (device) {
-  //    console.log('added ' + device);
-  //    monitor.close() // this closes the monitor.
-  //});
-  //monitor.on('remove', function (device) {
-  //    console.log('removed ' + device);
-  //});
-  //monitor.on('change', function (device) {
-  //    console.log('changed ' + device);
-  //});
   // Detect add/insert 
-  usbDetect.on('add', function(device) { console.log('add', device); });
-  usbDetect.on('add:vid', function(device) { console.log('add', device); });
-  usbDetect.on('add:vid:pid', function(device) { console.log('add', device); });
+  usbDetect.on('add', function(device) { 
+    console.log('add', device); 
+    let vid = device.vendorId;
+    usbDetect.find(vid, function(err, devices) { console.log('find', devices, err); });
+  });
+  usbDetect.on('add:vid', function(device) { console.log('add vid', device); });
+  usbDetect.on('add:vid:pid', function(device) { console.log('add vid pid', device); });
    
   // Detect remove 
   usbDetect.on('remove', function(device) { console.log('remove', device); });
