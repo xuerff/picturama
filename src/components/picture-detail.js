@@ -32,9 +32,11 @@ class PictureDetail extends React.Component {
   }
 
   keyboardListener(e) {
-    this.unbindEventListeners();
+    if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
+      this.unbindEventListeners();
 
     console.log('keycode', e.keyCode);
+
     if (e.keyCode == 27) // escape
       this.props.setCurrent(null);
 
