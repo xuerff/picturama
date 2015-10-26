@@ -97,12 +97,14 @@ class PhotoStore {
 
   onUpdatedPhotoSuccess(photo) {
     let updatedPhoto = photo.toJSON();
-    let lastVersion = {};
+    let lastVersion = null;
 
     if (updatedPhoto.hasOwnProperty('versions') && updatedPhoto.versions.length > 0) {
       var versionNumber = updatedPhoto.versions.length;
       lastVersion = updatedPhoto.versions.pop();
     }
+
+    console.log('updated photo', updatedPhoto);
 
     this.photos = this.photos.map(function(photo) {
       photo.versionNumber = 1;
@@ -111,6 +113,7 @@ class PhotoStore {
         photo = updatedPhoto;
 
         if (lastVersion) {
+          console.log('last version', lastVersion);
           photo.thumb = lastVersion.output;
           photo.thumb_250 = lastVersion.thumbnail;
           photo.versionNumber += versionNumber;
