@@ -1,8 +1,10 @@
 var gulp = require("gulp");
 var babel = require("gulp-babel");
 var less = require('gulp-less');
-//var sass = require('gulp-sass');
+//var jshint = require('gulp-jshint');
+//var stylish = require('jshint-stylish');
 var concat = require('gulp-concat');
+var eslint = require('gulp-eslint');
 
 gulp.task("babel", function () {
   return gulp.src("src/**/*.js")
@@ -27,5 +29,17 @@ gulp.task('styles', function() {
     .pipe(less())
     .pipe(gulp.dest('dist'));
 });
+
+gulp.task('lint', function () {
+  return gulp.src('./src/**/*.js')
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+//gulp.task('lint', function() {
+//  return gulp.src('./src/**/*.js')
+//    .pipe(jshint())
+//    .pipe(jshint.reporter(stylish));
+//});
 
 gulp.task('default', ['babel', 'mdl-js', 'mdl-styles', 'styles' ]);

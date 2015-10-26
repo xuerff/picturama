@@ -36,9 +36,12 @@
   },
   "devDependencies": {
     "electron-rebuild": "^0.2.5",
+    "eslint": "^1.7.3",
+    "eslint-plugin-react": "^3.6.3",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.0",
     "gulp-concat": "^2.6.0",
+    "gulp-eslint": "^1.0.0",
     "gulp-less": "^3.0.3",
     "gulp-sass": "^2.0.4"
   }
