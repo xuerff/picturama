@@ -36,5 +36,5 @@ class VersionActions {
   }
 }
 
-export default alt.createActions(VersionActions)
+export default alt.createActions(VersionActions);
 

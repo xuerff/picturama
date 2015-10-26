@@ -23,7 +23,7 @@ class DateElement extends React.Component {
           <i className="fa fa-calendar-o"></i> {this.props.date}
         </button>
       </li>
-    )
+    );
   }
 }
 

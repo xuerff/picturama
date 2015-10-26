@@ -6,7 +6,6 @@ import VersionStore from './../stores/version-store';
 import VersionActions from './../actions/version-actions';
 
 import remote from 'remote';
-import shell from 'shell';
 
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
@@ -35,6 +34,7 @@ class PictureDetail extends React.Component {
   keyboardListener(e) {
     this.unbindEventListeners();
 
+    console.log('keycode', e.keyCode);
     if (e.keyCode == 27) // escape
       this.props.setCurrent(null);
 
@@ -43,6 +43,9 @@ class PictureDetail extends React.Component {
 
     else if (e.keyCode == 39) // Right
       this.props.setRight();
+
+    else if (e.keyCode == 80) // p
+      this.props.toggleFlag();
 
     if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();
@@ -58,23 +61,23 @@ class PictureDetail extends React.Component {
     return '1/' + Math.pow(10, zeros);
   }
 
-  openWithRawtherapee(e) {
+  openWithRawtherapee() {
     VersionActions.createVersionAndOpenWith(this.props.photo, 'RAW', 'rawtherapee');
   }
 
-  openWithGimp(e) {
+  openWithGimp() {
     VersionActions.createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
   }
 
-  addRawtherapeeMenu(data) {
+  addRawtherapeeMenu() {
     this.menu.append(new MenuItem({ 
       label: 'Open with Rawtherapee', 
       click: this.openWithRawtherapee.bind(this)
     }));
   }
 
-  addGimpMenu(data) {
-   this.menu.append(new MenuItem({ 
+  addGimpMenu() {
+    this.menu.append(new MenuItem({ 
       label: 'Open with Gimp', 
       click: this.openWithGimp.bind(this)
     }));
@@ -84,7 +87,7 @@ class PictureDetail extends React.Component {
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
-    var self = this;
+
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
     let gimpCmd = spawn('which', ['gimp']);
 
@@ -125,9 +128,6 @@ class PictureDetail extends React.Component {
   render() {
     var className = [ 'mdl-shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
 
-    //if (this.props.isLast() && !this.state.binded)
-    //  this.bindEventListeners();
-
     return (
       <div className="picture-detail">
         <div className="v-align">
@@ -143,6 +143,7 @@ class PictureDetail extends React.Component {
             <li>f/{this.props.photo.aperture}</li>
             <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
             <li>v#: {this.props.photo.versionNumber}</li>
+            <li>Flag: {this.props.photo.flag}</li>
           </ul>
         </div>
       </div>

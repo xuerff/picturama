@@ -25,6 +25,12 @@ var Photo = anselBookshelf.Model.extend({
 
   getByDate: function(date) {
     return this.query().where({ date: date });
+  },
+
+  toggleFlag: function(photo) {
+    console.log('toggle falg');
+    return this.forge({ id: photo.id })
+      .save({ flag: (!photo.flag) }, { method: 'update' });
   }
 });
 

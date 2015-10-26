@@ -95,10 +95,6 @@ class PhotoStore {
     console.log('dates', dates);
   }
 
-  //onSetDateFilterSuccess(photos) {
-  //  this.photos = photos.toJSON();
-  //}
-
   onUpdatedPhotoSuccess(photo) {
     let updatedPhoto = photo.toJSON();
     let lastVersion = {};
@@ -125,7 +121,7 @@ class PhotoStore {
     });
   }
 
-  onSetImport(value) {
+  onSetImport() {
     this.importing = true;
   }
 }

@@ -1,6 +1,5 @@
 import app from 'app';
 import BrowserWindow from 'browser-window';
-import ipc from 'ipc';
 
 import MainMenu from './main-menu';
 import Library from './library';
@@ -28,7 +27,8 @@ app.on('ready', () => {
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
 
   let library = new Library(mainWindow, app.getAppPath());
-  let mainMenu = new MainMenu(mainWindow, library);
+
+  new MainMenu(mainWindow, library);
 
   //library.scan();
   library.watch();

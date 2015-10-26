@@ -53,6 +53,18 @@ class PhotoActions {
     console.log('start import');
     this.actions.setImporting(true);
   }
+
+  toggleFlag(photo) {
+    console.log('photo', photo);
+
+    Photo.toggleFlag(photo)
+      .then((photo) => {
+        this.actions.updatedPhotoSuccess(photo);
+      })
+      .catch((err) => {
+        console.log('err toggle flag', err);
+      });
+  }
 }
 
 export default alt.createActions(PhotoActions);

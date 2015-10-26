@@ -43,7 +43,7 @@ class DateMonth extends React.Component {
           setDate={handleDate}
           currentDate={currentDate}
           date={date.id} />
-      )
+      );
     });
 
     return (
@@ -54,7 +54,7 @@ class DateMonth extends React.Component {
 
         <ul className={this.getClasses()}>{dateElementsList}</ul>
       </li>
-    )
+    );
   }
 
 }

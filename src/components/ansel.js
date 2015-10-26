@@ -28,7 +28,7 @@ class Ansel extends React.Component {
   }
 
   render() {
-   return (
+    return (
       <div id="ansel">
         <Sidebar setDateFilter={this.handleDateFilter.bind(this)} />
         <Container dateFilter={this.state.dateFilter} />
