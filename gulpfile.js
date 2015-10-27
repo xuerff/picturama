@@ -3,6 +3,8 @@ var babel = require("gulp-babel");
 var less = require('gulp-less');
 var concat = require('gulp-concat');
 var eslint = require('gulp-eslint');
+var childProcess = require('child_process');
+var electron = require('electron-prebuilt');
 
 gulp.task("babel", function () {
   return gulp.src("src/**/*.js")
@@ -34,4 +36,8 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('default', [ 'babel', 'mdl-js', 'mdl-styles', 'styles' ]);
+gulp.task('run', function () {
+  childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
+});
+
+gulp.task('default', [ 'babel', 'mdl-js', 'mdl-styles', 'styles', 'run' ]);
