@@ -1,6 +1,4 @@
 import {spawn} from 'child-process-promise';
-//import Promise from 'bluebird';
-//import fs from 'fs';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';

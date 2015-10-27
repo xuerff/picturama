@@ -1,6 +1,9 @@
 import app from 'app';
 import BrowserWindow from 'browser-window';
-import usb from 'usb';
+import usbDetect from 'usb-detection';
+import fs from 'fs';
+import {spawn} from 'child-process-promise';
+import njds from 'nodejs-disks';
 
 import MainMenu from './main-menu';
 import Library from './library';
@@ -34,15 +37,41 @@ app.on('ready', () => {
   //library.scan();
   library.watch();
 
-  usb.on('attach', function(device) {
-    //let vid = device.deviceDescriptor.idVendor;
-    //let pid = device.deviceDescriptor.idProduct;
-    //let term = usb.findByIds(vid, pid);
-    console.log('device', device);
-    device.getStringDescriptor(device.deviceDescriptor.iSerialNumber, function(err, data) {
-      console.log('data', data);
-    })
+  usbDetect.on('add', function(device) {
+    var devicePath = '/dev/disk/by-id/usb-' + device.manufacturer + '_' + device.deviceName + 
+                     '_' + device.serialNumber + '-' + device.deviceAddress +
+                     ':' + device.locationId + '-part1';
+
+    console.log('add', device, devicePath);
+
+    setTimeout(function() {
+      let devPoint = fs.readlinkSync(devicePath);
+      let driveName = devPoint.match(/[a-z]{3}\d{1}/i)[0];
+
+      console.log('dev point', devPoint, devPoint.match(/[a-z]{3}\d{1}/i)[0]);
+      njds.drives(function (err, drives) {
+        njds.drivesDetail(drives, function (err, data) {
+          console.log('njds', data);
+
+          data.forEach(function(drive) {
+            if (drive.drive.match(/[a-z]{3}\d{1}$/i)) {
+              let targetDriveName = drive.drive.match(/[a-z]{3}\d{1}$/i)[0];
+              console.log('drive', drive.drive, drive.drive.match(/[a-z]{3}\d{1}$/i));
+
+              if (targetDriveName == driveName)
+                console.log('found', drive.mountpoint);
+            }
+          });
+        });
+      });
+    }, 2000);
   });
+  //usb.on('attach', function(device) {
+  //  console.log('device', device);
+  //  device.getStringDescriptor(device.deviceDescriptor.iSerialNumber, function(err, data) {
+  //    console.log('data', data);
+  //  })
+  //});
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
