@@ -1,9 +1,7 @@
 import app from 'app';
 import BrowserWindow from 'browser-window';
 import ipc from 'ipc';
-//import dbus from 'dbus-native';
-//import udev from 'udev';
-import usbDetect from 'usb-detection';
+import usb from 'usb';
 
 import MainMenu from './main-menu';
 import Library from './library';
