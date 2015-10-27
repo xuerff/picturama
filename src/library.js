@@ -1,19 +1,18 @@
 import {spawn} from 'child-process-promise';
-import Promise from 'bluebird';
-import fs from 'fs';
+//import Promise from 'bluebird';
+//import fs from 'fs';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
-import exifJs from 'exif-js';
 import notifier from 'node-notifier';
 
 import Photo from './models/photo';
 import Version from './models/version';
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
-var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
+//var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
 
 class Library {
 
@@ -28,8 +27,8 @@ class Library {
   }
 
   walk(root, fileStat, next) {
-    let allowed = new RegExp(acceptedRawFormats.join("$|") + '$', "i");
-    let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join("|") + ')$', "i");
+    let allowed = new RegExp(acceptedRawFormats.join('$|') + '$', 'i');
+    let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join('|') + ')$', 'i');
 
     console.log('walk', fileStat.name, this.thumbsPath);
 

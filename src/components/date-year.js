@@ -54,7 +54,7 @@ class DateYear extends React.Component {
 
         <ul className={this.getClasses()}>{dateMonthsList}</ul>
       </li>
-    )
+    );
   }
 
 }

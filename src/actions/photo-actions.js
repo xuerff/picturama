@@ -53,6 +53,32 @@ class PhotoActions {
     console.log('start import');
     this.actions.setImporting(true);
   }
+
+  toggleFlag(photo) {
+    console.log('photo', photo);
+
+    new Photo({ id: photo.id })
+      .save('flag', !photo.flag, { patch: true })
+      .then((photoModel) => {
+        return new Photo({ id: photo.id })
+          .fetch({ withRelated: ['versions'] });
+      })
+      .then((photoModel) => {
+        console.log('photo model', photoModel, photo);
+        this.actions.updatedPhotoSuccess(photoModel);
+      })
+      .catch((err) => {
+        console.log('err toggle flag', err);
+      });
+
+    //Photo.toggleFlag(photo)
+    //  .then((photo) => {
+    //    this.actions.updatedPhotoSuccess(photo);
+    //  })
+    //  .catch((err) => {
+    //    console.log('err toggle flag', err);
+    //  });
+  }
 }
 
 export default alt.createActions(PhotoActions);

@@ -29,6 +29,7 @@
     "node-jsx": "^0.13.3",
     "node-notifier": "^4.3.1",
     "react": "^0.13.3",
+    "sharp": "^0.11.3",
     "shortid": "^2.2.2",
     "sqlite3": "^3.1.0",
     "usb": "^1.1.0",
@@ -37,9 +38,12 @@
   },
   "devDependencies": {
     "electron-rebuild": "^0.2.5",
+    "eslint": "^1.7.3",
+    "eslint-plugin-react": "^3.6.3",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.0",
     "gulp-concat": "^2.6.0",
+    "gulp-eslint": "^1.0.0",
     "gulp-less": "^3.0.3",
     "gulp-sass": "^2.0.4"
   }

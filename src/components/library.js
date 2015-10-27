@@ -84,12 +84,18 @@ class Library extends React.Component {
       return false;
   }
 
+  handleFlag() {
+    console.log('handle flag');
+    PhotoActions.toggleFlag(this.state.current);
+  }
+
   render() {
     let currentView;
     let handleCurrent = this.handleCurrent.bind(this);
     let handleLeftCurrent = this.handleLeftCurrent.bind(this);
     let handleRightCurrent = this.handleRightCurrent.bind(this);
     let isLast = this.isLast.bind(this);
+    let handleFlag = this.handleFlag.bind(this);
 
     if (!this.state.current)
       currentView = this.state.photos.map(function(photo) {
@@ -103,10 +109,11 @@ class Library extends React.Component {
     else
       currentView = <PictureDetail
                       photo={this.state.current}
+                      toggleFlag={handleFlag}
                       setCurrent={handleCurrent}
                       isLast={isLast}
                       setLeft={handleLeftCurrent}
-                      setRight={handleRightCurrent} />
+                      setRight={handleRightCurrent} />;
 
     return (
       <div id="library">
