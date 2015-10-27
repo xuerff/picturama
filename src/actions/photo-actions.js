@@ -70,14 +70,6 @@ class PhotoActions {
       .catch((err) => {
         console.log('err toggle flag', err);
       });
-
-    //Photo.toggleFlag(photo)
-    //  .then((photo) => {
-    //    this.actions.updatedPhotoSuccess(photo);
-    //  })
-    //  .catch((err) => {
-    //    console.log('err toggle flag', err);
-    //  });
   }
 }
 
