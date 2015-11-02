@@ -1,7 +1,7 @@
 var gulp = require("gulp");
 var babel = require("gulp-babel");
 var less = require('gulp-less');
-var sass = require('gulp-sass');
+//var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 
 gulp.task("babel", function () {
@@ -17,8 +17,8 @@ gulp.task('mdl-js', function() {
 });
 
 gulp.task('mdl-styles', function() {
-  return gulp.src('./node_modules/material-design-lite/src/material-design-lite.scss')
-    .pipe(sass().on('error', sass.logError))
+  return gulp.src('./node_modules/material-design-lite/dist/material.css')
+    //.pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('dist'));
 });
 

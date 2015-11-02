@@ -6,7 +6,6 @@ import {ExifImage} from 'exif';
 import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
-import exifJs from 'exif-js';
 import notifier from 'node-notifier';
 
 import Photo from './models/photo';
