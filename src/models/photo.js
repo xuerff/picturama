@@ -13,7 +13,8 @@ var Photo = anselBookshelf.Model.extend({
   },
 
   initialize: function() {
-    this.on('saving', (model) => {
+    this.on('creating', (model) => {
+      console.log('creating');
       model.set('id', shortid.generate());
     });
   }

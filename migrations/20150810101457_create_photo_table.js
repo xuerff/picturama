@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
     table.string('thumb');
     table.string('thumb_250');
     table.string('extension', 10);
+    table.boolean('flag').defaultTo(false);
     table.timestamps();
   });
 };

@@ -30,7 +30,7 @@ var Version = anselBookshelf.Model.extend({
         let fileName = [
           photo.title,
           photo.id,
-          model.get('version'),
+          model.get('version')
         ].join('-');
 
         if (model.get('type') == 'RAW') {
@@ -93,6 +93,7 @@ var Version = anselBookshelf.Model.extend({
           throw 'not-found';
       })
       .catch(function(err) {
+        console.log('err', err);
         return null;
       });
   }

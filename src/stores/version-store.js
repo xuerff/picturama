@@ -1,4 +1,4 @@
-import {spawn} from 'child_process';
+//import {spawn} from 'child_process';
 import alt from './../alt';
 
 import VersionActions from './../actions/version-actions';
@@ -15,8 +15,7 @@ class VersionStore {
 
   onCreateVersionSuccessOpenWith(data) {
     this.version = data.version.toJSON();
-    console.log('version', this.version.master);
-    let rawtherapee = spawn(data.targetSoftware, [ this.version.master ]);
+    //let rawtherapee = spawn(data.targetSoftware, [ this.version.master ]);
   }
 }
 
