@@ -40,6 +40,15 @@ class PhotoActions {
     });
   }
 
+  getFlagged() {
+    new Photo()
+      .where({ flag: true })
+      .fetchAll({ withRelated: ['versions'] })
+      .then((photos) => {
+        this.actions.getPhotosSuccess(photos);
+      });
+  }
+
   setDateFilter(date) {
     new Photo()
       .where({ date: date })

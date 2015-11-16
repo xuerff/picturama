@@ -3,7 +3,6 @@ import React from 'react';
 import PhotoStore from './../stores/photo-store';
 import PhotoActions from './../actions/photo-actions';
 
-//import DateElement from './date-element';
 import DateYear from './date-year';
 
 class Sidebar extends React.Component {
@@ -43,14 +42,18 @@ class Sidebar extends React.Component {
     this.setState(state);
   }
 
+  filterFlagged() {
+    console.log('filter flagged');
+    PhotoActions.getFlagged();
+  }
+
   isActive(date) {
     return (date.date == this.state.currentDate) ? 'active' : '';
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this);
-    //var isActive = this.isActive.bind(this);
-    var currentDate = this.state.currentDate;
+    var handleDate = this.handleDate.bind(this)
+      , currentDate = this.state.currentDate;
 
     var dateYearsList = this.state.dates.years.map(function(year) {
       return (
@@ -61,25 +64,20 @@ class Sidebar extends React.Component {
       );
     });
 
-    //var datesList = this.state.dates.map(function(date) {
-    //  return (
-    //    <DateElement
-    //      date={date.date}
-    //      active={isActive(date)}
-    //      setDate={handleDate} />
-    //  )
-    //});
-
     return (
       <div id="sidebar">
         <h2><i className="fa fa-camera-retro"></i> Library</h2>
 
         <div className="sidebar-content">
-          <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
+          <button 
+            onClick={this.clearFilters.bind(this)} 
+            className="mdl-button mdl-js-button">
             <i className="fa fa-book"></i> All content
           </button>
 
-          <button className="mdl-button mdl-js-button flagged">
+          <button
+            onClick={this.filterFlagged.bind(this)}
+            className="mdl-button mdl-js-button flagged">
             <i className="fa fa-flag"></i> Flagged
           </button>
 
