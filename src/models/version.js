@@ -22,7 +22,7 @@ var Version = anselBookshelf.Model.extend({
 
   initialize: function() {
     this.on('creating', function(model) {
-      console.log('ON CREATING');
+      console.log('ON CREATING', model.get('photo_id'));
 
       return new Photo({ id: model.get('photo_id') }).fetch().then(function(photo) {
         photo = photo.toJSON();
@@ -33,12 +33,17 @@ var Version = anselBookshelf.Model.extend({
           model.get('version')
         ].join('-');
 
+        let photoMaster = photo.master;
+
         if (model.get('type') == 'RAW') {
           let fileNamePath = versionPath + fileName + '.' + photo.extension;
           model.set('master', fileNamePath);
 
+          console.log('raw', fileNamePath, photo, photoMaster);
           return copy(photo.master, fileNamePath);
+
         } else {
+          console.log('standard', fileNamePath);
           let fileNamePath = versionPath + fileName + '.png';
           model.set('master', fileNamePath);
 
