@@ -34,6 +34,7 @@
     "watchr": "^2.4.13"
   },
   "devDependencies": {
+    "del": "^2.1.0",
     "electron-rebuild": "^0.2.5",
     "eslint": "^1.7.3",
     "eslint-plugin-react": "^3.6.3",

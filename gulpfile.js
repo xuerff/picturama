@@ -5,6 +5,9 @@ var concat = require('gulp-concat');
 var eslint = require('gulp-eslint');
 var childProcess = require('child_process');
 var electron = require('electron-prebuilt');
+var del = require('del');
+var knexFile = require('./knexfile');
+var knex = require('knex')(knexFile.development);
 
 gulp.task("babel", function () {
   return gulp.src("src/**/*.js")
@@ -40,4 +43,27 @@ gulp.task('run', function () {
   childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
 });
 
+gulp.task('clear-db', function() {
+  return del([
+    'db.sqlite3',
+    'versions/**/*',
+    'thumbs/**/*',
+    'thumbs-250/**/*',
+  ]);
+});
+
+gulp.task('migrate', function() {
+  return knex.migrate.latest();
+});
+
 gulp.task('default', [ 'babel', 'mdl-js', 'mdl-styles', 'styles', 'run' ]);
+
+gulp.task('clear', [
+  'clear-db',
+  'migrate',
+  'babel',
+  'mdl-js',
+  'mdl-styles',
+  'styles',
+  'run'
+]);
