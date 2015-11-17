@@ -19,6 +19,7 @@ class Library extends React.Component {
   handleCurrent(photo) {
     let state = this.state;
 
+    state.diff = false;
     state.current = photo;
 
     if (state.current)
@@ -32,6 +33,8 @@ class Library extends React.Component {
   handleLeftCurrent() {
     var state = this.state;
 
+    state.diff = false;
+
     if (state.photos.indexOf(state.current) >= 1) {
       state.current = state.photos[state.photos.indexOf(state.current) - 1];
       this.setState(state);
@@ -40,6 +43,8 @@ class Library extends React.Component {
 
   handleRightCurrent() {
     var state = this.state;
+
+    state.diff = false;
 
     if (state.photos.length > state.photos.indexOf(state.current) + 1) {
       state.current = state.photos[state.photos.indexOf(state.current) + 1];
@@ -56,6 +61,7 @@ class Library extends React.Component {
     var state = this.state;
     var current = this.state.current;
 
+    this.state.diff = false;
     this.state.current = null;
 
     state.photos.forEach(function(photo) {
@@ -91,10 +97,13 @@ class Library extends React.Component {
   }
 
   handleDiff() {
-    console.log('show diff');
-    let state = this.state;
-    state.diff = !this.state.diff;
-    this.setState(state);
+    console.log('show diff', this.state.current);
+
+    //if (this.state.current.versionNumber > 1) {
+      let state = this.state;
+      state.diff = !this.state.diff;
+      this.setState(state);
+    //}
   }
 
   render() {
@@ -116,7 +125,9 @@ class Library extends React.Component {
       });
 
     else if (this.state.diff)
-      currentView = <PictureDiff photo={this.state.current} />;
+      currentView = <PictureDiff
+                      toggleDiff={handleDiff}
+                      photo={this.state.current} />;
 
     else
       currentView = <PictureDetail

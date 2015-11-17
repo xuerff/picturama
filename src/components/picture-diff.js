@@ -12,6 +12,9 @@ class PictureDiff extends React.Component {
     super(props);
 
     this.updateState = this.updateState.bind(this);
+    this.keyboardListener = this.keyboardListener.bind(this);
+    this.bindEventListeners = this.bindEventListeners.bind(this);
+    this.unbindEventListeners = this.unbindEventListeners.bind(this);
 
     this.state = { photo: { thumb: null } };
   }
@@ -20,6 +23,8 @@ class PictureDiff extends React.Component {
     new Photo({ id: this.props.photo.id })
       .fetch({ withRelated: ['versions'] })
       .then(this.updateState);
+
+    this.bindEventListeners();
   }
 
   updateState(photo) {
@@ -28,6 +33,26 @@ class PictureDiff extends React.Component {
     console.log('updated state', state);
     this.setState(state);
   }
+
+  componentWillUnmount() {
+    this.unbindEventListeners();
+  }
+
+  bindEventListeners() {
+    document.addEventListener('keyup', this.keyboardListener);
+  }
+
+  unbindEventListeners() {
+    document.removeEventListener('keyup', this.keyboardListener);
+  }
+
+  keyboardListener(e) {
+    if ([27, 89].indexOf(e.keyCode) != -1) {
+      this.unbindEventListeners();
+      this.props.toggleDiff();
+    }
+  }
+
 
   render() {
     var last = { thumb: null };

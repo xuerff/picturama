@@ -32,6 +32,7 @@ class PictureDetail extends React.Component {
   }
 
   keyboardListener(e) {
+    //if ([27, 37, 39, 80, 89].indexOf(e.keyCode) != -1)
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
@@ -49,8 +50,10 @@ class PictureDetail extends React.Component {
     else if (e.keyCode == 80) // p
       this.props.toggleFlag();
 
-    else if (e.keyCode == 89) // y
+    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) { // y
       this.props.showDiff();
+      this.unbindEventListeners();
+    }
 
     if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();
