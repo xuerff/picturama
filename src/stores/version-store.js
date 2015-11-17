@@ -14,8 +14,8 @@ class VersionStore {
   }
 
   onCreateVersionSuccessOpenWith(data) {
-    console.log('before open', data.targetSoftware, [ this.version.master ]);
     this.version = data.version.toJSON();
+    console.log('before open', data.targetSoftware, [ this.version.master ]);
 
     if (data.targetSoftware && this.version.master)
       spawn(data.targetSoftware, [ this.version.master ]);

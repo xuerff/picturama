@@ -5,12 +5,13 @@ import PhotoActions from './../actions/photo-actions';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
+import PictureDiff from './picture-diff';
 
 class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { photos: [], current: null, scrollTop: 0 };
+    this.state = { photos: [], current: null, scrollTop: 0, diff: false };
 
     this.updateCurrent = this.updateCurrent.bind(this);
   }
@@ -89,13 +90,21 @@ class Library extends React.Component {
     PhotoActions.toggleFlag(this.state.current);
   }
 
+  handleDiff() {
+    console.log('show diff');
+    let state = this.state;
+    state.diff = !this.state.diff;
+    this.setState(state);
+  }
+
   render() {
-    let currentView;
-    let handleCurrent = this.handleCurrent.bind(this);
-    let handleLeftCurrent = this.handleLeftCurrent.bind(this);
-    let handleRightCurrent = this.handleRightCurrent.bind(this);
-    let isLast = this.isLast.bind(this);
-    let handleFlag = this.handleFlag.bind(this);
+    let currentView
+      , handleCurrent = this.handleCurrent.bind(this)
+      , handleLeftCurrent = this.handleLeftCurrent.bind(this)
+      , handleRightCurrent = this.handleRightCurrent.bind(this)
+      , isLast = this.isLast.bind(this)
+      , handleFlag = this.handleFlag.bind(this)
+      , handleDiff = this.handleDiff.bind(this);
 
     if (!this.state.current)
       currentView = this.state.photos.map(function(photo) {
@@ -106,11 +115,15 @@ class Library extends React.Component {
         );
       });
 
+    else if (this.state.diff)
+      currentView = <PictureDiff photo={this.state.current} />;
+
     else
       currentView = <PictureDetail
                       photo={this.state.current}
                       toggleFlag={handleFlag}
                       setCurrent={handleCurrent}
+                      showDiff={handleDiff}
                       isLast={isLast}
                       setLeft={handleLeftCurrent}
                       setRight={handleRightCurrent} />;

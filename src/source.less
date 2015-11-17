@@ -25,14 +25,15 @@ body {
   #library {
     height: 100%;
 
-    div.picture-detail:before {    /* create a full-height inline block pseudo=element */
+    /* create a full-height inline block pseudo=element */
+    div.picture-diff, div.picture-detail:before { 
       content: ' ';
       display: inline-block;
       vertical-align: middle;  /* vertical alignment of the inline element */
       height: 100%;
     }
 
-    div.picture-detail {
+    div.picture-diff, div.picture-detail {
       height: ~"calc(100% - 26px)";
       margin: 0 auto;
       position: relative;
@@ -80,6 +81,12 @@ body {
             background: @deep-orange-500;
           }
         }
+      }
+    }
+
+    div.picture-diff {
+      div.before, div.after {
+        width: 50%;
       }
     }
 
