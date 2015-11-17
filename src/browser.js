@@ -1,4 +1,4 @@
-import app from 'app';
+import {app, screen} from 'electron';
 import BrowserWindow from 'browser-window';
 
 import MainMenu from './main-menu';
@@ -20,9 +20,12 @@ app.on('window-all-closed', () => {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
+  let workAreaSize = screen.getPrimaryDisplay().workAreaSize;
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1356, height: 768 });
-  mainWindow.maximize();
+
+  if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
+    mainWindow.maximize();
 
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
