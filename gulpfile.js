@@ -39,9 +39,10 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('run', function () {
-  childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
-});
+gulp.task('run', [ 'babel', 'mdl-js', 'mdl-styles', 'styles', 'migrate' ],
+  function () {
+    childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
+  });
 
 gulp.task('clear-db', function() {
   return del([
@@ -52,7 +53,7 @@ gulp.task('clear-db', function() {
   ]);
 });
 
-gulp.task('migrate', function() {
+gulp.task('migrate', [ 'clear-db' ], function() {
   return knex.migrate.latest();
 });
 

@@ -28,7 +28,7 @@ app.on('ready', () => {
     mainWindow.maximize();
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
 
   let library = new Library(mainWindow, app.getAppPath());
 
