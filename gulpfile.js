@@ -39,7 +39,7 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('run', [ 'babel', 'mdl-js', 'mdl-styles', 'styles', 'migrate' ],
+gulp.task('run', [ 'babel', 'mdl-js', 'mdl-styles', 'styles' ],
   function () {
     childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
   });
