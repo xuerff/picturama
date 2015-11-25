@@ -1,9 +1,13 @@
 import Menu from 'menu';
+import {ipcMain} from 'electron';
 
 class MainMenu {
   constructor(mainWindow, library) {
     this.mainWindow = mainWindow;
     this.library = library;
+    this.render = this.render.bind(this);
+
+    //this.addTagEnabled = false;
 
     this.template = [{
       label: 'File',
@@ -35,10 +39,22 @@ class MainMenu {
         accelerator: 'Shift+Ctrl+I',
         click: this.toggleDevTools.bind(this)
       }]
+    },
+    {
+      label: 'Tags',
+      submenu: [{
+        label: 'Add tag',
+        accelerator: 'Ctrl+T',
+        enabled: false,
+        click: this.addTag.bind(this)
+      }]
     }];
 
-    this.menu = Menu.buildFromTemplate(this.template);
-    this.mainWindow.setMenu(this.menu);
+    ipcMain.on('toggleAddTagMenu', (e, state) => {
+      this.menu.items[2].submenu.items[0].enabled = state;
+    });
+
+    this.render();
   }
 
   scan() {
@@ -59,6 +75,15 @@ class MainMenu {
 
   toggleDevTools() {
     this.mainWindow.toggleDevTools();
+  }
+
+  addTag() {
+    this.mainWindow.webContents.send('addTagClicked', true);
+  }
+
+  render() {
+    this.menu = Menu.buildFromTemplate(this.template);
+    this.mainWindow.setMenu(this.menu);
   }
 }
 

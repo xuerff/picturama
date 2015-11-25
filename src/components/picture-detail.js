@@ -1,4 +1,5 @@
 import {spawn} from 'child_process';
+import {ipcRenderer} from 'electron';
 
 import React from 'react';
 
@@ -143,6 +144,9 @@ class PictureDetail extends React.Component {
 
     document.addEventListener('keyup', this.keyboardListener);
     document.addEventListener('contextmenu', this.contextMenu);
+
+    ipcRenderer.send('toggleAddTagMenu', true);
+    ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
   }
 
   unbindEventListeners() {
@@ -152,6 +156,8 @@ class PictureDetail extends React.Component {
 
     document.removeEventListener('keyup', this.keyboardListener);
     document.removeEventListener('contextmenu', this.contextMenu);
+
+    ipcRenderer.send('toggleAddTagMenu', false);
   }
 
   render() {

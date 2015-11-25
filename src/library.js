@@ -85,7 +85,6 @@ class Library {
   }
 
   scan() {
-    //var self = this;
     let walker = Walk.walk(this.path, { followLinks: false });
 
     this.mainWindow.webContents.send('start-import', true);
