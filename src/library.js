@@ -1,6 +1,4 @@
 import {spawn} from 'child-process-promise';
-//import Promise from 'bluebird';
-//import fs from 'fs';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
@@ -12,7 +10,6 @@ import Photo from './models/photo';
 import Version from './models/version';
 
 var acceptedRawFormats = [ 'RAF', 'CR2' ];
-//var acceptedImgFormats = [ 'JPG', 'JPEG', 'PNG' ];
 
 class Library {
 
@@ -20,10 +17,10 @@ class Library {
     console.log('PATH', path);
     this.mainWindow = mainWindow;
 
-    this.path = path + '/photos';
-    this.versionsPath = path + '/versions/';
-    this.thumbsPath = path + '/thumbs/';
-    this.thumbs250Path = path + '/thumbs-250/';
+    this.path = `${path}/photos`;
+    this.versionsPath = `${path}/versions/`;
+    this.thumbsPath = `${path}/thumbs/`;
+    this.thumbs250Path = `${path}/thumbs-250/`;
   }
 
   walk(root, fileStat, next) {
@@ -35,19 +32,19 @@ class Library {
     if (fileStat.name.match(allowed)) {
       let filename = fileStat.name.match(extract)[1];
 
-      return spawn('dcraw', [ '-e', root + '/' + fileStat.name ]).then((data) => {
-        new ExifImage({ image: root + '/' + filename + '.thumb.jpg' }, (err, exifData) => {
-          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+      return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then((data) => {
+        new ExifImage({ image: `${root}/${filename}.thumb.jpg` }, (err, exifData) => {
+            var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
 
-          sharp(root + '/' + filename + '.thumb.jpg')
+          sharp(`${root}/${filename}.thumb.jpg`)
             .rotate()
-            .toFile(this.thumbsPath + filename + '.thumb.jpg')
+            .toFile(`${this.thumbsPath}${filename}.thumb.jpg`)
             .then((image) => {
-              return sharp(this.thumbsPath + filename + '.thumb.jpg')
+              return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
                 .resize(250, 250)
                 .max()
                 .quality(100)
-                .toFile(this.thumbs250Path + filename + '.jpg');
+                .toFile(`${this.thumbs250Path}${filename}.jpg`);
             })
             .then((image) => {
               return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
@@ -66,9 +63,9 @@ class Library {
                   iso: exifData.exif.ISO,
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
-                  master: root + '/' + fileStat.name,
-                  thumb_250: this.thumbs250Path + filename + '.jpg',
-                  thumb: this.thumbsPath + filename + '.thumb.jpg'
+                  master: `${root}/${fileStat.name}`,
+                  thumb_250: `${this.thumbs250Path}${filename}.jpg`,
+                  thumb: `${this.thumbsPath}${filename}.thumb.jpg`
                 }).save();
             })
             .then((photo) => {
