@@ -7,6 +7,8 @@ import VersionActions from './../actions/version-actions';
 
 import remote from 'remote';
 
+import AddTag from './add-tag';
+
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
 
@@ -19,7 +21,7 @@ class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { binded: false };
+    this.state = { binded: false, modalIsOpen: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
@@ -91,10 +93,29 @@ class PictureDetail extends React.Component {
     }));
   }
 
+  showTagDialog() {
+    var state = this.state;
+    console.log('show tag dialog', state);
+    state.modalIsOpen = true;
+    this.setState(state);
+  }
+
+  closeModal() {
+  }
+
   componentDidMount() {
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
+
+    this.menu.append(new MenuItem({ 
+      label: 'Add tag', 
+      click: this.showTagDialog.bind(this)
+    }));
+
+    this.menu.append(new MenuItem({ 
+      type: 'separator'
+    }));
 
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
     let gimpCmd = spawn('which', ['gimp']);
@@ -154,6 +175,8 @@ class PictureDetail extends React.Component {
             <li>Flag: {this.props.photo.flag}</li>
           </ul>
         </div>
+
+        <AddTag isOpen={this.state.modalIsOpen} />
       </div>
     );
   }
