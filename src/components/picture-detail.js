@@ -28,6 +28,7 @@ class PictureDetail extends React.Component {
     this.contextMenu = this.contextMenu.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
+    this.closeTagDialog = this.closeTagDialog.bind(this);
   }
 
   updateVersion(store) {
@@ -41,8 +42,11 @@ class PictureDetail extends React.Component {
 
     console.log('keycode', e.keyCode);
 
-    if (e.keyCode == 27) // escape
+    if (e.keyCode == 27 && !this.state.modalIsOpen) // escape
       this.props.setCurrent(null);
+
+    else if (e.keyCode == 27 && this.state.modalIsOpen) // escape
+      this.closeTagDialog();
 
     else if (e.keyCode == 37) // Left
       this.props.setLeft();
@@ -101,7 +105,10 @@ class PictureDetail extends React.Component {
     this.setState(state);
   }
 
-  closeModal() {
+  closeTagDialog() {
+    var state = this.state;
+    state.modalIsOpen = false;
+    this.setState(state);
   }
 
   componentDidMount() {
