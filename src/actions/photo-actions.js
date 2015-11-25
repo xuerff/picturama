@@ -68,7 +68,7 @@ class PhotoActions {
 
     new Photo({ id: photo.id })
       .save('flag', !photo.flag, { patch: true })
-      .then((photoModel) => {
+      .then(() => {
         return new Photo({ id: photo.id })
           .fetch({ withRelated: ['versions'] });
       })

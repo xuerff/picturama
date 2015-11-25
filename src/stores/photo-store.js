@@ -37,7 +37,7 @@ class PhotoStore {
     this.dates = {};
 
     data.forEach(function(date) {
-      let [ year, month, day ] = date.date.split('-');
+      let [ year, month ] = date.date.split('-');
 
       // Year
       if (dates.years.length === 0) {

@@ -32,21 +32,21 @@ class Library {
     if (fileStat.name.match(allowed)) {
       let filename = fileStat.name.match(extract)[1];
 
-      return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then((data) => {
+      return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then(() => {
         new ExifImage({ image: `${root}/${filename}.thumb.jpg` }, (err, exifData) => {
-            var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
 
           sharp(`${root}/${filename}.thumb.jpg`)
             .rotate()
             .toFile(`${this.thumbsPath}${filename}.thumb.jpg`)
-            .then((image) => {
+            .then(() => {
               return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
                 .resize(250, 250)
                 .max()
                 .quality(100)
                 .toFile(`${this.thumbs250Path}${filename}.jpg`);
             })
-            .then((image) => {
+            .then(() => {
               return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             })
             .then((photo) => {
@@ -68,7 +68,7 @@ class Library {
                   thumb: `${this.thumbsPath}${filename}.thumb.jpg`
                 }).save();
             })
-            .then((photo) => {
+            .then(() => {
               next();
             })
             .catch(function(err) {
@@ -97,12 +97,9 @@ class Library {
 
     console.log('Start walk', this.path);
 
-    walker.on("file", this.walk.bind(this));
+    walker.on('file', this.walk.bind(this));
 
-    walker.on("errors", (root, nodeStatsArray, next) => {
-    }); // plural
-
-    walker.on("end", () => {
+    walker.on('end', () => {
       this.mainWindow.webContents.send('finish-import', true);
 
       notifier.notify({

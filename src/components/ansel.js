@@ -19,8 +19,6 @@ class Ansel extends React.Component {
       PhotoActions.getPhotos();
       PhotoActions.getDates();
     });
-
-    componentHandler.upgradeAllRegistered();
   }
 
   handleDateFilter(date) {

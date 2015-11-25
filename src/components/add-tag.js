@@ -28,7 +28,7 @@ class AddTag extends React.Component {
           </form>
         </div>
       </div>
-    )
+    );
   }
 
 }

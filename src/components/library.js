@@ -97,13 +97,9 @@ class Library extends React.Component {
   }
 
   handleDiff() {
-    console.log('show diff', this.state.current);
-
-    //if (this.state.current.versionNumber > 1) {
-      let state = this.state;
-      state.diff = !this.state.diff;
-      this.setState(state);
-    //}
+    let state = this.state;
+    state.diff = !this.state.diff;
+    this.setState(state);
   }
 
   render() {
