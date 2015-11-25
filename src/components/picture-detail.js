@@ -157,6 +157,11 @@ class PictureDetail extends React.Component {
   render() {
     var className = [ 'mdl-shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
 
+    var showModal;
+
+    if (this.state.modalIsOpen)
+      showModal = <AddTag />;
+
     return (
       <div className="picture-detail">
         <div className="v-align">
@@ -176,7 +181,7 @@ class PictureDetail extends React.Component {
           </ul>
         </div>
 
-        <AddTag isOpen={this.state.modalIsOpen} />
+        {showModal}
       </div>
     );
   }
