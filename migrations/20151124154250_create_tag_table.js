@@ -1,6 +1,6 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('tags', function(table) {
-    table.string('id', 10).primary().unique();
+    table.increments();
     table.string('title');
     table.string('slug');
     table.timestamps();
