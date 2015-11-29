@@ -1,13 +1,34 @@
 import React from 'react';
 
+import TagActions from './../actions/tag-actions';
+
 class AddTag extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = { tag: null };
+
+    this.handleAutoComplete = this.handleAutoComplete.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
     console.log('modal');
+  }
+
+  handleAutoComplete(e) {
+    console.log('handle auto complete', e);
+    let state = this.state;
+    state.tag = e.target.value;
+    this.setState(state);
+  }
+
+  handleSubmit(e) {
+    console.log('handle submit');
+    e.preventDefault();
+    var tag = this.state.tag.trim();
+    TagActions.createTag(tag);
   }
 
   render() {
@@ -16,12 +37,18 @@ class AddTag extends React.Component {
     return (
       <div className="outer-modal">
         <div className="modal mdl-shadow--2dp">
-          <form action="#">
+          <form onSubmit={this.handleSubmit}>
             <h3>Add a tag</h3>
 
-            <div class="mdl-textfield mdl-js-textfield">
-              <input class="mdl-textfield__input" type="text" id="tag" />
-              <label class="mdl-textfield__label" for="tag">Tag...</label>
+            <div className="mdl-textfield mdl-js-textfield">
+              <input 
+                className="mdl-textfield__input" 
+                type="text" 
+                onChange={this.handleAutoComplete}
+                value={this.state.tag}
+                placeholder="tag"
+                id="tag" />
+
             </div>
 
             <button className={btnClass}>Add</button>

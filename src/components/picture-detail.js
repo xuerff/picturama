@@ -40,8 +40,6 @@ class PictureDetail extends React.Component {
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
-    console.log('keycode', e.keyCode);
-
     if (e.keyCode == 27 && !this.state.modalIsOpen) // escape
       this.props.setCurrent(null);
 
