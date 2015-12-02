@@ -8,7 +8,7 @@ import VersionActions from './../actions/version-actions';
 
 import remote from 'remote';
 
-import AddTag from './add-tag';
+import AddTags from './add-tags';
 
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
@@ -171,7 +171,7 @@ class PictureDetail extends React.Component {
     var showModal;
 
     if (this.state.modalIsOpen)
-      showModal = <AddTag />;
+      showModal = <AddTags />;
 
     return (
       <div className="picture-detail">

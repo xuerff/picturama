@@ -1,4 +1,5 @@
 import alt from './../alt';
+import Promise from 'bluebird';
 
 import Tag from './../models/tag';
 
@@ -7,6 +8,7 @@ class TagActions {
   constructor() {
     this.generateActions(
       'createTagSuccess',
+      'createTagsSuccess',
       'getTagsSuccess'
     );
   }
@@ -19,6 +21,18 @@ class TagActions {
         console.log('tag');
         this.actions.createTagSuccess(tag);
       });
+  }
+
+  createTags(tags) {
+    Promise.map(tags, (tagName) => {
+      return new Tag({ title: tagName })
+        .save()
+        .then((tag) => tag.toJSON());
+    })
+    .then((tags) => {
+      console.log('tags', tags);
+      this.actions.createTagsSuccess(tags);
+    });
   }
 
   getTags() {

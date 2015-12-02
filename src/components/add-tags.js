@@ -3,7 +3,7 @@ import TagsInput from 'react-tagsinput'
 
 import TagActions from './../actions/tag-actions';
 
-class AddTag extends React.Component {
+class AddTags extends React.Component {
 
   constructor(props) {
     super(props);
@@ -35,8 +35,9 @@ class AddTag extends React.Component {
   handleSubmit(e) {
     console.log('handle submit');
     e.preventDefault();
-    var tag = this.state.tag.trim();
-    TagActions.createTag(tag);
+
+    var tags = this.state.tags.map((tag) => tag.trim());
+    TagActions.createTags(tags);
   }
 
   render() {
@@ -49,15 +50,8 @@ class AddTag extends React.Component {
             <h3>Add a tag</h3>
 
             <div className="textfield">
-              <input 
-                className="textfield" 
-                type="text" 
-                onChange={this.handleAutoComplete}
-                value={this.state.tag}
-                placeholder="tag"
-                id="tag" />
-
               <TagsInput
+                id="tags"
                 value={this.state.tags}
                 onChange={this.handleChange} />
 
@@ -72,4 +66,4 @@ class AddTag extends React.Component {
 
 }
 
-export default AddTag;
+export default AddTags;

@@ -13,6 +13,10 @@ class TagStore {
     this.tags.push(data.toJSON());
   }
 
+  onCreateTagsSuccess(data) {
+    this.tags = this.tags.concat(data);
+  }
+
   onGetTagsSuccess(data) {
     this.tags = data.toJSON();
   }
