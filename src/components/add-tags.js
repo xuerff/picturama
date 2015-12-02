@@ -8,22 +8,14 @@ class AddTags extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { tag: null, tags: [] };
+    this.state = { tags: [] };
 
-    this.handleAutoComplete = this.handleAutoComplete.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
     console.log('modal');
-  }
-
-  handleAutoComplete(e) {
-    console.log('handle auto complete', e);
-    let state = this.state;
-    state.tag = e.target.value;
-    this.setState(state);
   }
 
   handleChange(tags) {
@@ -54,7 +46,6 @@ class AddTags extends React.Component {
                 id="tags"
                 value={this.state.tags}
                 onChange={this.handleChange} />
-
             </div>
 
             <button className={btnClass}>Add</button>

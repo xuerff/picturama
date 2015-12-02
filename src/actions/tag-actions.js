@@ -30,7 +30,6 @@ class TagActions {
         .then((tag) => tag.toJSON());
     })
     .then((tags) => {
-      console.log('tags', tags);
       this.actions.createTagsSuccess(tags);
     });
   }
