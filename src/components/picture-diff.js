@@ -58,7 +58,7 @@ class PictureDiff extends React.Component {
     var last = { thumb: null };
 
     var className = [
-      'mdl-shadow--2dp',
+      'shadow--2dp',
       rotation[this.props.photo.orientation]
     ].join(' ');
 

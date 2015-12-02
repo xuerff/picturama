@@ -166,7 +166,7 @@ class PictureDetail extends React.Component {
   }
 
   render() {
-    var className = [ 'mdl-shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
+    var className = [ 'shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
 
     var showModal;
 
@@ -181,7 +181,7 @@ class PictureDetail extends React.Component {
             className={className} />
         </div>
 
-        <div className="picture-info mdl-card mdl-shadow--2dp">
+        <div className="picture-info card shadow--2dp">
           <ul>
             <li className="title">{this.props.photo.title}</li>
             <li>ISO: {this.props.photo.iso}</li>

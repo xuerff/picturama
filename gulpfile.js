@@ -15,17 +15,6 @@ gulp.task("babel", function () {
     .pipe(gulp.dest("dist"));
 });
 
-//gulp.task('mdl-js', function() {
-//  return gulp.src('./node_modules/material-design-lite/src/**/*.js')
-//    .pipe(concat('material-design-lite.js'))
-//    .pipe(gulp.dest("dist"));
-//});
-
-//gulp.task('mdl-styles', function() {
-//  return gulp.src('./node_modules/material-design-lite/dist/material.css')
-//    .pipe(gulp.dest('dist'));
-//});
-
 gulp.task('styles', function() {
   return gulp.src('src/source.less')
     .pipe(less())
