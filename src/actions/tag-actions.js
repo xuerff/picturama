@@ -6,7 +6,8 @@ class TagActions {
 
   constructor() {
     this.generateActions(
-      'createTagSuccess'
+      'createTagSuccess',
+      'getTagsSuccess'
     );
   }
 
@@ -18,6 +19,12 @@ class TagActions {
         console.log('tag');
         this.actions.createTagSuccess(tag);
       });
+  }
+
+  getTags() {
+    new Tag().fetchAll().then((tags) => {
+      this.actions.getTagsSuccess(tags);
+    });
   }
 
 }

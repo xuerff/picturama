@@ -13,6 +13,10 @@ class TagStore {
     this.tags.push(data.toJSON());
   }
 
+  onGetTagsSuccess(data) {
+    this.tags = data.toJSON();
+  }
+
 }
 
 export default alt.createStore(TagStore);
