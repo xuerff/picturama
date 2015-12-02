@@ -27,6 +27,7 @@
     "node-notifier": "^4.3.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "react-tagsinput": "^3.0.3",
     "sharp": "^0.11.4",
     "shortid": "^2.2.2",
     "slug": "^0.9.1",

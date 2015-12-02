@@ -1,4 +1,5 @@
 import React from 'react';
+import TagsInput from 'react-tagsinput'
 
 import TagActions from './../actions/tag-actions';
 
@@ -7,9 +8,10 @@ class AddTag extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { tag: null };
+    this.state = { tag: null, tags: [] };
 
     this.handleAutoComplete = this.handleAutoComplete.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -21,6 +23,12 @@ class AddTag extends React.Component {
     console.log('handle auto complete', e);
     let state = this.state;
     state.tag = e.target.value;
+    this.setState(state);
+  }
+
+  handleChange(tags) {
+    let state = this.state;
+    state.tags = tags;
     this.setState(state);
   }
 
@@ -48,6 +56,10 @@ class AddTag extends React.Component {
                 value={this.state.tag}
                 placeholder="tag"
                 id="tag" />
+
+              <TagsInput
+                value={this.state.tags}
+                onChange={this.handleChange} />
 
             </div>
 
