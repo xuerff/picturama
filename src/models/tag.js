@@ -13,8 +13,8 @@ var Tag = anselBookshelf.Model.extend({
 
   initialize: function() {
     this.on('creating', (model) => {
-      console.log('creating', model);
-      model.set('slug', slug(model.get('title')));
+      let sluggedTitle = slug(model.get('title').toLowerCase());
+      model.set('slug', sluggedTitle);
     });
   }
 
