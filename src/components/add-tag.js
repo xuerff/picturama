@@ -42,7 +42,7 @@ class AddTag extends React.Component {
 
             <div className="textfield">
               <input 
-                className="textfield__input" 
+                className="textfield" 
                 type="text" 
                 onChange={this.handleAutoComplete}
                 value={this.state.tag}
