@@ -32,17 +32,17 @@ class AddTag extends React.Component {
   }
 
   render() {
-    var btnClass = `mdl-button mdl-button--raised mdl-button--colored`;
+    var btnClass = `button button--raised button--colored`;
 
     return (
       <div className="outer-modal">
-        <div className="modal mdl-shadow--2dp">
+        <div className="modal shadow--2dp">
           <form onSubmit={this.handleSubmit}>
             <h3>Add a tag</h3>
 
-            <div className="mdl-textfield mdl-js-textfield">
+            <div className="textfield">
               <input 
-                className="mdl-textfield__input" 
+                className="textfield" 
                 type="text" 
                 onChange={this.handleAutoComplete}
                 value={this.state.tag}

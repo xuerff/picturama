@@ -85,13 +85,13 @@ class Sidebar extends React.Component {
         <div className="sidebar-content">
           <button 
             onClick={this.clearFilters.bind(this)} 
-            className="mdl-button mdl-js-button">
+            className="button">
             <i className="fa fa-book"></i> All content
           </button>
 
           <button
             onClick={this.filterFlagged.bind(this)}
-            className="mdl-button mdl-js-button flagged">
+            className="button flagged">
             <i className="fa fa-flag"></i> Flagged
           </button>
 
