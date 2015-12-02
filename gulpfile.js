@@ -15,16 +15,16 @@ gulp.task("babel", function () {
     .pipe(gulp.dest("dist"));
 });
 
-gulp.task('mdl-js', function() {
-  return gulp.src('./node_modules/material-design-lite/src/**/*.js')
-    .pipe(concat('material-design-lite.js'))
-    .pipe(gulp.dest("dist"));
-});
+//gulp.task('mdl-js', function() {
+//  return gulp.src('./node_modules/material-design-lite/src/**/*.js')
+//    .pipe(concat('material-design-lite.js'))
+//    .pipe(gulp.dest("dist"));
+//});
 
-gulp.task('mdl-styles', function() {
-  return gulp.src('./node_modules/material-design-lite/dist/material.css')
-    .pipe(gulp.dest('dist'));
-});
+//gulp.task('mdl-styles', function() {
+//  return gulp.src('./node_modules/material-design-lite/dist/material.css')
+//    .pipe(gulp.dest('dist'));
+//});
 
 gulp.task('styles', function() {
   return gulp.src('src/source.less')
@@ -39,7 +39,7 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('run', [ 'babel', 'mdl-js', 'mdl-styles', 'styles' ],
+gulp.task('run', [ 'babel', 'styles' ],
   function () {
     childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
   });
@@ -57,14 +57,12 @@ gulp.task('migrate', [ 'clear-db' ], function() {
   return knex.migrate.latest();
 });
 
-gulp.task('default', [ 'babel', 'mdl-js', 'mdl-styles', 'styles', 'run' ]);
+gulp.task('default', [ 'babel', 'styles', 'run' ]);
 
 gulp.task('clear', [
   'clear-db',
   'migrate',
   'babel',
-  'mdl-js',
-  'mdl-styles',
   'styles',
   'run'
 ]);
