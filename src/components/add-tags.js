@@ -1,5 +1,5 @@
 import React from 'react';
-import TagsInput from 'react-tagsinput'
+import TagsInput from 'react-tagsinput';
 
 import TagActions from './../actions/tag-actions';
 

@@ -9,13 +9,13 @@ var del = require('del');
 var knexFile = require('./knexfile');
 var knex = require('knex')(knexFile.development);
 
-gulp.task("babel", function () {
+gulp.task("babel", ['lint'], function () {
   return gulp.src("src/**/*.js")
     .pipe(babel())
     .pipe(gulp.dest("dist"));
 });
 
-gulp.task('styles', function() {
+gulp.task('styles', ['lint'], function() {
   return gulp.src('src/source.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
@@ -46,7 +46,7 @@ gulp.task('migrate', [ 'clear-db' ], function() {
   return knex.migrate.latest();
 });
 
-gulp.task('default', [ 'babel', 'styles', 'run' ]);
+gulp.task('default', [ 'lint', 'babel', 'styles', 'run' ]);
 
 gulp.task('clear', [
   'clear-db',
