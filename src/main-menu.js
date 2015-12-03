@@ -16,8 +16,6 @@ class MainMenu {
     this.toggleDevTools = this.toggleDevTools.bind(this);
     this.addTags = this.addTags.bind(this);
 
-    console.log('this', this);
-
     this.template = template.menu.map((menu) => {
       menu.submenu = menu.submenu.map((submenu) => {
         if (this.hasOwnProperty(submenu.click))
@@ -28,47 +26,6 @@ class MainMenu {
 
       return menu;
     });
-
-    //this.template = [{
-    //  label: 'File',
-    //  submenu: [{
-    //    label: 'Scan',
-    //    accelerator: 'Ctrl+R',
-    //    click: this.scan.bind(this)
-    //  },
-    //  {
-    //    label: 'Close',
-    //    accelerator: 'Ctrl+Q',
-    //    click: this.close.bind(this)
-    //  }]
-    //},
-    //{
-    //  label: 'View',
-    //  submenu: [{
-    //    label: 'Reload',
-    //    accelerator: 'Shift+Ctrl+R',
-    //    click: this.fullscreen.bind(this)
-    //  },
-    //  {
-    //    label: 'Enter Fullscreen',
-    //    accelerator: 'F11',
-    //    click: this.fullscreen.bind(this)
-    //  },
-    //  {
-    //    label: 'Toggle DevTools',
-    //    accelerator: 'Shift+Ctrl+I',
-    //    click: this.toggleDevTools.bind(this)
-    //  }]
-    //},
-    //{
-    //  label: 'Tags',
-    //  submenu: [{
-    //    label: 'Add tag',
-    //    accelerator: 'Ctrl+T',
-    //    enabled: false,
-    //    click: this.addTag.bind(this)
-    //  }]
-    //}];
 
     ipcMain.on('toggleAddTagMenu', (e, state) => {
       this.menu.items[2].submenu.items[0].enabled = state;

@@ -2,6 +2,7 @@ import alt from './../alt';
 import Promise from 'bluebird';
 
 import Tag from './../models/tag';
+import Photo from './../models/photo';
 
 class TagActions {
 
@@ -32,6 +33,34 @@ class TagActions {
     .then((tags) => {
       this.actions.createTagsSuccess(tags);
     });
+  }
+
+  createTagsAndAssociateToPhoto(tags, photoId) {
+    new Photo({ id: photoId }).fetch().then(function(photo) {
+      console.log('before assoc', photo);
+
+      return Promise.map(tags, (tagName) => {
+        return new Tag({ title: tagName })
+          .save()
+          .then((tag) => {
+            return tag
+              .photos()
+              .attach(photo)
+              .then(() => tag.toJSON());
+          })
+        //return new Tag({ title: tagName })
+        //  .photos()
+        //  .attach(photo)
+        //  .then((tag) => tag.toJSON());
+      });
+    })
+    .then((tags) => {
+      console.log('created tags', tags);
+      this.actions.createTagsSuccess(tags);
+    })
+    .catch((err) => {
+      console.log('err', err);
+    })
   }
 
   getTags() {

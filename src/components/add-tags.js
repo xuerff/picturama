@@ -15,7 +15,7 @@ class AddTags extends React.Component {
   }
 
   componentDidMount() {
-    console.log('modal');
+    console.log('modal', this.props.photo);
   }
 
   handleChange(tags) {
@@ -25,11 +25,9 @@ class AddTags extends React.Component {
   }
 
   handleSubmit(e) {
-    console.log('handle submit');
     e.preventDefault();
-
-    var tags = this.state.tags.map((tag) => tag.trim());
-    TagActions.createTags(tags);
+    let tags = this.state.tags.map((tag) => tag.trim());
+    TagActions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
   }
 
   render() {
