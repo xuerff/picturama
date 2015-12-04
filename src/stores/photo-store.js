@@ -36,7 +36,7 @@ class PhotoStore {
     var dates = { years: [] };
     this.dates = {};
 
-    data.forEach(function(date) {
+    data.forEach((date) => {
       let [ year, month ] = date.date.split('-');
 
       // Year
@@ -46,7 +46,7 @@ class PhotoStore {
       } else {
         let foundYear = false;
 
-        dates.years.forEach(function(dateYear) {
+        dates.years.forEach((dateYear) => {
           if (dateYear.id == year)
             foundYear = true;
         });
@@ -56,7 +56,7 @@ class PhotoStore {
       }
 
       // Month
-      dates.years = dates.years.map(function(dateYear) {
+      dates.years = dates.years.map((dateYear) => {
         if (dateYear.id == year) {
           if (dateYear.months.length === 0) {
             dateYear.months.push({ id: month, days: [] });
@@ -64,7 +64,7 @@ class PhotoStore {
           } else {
             let foundMonth = false;
 
-            dateYear.months.forEach(function(dateMonth) {
+            dateYear.months.forEach((dateMonth) => {
               if (dateMonth.id == month)
                 foundMonth = true;
             });
@@ -78,9 +78,9 @@ class PhotoStore {
       });
 
       // Day
-      dates.years = dates.years.map(function(dateYear) {
+      dates.years = dates.years.map((dateYear) => {
         if (dateYear.id == year)
-          dateYear.months.map(function(dateMonth) {
+          dateYear.months.map((dateMonth) => {
             if (dateMonth.id == month)
               dateMonth.days.push({ id: date.date });
 
@@ -92,7 +92,6 @@ class PhotoStore {
     });
 
     this.dates = dates;
-    console.log('dates', dates);
   }
 
   onUpdatedPhotoSuccess(photo) {

@@ -64,7 +64,6 @@ class PhotoActions {
       .fetch({ withRelated: ['photos'] })
       .then((tag) => {
         let photos = tag.related('photos');
-        console.log('set tag filter', tag, photos);
         this.actions.getPhotosSuccess(photos);
       });
   }

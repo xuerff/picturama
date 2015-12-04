@@ -37,22 +37,42 @@ class TagActions {
 
   createTagsAndAssociateToPhoto(tags, photoId) {
     new Photo({ id: photoId }).fetch().then((photo) => {
+    //new Photo({ id: photoId }).fetch().then(() => {
       return Promise.map(tags, (tagName) => {
         return new Tag({ title: tagName })
-          .save()
+          .fetch()
+          .then((tag) => {
+            console.log('fetched tag', tag);
+            if (tag)
+              return tag;
+            else
+              return new Tag({ title: tagName }).save();
+          })
           .then((tag) => {
             return tag
               .photos()
               .attach(photo)
               .then(() => tag.toJSON());
           });
+        // 
+        //return new Tag({ title: tagName })
+        //  .save()
+        //  .then((tag) => {
+        //    return tag
+        //      .photos()
+        //      .attach(photo)
+        //      .then(() => tag.toJSON());
+        //  })
+        //  .catch((err) => {
+        //    console.log('err creating tag', err);
+        //  });
       });
     })
     .then((tags) => {
       this.actions.createTagsSuccess(tags);
-    })
-    .catch((err) => {
-      console.log('err', err);
+    //})
+    //.catch((err) => {
+    //  console.log('err', err);
     });
   }
 

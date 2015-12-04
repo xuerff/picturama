@@ -14,7 +14,20 @@ class TagStore {
   }
 
   onCreateTagsSuccess(data) {
-    this.tags = this.tags.concat(data);
+    let tags = data.map((tag) => {
+      let exists = false;
+
+      this.tags.forEach((storeTag) => {
+        if (tag.slug == storeTag.slug)
+          exists = true;
+      });
+
+      return (!exists) ? tag : null;
+    })
+    .filter((tag) => tag);
+
+    if (tags.length > 0)
+      this.tags = this.tags.concat(tags);
   }
 
   onGetTagsSuccess(data) {
