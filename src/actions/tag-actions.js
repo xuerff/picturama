@@ -15,11 +15,9 @@ class TagActions {
   }
 
   createTag(tagName) {
-    console.log('before action', tagName);
     new Tag({ title: tagName })
       .save()
       .then((tag) => {
-        console.log('tag');
         this.actions.createTagSuccess(tag);
       });
   }
@@ -37,7 +35,6 @@ class TagActions {
 
   createTagsAndAssociateToPhoto(tags, photoId) {
     new Photo({ id: photoId }).fetch().then((photo) => {
-    //new Photo({ id: photoId }).fetch().then(() => {
       return Promise.map(tags, (tagName) => {
         return new Tag({ title: tagName })
           .fetch()
@@ -54,25 +51,10 @@ class TagActions {
               .attach(photo)
               .then(() => tag.toJSON());
           });
-        // 
-        //return new Tag({ title: tagName })
-        //  .save()
-        //  .then((tag) => {
-        //    return tag
-        //      .photos()
-        //      .attach(photo)
-        //      .then(() => tag.toJSON());
-        //  })
-        //  .catch((err) => {
-        //    console.log('err creating tag', err);
-        //  });
       });
     })
     .then((tags) => {
       this.actions.createTagsSuccess(tags);
-    //})
-    //.catch((err) => {
-    //  console.log('err', err);
     });
   }
 

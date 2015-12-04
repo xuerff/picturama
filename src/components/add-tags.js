@@ -2,6 +2,7 @@ import React from 'react';
 import TagsInput from 'react-tagsinput';
 
 import TagActions from './../actions/tag-actions';
+import TagStore from './../stores/tag-store';
 
 class AddTags extends React.Component {
 
@@ -15,7 +16,7 @@ class AddTags extends React.Component {
   }
 
   componentDidMount() {
-    console.log('modal', this.props.photo);
+    TagStore.listen(this.props.closeTagDialog);
   }
 
   handleChange(tags) {

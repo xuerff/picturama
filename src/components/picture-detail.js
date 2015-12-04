@@ -171,7 +171,11 @@ class PictureDetail extends React.Component {
     var showModal;
 
     if (this.state.modalIsOpen)
-      showModal = <AddTags photo={this.props.photo} />;
+      showModal = (
+        <AddTags 
+          photo={this.props.photo} 
+          closeTagDialog={this.closeTagDialog} />
+      );
 
     return (
       <div className="picture-detail">
