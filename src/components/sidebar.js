@@ -6,12 +6,19 @@ import PhotoActions from './../actions/photo-actions';
 import TagActions from './../actions/tag-actions';
 
 import DateYear from './date-year';
+import TagButton from './tag-button';
 
 class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { dates: { years: [] }, currentDate: null, tags: [] };
+
+    this.state = { 
+      dates: { years: [] }, 
+      currentDate: null, 
+      currentTag: null,
+      tags: [] 
+    };
   }
 
   componentDidMount() {
@@ -52,6 +59,14 @@ class Sidebar extends React.Component {
     this.setState(state);
   }
 
+  handleTag(tag) {
+    let state = this.state;
+    state.currentTag = tag;
+
+    PhotoActions.setTagFilter(tag);
+    this.setState(state);
+  }
+
   filterFlagged() {
     console.log('filter flagged');
     PhotoActions.getFlagged();
@@ -75,7 +90,11 @@ class Sidebar extends React.Component {
     });
 
     var tagsList = this.state.tags.map((tag) => {
-      return <li>{tag.title}</li>;
+      return (
+        <TagButton 
+          setTag={this.handleTag.bind(this)} 
+          tag={tag} />
+      );
     });
 
     return (

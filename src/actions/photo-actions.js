@@ -1,6 +1,7 @@
 import alt from './../alt';
 
 import Photo from './../models/photo';
+import Tag from './../models/tag';
 
 class PhotoActions {
 
@@ -54,6 +55,16 @@ class PhotoActions {
       .where({ date: date })
       .fetchAll({ withRelated: ['versions'] })
       .then((photos) => {
+        this.actions.getPhotosSuccess(photos);
+      });
+  }
+
+  setTagFilter(tag) {
+    new Tag({ id: tag.id })
+      .fetch({ withRelated: ['photos'] })
+      .then((tag) => {
+        let photos = tag.related('photos');
+        console.log('set tag filter', tag, photos);
         this.actions.getPhotosSuccess(photos);
       });
   }
