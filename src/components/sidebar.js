@@ -1,27 +1,43 @@
 import React from 'react';
 
 import PhotoStore from './../stores/photo-store';
+import TagStore from './../stores/tag-store';
 import PhotoActions from './../actions/photo-actions';
+import TagActions from './../actions/tag-actions';
 
-//import DateElement from './date-element';
 import DateYear from './date-year';
+import TagButton from './tag-button';
 
 class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { dates: { years: [] }, currentDate: null };
+
+    this.state = { 
+      dates: { years: [] }, 
+      currentDate: null, 
+      currentTag: null,
+      tags: [] 
+    };
   }
 
   componentDidMount() {
     PhotoActions.getDates();
+    TagActions.getTags();
     PhotoStore.listen(this.appendDates.bind(this));
+    TagStore.listen(this.appendTags.bind(this));
   }
 
   appendDates(data) {
     let state = this.state;
-
     state.dates = data.dates;
+    this.setState(state);
+  }
+
+  appendTags(data) {
+    console.log('append tags', data);
+    let state = this.state;
+    state.tags = data.tags;
     this.setState(state);
   }
 
@@ -43,14 +59,26 @@ class Sidebar extends React.Component {
     this.setState(state);
   }
 
+  handleTag(tag) {
+    let state = this.state;
+    state.currentTag = tag;
+
+    PhotoActions.setTagFilter(tag);
+    this.setState(state);
+  }
+
+  filterFlagged() {
+    console.log('filter flagged');
+    PhotoActions.getFlagged();
+  }
+
   isActive(date) {
     return (date.date == this.state.currentDate) ? 'active' : '';
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this);
-    //var isActive = this.isActive.bind(this);
-    var currentDate = this.state.currentDate;
+    var handleDate = this.handleDate.bind(this)
+      , currentDate = this.state.currentDate;
 
     var dateYearsList = this.state.dates.years.map(function(year) {
       return (
@@ -61,25 +89,28 @@ class Sidebar extends React.Component {
       );
     });
 
-    //var datesList = this.state.dates.map(function(date) {
-    //  return (
-    //    <DateElement
-    //      date={date.date}
-    //      active={isActive(date)}
-    //      setDate={handleDate} />
-    //  )
-    //});
+    var tagsList = this.state.tags.map((tag) => {
+      return (
+        <TagButton 
+          setTag={this.handleTag.bind(this)} 
+          tag={tag} />
+      );
+    });
 
     return (
       <div id="sidebar">
         <h2><i className="fa fa-camera-retro"></i> Library</h2>
 
         <div className="sidebar-content">
-          <button onClick={this.clearFilters.bind(this)} className="mdl-button mdl-js-button">
+          <button 
+            onClick={this.clearFilters.bind(this)} 
+            className="button">
             <i className="fa fa-book"></i> All content
           </button>
 
-          <button className="mdl-button mdl-js-button flagged">
+          <button
+            onClick={this.filterFlagged.bind(this)}
+            className="button flagged">
             <i className="fa fa-flag"></i> Flagged
           </button>
 
@@ -93,6 +124,7 @@ class Sidebar extends React.Component {
 
           <div className="tags">
             <h3><i className="fa fa-tags"></i> Tags</h3>
+            <ul>{tagsList}</ul>
           </div>
         </div>
       </div>

@@ -1,0 +1,48 @@
+{
+  "menu": [
+    {
+      "label": "File",
+      "submenu": [
+        {
+          "label": "Scan",
+          "accelerator": "Ctrl+R",
+          "click": "scan"
+        },
+        {
+          "label": "Close",
+          "accelerator": "Ctrl+Q",
+          "click": "close"
+        }
+      ]
+    },
+    {
+      "label": "View",
+      "submenu": [
+        {
+          "label": "Reload",
+          "accelerator": "Shift+Ctrl+R",
+          "click": "fullscreen"
+        },
+        {
+          "label": "Enter Fullscreen",
+          "accelerator": "F11",
+          "click": "fullscreen"
+        },
+        {
+          "label": "Toggle DevTools",
+          "accelerator": "Shift+Ctrl+I",
+          "click": "toggleDevTools"
+        }
+      ]
+    },
+    {
+      "label": "Tags",
+      "submenu": [{
+        "label": "Add tags",
+        "accelerator": "Ctrl+T",
+        "enabled": false,
+        "click": "addTags"
+      }]
+    }
+  ]
+}

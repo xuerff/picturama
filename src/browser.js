@@ -1,4 +1,4 @@
-import app from 'app';
+import {app, screen} from 'electron';
 import BrowserWindow from 'browser-window';
 import usbDetect from 'usb-detection';
 import fs from 'fs';
@@ -25,11 +25,15 @@ app.on('window-all-closed', () => {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
+  let workAreaSize = screen.getPrimaryDisplay().workAreaSize;
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1356, height: 768 });
 
+  if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
+    mainWindow.maximize();
+
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/../static/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
 
   let library = new Library(mainWindow, app.getAppPath());
 

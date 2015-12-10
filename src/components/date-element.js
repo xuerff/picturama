@@ -19,7 +19,7 @@ class DateElement extends React.Component {
   render() {
     return (
       <li className={this.isActive(this.props.date)}>
-        <button onClick={this.handleClick.bind(this)} className="mdl-button mdl-js-button">
+        <button onClick={this.handleClick.bind(this)} className="button">
           <i className="fa fa-calendar-o"></i> {this.props.date}
         </button>
       </li>

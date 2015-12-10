@@ -1,5 +1,5 @@
 exports.up = function(knex, Promise) {
-  return knex.schema.createTable('photos', function (table) {
+  return knex.schema.createTable('photos', function(table) {
     table.string('id', 10).primary().unique();
     table.string('title');
     table.string('master');

@@ -22,12 +22,16 @@ class VersionActions {
   }
 
   createVersionAndOpenWith(photo, type, targetSoftware) {
+    console.log('create version and open with', photo.id, type);
     new Version({
       type: type,
       version: '1',
       photo_id: photo.id
     }).save().then((version) => {
       this.actions.createVersionSuccessOpenWith({ version, targetSoftware });
+
+    }).catch(function(err) {
+      console.log('err', err);
     });
   }
 

@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
     t.string('output');
     t.string('thumbnail');
     t.integer('version');
+
     t.integer('photo_id').index().references('id').inTable('photos');
   });
 };
