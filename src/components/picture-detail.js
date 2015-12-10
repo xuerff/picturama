@@ -29,6 +29,7 @@ class PictureDetail extends React.Component {
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeTagDialog = this.closeTagDialog.bind(this);
+    this.displayTags = this.displayTags.bind(this);
   }
 
   updateVersion(store) {
@@ -165,6 +166,15 @@ class PictureDetail extends React.Component {
     ipcRenderer.send('toggleAddTagMenu', false);
   }
 
+  displayTags() {
+    if (this.props.photo.tags.length == 0)
+      return 'none';
+    else
+      return this.props.photo.tags
+        .map((tag) => tag.title)
+        .join(', ');
+  }
+
   render() {
     var className = [ 'shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
 
@@ -193,6 +203,7 @@ class PictureDetail extends React.Component {
             <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
             <li>v#: {this.props.photo.versionNumber}</li>
             <li>Flag: {this.props.photo.flag}</li>
+            <li>Tags: {this.displayTags()}</li>
           </ul>
         </div>
 
