@@ -6,10 +6,12 @@ import watchr from 'watchr';
 import sharp from 'sharp';
 import notifier from 'node-notifier';
 
+import config from './config';
+
 import Photo from './models/photo';
 import Version from './models/version';
 
-var acceptedRawFormats = [ 'RAF', 'CR2', 'ARW' ];
+//var acceptedRawFormats = [ 'RAF', 'CR2', 'ARW' ];
 
 class Library {
 
@@ -24,8 +26,8 @@ class Library {
   }
 
   walk(root, fileStat, next) {
-    let allowed = new RegExp(acceptedRawFormats.join('$|') + '$', 'i');
-    let extract = new RegExp('(.+)\.(' + acceptedRawFormats.join('|') + ')$', 'i');
+    let allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
+    let extract = new RegExp('(.+)\.(' + config.acceptedRawFormats.join('|') + ')$', 'i');
 
     console.log('walk', fileStat.name, this.thumbsPath);
 
@@ -110,7 +112,8 @@ class Library {
 
   watch() {
     let self = this;
-    let allowed = /([\$\#\w\d]+)-([\$\#\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i;
+    //let allowed = /([\$\#\w\d]+)-([\$\#\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i;
+    let allowed = config.watchedFormats;
 
     watchr.watch({
       paths: [ self.path, self.versionsPath, self.thumbsPath ],
