@@ -69,11 +69,6 @@ class PictureDetail extends React.Component {
     this.menu.popup(remote.getCurrentWindow());
   }
 
-  //shutterSpeed(exposureTime) {
-  //  var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
-  //  return '1/' + Math.pow(10, zeros);
-  //}
-
   openWithRawtherapee() {
     VersionActions.createVersionAndOpenWith(
       this.props.photo, 
@@ -168,15 +163,6 @@ class PictureDetail extends React.Component {
 
     ipcRenderer.send('toggleAddTagMenu', false);
   }
-
-  //displayTags() {
-  //  if (this.props.photo.tags.length == 0)
-  //    return 'none';
-  //  else
-  //    return this.props.photo.tags
-  //      .map((tag) => tag.title)
-  //      .join(', ');
-  //}
 
   render() {
     var className = [

@@ -19,7 +19,6 @@ class AddTags extends React.Component {
     let state = this.state;
 
     TagStore.listen(this.props.closeTagDialog);
-    console.log('photo', this.props.photo);
 
     if (this.props.photo.tags.length > 0)
       this.state.tags = this.props.photo.tags.map((tag) => tag.title);

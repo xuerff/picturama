@@ -9,7 +9,7 @@ import notifier from 'node-notifier';
 import Photo from './models/photo';
 import Version from './models/version';
 
-var acceptedRawFormats = [ 'RAF', 'CR2' ];
+var acceptedRawFormats = [ 'RAF', 'CR2', 'ARW' ];
 
 class Library {
 
