@@ -19,7 +19,7 @@ class PhotoActions {
     console.log('photo actions new version', version, this);
 
     new Photo({ id: version.attributes.photo_id })
-      .fetch({ withRelated: ['versions'] })
+      .fetch({ withRelated: ['versions', 'tags'] })
       .then((photo) => {
         this.actions.updatedPhotoSuccess(photo);
       });
@@ -29,7 +29,7 @@ class PhotoActions {
     console.log('get photos');
 
     new Photo()
-      .fetchAll({ withRelated: ['versions'] })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         this.actions.getPhotosSuccess(photos);
       });
@@ -44,7 +44,7 @@ class PhotoActions {
   getFlagged() {
     new Photo()
       .where({ flag: true })
-      .fetchAll({ withRelated: ['versions'] })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         this.actions.getPhotosSuccess(photos);
       });
@@ -53,7 +53,7 @@ class PhotoActions {
   setDateFilter(date) {
     new Photo()
       .where({ date: date })
-      .fetchAll({ withRelated: ['versions'] })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         this.actions.getPhotosSuccess(photos);
       });
@@ -69,7 +69,6 @@ class PhotoActions {
   }
 
   startImport() {
-    console.log('start import');
     this.actions.setImporting(true);
   }
 
@@ -80,10 +79,9 @@ class PhotoActions {
       .save('flag', !photo.flag, { patch: true })
       .then(() => {
         return new Photo({ id: photo.id })
-          .fetch({ withRelated: ['versions'] });
+          .fetch({ withRelated: ['versions', 'tags'] });
       })
       .then((photoModel) => {
-        console.log('photo model', photoModel, photo);
         this.actions.updatedPhotoSuccess(photoModel);
       })
       .catch((err) => {
