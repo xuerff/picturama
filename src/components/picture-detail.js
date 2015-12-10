@@ -9,6 +9,7 @@ import VersionActions from './../actions/version-actions';
 import remote from 'remote';
 
 import AddTags from './add-tags';
+import PictureInfo from './picture-info';
 
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
@@ -29,7 +30,6 @@ class PictureDetail extends React.Component {
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeTagDialog = this.closeTagDialog.bind(this);
-    this.displayTags = this.displayTags.bind(this);
   }
 
   updateVersion(store) {
@@ -37,7 +37,6 @@ class PictureDetail extends React.Component {
   }
 
   keyboardListener(e) {
-    //if ([27, 37, 39, 80, 89].indexOf(e.keyCode) != -1)
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
@@ -70,13 +69,17 @@ class PictureDetail extends React.Component {
     this.menu.popup(remote.getCurrentWindow());
   }
 
-  shutterSpeed(exposureTime) {
-    var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
-    return '1/' + Math.pow(10, zeros);
-  }
+  //shutterSpeed(exposureTime) {
+  //  var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
+  //  return '1/' + Math.pow(10, zeros);
+  //}
 
   openWithRawtherapee() {
-    VersionActions.createVersionAndOpenWith(this.props.photo, 'RAW', 'rawtherapee');
+    VersionActions.createVersionAndOpenWith(
+      this.props.photo, 
+      'RAW', 
+      'rawtherapee'
+    );
   }
 
   openWithGimp() {
@@ -166,17 +169,20 @@ class PictureDetail extends React.Component {
     ipcRenderer.send('toggleAddTagMenu', false);
   }
 
-  displayTags() {
-    if (this.props.photo.tags.length == 0)
-      return 'none';
-    else
-      return this.props.photo.tags
-        .map((tag) => tag.title)
-        .join(', ');
-  }
+  //displayTags() {
+  //  if (this.props.photo.tags.length == 0)
+  //    return 'none';
+  //  else
+  //    return this.props.photo.tags
+  //      .map((tag) => tag.title)
+  //      .join(', ');
+  //}
 
   render() {
-    var className = [ 'shadow--2dp', rotation[this.props.photo.orientation] ].join(' ');
+    var className = [
+      'shadow--2dp',
+      rotation[this.props.photo.orientation] 
+    ].join(' ');
 
     var showModal;
 
@@ -195,17 +201,7 @@ class PictureDetail extends React.Component {
             className={className} />
         </div>
 
-        <div className="picture-info card shadow--2dp">
-          <ul>
-            <li className="title">{this.props.photo.title}</li>
-            <li>ISO: {this.props.photo.iso}</li>
-            <li>f/{this.props.photo.aperture}</li>
-            <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
-            <li>v#: {this.props.photo.versionNumber}</li>
-            <li>Flag: {this.props.photo.flag}</li>
-            <li>Tags: {this.displayTags()}</li>
-          </ul>
-        </div>
+        <PictureInfo photo={this.props.photo} />
 
         {showModal}
       </div>
