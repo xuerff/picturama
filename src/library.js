@@ -5,13 +5,15 @@ import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
 import notifier from 'node-notifier';
+import fs from 'fs';
+import Promise from 'bluebird';
 
 import config from './config';
 
 import Photo from './models/photo';
 import Version from './models/version';
 
-//var acceptedRawFormats = [ 'RAF', 'CR2', 'ARW' ];
+var readFile = Promise.promisify(fs.readFile);
 
 class Library {
 
@@ -29,36 +31,82 @@ class Library {
     let allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
     let extract = new RegExp('(.+)\.(' + config.acceptedRawFormats.join('|') + ')$', 'i');
 
-    console.log('walk', fileStat.name, this.thumbsPath);
+    if (fileStat.name.toLowerCase().match(allowed)) {
 
-    if (fileStat.name.match(allowed)) {
+      console.log('walk', fileStat.name, this.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 
       return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then(() => {
-        new ExifImage({ image: `${root}/${filename}.thumb.jpg` }, (err, exifData) => {
-          var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+        //return readFile(`${root}/${filename}.thumb.jpg`);
+        let thumbStat = fs.statSync(`${root}/${filename}.thumb.jpg`);
 
-          sharp(`${root}/${filename}.thumb.jpg`)
-            .rotate()
-            .toFile(`${this.thumbsPath}${filename}.thumb.jpg`)
-            .then(() => {
-              return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
-                .resize(250, 250)
-                .max()
-                .quality(100)
-                .toFile(`${this.thumbs250Path}${filename}.jpg`);
-            })
-            .then(() => {
-              return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
-            })
-            .then((photo) => {
+        if (thumbStat)
+          return `${root}/${filename}.thumb.jpg`;
+        else
+          throw 'invalid file';
+      })
+      .catch((err) => {
+        console.log('catch issue', err);
+        //return readFile(`${root}/${filename}.thumb.ppm`);
+        let thumbStat = fs.statSync(`${root}/${filename}.thumb.ppm`);
+
+        if (thumbStat)
+          return `${root}/${filename}.thumb.ppm`;
+        else
+          throw 'invalid file';
+      })
+      //.then((stats) => {
+      //  console.log('stats', stats);
+      //})
+      .then((imgPath) => {
+        console.log('img path', imgPath);
+
+        //new ExifImage({ image: imgPath }, (err, exifData) => {
+        ////new ExifImage({ image: `${root}/${filename}.thumb.jpg` }, (err, exifData) => {
+        //  console.log('exif data', err, exifData);
+        //  var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+
+          //sharp(`${root}/${filename}.thumb.jpg`)
+        readFile(imgPath)
+          .then((img) => {
+            return sharp(img)
+              .rotate()
+              .withMetadata()
+              .toFile(`${this.thumbsPath}${filename}.thumb.jpg`);
+          })
+        //sharp(imgPath)
+          //.rotate()
+          //.withMetadata()
+          //.toFile(`${this.thumbsPath}${filename}.thumb.jpg`)
+          .then(() => {
+            return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
+              .resize(250, 250)
+              .max()
+              .quality(100)
+              .toFile(`${this.thumbs250Path}${filename}.jpg`);
+          })
+          .then(() => {
+            //return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
+            return new Photo({ title: filename }).fetch();
+          })
+          .then((photo) => {
+            new ExifImage({ image: `${this.thumbsPath}${filename}.thumb.jpg` }, (err, exifData) => {
+
+              if (filename == 'IMG_20151212_220358')
+                console.log('exif', err, exifData);
+
+              let createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+
+              if (filename == 'IMG_20151212_220358')
+                console.log('created at', createdAt);
+
               if (photo)
-                throw 'alredy-existing';
+                next();
               else
                 return Photo.forge({
                   title: filename,
                   extension: fileStat.name.match(/\.(.+)$/i)[1],
-                  orientation: exifData.image.Orientation,
+                  orientation: exifData.image.Orientation || 1,
                   date: createdAt.format('YYYY-MM-DD'),
                   created_at: createdAt.toDate(),
                   exposure_time: exifData.exif.ExposureTime,
@@ -68,16 +116,25 @@ class Library {
                   master: `${root}/${fileStat.name}`,
                   thumb_250: `${this.thumbs250Path}${filename}.jpg`,
                   thumb: `${this.thumbsPath}${filename}.thumb.jpg`
-                }).save();
-            })
-            .then(() => {
-              next();
-            })
-            .catch(function(err) {
-              console.log('ERR', err);
-              next();
+                })
+                .save()
+                .then(() => {
+                  console.log('saved');
+                  next();
+                })
+                .catch((err) => {
+                  console.log('err on save', err);
+                });
             });
-        });
+          //})
+          //.then(() => {
+          //  next();
+          })
+          .catch(function(err) {
+            console.log('ERR', err);
+            next();
+          });
+        //});
       }).catch(function(err) {
         console.log('ERR', err);
         next();
