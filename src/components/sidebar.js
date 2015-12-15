@@ -2,6 +2,8 @@ import React from 'react';
 
 import PhotoStore from './../stores/photo-store';
 import TagStore from './../stores/tag-store';
+import DeviceStore from './../stores/device-store';
+
 import PhotoActions from './../actions/photo-actions';
 import TagActions from './../actions/tag-actions';
 
@@ -15,6 +17,7 @@ class Sidebar extends React.Component {
 
     this.state = { 
       dates: { years: [] }, 
+      devices: [],
       currentDate: null, 
       currentTag: null,
       tags: [] 
@@ -26,6 +29,14 @@ class Sidebar extends React.Component {
     TagActions.getTags();
     PhotoStore.listen(this.appendDates.bind(this));
     TagStore.listen(this.appendTags.bind(this));
+    DeviceStore.listen(this.appendDevices.bind(this));
+  }
+
+  appendDevices(data) {
+    console.log('append devices', data);
+    let state = this.state;
+    state.devices = data.devices;
+    this.setState(state);
   }
 
   appendDates(data) {
@@ -97,6 +108,12 @@ class Sidebar extends React.Component {
       );
     });
 
+    var devicesList = this.state.devices.map((device) => {
+      return (
+        <li>{device.name}</li>
+      );
+    });
+
     return (
       <div id="sidebar">
         <h2><i className="fa fa-camera-retro"></i> Library</h2>
@@ -125,6 +142,11 @@ class Sidebar extends React.Component {
           <div className="tags">
             <h3><i className="fa fa-tags"></i> Tags</h3>
             <ul>{tagsList}</ul>
+          </div>
+
+          <div className="devices">
+            <h3><i className="fa fa-usb"></i> Devices</h3>
+            <ul>{devicesList}</ul>
           </div>
         </div>
       </div>

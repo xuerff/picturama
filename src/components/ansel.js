@@ -1,7 +1,8 @@
 import React from 'react';
-import ipc from 'ipc';
+import {ipcRenderer} from 'electron';
 
 import PhotoActions from './../actions/photo-actions';
+import DeviceActions from './../actions/device-actions';
 
 import Sidebar from './sidebar';
 import Container from './container';
@@ -12,12 +13,17 @@ class Ansel extends React.Component {
     super(props);
     this.state = {};
 
-    ipc.on('new-version', PhotoActions.updatedPhoto);
-    ipc.on('start-import', PhotoActions.startImport);
+    ipcRenderer.on('new-version', PhotoActions.updatedPhoto);
+    ipcRenderer.on('start-import', PhotoActions.startImport);
 
-    ipc.on('finish-import', () => {
+    ipcRenderer.on('finish-import', () => {
       PhotoActions.getPhotos();
       PhotoActions.getDates();
+    });
+
+    ipcRenderer.on('scanned-devices', (e, devices) => {
+      console.log('scanned devices', devices);
+      DeviceActions.initDevices(devices);
     });
   }
 

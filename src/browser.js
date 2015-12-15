@@ -40,14 +40,16 @@ app.on('ready', () => {
 
   new MainMenu(mainWindow, library);
 
-  new Usb(function(err, drive) {
-    console.log('new drive', drive);
-  });
+  //new Usb(function(err, drive) {
+  //  console.log('new drive', drive);
+  //  mainWindow.webContents.send('scanned-devices', t);
+  //});
 
   let usb = new Usb();
 
   usb.scan((err, drives) => {
     console.log('drives list', drives);
+    mainWindow.webContents.send('scanned-devices', drives);
   });
 
   usb.watch((err, drive) => {
