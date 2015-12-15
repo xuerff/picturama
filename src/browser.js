@@ -44,18 +44,15 @@ app.on('ready', () => {
     console.log('new drive', drive);
   });
 
-  //console.log(udev.list()); // this is a long list :)
+  let usb = new Usb();
 
-  //var monitor = udev.monitor();
-  //monitor.on('add', function (device) {
-  //  console.log('added ' + device);
-  //});
-  //monitor.on('remove', function (device) {
-  //  console.log('removed ' + device);
-  //});
-  //monitor.on('change', function (device) {
-  //  console.log('changed ' + device);
-  //});
+  usb.scan((err, drives) => {
+    console.log('drives list', drives);
+  });
+
+  usb.watch((err, drive) => {
+    console.log('new drive', drive);
+  });
 
   //library.scan();
   library.watch();
