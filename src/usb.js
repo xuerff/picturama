@@ -16,21 +16,21 @@ class Usb {
       let devName = device.DEVNAME;
       let devModel = device.ID_MODEL || device.ID_NAME;
 
-      //setTimeout(function() {
-      njdsDrives()
-        //.then((drives) => njds.drivesDetail(drives))
-        .then((drives) => {
-          //console.log('drives', drives);
-          return njdsDrivesDetail(drives);
-        })
-        .each((data) => {
-          //console.log('drive', data);
+      setTimeout(function() {
+        njdsDrives()
+          //.then((drives) => njds.drivesDetail(drives))
+          .then((drives) => {
+            //console.log('drives', drives);
+            return njdsDrivesDetail(drives);
+          })
+          .each((data) => {
+            //console.log('drive', data);
 
-          if (data.drive == devName)
-            callback(null, { mountpoint: data.mountpoint, name: devModel });
-        });
+            if (data.drive == devName)
+              callback(null, { mountpoint: data.mountpoint, name: devModel });
+          });
 
-      //}, 100);
+      }, 100);
       //njds.drives(function (err, drives) {
       //  njds.drivesDetail(drives, function (err, data) {
       //    data.forEach(function(drive) {
