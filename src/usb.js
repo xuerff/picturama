@@ -11,23 +11,26 @@ class Usb {
     let monitor = udev.monitor();
 
     monitor.on('add', function (device) {
-      console.log('add device', device);
+      //console.log('add device', device);
 
       let devName = device.DEVNAME;
-      let devModel = device.ID_MODEL;
+      let devModel = device.ID_MODEL || device.ID_NAME;
 
+      //setTimeout(function() {
       njdsDrives()
         //.then((drives) => njds.drivesDetail(drives))
         .then((drives) => {
+          //console.log('drives', drives);
           return njdsDrivesDetail(drives);
         })
         .each((data) => {
-          console.log('drive', data.mountpoint, data.drive);
+          //console.log('drive', data);
 
           if (data.drive == devName)
             callback(null, { mountpoint: data.mountpoint, name: devModel });
         });
 
+      //}, 100);
       //njds.drives(function (err, drives) {
       //  njds.drivesDetail(drives, function (err, data) {
       //    data.forEach(function(drive) {
