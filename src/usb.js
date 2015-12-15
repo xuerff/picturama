@@ -1,5 +1,5 @@
 import usbDetect from 'usb-detection';
-import udev from 'udev';
+//import udev from 'udev';
 import fs from 'fs';
 import njds from 'nodejs-disks';
 
