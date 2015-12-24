@@ -52,8 +52,11 @@ app.on('ready', () => {
     mainWindow.webContents.send('scanned-devices', drives);
   });
 
-  usb.watch((err, drive) => {
+  usb.watch((err, action, drive) => {
     console.log('new drive', drive);
+
+    if (action == 'add')
+      mainWindow.webContents.send('add-device', drive);
   });
 
   //library.scan();

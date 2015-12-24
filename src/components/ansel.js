@@ -25,6 +25,10 @@ class Ansel extends React.Component {
       console.log('scanned devices', devices);
       DeviceActions.initDevices(devices);
     });
+
+    ipcRenderer.on('add-device', (e, device) => {
+      DeviceActions.addDevice(device);
+    });
   }
 
   handleDateFilter(date) {

@@ -11,6 +11,18 @@ class DeviceStore {
   onInitDevicesSuccess(devices) {
     this.devices = devices;
   }
+
+  onAddDeviceSuccess(device) {
+    let deviceExists = false;
+
+    this.devices.forEach((storedDevice) => {
+      if (storedDevice.name == device.name)
+        deviceExists = true;
+    });
+
+    if (!deviceExists)
+      this.devices.push(device);
+  }
 }
 
 export default alt.createStore(DeviceStore);

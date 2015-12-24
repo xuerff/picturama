@@ -11,11 +11,6 @@ class Usb {
   }
 
   scan(callback) {
-    //udev.list().forEach((dev) => {
-    //  if (dev.DEVNAME == '/dev/mmcblk0p1' || dev.DEVNAME == '/dev/sdb1')
-    //    console.log('dev name', dev);
-    //});
-
     njdsDrives()
       .then((drives) => {
         return njdsDrivesDetail(drives);
@@ -53,7 +48,8 @@ class Usb {
 
     monitor.on('add', function (device) {
       let devName = device.DEVNAME;
-      let devModel = device.ID_MODEL || device.ID_NAME;
+      //let devModel = device.ID_MODEL || device.ID_NAME;
+      let devModel = device.ID_FS_UUID || device.ID_NAME;
 
       setTimeout(function() {
         njdsDrives()
@@ -62,7 +58,7 @@ class Usb {
           })
           .each((data) => {
             if (data.drive == devName)
-              callback(null, { mountpoint: data.mountpoint, name: devModel });
+              callback(null, 'add', { mountpoint: data.mountpoint, name: devModel });
           });
 
       }, 100);
