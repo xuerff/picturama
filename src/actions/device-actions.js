@@ -4,7 +4,8 @@ class DeviceActions {
   constructor() {
     this.generateActions(
       'initDevicesSuccess',
-      'addDeviceSuccess'
+      'addDeviceSuccess',
+      'removeDeviceSuccess'
     );
   }
 
@@ -14,6 +15,10 @@ class DeviceActions {
 
   addDevice(device) {
     this.actions.addDeviceSuccess(device);
+  }
+
+  removeDevice(device) {
+    this.actions.removeDeviceSuccess(device);
   }
 }
 

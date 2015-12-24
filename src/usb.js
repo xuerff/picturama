@@ -48,7 +48,7 @@ class Usb {
 
     monitor.on('add', function (device) {
       let devName = device.DEVNAME;
-      //let devModel = device.ID_MODEL || device.ID_NAME;
+      let devId = device.ID_MODEL;
       let devModel = device.ID_FS_UUID || device.ID_NAME;
 
       setTimeout(function() {
@@ -58,10 +58,22 @@ class Usb {
           })
           .each((data) => {
             if (data.drive == devName)
-              callback(null, 'add', { mountpoint: data.mountpoint, name: devModel });
+              callback(null, 'add', { 
+                id: devId,
+                mountpoint: data.mountpoint, 
+                name: devModel 
+              });
           });
 
       }, 100);
+    });
+
+    monitor.on('remove', function (device) {
+      console.log('monitor remove', device);
+
+      let devId = device.ID_MODEL;
+
+      callback(null, 'remove', { id: devId });
     });
   }
 }

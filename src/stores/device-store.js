@@ -23,6 +23,12 @@ class DeviceStore {
     if (!deviceExists)
       this.devices.push(device);
   }
+
+  onRemoveDeviceSuccess(device) {
+    this.devices = this.devices.filter((storedDevice) => {
+      return (storedDevice.id != device.id);
+    });
+  }
 }
 
 export default alt.createStore(DeviceStore);
