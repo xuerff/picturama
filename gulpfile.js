@@ -37,10 +37,10 @@ gulp.task('run', [ 'babel', 'styles' ],
 
 gulp.task('clear-db', function() {
   return del([
-    'db.sqlite3',
+    'dot-ansel/db.sqlite3',
     'versions/**/*',
-    'thumbs/**/*',
-    'thumbs-250/**/*',
+    'dot-ansel/thumbs/**/*',
+    'dot-ansel/thumbs-250/**/*',
   ]);
 });
 

@@ -24,8 +24,8 @@ class Library {
 
     this.path = `${path}/photos`;
     this.versionsPath = `${path}/versions/`;
-    this.thumbsPath = `${path}/thumbs/`;
-    this.thumbs250Path = `${path}/thumbs-250/`;
+    //this.thumbsPath = `${path}/thumbs/`;
+    //this.thumbs250Path = `${path}/thumbs-250/`;
   }
 
   walk(root, fileStat, next) {
@@ -34,7 +34,7 @@ class Library {
 
     if (fileStat.name.toLowerCase().match(allowed)) {
 
-      console.log('walk', fileStat.name, this.thumbsPath);
+      console.log('walk', fileStat.name, config.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 
       return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then(() => {
@@ -62,20 +62,20 @@ class Library {
             return sharp(img)
               .rotate()
               .withMetadata()
-              .toFile(`${this.thumbsPath}${filename}.thumb.jpg`);
+              .toFile(`${config.thumbsPath}/${filename}.thumb.jpg`);
           })
           .then(() => {
-            return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
+            return sharp(`${config.thumbsPath}/${filename}.thumb.jpg`)
               .resize(250, 250)
               .max()
               .quality(100)
-              .toFile(`${this.thumbs250Path}${filename}.jpg`);
+              .toFile(`${config.thumbs250Path}/${filename}.jpg`);
           })
           .then(() => {
             return new Photo({ title: filename }).fetch();
           })
           .then((photo) => {
-            new ExifImage({ image: `${this.thumbsPath}${filename}.thumb.jpg` }, (err, exifData) => {
+            new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
 
               if (filename == 'IMG_20151212_220358')
                 console.log('exif', err, exifData);
@@ -99,8 +99,8 @@ class Library {
                   aperture: exifData.exif.FNumber,
                   focal_length: exifData.exif.FocalLength,
                   master: `${root}/${fileStat.name}`,
-                  thumb_250: `${this.thumbs250Path}${filename}.jpg`,
-                  thumb: `${this.thumbsPath}${filename}.thumb.jpg`
+                  thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
+                  thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
                 })
                 .save()
                 .then(() => {
@@ -153,7 +153,7 @@ class Library {
     let allowed = config.watchedFormats;
 
     watchr.watch({
-      paths: [ self.path, self.versionsPath, self.thumbsPath ],
+      paths: [ self.path, self.versionsPath, config.thumbsPath ],
 
       listener: (action, filePath) => {
         // on action:create then parse file and update version

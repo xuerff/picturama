@@ -7,5 +7,7 @@ export default {
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
   watchedFormats: /([\$\#\w\d]+)-([\$\#\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
   dotAnsel,
-  dbFile: `${dotAnsel}/db.sqlite3`
+  dbFile: `${dotAnsel}/db.sqlite3`,
+  thumbsPath: `${dotAnsel}/thumbs`,
+  thumbs250Path: `${dotAnsel}/thumbs-250`
 };
