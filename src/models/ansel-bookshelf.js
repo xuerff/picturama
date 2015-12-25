@@ -1,11 +1,9 @@
-import path from 'path';
-
-var dbFile = path.join(__dirname, '../../db.sqlite3');
+import config from './../config';
 
 var knex = require('knex')({
   client: 'sqlite3',
   connection: {
-    filename: dbFile
+    filename: config.dbFile
   }
 });
 
