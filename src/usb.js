@@ -48,7 +48,7 @@ class Usb {
 
     monitor.on('add', function (device) {
       let devName = device.DEVNAME;
-      let devId = device.ID_MODEL;
+      let devId = device.ID_MODEL || device.ID_SERIAL;
       let devModel = device.ID_FS_UUID || device.ID_NAME;
 
       setTimeout(function() {
@@ -65,14 +65,13 @@ class Usb {
               });
           });
 
-      }, 100);
+      }, 200);
     });
 
     monitor.on('remove', function (device) {
-      console.log('monitor remove', device);
+      let devId = device.ID_MODEL || device.ID_SERIAL;
 
-      let devId = device.ID_MODEL;
-
+      //console.log('monitor remove', devId);
       callback(null, 'remove', { id: devId });
     });
   }
