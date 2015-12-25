@@ -7,6 +7,8 @@ import Usb from './usb';
 
 require('crash-reporter').start();
 
+console.log('ENV', process.env.ANSEL_DEV_MODE);
+
 var mainWindow = null;
 
 app.on('window-all-closed', () => {
@@ -31,7 +33,6 @@ app.on('ready', () => {
   let usb = new Usb();
 
   usb.scan((err, drives) => {
-    console.log('drives list', drives);
     mainWindow.webContents.send('scanned-devices', drives);
   });
 

@@ -6,6 +6,8 @@ var eslint = require('gulp-eslint');
 var childProcess = require('child_process');
 var electron = require('electron-prebuilt');
 var del = require('del');
+var env = require('gulp-env');
+
 var knexFile = require('./knexfile');
 var knex = require('knex')(knexFile.development);
 
@@ -46,9 +48,18 @@ gulp.task('migrate', [ 'clear-db' ], function() {
   return knex.migrate.latest();
 });
 
-gulp.task('default', [ 'lint', 'babel', 'styles', 'run' ]);
+gulp.task('set-env', function () {
+  env({
+    vars: {
+      ANSEL_DEV_MODE: true
+    }
+  })
+});
+
+gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
 
 gulp.task('clear', [
+  'set-env',
   'clear-db',
   'migrate',
   'babel',
