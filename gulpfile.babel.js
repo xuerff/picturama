@@ -1,29 +1,31 @@
-var gulp = require("gulp");
-var babel = require("gulp-babel");
-var less = require('gulp-less');
-var concat = require('gulp-concat');
-var eslint = require('gulp-eslint');
-var childProcess = require('child_process');
-var electron = require('electron-prebuilt');
-var del = require('del');
-var env = require('gulp-env');
+import gulp from "gulp";
+import babel from "gulp-babel";
+import less from 'gulp-less';
+import concat from 'gulp-concat';
+import eslint from 'gulp-eslint';
+import childProcess from 'child_process';
+import electron from 'electron-prebuilt';
+import del from 'del';
+import env from 'gulp-env';
 
-var knexFile = require('./knexfile');
-var knex = require('knex')(knexFile.development);
+import config from './src/config';
+import knexFile from './knexfile';
 
-gulp.task("babel", ['lint'], function () {
+let knex = require('knex')(knexFile.development);
+
+gulp.task("babel", ['lint'], () => {
   return gulp.src("src/**/*.js")
     .pipe(babel())
     .pipe(gulp.dest("dist"));
 });
 
-gulp.task('styles', ['lint'], function() {
+gulp.task('styles', ['lint'], () => {
   return gulp.src('src/source.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('lint', function () {
+gulp.task('lint', () => {
   return gulp.src('./src/**/*.js')
     .pipe(eslint())
     .pipe(eslint.format())
@@ -31,11 +33,11 @@ gulp.task('lint', function () {
 });
 
 gulp.task('run', [ 'babel', 'styles' ],
-  function () {
+  () => {
     childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
   });
 
-gulp.task('clear-db', function() {
+gulp.task('clear-db', () => {
   return del([
     'dot-ansel/db.sqlite3',
     'versions/**/*',
@@ -44,11 +46,11 @@ gulp.task('clear-db', function() {
   ]);
 });
 
-gulp.task('migrate', [ 'clear-db' ], function() {
+gulp.task('migrate', [ 'clear-db' ], () => {
   return knex.migrate.latest();
 });
 
-gulp.task('set-env', function () {
+gulp.task('set-env', () => {
   env({
     vars: {
       ANSEL_DEV_MODE: true
