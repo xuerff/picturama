@@ -18,7 +18,8 @@ var readFile = Promise.promisify(fs.readFile);
 class Library {
 
   constructor(mainWindow, path) {
-    console.log('PATH', path);
+    //console.log('PATH', path);
+    console.log('config', config);
     this.mainWindow = mainWindow;
 
     this.path = `${path}/photos`;
@@ -37,7 +38,6 @@ class Library {
       let filename = fileStat.name.match(extract)[1];
 
       return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then(() => {
-        //return readFile(`${root}/${filename}.thumb.jpg`);
         let thumbStat = fs.statSync(`${root}/${filename}.thumb.jpg`);
 
         if (thumbStat)
@@ -47,7 +47,6 @@ class Library {
       })
       .catch((err) => {
         console.log('catch issue', err);
-        //return readFile(`${root}/${filename}.thumb.ppm`);
         let thumbStat = fs.statSync(`${root}/${filename}.thumb.ppm`);
 
         if (thumbStat)
@@ -55,18 +54,9 @@ class Library {
         else
           throw 'invalid file';
       })
-      //.then((stats) => {
-      //  console.log('stats', stats);
-      //})
       .then((imgPath) => {
         console.log('img path', imgPath);
 
-        //new ExifImage({ image: imgPath }, (err, exifData) => {
-        ////new ExifImage({ image: `${root}/${filename}.thumb.jpg` }, (err, exifData) => {
-        //  console.log('exif data', err, exifData);
-        //  var createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
-
-          //sharp(`${root}/${filename}.thumb.jpg`)
         readFile(imgPath)
           .then((img) => {
             return sharp(img)
@@ -74,10 +64,6 @@ class Library {
               .withMetadata()
               .toFile(`${this.thumbsPath}${filename}.thumb.jpg`);
           })
-        //sharp(imgPath)
-          //.rotate()
-          //.withMetadata()
-          //.toFile(`${this.thumbsPath}${filename}.thumb.jpg`)
           .then(() => {
             return sharp(`${this.thumbsPath}${filename}.thumb.jpg`)
               .resize(250, 250)
@@ -86,7 +72,6 @@ class Library {
               .toFile(`${this.thumbs250Path}${filename}.jpg`);
           })
           .then(() => {
-            //return new Photo({ title: filename, created_at: createdAt.toDate() }).fetch();
             return new Photo({ title: filename }).fetch();
           })
           .then((photo) => {
@@ -126,15 +111,11 @@ class Library {
                   console.log('err on save', err);
                 });
             });
-          //})
-          //.then(() => {
-          //  next();
           })
           .catch(function(err) {
             console.log('ERR', err);
             next();
           });
-        //});
       }).catch(function(err) {
         console.log('ERR', err);
         next();
@@ -169,7 +150,6 @@ class Library {
 
   watch() {
     let self = this;
-    //let allowed = /([\$\#\w\d]+)-([\$\#\w\d]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i;
     let allowed = config.watchedFormats;
 
     watchr.watch({

@@ -7,8 +7,6 @@ import Usb from './usb';
 
 require('crash-reporter').start();
 
-console.log('ENV', process.env.ANSEL_DEV_MODE);
-
 var mainWindow = null;
 
 app.on('window-all-closed', () => {
