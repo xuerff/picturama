@@ -1,4 +1,4 @@
-import {spawn} from 'child-process-promise';
+//import {spawn} from 'child-process-promise';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import notifier from 'node-notifier';
 import fs from 'fs';
 import Promise from 'bluebird';
+import libraw from 'node-libraw';
 
 import config from './config';
 
@@ -18,14 +19,11 @@ var readFile = Promise.promisify(fs.readFile);
 class Library {
 
   constructor(mainWindow, path) {
-    //console.log('PATH', path);
     console.log('config', config);
     this.mainWindow = mainWindow;
 
     this.path = `${path}/photos`;
     this.versionsPath = `${path}/versions/`;
-    //this.thumbsPath = `${path}/thumbs/`;
-    //this.thumbs250Path = `${path}/thumbs-250/`;
   }
 
   walk(root, fileStat, next) {
@@ -37,89 +35,72 @@ class Library {
       console.log('walk', fileStat.name, config.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 
-      return spawn('dcraw', [ '-e', `${root}/${fileStat.name}` ]).then(() => {
-        let thumbStat = fs.statSync(`${root}/${filename}.thumb.jpg`);
+      let imgPath = libraw.extractThumb(`${root}/${fileStat.name}`, `${root}/${filename}`);
+      console.log('libraw premiere', imgPath);
 
-        if (thumbStat)
-          return `${root}/${filename}.thumb.jpg`;
-        else
-          throw 'invalid file';
-      })
-      .catch((err) => {
-        console.log('catch issue', err);
-        let thumbStat = fs.statSync(`${root}/${filename}.thumb.ppm`);
+      readFile(imgPath)
+        .then((img) => {
+          return sharp(img)
+            .rotate()
+            .withMetadata()
+            .toFile(`${config.thumbsPath}/${filename}.thumb.jpg`);
+        })
+        .then(() => {
+          return sharp(`${config.thumbsPath}/${filename}.thumb.jpg`)
+            .resize(250, 250)
+            .max()
+            .quality(100)
+            .toFile(`${config.thumbs250Path}/${filename}.jpg`);
+        })
+        .then(() => {
+          return new Photo({ title: filename }).fetch();
+        })
+        .then((photo) => {
+          new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
 
-        if (thumbStat)
-          return `${root}/${filename}.thumb.ppm`;
-        else
-          throw 'invalid file';
-      })
-      .then((imgPath) => {
-        console.log('img path', imgPath);
+            if (filename == 'IMG_20151212_220358')
+              console.log('exif', err, exifData);
 
-        readFile(imgPath)
-          .then((img) => {
-            return sharp(img)
-              .rotate()
-              .withMetadata()
-              .toFile(`${config.thumbsPath}/${filename}.thumb.jpg`);
-          })
-          .then(() => {
-            return sharp(`${config.thumbsPath}/${filename}.thumb.jpg`)
-              .resize(250, 250)
-              .max()
-              .quality(100)
-              .toFile(`${config.thumbs250Path}/${filename}.jpg`);
-          })
-          .then(() => {
-            return new Photo({ title: filename }).fetch();
-          })
-          .then((photo) => {
-            new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
+            let createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
 
-              if (filename == 'IMG_20151212_220358')
-                console.log('exif', err, exifData);
+            if (filename == 'IMG_20151212_220358')
+              console.log('created at', createdAt);
 
-              let createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
-
-              if (filename == 'IMG_20151212_220358')
-                console.log('created at', createdAt);
-
-              if (photo)
+            if (photo)
+              next();
+            else
+              return Photo.forge({
+                title: filename,
+                extension: fileStat.name.match(/\.(.+)$/i)[1],
+                orientation: exifData.image.Orientation || 1,
+                date: createdAt.format('YYYY-MM-DD'),
+                created_at: createdAt.toDate(),
+                exposure_time: exifData.exif.ExposureTime,
+                iso: exifData.exif.ISO,
+                aperture: exifData.exif.FNumber,
+                focal_length: exifData.exif.FocalLength,
+                master: `${root}/${fileStat.name}`,
+                thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
+                thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
+              })
+              .save()
+              .then(() => {
+                console.log('saved');
                 next();
-              else
-                return Photo.forge({
-                  title: filename,
-                  extension: fileStat.name.match(/\.(.+)$/i)[1],
-                  orientation: exifData.image.Orientation || 1,
-                  date: createdAt.format('YYYY-MM-DD'),
-                  created_at: createdAt.toDate(),
-                  exposure_time: exifData.exif.ExposureTime,
-                  iso: exifData.exif.ISO,
-                  aperture: exifData.exif.FNumber,
-                  focal_length: exifData.exif.FocalLength,
-                  master: `${root}/${fileStat.name}`,
-                  thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
-                  thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
-                })
-                .save()
-                .then(() => {
-                  console.log('saved');
-                  next();
-                })
-                .catch((err) => {
-                  console.log('err on save', err);
-                });
-            });
-          })
-          .catch(function(err) {
-            console.log('ERR', err);
-            next();
+              })
+              .catch((err) => {
+                console.log('err on save', err);
+              });
           });
-      }).catch(function(err) {
-        console.log('ERR', err);
-        next();
-      });
+        })
+        .catch(function(err) {
+          console.log('ERR', err);
+          next();
+        });
+      //}).catch(function(err) {
+      //  console.log('ERR', err);
+      //  next();
+      //});
 
     } else next();
   }
