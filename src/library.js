@@ -1,4 +1,3 @@
-//import {spawn} from 'child-process-promise';
 import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
@@ -24,6 +23,9 @@ class Library {
 
     this.path = `${path}/photos`;
     this.versionsPath = `${path}/versions/`;
+
+    if (!fs.existsSync(config.tmp))
+      fs.mkdirSync(config.tmp);
   }
 
   walk(root, fileStat, next) {
@@ -35,7 +37,10 @@ class Library {
       console.log('walk', fileStat.name, config.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 
-      let imgPath = libraw.extractThumb(`${root}/${fileStat.name}`, `/tmp/${filename}`);
+      let imgPath = libraw.extractThumb(
+        `${root}/${fileStat.name}`,
+        `${config.tmp}/${filename}`
+      );
 
       readFile(imgPath)
         .then((img) => {

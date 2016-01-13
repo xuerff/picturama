@@ -9,5 +9,6 @@ export default {
   dotAnsel,
   dbFile: `${dotAnsel}/db.sqlite3`,
   thumbsPath: `${dotAnsel}/thumbs`,
-  thumbs250Path: `${dotAnsel}/thumbs-250`
+  thumbs250Path: `${dotAnsel}/thumbs-250`,
+  tmp: '/tmp/ansel'
 };
