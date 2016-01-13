@@ -35,8 +35,7 @@ class Library {
       console.log('walk', fileStat.name, config.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 
-      let imgPath = libraw.extractThumb(`${root}/${fileStat.name}`, `${root}/${filename}`);
-      console.log('libraw premiere', imgPath);
+      let imgPath = libraw.extractThumb(`${root}/${fileStat.name}`, `/tmp/${filename}`);
 
       readFile(imgPath)
         .then((img) => {
