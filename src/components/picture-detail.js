@@ -16,7 +16,7 @@ var MenuItem = remote.require('menu-item');
 
 var rotation = {};
 rotation[1] = '';
-rotation[8] = 'minus-ninety';
+rotation[0] = 'minus-ninety';
 
 class PictureDetail extends React.Component {
 

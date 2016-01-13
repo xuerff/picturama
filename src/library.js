@@ -18,7 +18,6 @@ var readFile = Promise.promisify(fs.readFile);
 class Library {
 
   constructor(mainWindow, path) {
-    console.log('config', config);
     this.mainWindow = mainWindow;
 
     this.path = `${path}/photos`;
@@ -62,13 +61,18 @@ class Library {
         .then((photo) => {
           new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
 
-            if (filename == 'IMG_20151212_220358')
-              console.log('exif', err, exifData);
+            //if (filename == 'IMG_20151212_220358')
+            //  console.log('exif', err, exifData);
 
-            let createdAt = moment(exifData.image.ModifyDate, 'YYYY:MM:DD HH:mm:ss');
+            let createdAt = moment(
+              exifData.image.ModifyDate,
+              'YYYY:MM:DD HH:mm:ss'
+            );
 
-            if (filename == 'IMG_20151212_220358')
-              console.log('created at', createdAt);
+            let orientation = 1;
+
+            if (exifData.image.hasOwnProperty('Orientation'))
+              orientation = exifData.image.Orientation;
 
             if (photo)
               next();
@@ -76,7 +80,7 @@ class Library {
               return Photo.forge({
                 title: filename,
                 extension: fileStat.name.match(/\.(.+)$/i)[1],
-                orientation: exifData.image.Orientation || 1,
+                orientation,
                 date: createdAt.format('YYYY-MM-DD'),
                 created_at: createdAt.toDate(),
                 exposure_time: exifData.exif.ExposureTime,

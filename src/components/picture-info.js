@@ -29,6 +29,7 @@ class PictureInfo extends React.Component {
           <li>f/{this.props.photo.aperture}</li>
           <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
           <li>v#: {this.props.photo.versionNumber}</li>
+          <li>Orientation: {this.props.photo.orientation}</li>
           <li>Flag: {this.props.photo.flag}</li>
           <li>Tags: {this.displayTags()}</li>
         </ul>
