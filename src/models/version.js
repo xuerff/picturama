@@ -4,14 +4,15 @@ import fs from 'fs.extra';
 import Promise from 'bluebird';
 import sharp from 'sharp';
 
+import config from './../config';
+
 import Photo from './photo';
 
 var copy = Promise.promisify(fs.copy);
 var readFile = Promise.promisify(fs.readFile);
 
-var versionPath = process.env.OLDPWD + '/versions/';
-var photosPath = process.env.OLDPWD  + '/photos/';
-var thumbs250Path = process.env.OLDPWD + '/thumbs-250/';
+var versionPath = process.env.OLDPWD + '/versions';
+var photosPath = process.env.OLDPWD  + '/photos';
 
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
@@ -33,23 +34,26 @@ var Version = anselBookshelf.Model.extend({
           model.get('version')
         ].join('-');
 
-        let photoMaster = photo.master;
+        //let photoMaster = photo.master;
 
         if (model.get('type') == 'RAW') {
-          let fileNamePath = versionPath + fileName + '.' + photo.extension;
+          //let fileNamePath = versionPath + fileName + '.' + photo.extension;
+          let fileNamePath = `${config.tmp}/${fileName}.${photo.extension}`;
           model.set('master', fileNamePath);
 
-          console.log('raw', fileNamePath, photo, photoMaster);
+          //console.log('raw', fileNamePath, photo, photoMaster);
           return copy(photo.master, fileNamePath);
 
         } else {
           console.log('standard', fileNamePath);
-          let fileNamePath = versionPath + fileName + '.png';
+          //let fileNamePath = versionPath + fileName + '.png';
+          let fileNamePath = `${versionPath}/${fileName}.png`;
           model.set('master', fileNamePath);
 
           return spawn('dcraw', [ '-q', '0', photo.master ])
             .then(function() {
-              return readFile(photosPath + photo.title + '.ppm');
+              //return readFile(photosPath + photo.title + '.ppm');
+              return readFile(`${photosPath}/${photo.title}.ppm`);
             })
             .then(function(ppm) {
               console.log('ppm #2');
@@ -72,7 +76,7 @@ var Version = anselBookshelf.Model.extend({
   updateImage: function(data) {
     let filename = [data[1], data[2], data[3]].join('-');
     console.log('fileName', filename);
-    let thumbPathName = thumbs250Path + filename + '.jpg';
+    let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`;
 
     console.log('before sharp', thumbPathName);
 

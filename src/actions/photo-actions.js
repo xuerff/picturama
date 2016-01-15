@@ -15,7 +15,7 @@ class PhotoActions {
     );
   }
 
-  updatedPhoto(version) {
+  updatedPhoto(e, version) {
     console.log('photo actions new version', version, this);
 
     new Photo({ id: version.attributes.photo_id })
