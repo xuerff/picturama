@@ -1,18 +1,19 @@
-import {spawn} from 'child-process-promise';
+//import {spawn} from 'child-process-promise';
 import anselBookshelf from './ansel-bookshelf';
 import fs from 'fs.extra';
 import Promise from 'bluebird';
 import sharp from 'sharp';
+import libraw from 'node-libraw';
 
 import config from './../config';
 
 import Photo from './photo';
 
 var copy = Promise.promisify(fs.copy);
-var readFile = Promise.promisify(fs.readFile);
+//var readFile = Promise.promisify(fs.readFile);
 
-var versionPath = process.env.OLDPWD + '/versions';
-var photosPath = process.env.OLDPWD  + '/photos';
+//var versionPath = process.env.OLDPWD + '/versions';
+//var photosPath = process.env.OLDPWD  + '/photos';
 
 var Version = anselBookshelf.Model.extend({
   tableName: 'versions',
@@ -47,24 +48,32 @@ var Version = anselBookshelf.Model.extend({
         } else {
           console.log('standard', fileNamePath);
           //let fileNamePath = versionPath + fileName + '.png';
-          let fileNamePath = `${versionPath}/${fileName}.png`;
-          model.set('master', fileNamePath);
+          //let fileNamePath = `${versionPath}/${fileName}.png`;
+          let fileNamePath = `${config.tmp}/${fileName}`;
+          model.set('master', `${fileNamePath}.tiff`);
 
-          return spawn('dcraw', [ '-q', '0', photo.master ])
-            .then(function() {
-              //return readFile(photosPath + photo.title + '.ppm');
-              return readFile(`${photosPath}/${photo.title}.ppm`);
-            })
-            .then(function(ppm) {
-              console.log('ppm #2');
-              return sharp(ppm)
-                .toFormat('png')
-                .compressionLevel(0)
-                .toFile(fileNamePath);
-            })
-            .catch(function(err) {
-              console.log('ERR', err);
-            });
+          // TODO: Should not use dcraw
+          let output = libraw.extract(photo.master, fileNamePath);
+          console.log('extracted tiff', output);
+
+          model.set('master', output);
+
+          return output;
+          //return spawn('dcraw', [ '-q', '0', photo.master ])
+          //  .then(function() {
+          //    //return readFile(photosPath + photo.title + '.ppm');
+          //    return readFile(`${photosPath}/${photo.title}.ppm`);
+          //  })
+          //  .then(function(ppm) {
+          //    console.log('ppm #2');
+          //    return sharp(ppm)
+          //      .toFormat('png')
+          //      .compressionLevel(0)
+          //      .toFile(fileNamePath);
+          //  })
+          //  .catch(function(err) {
+          //    console.log('ERR', err);
+          //  });
         }
       })
       .catch(function(err) {
