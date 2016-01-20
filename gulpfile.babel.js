@@ -3,6 +3,7 @@ import babel from "gulp-babel";
 import less from 'gulp-less';
 import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
+import mocha from 'gulp-mocha';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -56,6 +57,14 @@ gulp.task('set-env', () => {
       ANSEL_DEV_MODE: true
     }
   })
+});
+
+gulp.task('test', () => {
+  return gulp.src('tests/**/*.spec.js', { read: false })
+    .pipe(mocha())
+    .once('end', () => {
+      process.exit();
+    });
 });
 
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
