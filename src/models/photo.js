@@ -6,7 +6,6 @@ import config from './../config';
 import Version from './version';
 import Tag from './tag';
 
-//shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$#');
 shortid.characters(config.characters);
 
 var Photo = anselBookshelf.Model.extend({
