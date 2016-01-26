@@ -144,7 +144,9 @@ div.outer-modal {
     height: 100%;
 
     /* create a full-height inline block pseudo=element */
-    div.picture-diff, div.picture-detail:before { 
+    div.picture-diff div.before:before, 
+    div.picture-diff div.after:before, 
+    div.picture-detail:before { 
       content: ' ';
       display: inline-block;
       vertical-align: middle;  /* vertical alignment of the inline element */
@@ -203,8 +205,11 @@ div.outer-modal {
     }
 
     div.picture-diff {
+      height: 100%;
+
       div.before, div.after {
         width: 50%;
+        height: 25%;
       }
     }
 
