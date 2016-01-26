@@ -61,7 +61,11 @@ gulp.task('set-env', () => {
 
 gulp.task('test', () => {
   return gulp.src('tests/**/*.spec.js', { read: false })
-    .pipe(mocha())
+    .pipe(mocha({
+      compilers: {
+        js: babel
+      }
+    }))
     .once('end', () => {
       process.exit();
     });
