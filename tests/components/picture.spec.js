@@ -4,18 +4,26 @@ import jsdom from 'mocha-jsdom';
 import assert from 'assert';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
+import {expect} from 'chai';
 
 import Picture from './../../src/components/picture';
 
-describe('Testing my div', () => {
+describe('Picture Component', () => {
   jsdom({ skipWindowCheck: true });
 
-  it('should contain text: Lovely! Here it is - my very first React component!', () => {
-    let myDiv = TestUtils.renderIntoDocument(
-      <Picture />
-    );
-    let divText = TestUtils.findRenderedDOMComponentWithTag(myDiv, 'span');
+  it('should fire setCurrent after click', (done) => {
+    let photo = {};
 
-    assert.equal(divText.textContent, 'Lovely! Here it is - my very first React component!');
+    let handleCurrent = () => {
+      done();
+    };
+
+    let picture = TestUtils.renderIntoDocument(
+      <Picture photo={photo} setCurrent={handleCurrent} />
+    );
+
+    TestUtils.Simulate.click(
+      TestUtils.findRenderedDOMComponentWithTag(picture, 'a')
+    );
   });
 });
