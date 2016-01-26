@@ -47,12 +47,14 @@ class PictureDiff extends React.Component {
   }
 
   keyboardListener(e) {
+    e.preventDefault();
+
     if ([27, 89].indexOf(e.keyCode) != -1) {
+      console.log('picture diff', e.keyCode);
       this.unbindEventListeners();
       this.props.toggleDiff();
     }
   }
-
 
   render() {
     var last = { thumb: null };
