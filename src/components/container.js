@@ -1,9 +1,11 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 import Library from './library';
 
 class Container extends React.Component {
   handleScrollTop(scrollTop) {
-    React.findDOMNode(this).scrollTop = scrollTop;
+    ReactDOM.findDOMNode(this).scrollTop = scrollTop;
   }
 
   render() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import PhotoStore from './../stores/photo-store';
 import PhotoActions from './../actions/photo-actions';
@@ -23,7 +24,7 @@ class Library extends React.Component {
     state.current = photo;
 
     if (state.current)
-      state.scrollTop = React.findDOMNode(this).parentNode.scrollTop;
+      state.scrollTop = ReactDOM.findDOMNode(this).parentNode.scrollTop;
     else
       this.props.setScrollTop(state.scrollTop);
 
