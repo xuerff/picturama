@@ -1,19 +1,20 @@
-require('./../dom-mock')('<html><body></body></html>');
+require('./../dom-mock').default('<html><body></body></html>');
 
-var jsdom = require('mocha-jsdom');
-var assert = require('assert');
-var React = require('react');
-var TestUtils = require('react-addons-test-utils');
+import jsdom from 'mocha-jsdom';
+import assert from 'assert';
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
 
-describe('Testing my div', function() {
+import Picture from './../../src/components/picture';
+
+describe('Testing my div', () => {
   jsdom({ skipWindowCheck: true });
 
-  it('should contain text: Lovely! Here it is - my very first React component!', function() {
-    var Picture = require('./../../src/components/picture.js');
-    var myDiv = TestUtils.renderIntoDocument(
+  it('should contain text: Lovely! Here it is - my very first React component!', () => {
+    let myDiv = TestUtils.renderIntoDocument(
       <Picture />
     );
-    var divText = TestUtils.findRenderedDOMComponentWithTag(myDiv, 'span');
+    let divText = TestUtils.findRenderedDOMComponentWithTag(myDiv, 'span');
 
     assert.equal(divText.textContent, 'Lovely! Here it is - my very first React component!');
   });

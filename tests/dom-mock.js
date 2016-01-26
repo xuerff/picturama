@@ -1,7 +1,9 @@
-module.exports = function(markup) {
+import {jsdom} from 'jsdom';
+
+export default (markup) => {
   if (typeof document !== 'undefined') return;
 
-  var jsdom = require('jsdom').jsdom;
+  //var jsdom = require('jsdom').jsdom;
 
   global.document = jsdom(markup || '');
   global.window = document.defaultView;
