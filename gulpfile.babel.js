@@ -7,6 +7,7 @@ import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
 import env from 'gulp-env';
+import packager from 'electron-packager';
 
 import config from './src/config';
 import knexFile from './knexfile';
@@ -46,6 +47,10 @@ gulp.task('clear-db', () => {
   ]);
 });
 
+gulp.task('clear-build', () => {
+  return del([ 'build/**/*' ]);
+});
+
 gulp.task('migrate', [ 'clear-db' ], () => {
   return knex.migrate.latest();
 });
@@ -58,7 +63,26 @@ gulp.task('set-env', () => {
   })
 });
 
+gulp.task('package', [ 'babel', 'styles', 'clear-build' ], (cb) => {
+  let opts = {
+    arch: 'x64',
+    dir: './',
+    ignore: /(src|photos|versions|build|tests|dot-ansel|sqlite3|gulpfile|jpg$|jpeg$)/i,
+    platform: 'linux',
+    asar: false,
+    out: './build',
+    //prune: true,
+    version: '0.36.0'
+  };
+
+  packager(opts, function done (err, appPath) { 
+    console.log('done packaging', appPath);
+    cb();
+  });
+});
+
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
+gulp.task('build', [ 'lint', 'clear-build', 'babel', 'styles', 'package' ]);
 
 gulp.task('clear', [
   'set-env',
