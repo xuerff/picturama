@@ -70,12 +70,14 @@ class PictureDiff extends React.Component {
     return (
       <div className="picture-diff">
         <div className="before v-align">
+          <h3>Before</h3>
           <img
             src={this.state.photo.thumb} 
             className={className} />
         </div>
 
         <div className="after v-align">
+          <h3>After</h3>
           <img
             src={last.output} 
             className={className} />

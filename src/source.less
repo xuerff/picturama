@@ -208,8 +208,18 @@ div.outer-modal {
       height: 100%;
 
       div.before, div.after {
+        position: relative;
         width: 50%;
         height: 25%;
+
+        h3 {
+          position: absolute; 
+          width: 100%;
+          text-align: center;
+          top: 0;
+          left: 0;
+          color: @blue-grey-700;
+        }
       }
     }
 
