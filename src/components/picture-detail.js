@@ -2,6 +2,7 @@ import {spawn} from 'child_process';
 import {ipcRenderer} from 'electron';
 
 import React from 'react';
+import Loader from 'react-loader';
 
 import VersionStore from './../stores/version-store';
 import VersionActions from './../actions/version-actions';
@@ -23,7 +24,7 @@ class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { binded: false, modalIsOpen: false };
+    this.state = { binded: false, modalIsOpen: false, loaded: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
@@ -135,6 +136,11 @@ class PictureDetail extends React.Component {
 
   finishLoading() {
     console.log('stop loader');
+    let state = this.state;
+
+    state.loaded = true;
+
+    this.setState(state);
   }
 
   componentWillReceiveProps() {
@@ -195,6 +201,7 @@ class PictureDetail extends React.Component {
         </div>
 
         <PictureInfo photo={this.props.photo} />
+        <Loader loaded={this.state.loaded} />
 
         {showModal}
       </div>
