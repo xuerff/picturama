@@ -1,13 +1,18 @@
 import {app, screen} from 'electron';
 import BrowserWindow from 'browser-window';
+import fs from 'fs';
 
 import MainMenu from './main-menu';
 import Library from './library';
 import Usb from './usb';
+import config from './config';
 
 require('crash-reporter').start();
 
 var mainWindow = null;
+
+if (!fs.existsSync(config.dotAnsel))
+  fs.mkdirSync(config.dotAnsel);
 
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin')

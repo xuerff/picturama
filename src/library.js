@@ -33,6 +33,12 @@ class Library {
 
     if (fileStat.name.toLowerCase().match(allowed)) {
 
+      if (!fs.existsSync(config.thumbsPath))
+        fs.mkdirSync(config.thumbsPath);
+
+      if (!fs.existsSync(config.thumbs250Path))
+        fs.mkdirSync(config.thumbs250Path);
+
       console.log('walk', fileStat.name, config.thumbsPath);
       let filename = fileStat.name.match(extract)[1];
 

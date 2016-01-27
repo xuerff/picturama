@@ -87,7 +87,7 @@ gulp.task('build', [ 'lint', 'clear-build', 'babel', 'styles', 'package' ]);
 gulp.task('clear', [
   'set-env',
   'clear-db',
-  'migrate',
+  //'migrate',
   'babel',
   'styles',
   'run'
