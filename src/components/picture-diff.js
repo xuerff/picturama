@@ -1,4 +1,5 @@
 import React from 'react';
+import Loader from 'react-loader';
 
 import Photo from './../models/photo';
 
@@ -15,8 +16,13 @@ class PictureDiff extends React.Component {
     this.keyboardListener = this.keyboardListener.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
+    this.onImgLoad = this.onImgLoad.bind(this);
 
-    this.state = { photo: { thumb: null } };
+    this.state = { 
+      photo: { thumb: null }, 
+      loaded: false,
+      loadingCount: 0
+    };
   }
 
   componentDidMount() {
@@ -31,6 +37,16 @@ class PictureDiff extends React.Component {
     let state = this.state;
     state.photo = photo.toJSON();
     console.log('updated state', state);
+    this.setState(state);
+  }
+
+  onImgLoad() {
+    let state = this.state;
+    state.loadingCount++;
+
+    if (state.loadingCount >= 2)
+      state.loaded = true;
+
     this.setState(state);
   }
 
@@ -73,6 +89,7 @@ class PictureDiff extends React.Component {
           <h3>Before</h3>
           <img
             src={this.state.photo.thumb} 
+            onLoad={this.onImgLoad}
             className={className} />
         </div>
 
@@ -80,8 +97,11 @@ class PictureDiff extends React.Component {
           <h3>After</h3>
           <img
             src={last.output} 
+            onLoad={this.onImgLoad}
             className={className} />
         </div>
+
+        <Loader loaded={this.state.loaded} />
       </div>
     );
   }

@@ -98,6 +98,7 @@ class Library extends React.Component {
   }
 
   handleDiff() {
+    //console.log('start loader!');
     let state = this.state;
     state.diff = !this.state.diff;
     this.setState(state);

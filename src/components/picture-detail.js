@@ -30,6 +30,7 @@ class PictureDetail extends React.Component {
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeTagDialog = this.closeTagDialog.bind(this);
+    this.finishLoading = this.finishLoading.bind(this);
   }
 
   updateVersion(store) {
@@ -109,6 +110,7 @@ class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
+    console.log('start loader');
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
@@ -129,6 +131,10 @@ class PictureDetail extends React.Component {
     gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
     this.bindEventListeners();
+  }
+
+  finishLoading() {
+    console.log('stop loader');
   }
 
   componentWillReceiveProps() {
@@ -184,6 +190,7 @@ class PictureDetail extends React.Component {
         <div className="v-align">
           <img
             src={this.props.photo.thumb} 
+            onLoad={this.finishLoading}
             className={className} />
         </div>
 
