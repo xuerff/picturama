@@ -57,11 +57,8 @@ class PictureDetail extends React.Component {
     else if (e.keyCode == 80) // p
       this.props.toggleFlag();
 
-    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) { // y
-      console.log('picture detail', e.keyCode);
-      //this.unbindEventListeners();
+    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
       this.props.showDiff();
-    }
 
     else if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();
