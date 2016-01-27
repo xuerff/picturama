@@ -104,6 +104,21 @@ class Library extends React.Component {
     this.setState(state);
   }
 
+  handleHighlight(photo) {
+    let state = this.state;
+
+    state.photos = state.photos.map((statePhoto) => {
+      statePhoto.highlighted = false;
+
+      if (statePhoto.id == photo.id)
+        statePhoto.highlighted = true;
+
+      return statePhoto;
+    });
+
+    this.setState(state);
+  }
+
   render() {
     let currentView
       , handleCurrent = this.handleCurrent.bind(this)
@@ -114,10 +129,11 @@ class Library extends React.Component {
       , handleDiff = this.handleDiff.bind(this);
 
     if (!this.state.current)
-      currentView = this.state.photos.map(function(photo) {
+      currentView = this.state.photos.map((photo) => {
         return (
           <Picture
             photo={photo}
+            setHighlight={this.handleHighlight.bind(this)}
             setCurrent={handleCurrent} />
         );
       });

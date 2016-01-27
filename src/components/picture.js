@@ -11,23 +11,41 @@ class Picture extends React.Component {
     this.getImgClass = this.getImgClass.bind(this);
   }
 
-  handleClick() {
+  handleDblClick() {
     console.log('this', this);
     console.log('this props', this.props);
     this.props.setCurrent(this.props.photo);
   }
 
+  handleClick() {
+    this.props.setHighlight(this.props.photo);
+  }
+
   getImgClass() {
-    return [
+    let classes = [
       rotation[this.props.photo.orientation],
       'shadow--2dp'
-    ].join(' ');
+    ];
+
+    return classes.join(' ');
+  }
+
+  getAnchorClass() {
+    let classes = [ 'picture', 'card' ];
+
+    if (this.props.photo.highlighted)
+      classes.push('highlighted');
+
+    return classes.join(' ');
   }
 
   render() {
     return (
-      <a className="picture card " onClick={this.handleClick.bind(this)}>
+      <a
+        className={this.getAnchorClass()}
+        onDoubleClick={this.handleDblClick.bind(this)}>
         <img
+          onClick={this.handleClick.bind(this)}
           src={this.props.photo.thumb_250} 
           className={this.getImgClass()} />
       </a>
