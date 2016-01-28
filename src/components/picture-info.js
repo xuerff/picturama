@@ -12,8 +12,12 @@ class PictureInfo extends React.Component {
   }
 
   displayTags() {
+    if (!this.props.photo.hasOwnProperty('tags'))
+      return '';
+
     if (this.props.photo.tags.length == 0)
       return 'none';
+
     else
       return this.props.photo.tags
         .map((tag) => tag.title)

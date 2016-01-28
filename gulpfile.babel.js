@@ -95,7 +95,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
     dir: './build/prepared',
     ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample|tests)/i,
     platform: 'linux',
-    asar: false,
+    asar: true,
     out: './build',
     version: '0.36.0'
   };
