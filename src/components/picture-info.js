@@ -15,7 +15,7 @@ class PictureInfo extends React.Component {
     if (!this.props.photo.hasOwnProperty('tags'))
       return '';
 
-    if (this.props.photo.tags.length == 0)
+    else if (this.props.photo.tags.length == 0)
       return 'none';
 
     else
