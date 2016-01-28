@@ -103,6 +103,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   packager(opts, function done (err, appPath) { 
     console.log('done packaging', appPath);
     cb();
+    process.exit(0);
   });
 });
 
