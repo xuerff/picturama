@@ -17,11 +17,16 @@ var readFile = Promise.promisify(fs.readFile);
 
 class Library {
 
-  constructor(mainWindow, path) {
+  constructor(mainWindow) {
     this.mainWindow = mainWindow;
 
-    this.path = `${path}/photos`;
-    this.versionsPath = `${path}/versions/`;
+    if (fs.existsSync(config.settings)) {
+      let settings = require(config.settings);
+      console.log(settings);
+
+      this.path = settings.directories.photos;
+      this.versionsPath = settings.directories.versions;
+    }
 
     if (!fs.existsSync(config.tmp))
       fs.mkdirSync(config.tmp);
@@ -67,9 +72,6 @@ class Library {
         .then((photo) => {
           new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
 
-            //if (filename == 'IMG_20151212_220358')
-            //  console.log('exif', err, exifData);
-
             let createdAt = moment(
               exifData.image.ModifyDate,
               'YYYY:MM:DD HH:mm:ss'
@@ -111,15 +113,15 @@ class Library {
           console.log('ERR', err);
           next();
         });
-      //}).catch(function(err) {
-      //  console.log('ERR', err);
-      //  next();
-      //});
 
     } else next();
   }
 
   scan() {
+    console.log('scan', this.path, this.versionsPath);
+    if (!this.path || !this.versionsPath)
+      return false;
+
     let walker = Walk.walk(this.path, { followLinks: false });
 
     this.mainWindow.webContents.send('start-import', true);

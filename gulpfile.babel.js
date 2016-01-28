@@ -45,6 +45,7 @@ gulp.task('run', [ 'babel', 'styles' ],
 gulp.task('clear-db', () => {
   return del([
     'dot-ansel/db.sqlite3',
+    'dot-ansel/settings.json',
     'versions/**/*',
     'dot-ansel/thumbs/**/*',
     'dot-ansel/thumbs-250/**/*',
