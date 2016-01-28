@@ -12,6 +12,10 @@ import packager from 'electron-packager';
 import config from './src/config';
 import knexFile from './knexfile';
 
+import npmPkgs from './package.json';
+
+//console.log('npm-pkgs', Object.keys(npmPkgs.dependencies));
+
 let knex = require('knex')(knexFile.development);
 
 gulp.task("babel", ['lint'], () => {
@@ -63,11 +67,33 @@ gulp.task('set-env', () => {
   })
 });
 
-gulp.task('package', [ 'babel', 'styles', 'clear-build' ], (cb) => {
+gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 
+  () => {
+    return gulp
+      .src([
+        "dist/**/*", 
+        "static/**/*",
+        "menus/**/*",
+        "migrations/**/*",
+        "knexfile.js",
+        "package.json"
+      ], { base: '.' })
+      .pipe(gulp.dest("build/prepared"));
+  });
+
+gulp.task('prepare-modules', [ 'prepare-src' ], () => {
+  let modulesSrc = Object.keys(npmPkgs.dependencies)
+    .map((dependency) => `node_modules/${dependency}/**/*`)
+
+  return gulp.src(modulesSrc, { base: 'node_modules' })
+    .pipe(gulp.dest("build/prepared/node_modules"))
+});
+
+gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
-    dir: './',
-    ignore: /(src|photos|versions|build|tests|dot-ansel|sqlite3|gulpfile|jpg$|jpeg$)/i,
+    dir: './build/prepared',
+    ignore: /(test|example|samples|LICENSE|text$|md$|jpg$|jpeg$|cc$)/i,
     platform: 'linux',
     asar: false,
     out: './build',
@@ -82,12 +108,20 @@ gulp.task('package', [ 'babel', 'styles', 'clear-build' ], (cb) => {
 });
 
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
-gulp.task('build', [ 'lint', 'clear-build', 'babel', 'styles', 'package' ]);
+
+gulp.task('build', [ 
+  'lint', 
+  'clear-build', 
+  'babel', 
+  'styles', 
+  'prepare-src', 
+  'prepare-modules', 
+  'package' 
+]);
 
 gulp.task('clear', [
   'set-env',
   'clear-db',
-  //'migrate',
   'babel',
   'styles',
   'run'
