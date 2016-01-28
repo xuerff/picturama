@@ -35,7 +35,6 @@
     "react-tagsinput": "^3.0.3",
     "sharp": "^0.12.2",
     "shortid": "^2.2.2",
-    "slug": "^0.9.1",
     "sqlite3": "^3.1.1",
     "udev": "git+https://github.com/cheery/node-udev#master",
     "walk": "^2.3.9",

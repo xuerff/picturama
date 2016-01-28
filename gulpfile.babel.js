@@ -93,11 +93,10 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
     dir: './build/prepared',
-    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample)/i,
+    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample|tests)/i,
     platform: 'linux',
     asar: false,
     out: './build',
-    //prune: true,
     version: '0.36.0'
   };
 

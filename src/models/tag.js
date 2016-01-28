@@ -1,4 +1,4 @@
-import slug from 'slug';
+import slug from '../lib/slug';
 
 import anselBookshelf from './ansel-bookshelf';
 
@@ -13,7 +13,7 @@ var Tag = anselBookshelf.Model.extend({
 
   initialize: function() {
     this.on('creating', (model) => {
-      let sluggedTitle = slug(model.get('title').toLowerCase());
+      let sluggedTitle = slug(model.get('title'));
       model.set('slug', sluggedTitle);
     });
   }
