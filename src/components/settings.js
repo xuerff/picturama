@@ -47,7 +47,8 @@ class Settings extends React.Component {
 
   save() {
     let settings = JSON.stringify(this.state, null, 2);
-    fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
+    //fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
+    fs.writeFile(config.settings, settings, this.props.setSavedFile);
   }
 
   onSavedFile(err) {
