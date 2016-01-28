@@ -1,10 +1,12 @@
 import {remote} from 'electron';
-//import {ipcRenderer} from 'electron';
+import fs from 'fs';
 import React from 'react';
+
+import config from '../config';
 
 const dialog = remote.dialog;
 
-class LocalConf extends React.Component {
+class Settings extends React.Component {
   constructor(props) {
     super(props);
 
@@ -43,6 +45,18 @@ class LocalConf extends React.Component {
     );
   }
 
+  save() {
+    let settings = JSON.stringify(this.state, null, 2);
+    fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
+  }
+
+  onSavedFile(err) {
+    if (!err)
+      console.log('file saved');
+    else
+      console.log('err', err);
+  }
+
   render() {
     return (
       <div>
@@ -64,10 +78,10 @@ class LocalConf extends React.Component {
           </button>
         </div>
 
-        <button>Save</button>
+        <button onClick={this.save.bind(this)}>Save</button>
       </div>
     );
   }
 }
 
-export default LocalConf;
+export default Settings;

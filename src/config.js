@@ -9,7 +9,7 @@ export default {
   watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
   dotAnsel,
   dbFile: `${dotAnsel}/db.sqlite3`,
-  localConf: `${dotAnsel}/config.json`,
+  settings: `${dotAnsel}/settings.json`,
   thumbsPath: `${dotAnsel}/thumbs`,
   thumbs250Path: `${dotAnsel}/thumbs-250`,
   tmp: '/tmp/ansel'

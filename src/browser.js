@@ -1,4 +1,4 @@
-import {app, screen, ipcMain, dialog} from 'electron';
+import {app, screen} from 'electron';
 import BrowserWindow from 'browser-window';
 import fs from 'fs';
 
@@ -50,9 +50,9 @@ app.on('ready', () => {
 
   library.watch();
 
-  ipcMain.on('openFolder', () => {
-    dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
-  });
+  //ipcMain.on('openFolder', () => {
+  //  dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
+  //});
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
