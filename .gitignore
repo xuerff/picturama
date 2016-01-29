@@ -20,5 +20,6 @@ udev.*
 *.swn
 *.swm
 
+*.tar.gz
 *.old
 *~

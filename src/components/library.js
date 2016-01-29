@@ -24,11 +24,29 @@ class Library extends React.Component {
     state.current = photo;
 
     if (state.current)
-      state.scrollTop = ReactDOM.findDOMNode(this).parentNode.scrollTop;
-    else
-      this.props.setScrollTop(state.scrollTop);
+      state.scrollTop = ReactDOM
+        .findDOMNode(this)
+        .parentNode
+        .scrollTop;
+    //  this.props.setScrollTop(state.scrollTop);
+
+    //console.log('library# scroll top', state.scrollTop);
+    console.log('library# dom element', 
+                state.scrollTop,
+                ReactDOM.findDOMNode(this).parentNode.scrollTop,
+                ReactDOM.findDOMNode(this).parentNode);
 
     this.setState(state);
+  }
+
+  componentDidUpdate() {
+    let state = this.state;
+
+    if (!state.current && state.scrollTop > 0) {
+      this.props.setScrollTop(state.scrollTop);
+      state.scrollTop = 0;
+      this.setState(state);
+    }
   }
 
   handleLeftCurrent() {

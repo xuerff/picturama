@@ -1,6 +1,5 @@
 import fs from 'fs';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import Library from './library';
 import Settings from './settings';
@@ -13,11 +12,11 @@ class Container extends React.Component {
 
     this.areSettingsExisting = this.areSettingsExisting.bind(this);
 
-    this.state = { settingsExists: false };
+    this.state = { settingsExists: false, scrollTop: 0 };
   }
 
   handleScrollTop(scrollTop) {
-    ReactDOM.findDOMNode(this).scrollTop = scrollTop;
+    this.refs.container.scrollTop = scrollTop;
   }
 
   areSettingsExisting() {
@@ -37,7 +36,7 @@ class Container extends React.Component {
       content = <Library setScrollTop={this.handleScrollTop.bind(this)}/>;
 
     return (
-      <div id="container">
+      <div id="container" ref="container">
         {content}
       </div>
     );
