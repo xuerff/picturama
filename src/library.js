@@ -1,4 +1,3 @@
-import Walk from 'walk';
 import {ExifImage} from 'exif';
 import moment from 'moment';
 import watchr from 'watchr';
@@ -9,6 +8,7 @@ import Promise from 'bluebird';
 import libraw from 'node-libraw';
 
 import config from './config';
+import walk from './lib/walk';
 
 import Photo from './models/photo';
 import Version from './models/version';
@@ -32,11 +32,12 @@ class Library {
       fs.mkdirSync(config.tmp);
   }
 
-  walk(root, fileStat, next) {
+  //walk(root, fileStat, next) {
+  walk(fileStat) {
     let allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
-    let extract = new RegExp('(.+)\.(' + config.acceptedRawFormats.join('|') + ')$', 'i');
+    let extract = new RegExp('([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$', 'i');
 
-    if (fileStat.name.toLowerCase().match(allowed)) {
+    if (fileStat.toLowerCase().match(allowed)) {
 
       if (!fs.existsSync(config.thumbsPath))
         fs.mkdirSync(config.thumbsPath);
@@ -44,15 +45,16 @@ class Library {
       if (!fs.existsSync(config.thumbs250Path))
         fs.mkdirSync(config.thumbs250Path);
 
-      console.log('walk', fileStat.name, config.thumbsPath);
-      let filename = fileStat.name.match(extract)[1];
+      //console.log('walk', fileStat.name, config.thumbsPath);
+      let filename = fileStat.match(extract)[1];
+      console.log('each', fileStat, filename);
 
       let imgPath = libraw.extractThumb(
-        `${root}/${fileStat.name}`,
+        `${fileStat}`,
         `${config.tmp}/${filename}`
       );
 
-      readFile(imgPath)
+      return readFile(imgPath)
         .then((img) => {
           return sharp(img)
             .rotate()
@@ -70,79 +72,100 @@ class Library {
           return new Photo({ title: filename }).fetch();
         })
         .then((photo) => {
-          new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
+          return new Promise(function (resolve, reject) {
+            new ExifImage({ image: `${config.thumbsPath}/${filename}.thumb.jpg` }, (err, exifData) => {
 
-            let createdAt = moment(
-              exifData.image.ModifyDate,
-              'YYYY:MM:DD HH:mm:ss'
-            );
+              let createdAt = moment(
+                exifData.image.ModifyDate,
+                'YYYY:MM:DD HH:mm:ss'
+              );
 
-            let orientation = 1;
+              let orientation = 1;
 
-            if (exifData.image.hasOwnProperty('Orientation'))
-              orientation = exifData.image.Orientation;
+              if (exifData.image.hasOwnProperty('Orientation'))
+                orientation = exifData.image.Orientation;
 
-            if (photo)
-              next();
-            else
-              return Photo.forge({
-                title: filename,
-                extension: fileStat.name.match(/\.(.+)$/i)[1],
-                orientation,
-                date: createdAt.format('YYYY-MM-DD'),
-                created_at: createdAt.toDate(),
-                exposure_time: exifData.exif.ExposureTime,
-                iso: exifData.exif.ISO,
-                aperture: exifData.exif.FNumber,
-                focal_length: exifData.exif.FocalLength,
-                master: `${root}/${fileStat.name}`,
-                thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
-                thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
-              })
-              .save()
-              .then(() => {
-                console.log('saved');
-                next();
-              })
-              .catch((err) => {
-                console.log('err on save', err);
-              });
+              if (photo)
+                //next();
+                resolve();
+              else
+                return Photo.forge({
+                  title: filename,
+                  extension: fileStat.name.match(/\.(.+)$/i)[1],
+                  orientation,
+                  date: createdAt.format('YYYY-MM-DD'),
+                  created_at: createdAt.toDate(),
+                  exposure_time: exifData.exif.ExposureTime,
+                  iso: exifData.exif.ISO,
+                  aperture: exifData.exif.FNumber,
+                  focal_length: exifData.exif.FocalLength,
+                  master: `${root}/${fileStat.name}`,
+                  thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
+                  thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
+                })
+                .save()
+                .then(() => {
+                  console.log('saved');
+                  //next();
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log('err on save', err);
+                  reject();
+                });
+            });
           });
-        })
-        .catch(function(err) {
-          console.log('ERR', err);
-          next();
+        //})
+        //.catch(function(err) {
+        //  console.log('ERR', err);
+        //  next();
         });
 
-    } else next();
+    } else return false;
   }
 
   scan() {
-    console.log('scan', this.path, this.versionsPath);
+    var start = new Date().getTime();
+
     if (!this.path || !this.versionsPath)
       return false;
 
-    let walker = Walk.walk(this.path, { followLinks: false });
+    walk(this.path)
+      .map(this.walk.bind(this), { 
+        concurrency: parseFloat(process.argv[2] || 'Infinity')
+      })
+      .then((pics) => {
+        let end = new Date().getTime();
+        let time = moment.duration(end - start);
 
-    this.mainWindow.webContents.send('start-import', true);
+        console.log('execution time', time);
+
+        notifier.notify({
+          'title': 'Ansel',
+          'message': `Finish importing ${pics.length} in ${time.humanize()} `
+        });
+      });
+    //let walker = Walk.walk(this.path, { followLinks: false });
+
+    //this.mainWindow.webContents.send('start-import', true);
 
     notifier.notify({
       'title': 'Ansel',
       'message': 'Start import'
     });
 
-    console.log('Start walk', this.path);
+    //console.log('Start walk', this.path);
 
-    walker.on('file', this.walk.bind(this));
+    //walker.on('file', this.walk.bind(this));
 
-    walker.on('end', () => {
-      this.mainWindow.webContents.send('finish-import', true);
+    //walker.on('end', () => {
+    //  this.mainWindow.webContents.send('finish-import', true);
 
-      notifier.notify({
-        'title': 'Ansel',
-        'message': 'Finish import'
-      });
-    });
+    //  notifier.notify({
+    //    'title': 'Ansel',
+    //    'message': 'Finish import'
+    //  });
+    //});
   }
 
   watch() {

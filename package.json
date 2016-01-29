@@ -37,7 +37,6 @@
     "shortid": "^2.2.2",
     "sqlite3": "^3.1.1",
     "udev": "git+https://github.com/cheery/node-udev#master",
-    "walk": "^2.3.9",
     "watchr": "^2.4.13"
   },
   "devDependencies": {
