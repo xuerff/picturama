@@ -99,7 +99,7 @@ class PictureDetail extends React.Component {
 
   showTagDialog() {
     var state = this.state;
-    console.log('show tag dialog', state);
+    //console.log('show tag dialog', state);
     state.modalIsOpen = true;
     this.setState(state);
   }
@@ -111,7 +111,7 @@ class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
-    console.log('start loader');
+    //console.log('start loader');
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
@@ -135,7 +135,7 @@ class PictureDetail extends React.Component {
   }
 
   finishLoading() {
-    console.log('stop loader');
+    //console.log('stop loader');
     let state = this.state;
 
     state.loaded = true;
@@ -163,6 +163,8 @@ class PictureDetail extends React.Component {
 
     ipcRenderer.send('toggleAddTagMenu', true);
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
+
+    console.log('bind');
   }
 
   unbindEventListeners() {
@@ -174,6 +176,10 @@ class PictureDetail extends React.Component {
     document.removeEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', false);
+    ipcRenderer.removeListener('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.removeAllListeners('addTagClicked');
+
+    console.log('unbind');
   }
 
   render() {
