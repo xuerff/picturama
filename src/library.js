@@ -77,7 +77,7 @@ class Library {
       };
 
       if (imgPos != -1) {
-        element.imgFilePath = imgFiles[imgPos];
+        element.imgPath = imgFiles[imgPos];
 
         imgFiles = imgFiles.filter((imgFile) => {
           return (imgFile != imgFiles[imgPos]);
@@ -102,11 +102,17 @@ class Library {
 
   walk(file) {
     if (file.isRaw) {
-      console.log('walk', file.name);
-      let imgPath = libraw.extractThumb(
-        `${file.path}`,
-        `${config.tmp}/${file.name}`
-      );
+      console.log('walk', file);
+
+      let imgPath = '';
+
+      if (file.hasOwnProperty('imgPath'))
+        imgPath = file.imgPath;
+      else
+        imgPath = libraw.extractThumb(
+          `${file.path}`,
+          `${config.tmp}/${file.name}`
+        );
 
       return readFile(imgPath)
         .then((img) => {
