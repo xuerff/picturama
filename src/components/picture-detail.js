@@ -166,8 +166,6 @@ class PictureDetail extends React.Component {
 
     ipcRenderer.send('toggleAddTagMenu', true);
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
-
-    console.log('bind');
   }
 
   unbindEventListeners() {
@@ -181,8 +179,6 @@ class PictureDetail extends React.Component {
     ipcRenderer.send('toggleAddTagMenu', false);
     ipcRenderer.removeListener('addTagClicked', this.showTagDialog.bind(this));
     ipcRenderer.removeAllListeners('addTagClicked');
-
-    console.log('unbind');
   }
 
   render() {
