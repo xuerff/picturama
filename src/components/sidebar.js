@@ -91,14 +91,17 @@ class Sidebar extends React.Component {
     var handleDate = this.handleDate.bind(this)
       , currentDate = this.state.currentDate;
 
-    var dateYearsList = this.state.dates.years.map(function(year) {
-      return (
-        <DateYear
-          year={year}
-          currentDate={currentDate}
-          setDate={handleDate} />
-      );
-    });
+    var dateYearsList = [];
+
+    if (this.state.dates.years)
+      dateYearsList = this.state.dates.years.map(function(year) {
+        return (
+          <DateYear
+            year={year}
+            currentDate={currentDate}
+            setDate={handleDate} />
+        );
+      });
 
     var tagsList = this.state.tags.map((tag) => {
       return (

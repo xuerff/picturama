@@ -180,7 +180,7 @@ class Library {
         let end = new Date().getTime();
         let time = moment.duration(end - start);
 
-        console.log('execution time', time);
+        this.mainWindow.webContents.send('finish-import', true);
 
         notifier.notify({
           'title': 'Ansel',
