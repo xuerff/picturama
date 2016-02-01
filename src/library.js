@@ -11,11 +11,24 @@ import config from './config';
 
 import exifParser from './lib/exif-parser';
 import walker from './lib/walker';
+import matches from './lib/matches';
 
 import Photo from './models/photo';
 import Version from './models/version';
 
-var readFile = Promise.promisify(fs.readFile);
+const readFile = Promise.promisify(fs.readFile);
+const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
+const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
+
+const extract = new RegExp(
+  '([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$',
+  'i'
+);
+
+const extractImg = new RegExp(
+  '([^\/]+)\.(' + config.acceptedImgFormats.join('|') + ')$',
+  'i'
+);
 
 class Library {
 
@@ -28,30 +41,71 @@ class Library {
 
       this.path = settings.directories.photos;
       this.versionsPath = settings.directories.versions;
-    }
-
-    if (!fs.existsSync(config.tmp))
-      fs.mkdirSync(config.tmp);
-  }
-
-  walk(fileStat) {
-    let allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
-    let extract = new RegExp('([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$', 'i');
-
-    if (fileStat.toLowerCase().match(allowed)) {
 
       if (!fs.existsSync(config.thumbsPath))
         fs.mkdirSync(config.thumbsPath);
 
       if (!fs.existsSync(config.thumbs250Path))
         fs.mkdirSync(config.thumbs250Path);
+    }
 
-      let filename = fileStat.match(extract)[1];
-      console.log('each', fileStat, filename);
+    if (!fs.existsSync(config.tmp))
+      fs.mkdirSync(config.tmp);
+  }
 
+  prepare(filePaths) {
+    let rawFiles = filePaths.map((filePath) => {
+      if (filePath.match(allowed))
+        return filePath;
+    })
+    .filter((filePath) => (filePath));
+
+    let imgFiles = filePaths.map((filePath) => {
+      if (filePath.match(allowedImg))
+        return filePath;
+    })
+    .filter((filePath) => (filePath));
+
+    let preparedFiles = rawFiles.map((rawFile) => {
+      let filename = rawFile.match(extract)[1];
+      let imgPos = matches(imgFiles, filename);
+
+      let element = {
+        path: rawFile,
+        name: filename,
+        isRaw: true
+      };
+
+      if (imgPos != -1) {
+        element.imgFilePath = imgFiles[imgPos];
+
+        imgFiles = imgFiles.filter((imgFile) => {
+          return (imgFile != imgFiles[imgPos]);
+        });
+      }
+
+      return element;
+    });
+
+    imgFiles.forEach((imgFile) => {
+      let filename = imgFile.match(extractImg)[1];
+
+      preparedFiles.push({
+        path: imgFile,
+        mame: filename,
+        isRaw: false
+      });
+    });
+
+    return preparedFiles;
+  }
+
+  walk(file) {
+    if (file.isRaw) {
+      console.log('walk', file.name);
       let imgPath = libraw.extractThumb(
-        `${fileStat}`,
-        `${config.tmp}/${filename}`
+        `${file.path}`,
+        `${config.tmp}/${file.name}`
       );
 
       return readFile(imgPath)
@@ -59,22 +113,22 @@ class Library {
           return sharp(img)
             .rotate()
             .withMetadata()
-            .toFile(`${config.thumbsPath}/${filename}.thumb.jpg`);
+            .toFile(`${config.thumbsPath}/${file.name}.thumb.jpg`);
         })
         .then(() => {
-          return sharp(`${config.thumbsPath}/${filename}.thumb.jpg`)
+          return sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`)
             .resize(250, 250)
             .max()
             .quality(100)
-            .toFile(`${config.thumbs250Path}/${filename}.jpg`);
+            .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
         })
         .then(() => {
-          return new Photo({ title: filename }).fetch();
+          return new Photo({ title: file.name }).fetch();
         })
         .then((photo) => {
           return [ 
             photo, 
-            exifParser(`${config.thumbsPath}/${filename}.thumb.jpg`)
+            exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`)
           ];
         })
         .spread((photo, exifData) => {
@@ -92,8 +146,8 @@ class Library {
             return;
           else
             return Photo.forge({
-              title: filename,
-              extension: fileStat.name.match(/\.(.+)$/i)[1],
+              title: file.name,
+              extension: file.path.match(/\.(.+)$/i)[1],
               orientation,
               date: createdAt.format('YYYY-MM-DD'),
               created_at: createdAt.toDate(),
@@ -101,9 +155,9 @@ class Library {
               iso: exifData.exif.ISO,
               aperture: exifData.exif.FNumber,
               focal_length: exifData.exif.FocalLength,
-              master: `${root}/${fileStat.name}`,
-              thumb_250: `${config.thumbs250Path}/${filename}.jpg`,
-              thumb: `${config.thumbsPath}/${filename}.thumb.jpg`
+              master: `${file.path}`,
+              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+              thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
             })
             .save();
         });
@@ -118,6 +172,7 @@ class Library {
       return false;
 
     walker(this.path)
+      .then(this.prepare.bind(this))
       .map(this.walk.bind(this), { 
         concurrency: parseFloat(process.argv[2] || 'Infinity')
       })
