@@ -13,17 +13,32 @@ class AddTags extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.keyboardListener = this.keyboardListener.bind(this);
+  }
+
+  keyboardListener(e) {
+    console.log('add tag keyboard listener', e);
+
+    e.preventDefault();
+
+    if (e.keyCode == 27) // escape
+      this.props.closeTagDialog();
   }
 
   componentDidMount() {
     let state = this.state;
 
     TagStore.listen(this.props.closeTagDialog);
+    document.addEventListener('keyup', this.keyboardListener);
 
     if (this.props.photo.tags.length > 0)
       this.state.tags = this.props.photo.tags.map((tag) => tag.title);
 
     this.setState(state);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keyup', this.keyboardListener);
   }
 
   handleChange(tags) {

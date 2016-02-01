@@ -98,13 +98,16 @@ class PictureDetail extends React.Component {
   }
 
   showTagDialog() {
+    this.unbindEventListeners();
+
     var state = this.state;
-    //console.log('show tag dialog', state);
     state.modalIsOpen = true;
     this.setState(state);
   }
 
   closeTagDialog() {
+    this.bindEventListeners();
+
     var state = this.state;
     state.modalIsOpen = false;
     this.setState(state);
