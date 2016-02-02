@@ -101,9 +101,9 @@ class Library {
   }
 
   walk(file) {
-    if (file.isRaw) {
-      console.log('walk', file);
+    console.log('walk', file);
 
+    if (file.isRaw) {
       let imgPath = '';
 
       if (file.hasOwnProperty('imgPath'))
@@ -188,9 +188,11 @@ class Library {
 
         this.mainWindow.webContents.send('finish-import', true);
 
+        console.log(`Finish importing ${pics.length} in ${time.humanize()}`);
+
         notifier.notify({
           'title': 'Ansel',
-          'message': `Finish importing ${pics.length} in ${time.humanize()} `
+          'message': `Finish importing ${pics.length} in ${time.humanize()}`
         });
       });
 
