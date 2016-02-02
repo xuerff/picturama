@@ -28,7 +28,7 @@ class PhotoActions {
   getPhotos() {
     Photo
       .query(function (qb) {
-        qb.limit(100).offset(0);
+        qb.limit(100).offset(0).orderBy('created_at', 'desc');
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
