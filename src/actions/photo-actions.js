@@ -26,9 +26,10 @@ class PhotoActions {
   }
 
   getPhotos() {
-    console.log('get photos');
-
-    new Photo()
+    Photo
+      .query(function (qb) {
+        qb.limit(100).offset(0);
+      })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         this.actions.getPhotosSuccess(photos);

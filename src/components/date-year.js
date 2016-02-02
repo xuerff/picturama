@@ -25,7 +25,6 @@ class DateYear extends React.Component {
   }
 
   getClasses() {
-    console.log('get class', this.state.showDropdown);
     return (this.state.showDropdown) ? '' : 'hide';
   }
 

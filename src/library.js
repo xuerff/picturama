@@ -1,4 +1,3 @@
-//import {ExifImage} from 'exif';
 import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
@@ -180,7 +179,7 @@ class Library {
     walker(this.path)
       .then(this.prepare.bind(this))
       .map(this.walk.bind(this), { 
-        concurrency: parseFloat(process.argv[2] || 'Infinity')
+        //concurrency: 5
       })
       .then((pics) => {
         let end = new Date().getTime();
