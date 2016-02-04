@@ -14,8 +14,6 @@ import knexFile from './knexfile';
 
 import npmPkgs from './package.json';
 
-//console.log('npm-pkgs', Object.keys(npmPkgs.dependencies));
-
 let knex = require('knex')(knexFile.development);
 
 gulp.task("babel", ['lint'], () => {
@@ -98,7 +96,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
     platform: 'linux',
     asar: true,
     out: './build',
-    version: '0.36.0'
+    version: npmPkgs.dependencies['electron-prebuilt']
   };
 
   packager(opts, function done (err, appPath) { 
