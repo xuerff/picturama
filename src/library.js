@@ -177,8 +177,8 @@ class Library {
 
     walker(this.path)
       .then(this.prepare.bind(this))
-      .map(this.walk.bind(this), { 
-        //concurrency: 5
+      .map(this.walk.bind(this), {
+        concurrency: config.concurrency
       })
       .then((pics) => {
         let end = new Date().getTime();

@@ -13,5 +13,6 @@ export default {
   settings: `${dotAnsel}/settings.json`,
   thumbsPath: `${dotAnsel}/thumbs`,
   thumbs250Path: `${dotAnsel}/thumbs-250`,
-  tmp: '/tmp/ansel'
+  tmp: '/tmp/ansel',
+  concurrency: 5
 };
