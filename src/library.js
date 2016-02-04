@@ -36,7 +36,6 @@ class Library {
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
-      console.log(settings);
 
       this.path = settings.directories.photos;
       this.versionsPath = settings.directories.versions;
