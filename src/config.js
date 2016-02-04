@@ -14,5 +14,5 @@ export default {
   thumbsPath: `${dotAnsel}/thumbs`,
   thumbs250Path: `${dotAnsel}/thumbs-250`,
   tmp: '/tmp/ansel',
-  concurrency: 5
+  concurrency: 3
 };
