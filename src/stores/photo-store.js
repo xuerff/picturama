@@ -13,7 +13,10 @@ class PhotoStore {
   }
 
   onGetPhotosSuccess(data) {
-    let photos = data.toJSON();
+    let photos = data.photos.toJSON();
+
+    if (data.hasOwnProperty('date'))
+      this.currentDate = data.date;
 
     this.importing = false;
     this.photos = photos.map(function(photo) {
@@ -125,6 +128,10 @@ class PhotoStore {
 
   onSetImport() {
     this.importing = true;
+  }
+
+  onSetCurrentDate(value) {
+    this.currentDate = value;
   }
 }
 

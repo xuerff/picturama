@@ -11,6 +11,7 @@ class PhotoActions {
       'getDatesSuccess',
       'setDateFilterSuccess',
       'updatedPhotoSuccess',
+      'setCurrentDate',
       'setImporting'
     );
   }
@@ -32,7 +33,7 @@ class PhotoActions {
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        this.actions.getPhotosSuccess(photos);
+        this.actions.getPhotosSuccess({ photos });
       });
   }
 
@@ -47,7 +48,7 @@ class PhotoActions {
       .where({ flag: true })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        this.actions.getPhotosSuccess(photos);
+        this.actions.getPhotosSuccess({ photos });
       });
   }
 
@@ -56,7 +57,7 @@ class PhotoActions {
       .where({ date: date })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        this.actions.getPhotosSuccess(photos);
+        this.actions.getPhotosSuccess({ photos, date });
       });
   }
 
@@ -65,8 +66,12 @@ class PhotoActions {
       .fetch({ withRelated: ['photos'] })
       .then((tag) => {
         let photos = tag.related('photos');
-        this.actions.getPhotosSuccess(photos);
+        this.actions.getPhotosSuccess({ photos });
       });
+  }
+
+  clearDate() {
+    this.actions.setCurrentDate(null);
   }
 
   startImport() {
