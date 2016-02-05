@@ -99,8 +99,6 @@ class Library {
   }
 
   walk(file) {
-    console.log('walk', file);
-
     if (file.isRaw) {
       let imgPath = '';
 
@@ -175,7 +173,7 @@ class Library {
     if (!this.path || !this.versionsPath)
       return false;
 
-    walker(this.path)
+    walker(this.path, [ this.versionsPath ])
       .then(this.prepare.bind(this))
       .map(this.walk.bind(this), {
         concurrency: config.concurrency
@@ -210,7 +208,6 @@ class Library {
       listener: (action, filePath) => {
         // on action:create then parse file and update version
         if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
-          console.log('listen now', action, filePath);
 
           Version.updateImage(filePath.match(allowed)).then(function(version) {
             console.log('version done', version);
