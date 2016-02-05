@@ -12,7 +12,7 @@ class Tags extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { tags: [] };
+    this.state = { tags: [], currentTag: null };
   }
 
   componentDidMount() {
