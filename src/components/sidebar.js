@@ -1,3 +1,4 @@
+import fs from 'fs';
 import React from 'react';
 
 import PhotoActions from './../actions/photo-actions';
@@ -6,10 +7,18 @@ import Tags from './tags';
 import Dates from './dates';
 import Devices from './devices';
 
+import config from './../config';
+
+var settings;
+
+if (fs.existsSync(config.settings))
+  settings = require(config.settings);
+
 class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log(settings);
   }
 
   clearFilters() {
@@ -22,6 +31,22 @@ class Sidebar extends React.Component {
   }
 
   render() {
+    var menus = [
+      <Dates />,
+      <Tags />,
+      <Devices />
+    ];
+
+    if (settings.hasOwnProperty('menus')) {
+      menus = [];
+
+      settings.menus.forEach((menu) => {
+        if (menu == 'dates') menus.push(<Dates />);
+        else if (menu == 'tags') menus.push(<Tags />);
+        else if (menu == 'devices') menus.push(<Devices />);
+      });
+    }
+
     return (
       <div id="sidebar">
         <h2><i className="fa fa-camera-retro"></i> Library</h2>
@@ -39,9 +64,7 @@ class Sidebar extends React.Component {
             <i className="fa fa-flag"></i> Flagged
           </button>
 
-          <Dates />
-          <Tags />
-          <Devices />
+          {menus}
         </div>
       </div>
     );
