@@ -22,7 +22,6 @@ class Sidebar extends React.Component {
   }
 
   clearFilters() {
-    PhotoActions.clearDate();
     PhotoActions.getPhotos();
   }
 

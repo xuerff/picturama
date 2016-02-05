@@ -17,6 +17,8 @@ class PhotoStore {
 
     if (data.hasOwnProperty('date'))
       this.currentDate = data.date;
+    else
+      this.currentDate = null;
 
     this.importing = false;
     this.photos = photos.map(function(photo) {
@@ -130,9 +132,6 @@ class PhotoStore {
     this.importing = true;
   }
 
-  onSetCurrentDate(value) {
-    this.currentDate = value;
-  }
 }
 
 export default alt.createStore(PhotoStore);

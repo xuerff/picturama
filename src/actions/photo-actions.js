@@ -11,7 +11,6 @@ class PhotoActions {
       'getDatesSuccess',
       'setDateFilterSuccess',
       'updatedPhotoSuccess',
-      'setCurrentDate',
       'setImporting'
     );
   }
@@ -68,10 +67,6 @@ class PhotoActions {
         let photos = tag.related('photos');
         this.actions.getPhotosSuccess({ photos });
       });
-  }
-
-  clearDate() {
-    this.actions.setCurrentDate(null);
   }
 
   startImport() {
