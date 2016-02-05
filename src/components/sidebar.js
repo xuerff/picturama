@@ -1,14 +1,16 @@
 import React from 'react';
 
 import PhotoStore from './../stores/photo-store';
-import TagStore from './../stores/tag-store';
+//import TagStore from './../stores/tag-store';
 import DeviceStore from './../stores/device-store';
 
 import PhotoActions from './../actions/photo-actions';
-import TagActions from './../actions/tag-actions';
+//import TagActions from './../actions/tag-actions';
 
 import DateYear from './date-year';
-import TagButton from './tag-button';
+import Tags from './tags';
+
+//import TagButton from './tag-button';
 
 class Sidebar extends React.Component {
 
@@ -26,14 +28,13 @@ class Sidebar extends React.Component {
 
   componentDidMount() {
     PhotoActions.getDates();
-    TagActions.getTags();
+    //TagActions.getTags();
     PhotoStore.listen(this.appendDates.bind(this));
-    TagStore.listen(this.appendTags.bind(this));
+    //TagStore.listen(this.appendTags.bind(this));
     DeviceStore.listen(this.appendDevices.bind(this));
   }
 
   appendDevices(data) {
-    console.log('append devices', data);
     let state = this.state;
     state.devices = data.devices;
     this.setState(state);
@@ -45,12 +46,11 @@ class Sidebar extends React.Component {
     this.setState(state);
   }
 
-  appendTags(data) {
-    console.log('append tags', data);
-    let state = this.state;
-    state.tags = data.tags;
-    this.setState(state);
-  }
+  //appendTags(data) {
+  //  let state = this.state;
+  //  state.tags = data.tags;
+  //  this.setState(state);
+  //}
 
   clearFilters() {
     let state = this.state;
@@ -62,7 +62,6 @@ class Sidebar extends React.Component {
   }
 
   handleDate(date) {
-    console.log(date);
     let state = this.state;
 
     state.currentDate = date;
@@ -70,16 +69,15 @@ class Sidebar extends React.Component {
     this.setState(state);
   }
 
-  handleTag(tag) {
-    let state = this.state;
-    state.currentTag = tag;
+  //handleTag(tag) {
+  //  let state = this.state;
+  //  state.currentTag = tag;
 
-    PhotoActions.setTagFilter(tag);
-    this.setState(state);
-  }
+  //  PhotoActions.setTagFilter(tag);
+  //  this.setState(state);
+  //}
 
   filterFlagged() {
-    console.log('filter flagged');
     PhotoActions.getFlagged();
   }
 
@@ -103,13 +101,13 @@ class Sidebar extends React.Component {
         );
       });
 
-    var tagsList = this.state.tags.map((tag) => {
-      return (
-        <TagButton 
-          setTag={this.handleTag.bind(this)} 
-          tag={tag} />
-      );
-    });
+    //var tagsList = this.state.tags.map((tag) => {
+    //  return (
+    //    <TagButton 
+    //      setTag={this.handleTag.bind(this)} 
+    //      tag={tag} />
+    //  );
+    //});
 
     var devicesList = this.state.devices.map((device) => {
       return (
@@ -142,10 +140,7 @@ class Sidebar extends React.Component {
             <ul>{dateYearsList}</ul>
           </div>
 
-          <div className="tags">
-            <h3><i className="fa fa-tags"></i> Tags</h3>
-            <ul>{tagsList}</ul>
-          </div>
+          <Tags />
 
           <div className="devices">
             <h3><i className="fa fa-usb"></i> Devices</h3>
