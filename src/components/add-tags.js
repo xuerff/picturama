@@ -17,8 +17,6 @@ class AddTags extends React.Component {
   }
 
   keyboardListener(e) {
-    console.log('add tag keyboard listener', e);
-
     e.preventDefault();
 
     if (e.keyCode == 27) // escape
@@ -26,6 +24,8 @@ class AddTags extends React.Component {
   }
 
   componentDidMount() {
+    this.refs.tags.focus();
+
     let state = this.state;
 
     TagStore.listen(this.props.closeTagDialog);
@@ -65,6 +65,7 @@ class AddTags extends React.Component {
             <div className="textfield">
               <TagsInput
                 id="tags"
+                ref="tags"
                 value={this.state.tags}
                 onChange={this.handleChange} />
             </div>
