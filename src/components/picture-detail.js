@@ -53,7 +53,7 @@ class PictureDetail extends React.Component {
     else if (e.keyCode == 37) // Left
       this.props.setLeft();
 
-    else if (e.keyCode == 39) // Right
+    else if (e.keyCode == 39 && !this.props.isLast()) // Right
       this.props.setRight();
 
     else if (e.keyCode == 80) // p
