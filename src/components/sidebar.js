@@ -36,7 +36,7 @@ class Sidebar extends React.Component {
       <Devices />
     ];
 
-    if (settings.hasOwnProperty('menus')) {
+    if (settings && settings.hasOwnProperty('menus')) {
       menus = [];
 
       settings.menus.forEach((menu) => {
