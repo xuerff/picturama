@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear": "rm db.sqlite3 && knex migrate:latest && npm start",
     "postinstall": "npm run rebuild-sqlite3 && npm run rebuild-sharp && npm run rebuild-udev && npm run rebuild-libraw",
-    "rebuild-libraw": "cd node_modules/node-libraw && node-gyp configure --module_name=node-libraw --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node-libraw --module_path=../lib/binding/node-v47-linux-x64",
+    "rebuild-libraw": "cd node_modules/libraw && node-gyp configure --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64",
     "rebuild-udev": "cd node_modules/udev && node-gyp configure --module_name=udev --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=udev --module_path=../lib/binding/node-v47-linux-x64",
     "rebuild-sharp": "cd node_modules/sharp && node-gyp configure --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64",
     "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64"
@@ -26,7 +26,7 @@
     "knex": "^0.9.0",
     "moment": "^2.10.6",
     "node-jsx": "^0.13.3",
-    "node-libraw": "git+https://github.com/m0g/node-libraw#master",
+    "libraw": "git+https://github.com/m0g/node-libraw#master",
     "node-notifier": "^4.3.1",
     "nodejs-disks": "git+https://github.com/shaun-h/nodejs-disks#master",
     "react": "^0.14.7",

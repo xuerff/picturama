@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import notifier from 'node-notifier';
 import fs from 'fs';
 import Promise from 'bluebird';
-import libraw from 'node-libraw';
+import libraw from 'libraw';
 
 import config from './config';
 
@@ -100,40 +100,52 @@ class Library {
 
   walk(file) {
     if (file.isRaw) {
-      let imgPath = '';
+      let waitFor;
+
+      //console.log(file.hasOwnProperty('imgPath'));
 
       if (file.hasOwnProperty('imgPath'))
-        imgPath = file.imgPath;
+        waitFor = Promise.resolve(file.imgPath);
       else
-        imgPath = libraw.extractThumb(
+        waitFor = libraw.extractThumb(
           `${file.path}`,
           `${config.tmp}/${file.name}`
         );
 
-      return readFile(imgPath)
+      return waitFor
+        .then((imgPath) => {
+          //console.log('img path', imgPath);
+          return readFile(imgPath);
+        })
         .then((img) => {
+          //console.log('after read file', img);
           return sharp(img)
             .rotate()
             .withMetadata()
             .toFile(`${config.thumbsPath}/${file.name}.thumb.jpg`);
         })
         .then(() => {
+          //console.log('after sharp file');
           return sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`)
             .resize(250, 250)
             .max()
             .quality(100)
             .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
         })
+        //.then(() => {
+        //  return new Photo({ title: file.name }).fetch();
+        //})
         .then(() => {
-          return new Photo({ title: file.name }).fetch();
+          //console.log('before spread', `${config.thumbsPath}/${file.name}.thumb.jpg`);
+          //return [ 
+          //  exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`),
+          //  new Photo({ title: file.name }).fetch()
+          //];
+          return exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`);
         })
-        .then((photo) => {
-          return [ 
-            photo, 
-            exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`)
-          ];
-        })
-        .spread((photo, exifData) => {
+        //.spread((exifData, photo) => {
+        .then((exifData) => {
+          //console.log('after spread', photo, exifData);
           let createdAt = moment(
             exifData.image.ModifyDate,
             'YYYY:MM:DD HH:mm:ss'
@@ -144,24 +156,29 @@ class Library {
           if (exifData.image.hasOwnProperty('Orientation'))
             orientation = exifData.image.Orientation;
 
-          if (photo)
-            return;
-          else
-            return Photo.forge({
-              title: file.name,
-              extension: file.path.match(/\.(.+)$/i)[1],
-              orientation,
-              date: createdAt.format('YYYY-MM-DD'),
-              created_at: createdAt.toDate(),
-              exposure_time: exifData.exif.ExposureTime,
-              iso: exifData.exif.ISO,
-              aperture: exifData.exif.FNumber,
-              focal_length: exifData.exif.FocalLength,
-              master: `${file.path}`,
-              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
-              thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
-            })
-            .save();
+          return new Photo({ title: file.name }).fetch().then((photo) => {
+            if (photo)
+              return;
+            else
+              return Photo.forge({
+                title: file.name,
+                extension: file.path.match(/\.(.+)$/i)[1],
+                orientation,
+                date: createdAt.format('YYYY-MM-DD'),
+                created_at: createdAt.toDate(),
+                exposure_time: exifData.exif.ExposureTime,
+                iso: exifData.exif.ISO,
+                aperture: exifData.exif.FNumber,
+                focal_length: exifData.exif.FocalLength,
+                master: `${file.path}`,
+                thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+                thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
+              })
+              .save();
+          });
+        })
+        .catch((err) => {
+          console.log('ERR', err);
         });
 
     } else return false;

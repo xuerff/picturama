@@ -2,7 +2,7 @@ import anselBookshelf from './ansel-bookshelf';
 import fs from 'fs.extra';
 import Promise from 'bluebird';
 import sharp from 'sharp';
-import libraw from 'node-libraw';
+import libraw from 'libraw';
 
 import config from './../config';
 
@@ -41,13 +41,19 @@ var Version = anselBookshelf.Model.extend({
           let fileNamePath = `${config.tmp}/${fileName}`;
           model.set('master', `${fileNamePath}.tiff`);
 
-          // TODO: Should not use dcraw
-          let output = libraw.extract(photo.master, fileNamePath);
-          console.log('extracted tiff', output);
+          //let output = libraw.extract(photo.master, fileNamePath);
+          //console.log('extracted tiff', output);
 
-          model.set('master', output);
+          //model.set('master', output);
 
-          return output;
+          //return output;
+
+          return libraw.extract(photo.master, fileNamePath)
+            .then((output) => {
+              console.log('extracted tiff', output);
+              model.set('master', output);
+              return output;
+            });
         }
       })
       .catch(function(err) {
