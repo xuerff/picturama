@@ -90,7 +90,7 @@ class Library {
 
       preparedFiles.push({
         path: imgFile,
-        mame: filename,
+        name: filename,
         isRaw: false
       });
     });
@@ -100,6 +100,7 @@ class Library {
 
   walk(file) {
     if (file.isRaw) {
+      console.log('raw', file.path);
       let waitFor;
 
       if (file.hasOwnProperty('imgPath'))
@@ -166,7 +167,105 @@ class Library {
           console.log('ERR', err);
         });
 
-    } else return false;
+    } else {
+      return Promise.join(
+        sharp(file.path)
+          .resize(250, 250)
+          .max()
+          .quality(100)
+          .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
+        exifParser(file.path),
+        (img, exifData) => {
+          let createdAt;
+
+          if (exifData.image.hasOwnProperty('ModifyDate'))
+            createdAt = moment(
+              exifData.image.ModifyDate,
+              'YYYY:MM:DD HH:mm:ss'
+            );
+          else
+            createdAt = moment(
+              fs.statSync(file.path).birthtime
+            );
+
+          //console.log('stat', fs.statSync(file.path));
+
+          let orientation = 1;
+
+          if (exifData.image.hasOwnProperty('Orientation'))
+            orientation = exifData.image.Orientation;
+
+          console.log('not raw', file, exifData);
+          return new Photo({ title: file.name }).fetch().then((photo) => {
+            if (photo)
+              return;
+            else
+              return Photo.forge({
+                title: file.name,
+                extension: file.path.match(/\.(.+)$/i)[1],
+                orientation,
+                date: createdAt.format('YYYY-MM-DD'),
+                created_at: createdAt.toDate(),
+                exposure_time: exifData.exif.ExposureTime,
+                iso: exifData.exif.ISO,
+                aperture: exifData.exif.FNumber,
+                focal_length: exifData.exif.FocalLength,
+                master: file.path,
+                thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+                thumb: file.path
+              })
+              .save();
+          });
+        }
+      )
+      .catch((err) => {
+        console.log('err', err);
+        return false;
+      });
+      //return sharp(file.path)
+      //  .resize(250, 250)
+      //  .max()
+      //  .quality(100)
+      //  .toFile(`${config.thumbs250Path}/${file.name}.jpg`)
+      //  .then(() => {
+      //    return exifParser(file.path);
+      //  })
+      //  .then((exifData) => {
+      //    let createdAt = moment(
+      //      exifData.image.ModifyDate,
+      //      'YYYY:MM:DD HH:mm:ss'
+      //    );
+
+      //    let orientation = 1;
+
+      //    if (exifData.image.hasOwnProperty('Orientation'))
+      //      orientation = exifData.image.Orientation;
+
+      //    return new Photo({ title: file.name }).fetch().then((photo) => {
+      //      if (photo)
+      //        return;
+      //      else
+      //        return Photo.forge({
+      //          title: file.name,
+      //          extension: file.path.match(/\.(.+)$/i)[1],
+      //          orientation,
+      //          date: createdAt.format('YYYY-MM-DD'),
+      //          created_at: createdAt.toDate(),
+      //          exposure_time: exifData.exif.ExposureTime,
+      //          iso: exifData.exif.ISO,
+      //          aperture: exifData.exif.FNumber,
+      //          focal_length: exifData.exif.FocalLength,
+      //          master: `${file.path}`,
+      //          thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+      //          thumb: `${file.imgPath}`
+      //        })
+      //        .save();
+      //    });
+      //  })
+      //  .catch((err) => {
+      //    console.log('ERR', err);
+      //  });
+    }
   }
 
   scan() {
