@@ -79,6 +79,14 @@ class PictureDetail extends React.Component {
     );
   }
 
+  openWithDarktable() {
+    VersionActions.createVersionAndOpenWith(
+      this.props.photo, 
+      'RAW', 
+      'darktable'
+    );
+  }
+
   openWithGimp() {
     VersionActions.createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
   }
@@ -87,6 +95,13 @@ class PictureDetail extends React.Component {
     this.menu.append(new MenuItem({ 
       label: 'Open with Rawtherapee', 
       click: this.openWithRawtherapee.bind(this)
+    }));
+  }
+
+  addDarktableMenu() {
+    this.menu.append(new MenuItem({ 
+      label: 'Open with Darktable', 
+      click: this.openWithDarktable.bind(this)
     }));
   }
 
@@ -114,7 +129,6 @@ class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
-    //console.log('start loader');
     VersionStore.listen(this.updateVersion.bind(this));
 
     this.menu = new Menu();
@@ -129,9 +143,11 @@ class PictureDetail extends React.Component {
     }));
 
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
+    let darktableCmd = spawn('which', ['darktable']);
     let gimpCmd = spawn('which', ['gimp']);
 
     rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
+    darktableCmd.stdout.on('data', this.addDarktableMenu.bind(this));
     gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
     this.bindEventListeners();
