@@ -175,7 +175,8 @@ class Library {
           .quality(100)
           .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
         exifParser(file.path),
-        (img, exifData) => {
+        sharp(file.path).metadata(),
+        (img, exifData, metadata) => {
           let createdAt;
 
           if (exifData.image.hasOwnProperty('ModifyDate'))
@@ -188,14 +189,18 @@ class Library {
               fs.statSync(file.path).birthtime
             );
 
+          //console.log('sharp', metadata);
           //console.log('stat', fs.statSync(file.path));
 
           let orientation = 1;
 
           if (exifData.image.hasOwnProperty('Orientation'))
             orientation = exifData.image.Orientation;
+          else if (metadata.width < metadata.height)
+            orientation = 0;
 
-          console.log('not raw', file, exifData);
+          // TODO: How to determine orientation from a JPG file?
+
           return new Photo({ title: file.name }).fetch().then((photo) => {
             if (photo)
               return;
