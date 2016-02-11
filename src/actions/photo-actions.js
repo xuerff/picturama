@@ -11,7 +11,8 @@ class PhotoActions {
       'getDatesSuccess',
       'setDateFilterSuccess',
       'updatedPhotoSuccess',
-      'setImporting'
+      'setImporting',
+      'setImportProgress'
     );
   }
 
@@ -70,7 +71,13 @@ class PhotoActions {
   }
 
   startImport() {
+    console.log('start import');
     this.actions.setImporting(true);
+  }
+
+  importProgress(e, progress) {
+    console.log('import progress', progress);
+    this.actions.setImportProgress(progress);
   }
 
   toggleFlag(photo) {

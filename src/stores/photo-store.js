@@ -10,6 +10,7 @@ class PhotoStore {
     this.dates = [];
     this.currentDate = null;
     this.importing = false;
+    this.progress = {};
   }
 
   onGetPhotosSuccess(data) {
@@ -128,10 +129,15 @@ class PhotoStore {
     });
   }
 
-  onSetImport() {
-    this.importing = true;
+  onSetImporting(isImporting) {
+    console.log('on set importing', isImporting);
+    this.importing = isImporting;
   }
 
+  onSetImportProgress(progress) {
+    console.log('on set import progress', progress);
+    this.progress = progress;
+  }
 }
 
 export default alt.createStore(PhotoStore);

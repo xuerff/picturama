@@ -33,6 +33,7 @@ class Library {
 
   constructor(mainWindow) {
     this.mainWindow = mainWindow;
+    this.progress = { processed: 0, total: 0 };
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -94,6 +95,8 @@ class Library {
         isRaw: false
       });
     });
+
+    this.progress.total = preparedFiles.length;
 
     return preparedFiles;
   }
@@ -175,37 +178,21 @@ class Library {
             .save();
         });
       })
+      .then(this.onImportedStep.bind(this))
       .catch((err) => {
         console.log('ERR', file, err);
       });
   }
 
   importImg(file) {
-    let start = new Date().getTime();
-    let thumbStep;
-    let exifStep;
-    let metadataStep;
-
     return Promise.join(
       sharp(file.path)
         .resize(250, 250)
         .max()
         .quality(100)
-        .toFile(`${config.thumbs250Path}/${file.name}.jpg`)
-        .then(() => {
-          thumbStep = new Date().getTime();
-          return true;
-        }),
-      exifParser(file.path)
-        .then((exifData) => {
-          exifStep = new Date().getTime();
-          return exifData;
-        }),
-      sharp(file.path).metadata()
-        .then((metadata) => {
-          metadataStep = new Date().getTime();
-          return metadata;
-        }),
+        .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
+      exifParser(file.path),
+      sharp(file.path).metadata(),
       (img, exifData, metadata) => {
         let createdAt;
 
@@ -250,24 +237,23 @@ class Library {
         });
       }
     )
-    .then(() => {
-      let end = new Date().getTime();
-      let time = moment.duration(end - start);
-      let thumb = moment.duration(thumbStep - start);
-      let exif = moment.duration(exifStep - start);
-      let metadata = moment.duration(metadataStep - start);
-
-      console.log(`${file.name} thumb:${thumb} exif:${exif} metadata:${metadata} total ${time}`);
-    })
+    .then(this.onImportedStep.bind(this))
     .catch((err) => {
       console.log('err', err);
       return false;
     });
-   
+  }
+
+  onImportedStep() {
+    console.log('on import step');
+    this.progress.processed++;
+    this.mainWindow.webContents.send('progress', this.progress);
+    return true;
   }
 
   scan() {
     var start = new Date().getTime();
+    this.mainWindow.webContents.send('start-import', true);
 
     if (!this.path || !this.versionsPath)
       return false;

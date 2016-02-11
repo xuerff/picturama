@@ -1,8 +1,11 @@
 import fs from 'fs';
 import React from 'react';
 
+import PhotoStore from './../stores/photo-store';
+
 import Library from './library';
 import Settings from './settings';
+import Progress from './progress';
 
 import config from './../config';
 
@@ -12,7 +15,7 @@ class Container extends React.Component {
 
     this.areSettingsExisting = this.areSettingsExisting.bind(this);
 
-    this.state = { settingsExists: false, scrollTop: 0 };
+    this.state = { settingsExists: false, scrollTop: 0, isImporting: false };
   }
 
   handleScrollTop(scrollTop) {
@@ -25,8 +28,16 @@ class Container extends React.Component {
     this.setState(state);
   }
 
+  handleImport(store) {
+    let state = this.state;
+    state.isImporting = store.importing;
+    console.log('handle import', state);
+    this.setState(state);
+  }
+
   componentDidMount() {
     this.areSettingsExisting();
+    PhotoStore.listen(this.handleImport.bind(this));
   }
 
   render() {
@@ -34,6 +45,9 @@ class Container extends React.Component {
 
     if (this.state.settingsExists)
       content = <Library setScrollTop={this.handleScrollTop.bind(this)}/>;
+
+    if (this.state.isImporting)
+      content = <Progress />;
 
     return (
       <div id="container" ref="container">
