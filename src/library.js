@@ -99,22 +99,20 @@ class Library {
       });
     });
 
-    this.progress.total = preparedFiles.length;
-
     return preparedFiles;
   }
 
+  filterStoredPhoto(file) {
+    return new Photo({ master: file.path })
+      .fetch()
+      .then((photo) => !photo);
+  }
+
   walk(file) {
-    return new Photo({ master: file.path }).fetch().then((photo) => {
-      if (photo)
-        return false;
-
-      else if (file.isRaw)
-        return this.importRaw(file);
-
-      else
-        return this.importImg(file);
-    });
+    if (file.isRaw)
+      return this.importRaw(file);
+    else
+      return this.importImg(file);
   }
 
   importRaw(file) {
@@ -254,6 +252,11 @@ class Library {
     return true;
   }
 
+  setTotal(files) {
+    this.progress.total = files.length;
+    return files;
+  }
+
   scan() {
     var start = new Date().getTime();
     this.mainWindow.webContents.send('start-import', true);
@@ -263,6 +266,9 @@ class Library {
 
     walker(this.path, [ this.versionsPath ])
       .then(this.prepare.bind(this))
+      // TODO: remove already stored photo & redo the total
+      .filter(this.filterStoredPhoto.bind(this))
+      .then(this.setTotal.bind(this))
       .map(this.walk.bind(this), {
         concurrency: config.concurrency
       })

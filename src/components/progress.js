@@ -1,17 +1,20 @@
+import fs from 'fs';
 import React from 'react';
 
 import PhotoStore from './../stores/photo-store';
 
 import config from './../config';
 
-const settings = require(config.settings);
+var settings = {};
+
+if (fs.existsSync(config.settings))
+  settings = require(config.settings);
 
 class Progress extends React.Component {
   constructor(props) {
     super(props);
 
     this.getProgress = this.getProgress.bind(this);
-    //this.getWidth = this.getWidth.bind(this);
 
     this.state = { progress: {
       processed: 0, total: 0
@@ -32,14 +35,15 @@ class Progress extends React.Component {
     return progress.processed / (progress.total / 100);
   }
 
-  //getWidth() {
-  //  return `width: ${this.getProgress()}%;`;
-  //}
-
   render() {
+    let photosDir = '';
+
+    if (settings)
+      photosDir = settings.directories.photos;
+
     return (
       <div id="progress">
-        <h2>scanning: {settings.directories.photos}</h2>
+        <h2>scanning: {photosDir}</h2>
 
         <div className="progress-bar">
           <div 
@@ -47,7 +51,7 @@ class Progress extends React.Component {
             style={{ width: this.getProgress() + '%' }}></div>
         </div>
 
-        <p>{this.getProgress()}%</p>
+        <p>{Math.round(this.getProgress())}%</p>
         <p>{this.state.progress.processed} / {this.state.progress.total}</p>
       </div>
     );
