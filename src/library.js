@@ -35,6 +35,9 @@ class Library {
     this.mainWindow = mainWindow;
     this.progress = { processed: 0, total: 0 };
 
+    this.importRaw = this.importRaw.bind(this);
+    this.importImg = this.importImg.bind(this);
+
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
 
@@ -107,10 +110,10 @@ class Library {
         return false;
 
       else if (file.isRaw)
-        return this.importRaw(file).bind(this);
+        return this.importRaw(file);
 
       else
-        return this.importImg(file).bind(this);
+        return this.importImg(file);
     });
   }
 
