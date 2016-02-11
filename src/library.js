@@ -103,159 +103,167 @@ class Library {
       if (photo)
         return false;
 
-      else if (file.isRaw) {
-        console.log('raw', file.path);
-        let waitFor;
+      else if (file.isRaw)
+        return this.importRaw(file).bind(this);
 
-        if (file.hasOwnProperty('imgPath'))
-          waitFor = Promise.resolve(file.imgPath);
+      else
+        return this.importImg(file).bind(this);
+    });
+  }
+
+  importRaw(file) {
+    console.log('raw', file.path);
+    let waitFor;
+
+    if (file.hasOwnProperty('imgPath'))
+      waitFor = Promise.resolve(file.imgPath);
+    else
+      waitFor = libraw.extractThumb(
+        `${file.path}`,
+        `${config.tmp}/${file.name}`
+      );
+
+    return waitFor
+      .then((imgPath) => {
+        return readFile(imgPath);
+      })
+      .then((img) => {
+        return sharp(img)
+          .rotate()
+          .withMetadata()
+          .toFile(`${config.thumbsPath}/${file.name}.thumb.jpg`);
+      })
+      .then(() => {
+        return sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`)
+          .resize(250, 250)
+          .max()
+          .quality(100)
+          .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
+      })
+      .then(() => {
+        return exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`);
+      })
+      .then((exifData) => {
+        let createdAt = moment(
+          exifData.image.ModifyDate,
+          'YYYY:MM:DD HH:mm:ss'
+        );
+
+        let orientation = 1;
+
+        if (exifData.image.hasOwnProperty('Orientation'))
+          orientation = exifData.image.Orientation;
+
+        return new Photo({ title: file.name }).fetch().then((photo) => {
+          if (photo)
+            return;
+          else
+            return Photo.forge({
+              title: file.name,
+              extension: file.path.match(/\.(.+)$/i)[1],
+              orientation,
+              date: createdAt.format('YYYY-MM-DD'),
+              created_at: createdAt.toDate(),
+              exposure_time: exifData.exif.ExposureTime,
+              iso: exifData.exif.ISO,
+              aperture: exifData.exif.FNumber,
+              focal_length: exifData.exif.FocalLength,
+              master: `${file.path}`,
+              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+              thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
+            })
+            .save();
+        });
+      })
+      .catch((err) => {
+        console.log('ERR', file, err);
+      });
+  }
+
+  importImg(file) {
+    let start = new Date().getTime();
+    let thumbStep;
+    let exifStep;
+    let metadataStep;
+
+    return Promise.join(
+      sharp(file.path)
+        .resize(250, 250)
+        .max()
+        .quality(100)
+        .toFile(`${config.thumbs250Path}/${file.name}.jpg`)
+        .then(() => {
+          thumbStep = new Date().getTime();
+          return true;
+        }),
+      exifParser(file.path)
+        .then((exifData) => {
+          exifStep = new Date().getTime();
+          return exifData;
+        }),
+      sharp(file.path).metadata()
+        .then((metadata) => {
+          metadataStep = new Date().getTime();
+          return metadata;
+        }),
+      (img, exifData, metadata) => {
+        let createdAt;
+
+        if (exifData.image.hasOwnProperty('ModifyDate'))
+          createdAt = moment(
+            exifData.image.ModifyDate,
+            'YYYY:MM:DD HH:mm:ss'
+          );
         else
-          waitFor = libraw.extractThumb(
-            `${file.path}`,
-            `${config.tmp}/${file.name}`
+          createdAt = moment(
+            fs.statSync(file.path).birthtime
           );
 
-        return waitFor
-          .then((imgPath) => {
-            return readFile(imgPath);
-          })
-          .then((img) => {
-            return sharp(img)
-              .rotate()
-              .withMetadata()
-              .toFile(`${config.thumbsPath}/${file.name}.thumb.jpg`);
-          })
-          .then(() => {
-            return sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`)
-              .resize(250, 250)
-              .max()
-              .quality(100)
-              .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
-          })
-          .then(() => {
-            return exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`);
-          })
-          .then((exifData) => {
-            let createdAt = moment(
-              exifData.image.ModifyDate,
-              'YYYY:MM:DD HH:mm:ss'
-            );
+        let orientation = 1;
 
-            let orientation = 1;
+        if (exifData.image.hasOwnProperty('Orientation'))
+          orientation = exifData.image.Orientation;
+        else if (metadata.width < metadata.height)
+          orientation = 0;
 
-            if (exifData.image.hasOwnProperty('Orientation'))
-              orientation = exifData.image.Orientation;
+        // TODO: How to determine orientation from a JPG file?
 
-            return new Photo({ title: file.name }).fetch().then((photo) => {
-              if (photo)
-                return;
-              else
-                return Photo.forge({
-                  title: file.name,
-                  extension: file.path.match(/\.(.+)$/i)[1],
-                  orientation,
-                  date: createdAt.format('YYYY-MM-DD'),
-                  created_at: createdAt.toDate(),
-                  exposure_time: exifData.exif.ExposureTime,
-                  iso: exifData.exif.ISO,
-                  aperture: exifData.exif.FNumber,
-                  focal_length: exifData.exif.FocalLength,
-                  master: `${file.path}`,
-                  thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
-                  thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
-                })
-                .save();
-            });
-          })
-          .catch((err) => {
-            console.log('ERR', err);
-          });
-
-      } else {
-        let start = new Date().getTime();
-        let thumbStep;
-        let exifStep;
-        let metadataStep;
-
-        return Promise.join(
-          sharp(file.path)
-            .resize(250, 250)
-            .max()
-            .quality(100)
-            .toFile(`${config.thumbs250Path}/${file.name}.jpg`)
-            .then(() => {
-              thumbStep = new Date().getTime();
-              return true;
-            }),
-          exifParser(file.path)
-            .then((exifData) => {
-              exifStep = new Date().getTime();
-              return exifData;
-            }),
-          sharp(file.path).metadata()
-            .then((metadata) => {
-              metadataStep = new Date().getTime();
-              return metadata;
-            }),
-          (img, exifData, metadata) => {
-            let createdAt;
-
-            if (exifData.image.hasOwnProperty('ModifyDate'))
-              createdAt = moment(
-                exifData.image.ModifyDate,
-                'YYYY:MM:DD HH:mm:ss'
-              );
-            else
-              createdAt = moment(
-                fs.statSync(file.path).birthtime
-              );
-
-            let orientation = 1;
-
-            if (exifData.image.hasOwnProperty('Orientation'))
-              orientation = exifData.image.Orientation;
-            else if (metadata.width < metadata.height)
-              orientation = 0;
-
-            // TODO: How to determine orientation from a JPG file?
-
-            return new Photo({ title: file.name }).fetch().then((photo) => {
-              if (photo)
-                return;
-              else
-                return Photo.forge({
-                  title: file.name,
-                  extension: file.path.match(/\.(.+)$/i)[1],
-                  orientation,
-                  date: createdAt.format('YYYY-MM-DD'),
-                  created_at: createdAt.toDate(),
-                  exposure_time: exifData.exif.ExposureTime,
-                  iso: exifData.exif.ISO,
-                  aperture: exifData.exif.FNumber,
-                  focal_length: exifData.exif.FocalLength,
-                  master: file.path,
-                  thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
-                  thumb: file.path
-                })
-                .save();
-            });
-          }
-        )
-        .then(() => {
-          let end = new Date().getTime();
-          let time = moment.duration(end - start);
-          let thumb = moment.duration(thumbStep - start);
-          let exif = moment.duration(exifStep - start);
-          let metadata = moment.duration(metadataStep - start);
-
-          console.log(`${file.name} thumb:${thumb} exif:${exif} metadata:${metadata} total ${time}`);
-        })
-        .catch((err) => {
-          console.log('err', err);
-          return false;
+        return new Photo({ title: file.name }).fetch().then((photo) => {
+          if (photo)
+            return;
+          else
+            return Photo.forge({
+              title: file.name,
+              extension: file.path.match(/\.(.+)$/i)[1],
+              orientation,
+              date: createdAt.format('YYYY-MM-DD'),
+              created_at: createdAt.toDate(),
+              exposure_time: exifData.exif.ExposureTime,
+              iso: exifData.exif.ISO,
+              aperture: exifData.exif.FNumber,
+              focal_length: exifData.exif.FocalLength,
+              master: file.path,
+              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+              thumb: file.path
+            })
+            .save();
         });
       }
+    )
+    .then(() => {
+      let end = new Date().getTime();
+      let time = moment.duration(end - start);
+      let thumb = moment.duration(thumbStep - start);
+      let exif = moment.duration(exifStep - start);
+      let metadata = moment.duration(metadataStep - start);
+
+      console.log(`${file.name} thumb:${thumb} exif:${exif} metadata:${metadata} total ${time}`);
+    })
+    .catch((err) => {
+      console.log('err', err);
+      return false;
     });
+   
   }
 
   scan() {
