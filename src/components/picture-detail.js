@@ -24,7 +24,7 @@ class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { binded: false, modalIsOpen: false, loaded: false };
+    this.state = { binded: false, modal: 'none', loaded: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
@@ -44,10 +44,10 @@ class PictureDetail extends React.Component {
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
-    if (e.keyCode == 27 && !this.state.modalIsOpen) // escape
+    if (e.keyCode == 27 && this.state.modal == 'none') // escape
       this.props.setCurrent(null);
 
-    else if (e.keyCode == 27 && this.state.modalIsOpen) // escape
+    else if (e.keyCode == 27 && this.state.modal != 'none') // escape
       this.closeTagDialog();
 
     else if (e.keyCode == 37) // Left
@@ -116,7 +116,7 @@ class PictureDetail extends React.Component {
     this.unbindEventListeners();
 
     var state = this.state;
-    state.modalIsOpen = true;
+    state.modal = 'addTags';
     this.setState(state);
   }
 
@@ -124,8 +124,11 @@ class PictureDetail extends React.Component {
     this.bindEventListeners();
 
     var state = this.state;
-    state.modalIsOpen = false;
+    state.modal = 'none';
     this.setState(state);
+  }
+
+  showExportDialog() {
   }
 
   componentDidMount() {
@@ -154,11 +157,8 @@ class PictureDetail extends React.Component {
   }
 
   finishLoading() {
-    //console.log('stop loader');
     let state = this.state;
-
     state.loaded = true;
-
     this.setState(state);
   }
 
@@ -181,7 +181,10 @@ class PictureDetail extends React.Component {
     document.addEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', true);
+    ipcRenderer.send('toggleExportMenu', true);
+
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
   }
 
   unbindEventListeners() {
@@ -193,8 +196,10 @@ class PictureDetail extends React.Component {
     document.removeEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', false);
-    ipcRenderer.removeListener('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.send('toggleExportMenu', false);
+
     ipcRenderer.removeAllListeners('addTagClicked');
+    ipcRenderer.removeAllListeners('exportClicked');
   }
 
   render() {
@@ -205,7 +210,7 @@ class PictureDetail extends React.Component {
 
     var showModal;
 
-    if (this.state.modalIsOpen)
+    if (this.state.modal == 'addTags')
       showModal = (
         <AddTags 
           photo={this.props.photo} 

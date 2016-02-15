@@ -4,6 +4,12 @@
       "label": "File",
       "submenu": [
         {
+          "label": "Export picture(s)",
+          "accelerator": "Ctrl+Shift+E",
+          "enabled": false,
+          "click": "export"
+        },
+        {
           "label": "Scan",
           "accelerator": "Ctrl+R",
           "click": "scan"

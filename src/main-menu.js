@@ -15,6 +15,7 @@ class MainMenu {
     this.fullscreen = this.fullscreen.bind(this);
     this.toggleDevTools = this.toggleDevTools.bind(this);
     this.addTags = this.addTags.bind(this);
+    this.export = this.export.bind(this);
 
     this.template = template.menu.map((menu) => {
       menu.submenu = menu.submenu.map((submenu) => {
@@ -29,6 +30,10 @@ class MainMenu {
 
     ipcMain.on('toggleAddTagMenu', (e, state) => {
       this.menu.items[2].submenu.items[0].enabled = state;
+    });
+
+    ipcMain.on('toggleExportMenu', (e, state) => {
+      this.menu.items[0].submenu.items[0].enabled = state;
     });
 
     this.render();
@@ -56,6 +61,10 @@ class MainMenu {
 
   addTags() {
     this.mainWindow.webContents.send('addTagClicked', true);
+  }
+
+  export() {
+    this.mainWindow.webContents.send('exportClicked', true);
   }
 
   render() {
