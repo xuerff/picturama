@@ -7,10 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear": "rm db.sqlite3 && knex migrate:latest && npm start",
     "postinstall": "npm run rebuild-sqlite3 && npm run rebuild-sharp && npm run rebuild-udev && npm run rebuild-libraw",
-    "rebuild-libraw": "cd node_modules/libraw && node-gyp configure --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64",
-    "rebuild-udev": "cd node_modules/udev && node-gyp configure --module_name=udev --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=udev --module_path=../lib/binding/node-v47-linux-x64",
-    "rebuild-sharp": "cd node_modules/sharp && node-gyp configure --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64",
-    "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64"
+    "rebuild-libraw": "cd node_modules/libraw && node-gyp configure --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.7 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=libraw --module_path=../lib/binding/node-v47-linux-x64",
+    "rebuild-udev": "cd node_modules/udev && node-gyp configure --module_name=udev --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.7 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=udev --module_path=../lib/binding/node-v47-linux-x64",
+    "rebuild-sharp": "cd node_modules/sharp && node-gyp configure --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.7 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=sharp --module_path=../lib/binding/node-v47-linux-x64",
+    "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64 && node-gyp rebuild --target=0.36.7 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/node-v47-linux-x64"
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "ISC",
@@ -50,7 +50,7 @@
     "electron-rebuild": "^0.2.5",
     "eslint": "^1.7.3",
     "eslint-plugin-react": "^3.6.3",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-babel": "^6.1.1",
     "gulp-concat": "^2.6.0",
     "gulp-env": "^0.2.0",
