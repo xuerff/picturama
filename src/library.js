@@ -266,7 +266,6 @@ class Library {
 
     walker(this.path, [ this.versionsPath ])
       .then(this.prepare.bind(this))
-      // TODO: remove already stored photo & redo the total
       .filter(this.filterStoredPhoto.bind(this))
       .then(this.setTotal.bind(this))
       .map(this.walk.bind(this), {

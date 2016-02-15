@@ -16,18 +16,23 @@ class Progress extends React.Component {
 
     this.getProgress = this.getProgress.bind(this);
 
-    this.state = { progress: {
-      processed: 0, total: 0
-    } };
+    this.state = {
+      progress: { processed: 0, total: 0 }, timer: 0
+    };
   }
 
   componentDidMount() {
+    let state = this.state;
+    state.timer = new Date().getTime();
+    this.setState(state);
+
     PhotoStore.listen(this.handleProgress.bind(this));
   }
 
   handleProgress(store) {
-    console.log('handle progress', store);
-    this.setState({ progress: store.progress });
+    let state = this.state;
+    state.progress = store.progress;
+    this.setState(state);
   }
 
   getProgress() {
