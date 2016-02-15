@@ -10,6 +10,7 @@ import VersionActions from './../actions/version-actions';
 import remote from 'remote';
 
 import AddTags from './add-tags';
+import Export from './export';
 import PictureInfo from './picture-info';
 
 var Menu = remote.require('menu');
@@ -24,13 +25,13 @@ class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { binded: false, modalIsOpen: false, loaded: false };
+    this.state = { binded: false, modal: 'none', loaded: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
-    this.closeTagDialog = this.closeTagDialog.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
   }
 
@@ -44,11 +45,11 @@ class PictureDetail extends React.Component {
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
-    if (e.keyCode == 27 && !this.state.modalIsOpen) // escape
+    if (e.keyCode == 27 && this.state.modal == 'none') // escape
       this.props.setCurrent(null);
 
-    else if (e.keyCode == 27 && this.state.modalIsOpen) // escape
-      this.closeTagDialog();
+    else if (e.keyCode == 27 && this.state.modal != 'none') // escape
+      this.closeDialog();
 
     else if (e.keyCode == 37) // Left
       this.props.setLeft();
@@ -116,15 +117,24 @@ class PictureDetail extends React.Component {
     this.unbindEventListeners();
 
     var state = this.state;
-    state.modalIsOpen = true;
+    state.modal = 'addTags';
     this.setState(state);
   }
 
-  closeTagDialog() {
+  closeDialog() {
     this.bindEventListeners();
 
     var state = this.state;
-    state.modalIsOpen = false;
+    state.modal = 'none';
+    this.setState(state);
+  }
+
+  showExportDialog() {
+    console.log('show export dialog');
+    this.unbindEventListeners();
+
+    var state = this.state;
+    state.modal = 'export';
     this.setState(state);
   }
 
@@ -154,11 +164,8 @@ class PictureDetail extends React.Component {
   }
 
   finishLoading() {
-    //console.log('stop loader');
     let state = this.state;
-
     state.loaded = true;
-
     this.setState(state);
   }
 
@@ -181,7 +188,10 @@ class PictureDetail extends React.Component {
     document.addEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', true);
+    ipcRenderer.send('toggleExportMenu', true);
+
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
   }
 
   unbindEventListeners() {
@@ -193,8 +203,10 @@ class PictureDetail extends React.Component {
     document.removeEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', false);
-    ipcRenderer.removeListener('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.send('toggleExportMenu', false);
+
     ipcRenderer.removeAllListeners('addTagClicked');
+    ipcRenderer.removeAllListeners('exportClicked');
   }
 
   render() {
@@ -205,11 +217,17 @@ class PictureDetail extends React.Component {
 
     var showModal;
 
-    if (this.state.modalIsOpen)
+    if (this.state.modal == 'addTags')
       showModal = (
         <AddTags 
           photo={this.props.photo} 
-          closeTagDialog={this.closeTagDialog} />
+          closeTagDialog={this.closeDialog} />
+      );
+    else if (this.state.modal == 'export')
+      showModal = (
+        <Export
+          photo={this.props.photo} 
+          closeExportDialog={this.closeDialog} />
       );
 
     return (
