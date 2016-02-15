@@ -10,6 +10,7 @@ import VersionActions from './../actions/version-actions';
 import remote from 'remote';
 
 import AddTags from './add-tags';
+import Export from './export';
 import PictureInfo from './picture-info';
 
 var Menu = remote.require('menu');
@@ -30,7 +31,7 @@ class PictureDetail extends React.Component {
     this.contextMenu = this.contextMenu.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
-    this.closeTagDialog = this.closeTagDialog.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
   }
 
@@ -48,7 +49,7 @@ class PictureDetail extends React.Component {
       this.props.setCurrent(null);
 
     else if (e.keyCode == 27 && this.state.modal != 'none') // escape
-      this.closeTagDialog();
+      this.closeDialog();
 
     else if (e.keyCode == 37) // Left
       this.props.setLeft();
@@ -120,7 +121,7 @@ class PictureDetail extends React.Component {
     this.setState(state);
   }
 
-  closeTagDialog() {
+  closeDialog() {
     this.bindEventListeners();
 
     var state = this.state;
@@ -129,6 +130,12 @@ class PictureDetail extends React.Component {
   }
 
   showExportDialog() {
+    console.log('show export dialog');
+    this.unbindEventListeners();
+
+    var state = this.state;
+    state.modal = 'export';
+    this.setState(state);
   }
 
   componentDidMount() {
@@ -214,7 +221,13 @@ class PictureDetail extends React.Component {
       showModal = (
         <AddTags 
           photo={this.props.photo} 
-          closeTagDialog={this.closeTagDialog} />
+          closeTagDialog={this.closeDialog} />
+      );
+    else if (this.state.modal == 'export')
+      showModal = (
+        <Export
+          photo={this.props.photo} 
+          closeExportDialog={this.closeDialog} />
       );
 
     return (

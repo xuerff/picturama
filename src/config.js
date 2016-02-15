@@ -8,6 +8,7 @@ export default {
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
   acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff' ],
   watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
+  exportFormats: [ 'jpg', 'png' ],
   dotAnsel,
   dbFile: `${dotAnsel}/db.sqlite3`,
   settings: `${dotAnsel}/settings.json`,
