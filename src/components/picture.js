@@ -12,8 +12,6 @@ class Picture extends React.Component {
   }
 
   handleDblClick() {
-    console.log('this', this);
-    console.log('this props', this.props);
     this.props.setCurrent(this.props.photo);
   }
 

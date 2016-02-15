@@ -1,4 +1,5 @@
 import {remote} from 'electron';
+import sharp from 'sharp';
 import React from 'react';
 
 import config from './../config';
@@ -43,7 +44,15 @@ class Export extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log('save', this.state);
+    console.log('save', this.state, this.props.photo);
+
+    let photo = this.props.photo;
+
+    // TODO: Proceed to the actual export
+    if (photo.versions.length > 0)
+      sharp(photo.thumb)
+        .quality(this.state.quality)
+        .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 
   updateQuality() {

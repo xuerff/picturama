@@ -3,7 +3,6 @@ import alt from './../alt';
 import PhotoActions from './../actions/photo-actions';
 
 class PhotoStore {
-
   constructor() {
     this.bindActions(PhotoActions);
     this.photos = [];
@@ -28,7 +27,7 @@ class PhotoStore {
       if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
         photo.versionNumber = 1 + photo.versions.length;
 
-        let lastVersion = photo.versions.pop();
+        let lastVersion = photo.versions[photo.versions.length - 1];
 
         photo.thumb = lastVersion.output;
         photo.thumb_250 = lastVersion.thumbnail;
