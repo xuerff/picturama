@@ -69,7 +69,7 @@ class Export extends React.Component {
 
     // TODO: if RAW export directly from the RAW
     else if (config.acceptedRawFormats.indexOf(extension) != -1)
-      libraw.extractThumb(photo.master, `${config.tmp}/${photo.title}`)
+      libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
         .then((imgPath) => {
           return readFile(imgPath);
         })
@@ -80,6 +80,13 @@ class Export extends React.Component {
             .quality(this.state.quality)
             .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
         });
+
+    else
+      sharp(photo.master)
+        .rotate()
+        .withMetadata()
+        .quality(this.state.quality)
+        .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 
   updateQuality() {
