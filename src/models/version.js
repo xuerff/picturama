@@ -41,13 +41,6 @@ var Version = anselBookshelf.Model.extend({
           let fileNamePath = `${config.tmp}/${fileName}`;
           model.set('master', `${fileNamePath}.tiff`);
 
-          //let output = libraw.extract(photo.master, fileNamePath);
-          //console.log('extracted tiff', output);
-
-          //model.set('master', output);
-
-          //return output;
-
           return libraw.extract(photo.master, fileNamePath)
             .then((output) => {
               console.log('extracted tiff', output);
