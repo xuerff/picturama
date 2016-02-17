@@ -1,8 +1,13 @@
 import {remote} from 'electron';
+import fs from 'fs';
+import Promise from 'bluebird';
+import libraw from 'libraw';
 import sharp from 'sharp';
 import React from 'react';
 
 import config from './../config';
+
+const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   constructor(props) {
@@ -47,12 +52,34 @@ class Export extends React.Component {
     console.log('save', this.state, this.props.photo);
 
     let photo = this.props.photo;
+    let extension = photo.extension.toLowerCase();
 
-    // TODO: Proceed to the actual export
+    console.log(config.acceptedRawFormats.indexOf(extension));
+
+    if (!this.state.folder)
+      return false;
+
+    // Proceed to the actual export
     if (photo.versions.length > 0)
       sharp(photo.thumb)
+        .rotate()
+        .withMetadata()
         .quality(this.state.quality)
         .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+
+    // TODO: if RAW export directly from the RAW
+    else if (config.acceptedRawFormats.indexOf(extension) != -1)
+      libraw.extractThumb(photo.master, `${config.tmp}/${photo.title}`)
+        .then((imgPath) => {
+          return readFile(imgPath);
+        })
+        .then((img) => {
+          return sharp(img)
+            .rotate()
+            .withMetadata()
+            .quality(this.state.quality)
+            .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+        });
   }
 
   updateQuality() {
