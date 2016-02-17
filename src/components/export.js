@@ -16,6 +16,7 @@ class Export extends React.Component {
     this.state = { folder: null, quality: 90, format: config.exportFormats[0] };
 
     this.keyboardListener = this.keyboardListener.bind(this);
+    this.processImg = this.processImg.bind(this);
   }
 
   componentDidMount() {
@@ -47,6 +48,16 @@ class Export extends React.Component {
     );
   }
 
+  processImg(img) {
+    let photo = this.props.photo;
+
+    return sharp(img)
+      .rotate()
+      .withMetadata()
+      .quality(this.state.quality)
+      .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+  }
+
   handleSubmit(e) {
     e.preventDefault();
     console.log('save', this.state, this.props.photo);
@@ -61,32 +72,35 @@ class Export extends React.Component {
 
     // Proceed to the actual export
     if (photo.versions.length > 0)
-      sharp(photo.thumb)
-        .rotate()
-        .withMetadata()
-        .quality(this.state.quality)
-        .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+      return this.processImg(photo.thumb);
+      //sharp(photo.thumb)
+      //  .rotate()
+      //  .withMetadata()
+      //  .quality(this.state.quality)
+      //  .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
 
     // TODO: if RAW export directly from the RAW
     else if (config.acceptedRawFormats.indexOf(extension) != -1)
-      libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
+      return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
         .then((imgPath) => {
           return readFile(imgPath);
         })
-        .then((img) => {
-          return sharp(img)
-            .rotate()
-            .withMetadata()
-            .quality(this.state.quality)
-            .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
-        });
+        .then(this.processImg);
+        //.then((img) => {
+        //  return sharp(img)
+        //    .rotate()
+        //    .withMetadata()
+        //    .quality(this.state.quality)
+        //    .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+        //});
 
     else
-      sharp(photo.master)
-        .rotate()
-        .withMetadata()
-        .quality(this.state.quality)
-        .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
+      return this.processImg(photo.thumb);
+      //sharp(photo.master)
+      //  .rotate()
+      //  .withMetadata()
+      //  .quality(this.state.quality)
+      //  .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 
   updateQuality() {
