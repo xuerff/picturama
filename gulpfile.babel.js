@@ -95,7 +95,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
     dir: './build/prepared',
     ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample|tests)/i,
     platform: 'linux',
-    asar: true,
+    asar: false,
     out: './build',
     version: npmPkgs.dependencies['electron-prebuilt']
   };

@@ -27,7 +27,7 @@
         {
           "label": "Reload",
           "accelerator": "Shift+Ctrl+R",
-          "click": "fullscreen"
+          "click": "reload"
         },
         {
           "label": "Enter Fullscreen",
