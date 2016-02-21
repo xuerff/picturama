@@ -50,7 +50,7 @@ class Container extends React.Component {
       content = <Progress />;
 
     return (
-      <div id="container" ref="container">
+      <div id="container" ref="container" className={this.props.className}>
         {content}
       </div>
     );
