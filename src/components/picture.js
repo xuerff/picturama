@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 
 var rotation = {};
@@ -19,33 +20,26 @@ class Picture extends React.Component {
     this.props.setHighlight(this.props.photo);
   }
 
-  getImgClass() {
-    let classes = [
+  render() {
+    let anchorClass = classNames(
+      'picture',
+      'card',
+      { 'highlighted': this.props.photo.highlighted }
+    );
+
+    let imgClass = classNames(
       rotation[this.props.photo.orientation],
       'shadow--2dp'
-    ];
+    );
 
-    return classes.join(' ');
-  }
-
-  getAnchorClass() {
-    let classes = [ 'picture', 'card' ];
-
-    if (this.props.photo.highlighted)
-      classes.push('highlighted');
-
-    return classes.join(' ');
-  }
-
-  render() {
     return (
       <a
-        className={this.getAnchorClass()}
+        className={anchorClass}
         onDoubleClick={this.handleDblClick.bind(this)}>
         <img
           onClick={this.handleClick.bind(this)}
           src={this.props.photo.thumb_250} 
-          className={this.getImgClass()} />
+          className={imgClass} />
       </a>
     );
   }

@@ -24,7 +24,6 @@ class Ansel extends React.Component {
     });
 
     ipcRenderer.on('scanned-devices', (e, devices) => {
-      console.log('scanned devices', devices);
       DeviceActions.initDevices(devices);
     });
 
@@ -52,7 +51,6 @@ class Ansel extends React.Component {
   }
 
   keyboardListener(e) {
-    console.log('ansel', e.keyCode);
     let state = this.state;
 
     if (e.keyCode == 9) // ESC key
@@ -70,8 +68,6 @@ class Ansel extends React.Component {
 
     if (this.state.showSidebar)
       sidebar = <Sidebar setDateFilter={this.handleDateFilter.bind(this)} />;
-
-    console.log('container class', containerClass);
 
     return (
       <div id="ansel">
