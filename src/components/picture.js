@@ -9,7 +9,6 @@ class Picture extends React.Component {
 
   constructor(props) {
     super(props);
-    this.getImgClass = this.getImgClass.bind(this);
   }
 
   handleDblClick() {
@@ -21,6 +20,8 @@ class Picture extends React.Component {
   }
 
   render() {
+    console.log('photo', this.props.photo);
+
     let anchorClass = classNames(
       'picture',
       'card',
@@ -36,6 +37,7 @@ class Picture extends React.Component {
       <a
         className={anchorClass}
         onDoubleClick={this.handleDblClick.bind(this)}>
+        <span className="v-align"></span>
         <img
           onClick={this.handleClick.bind(this)}
           src={this.props.photo.thumb_250} 
