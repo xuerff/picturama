@@ -20,8 +20,6 @@ class Picture extends React.Component {
   }
 
   render() {
-    console.log('photo', this.props.photo);
-
     let anchorClass = classNames(
       'picture',
       'card',
