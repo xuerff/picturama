@@ -28,13 +28,6 @@ class Library extends React.Component {
         .findDOMNode(this)
         .parentNode
         .scrollTop;
-    //  this.props.setScrollTop(state.scrollTop);
-
-    //console.log('library# scroll top', state.scrollTop);
-    console.log('library# dom element', 
-                state.scrollTop,
-                ReactDOM.findDOMNode(this).parentNode.scrollTop,
-                ReactDOM.findDOMNode(this).parentNode);
 
     this.setState(state);
   }
@@ -150,6 +143,7 @@ class Library extends React.Component {
       currentView = this.state.photos.map((photo) => {
         return (
           <Picture
+            key={photo.id}
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
             setCurrent={handleCurrent} />

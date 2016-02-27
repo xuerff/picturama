@@ -31,18 +31,18 @@ class Sidebar extends React.Component {
 
   render() {
     var menus = [
-      <Dates />,
-      <Tags />,
-      <Devices />
+      <Dates key="0" />,
+      <Tags key="1" />,
+      <Devices key="2" />
     ];
 
     if (settings && settings.hasOwnProperty('menus')) {
       menus = [];
 
-      settings.menus.forEach((menu) => {
-        if (menu == 'dates') menus.push(<Dates />);
-        else if (menu == 'tags') menus.push(<Tags />);
-        else if (menu == 'devices') menus.push(<Devices />);
+      settings.menus.forEach((menu, key) => {
+        if (menu == 'dates') menus.push(<Dates key={key} />);
+        else if (menu == 'tags') menus.push(<Tags key={key} />);
+        else if (menu == 'devices') menus.push(<Devices key={key} />);
       });
     }
 

@@ -39,6 +39,7 @@ class Tags extends React.Component {
       return (
         <TagButton 
           setTag={this.handleTag.bind(this)} 
+          key={tag}
           tag={tag} />
       );
     });

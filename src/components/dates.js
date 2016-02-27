@@ -43,6 +43,7 @@ class Dates extends React.Component {
         return (
           <DateYear
             year={year}
+            key={year.id}
             currentDate={this.state.currentDate}
             setDate={this.handleDate.bind(this)} />
         );

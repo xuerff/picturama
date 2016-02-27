@@ -41,6 +41,7 @@ class DateMonth extends React.Component {
         <DateElement
           setDate={handleDate}
           currentDate={currentDate}
+          key={date.id}
           date={date.id} />
       );
     });
