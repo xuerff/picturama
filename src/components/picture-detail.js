@@ -1,6 +1,7 @@
 import {spawn} from 'child_process';
 import {ipcRenderer} from 'electron';
 
+import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
 
@@ -166,6 +167,7 @@ class PictureDetail extends React.Component {
   finishLoading() {
     let state = this.state;
     state.loaded = true;
+    console.log('height', this.refs.pictureDetail.height);
     this.setState(state);
   }
 
@@ -210,10 +212,10 @@ class PictureDetail extends React.Component {
   }
 
   render() {
-    var className = [
+    let imgClass = classNames(
       'shadow--2dp',
       rotation[this.props.photo.orientation] 
-    ].join(' ');
+    );
 
     var showModal;
 
@@ -231,12 +233,12 @@ class PictureDetail extends React.Component {
       );
 
     return (
-      <div className="picture-detail">
+      <div className="picture-detail" ref="pictureDetail">
         <div className="v-align">
           <img
             src={this.props.photo.thumb} 
             onLoad={this.finishLoading}
-            className={className} />
+            className={imgClass} />
         </div>
 
         <PictureInfo photo={this.props.photo} />

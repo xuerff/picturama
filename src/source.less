@@ -154,6 +154,7 @@ div.outer-modal {
     }
 
     div.picture-diff, div.picture-detail {
+      width: 100%;
       height: ~"calc(100% - 26px)";
       margin: 0 auto;
       position: relative;
@@ -162,11 +163,15 @@ div.outer-modal {
         display: inline-block;
         vertical-align: middle;
         width: 100%;
+        /*height: 100%;*/
 
         img {
           display: block;
+          vertical-align: middle;
           max-width: 90%;
           max-height: 90%;
+          width: auto;
+          height: auto;
           margin: auto;
         }
 
@@ -198,7 +203,6 @@ div.outer-modal {
             font-weight: 200;
             font-size: 26px;
             line-height: 26px;
-            /*background: @blue-grey-700;*/
             background: @deep-orange-500;
           }
         }
