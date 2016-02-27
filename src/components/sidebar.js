@@ -29,6 +29,10 @@ class Sidebar extends React.Component {
     PhotoActions.getFlagged();
   }
 
+  filterProcessed() {
+    PhotoActions.getProcessed();
+  }
+
   render() {
     var menus = [
       <Dates key="0" />,
@@ -61,6 +65,12 @@ class Sidebar extends React.Component {
             onClick={this.filterFlagged.bind(this)}
             className="button flagged">
             <i className="fa fa-flag"></i> Flagged
+          </button>
+
+          <button
+            onClick={this.filterProcessed.bind(this)}
+            className="button">
+            <i className="fa fa-pencil-square-o"></i> Processed
           </button>
 
           {menus}

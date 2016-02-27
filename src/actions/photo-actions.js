@@ -52,6 +52,18 @@ class PhotoActions {
       });
   }
 
+  getProcessed() {
+    Photo.forge()
+      .query((q) => {
+        q.join('versions', 'versions.photo_id', '=', 'photos.id');
+      })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        console.log('processed', photos);
+        this.actions.getPhotosSuccess({ photos });
+      });
+  }
+
   setDateFilter(date) {
     new Photo()
       .where({ date: date })
