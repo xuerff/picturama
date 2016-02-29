@@ -1,12 +1,18 @@
 import classNames from 'classnames';
 import React from 'react';
-import {ipcRenderer} from 'electron';
+//import {ipcRenderer} from 'electron';
 
-import PhotoActions from './../actions/photo-actions';
-import DeviceActions from './../actions/device-actions';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import anselApp from './reducers';
+
+//import PhotoActions from './../actions/photo-actions';
+//import DeviceActions from './../actions/device-actions';
 
 import Sidebar from './sidebar';
 import Container from './container';
+
+let store = createStore(anselApp);
 
 class Ansel extends React.Component {
 
@@ -14,26 +20,26 @@ class Ansel extends React.Component {
     super(props);
     this.state = { showSidebar: true };
 
-    ipcRenderer.on('new-version', PhotoActions.updatedPhoto);
-    ipcRenderer.on('start-import', PhotoActions.startImport);
-    ipcRenderer.on('progress', PhotoActions.importProgress);
+    //ipcRenderer.on('new-version', PhotoActions.updatedPhoto);
+    //ipcRenderer.on('start-import', PhotoActions.startImport);
+    //ipcRenderer.on('progress', PhotoActions.importProgress);
 
-    ipcRenderer.on('finish-import', () => {
-      PhotoActions.getPhotos();
-      PhotoActions.getDates();
-    });
+    //ipcRenderer.on('finish-import', () => {
+    //  PhotoActions.getPhotos();
+    //  PhotoActions.getDates();
+    //});
 
-    ipcRenderer.on('scanned-devices', (e, devices) => {
-      DeviceActions.initDevices(devices);
-    });
+    //ipcRenderer.on('scanned-devices', (e, devices) => {
+    //  DeviceActions.initDevices(devices);
+    //});
 
-    ipcRenderer.on('add-device', (e, device) => {
-      DeviceActions.addDevice(device);
-    });
+    //ipcRenderer.on('add-device', (e, device) => {
+    //  DeviceActions.addDevice(device);
+    //});
 
-    ipcRenderer.on('remove-device', (e, device) => {
-      DeviceActions.removeDevice(device);
-    });
+    //ipcRenderer.on('remove-device', (e, device) => {
+    //  DeviceActions.removeDevice(device);
+    //});
 
     this.keyboardListener = this.keyboardListener.bind(this);
   }
@@ -70,13 +76,13 @@ class Ansel extends React.Component {
       sidebar = <Sidebar setDateFilter={this.handleDateFilter.bind(this)} />;
 
     return (
-      <div id="ansel">
+      <Provider store={store} id="ansel">
         {sidebar}
 
         <Container
           className={containerClass}
           dateFilter={this.state.dateFilter} />
-      </div>
+      </Provider>
     );
   }
 }
