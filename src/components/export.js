@@ -113,7 +113,8 @@ class Export extends React.Component {
         <div className="modal shadow--2dp">
           <form onSubmit={this.handleSubmit.bind(this)}>
             <div>
-              <label for="format">Format:</label>
+              <label htmlFor="format">Format:</label>
+
               <select 
                 id="format" 
                 ref="format" 
@@ -122,7 +123,7 @@ class Export extends React.Component {
             </div>
 
             <div>
-              <label for="quality">Quality</label>
+              <label htmlFor="quality">Quality</label>
 
               <input
                 type="range" 
@@ -138,7 +139,7 @@ class Export extends React.Component {
             </div>
 
             <div>
-              <label for="folder">Folder:</label>
+              <label htmlFor="folder">Folder:</label>
 
               <button id="folder" onClick={this.openFolderDialog.bind(this)}>
                 export to: {this.state.folder}

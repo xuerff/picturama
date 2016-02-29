@@ -31,7 +31,6 @@ class Container extends React.Component {
   handleImport(store) {
     let state = this.state;
     state.isImporting = store.importing;
-    console.log('handle import', state);
     this.setState(state);
   }
 

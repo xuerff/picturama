@@ -64,7 +64,7 @@ class Settings extends React.Component {
         <h1>Settings</h1>
 
         <div>
-          <label for="photos-dir">Photos directory</label>
+          <label htmlFor="photos-dir">Photos directory</label>
 
           <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
             Photos directory {this.state.directories.photos}
@@ -72,7 +72,7 @@ class Settings extends React.Component {
         </div>
 
         <div>
-          <label for="versions-dir">Photos directory</label>
+          <label htmlFor="versions-dir">Photos directory</label>
 
           <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
             Versions directory {this.state.directories.versions}

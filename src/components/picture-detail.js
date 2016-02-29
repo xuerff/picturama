@@ -37,7 +37,8 @@ class PictureDetail extends React.Component {
   }
 
   updateVersion(store) {
-    if (store.version) this.setState(store);
+    console.log('state & store', this.state, store);
+    //if (store.version) this.setState(store);
   }
 
   keyboardListener(e) {
@@ -131,7 +132,6 @@ class PictureDetail extends React.Component {
   }
 
   showExportDialog() {
-    console.log('show export dialog');
     this.unbindEventListeners();
 
     var state = this.state;
@@ -167,7 +167,6 @@ class PictureDetail extends React.Component {
   finishLoading() {
     let state = this.state;
     state.loaded = true;
-    console.log('height', this.refs.pictureDetail.height);
     this.setState(state);
   }
 
@@ -225,6 +224,7 @@ class PictureDetail extends React.Component {
           photo={this.props.photo} 
           closeTagDialog={this.closeDialog} />
       );
+
     else if (this.state.modal == 'export')
       showModal = (
         <Export
