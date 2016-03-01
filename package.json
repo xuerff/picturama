@@ -41,6 +41,7 @@
   "devDependencies": {
     "asar": "^0.9.1",
     "babel-core": "^6.5.2",
+    "babel-eslint": "^5.0.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "del": "^2.1.0",
