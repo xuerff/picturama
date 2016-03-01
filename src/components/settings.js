@@ -8,7 +8,7 @@ const dialog = remote.dialog;
 
 class Settings extends React.Component {
   static propTypes = {
-    setSavedFile: React.PropType.func.isRequired
+    setSavedFile: React.PropTypes.func.isRequired
   }
 
   constructor(props) {

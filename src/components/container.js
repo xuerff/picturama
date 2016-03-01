@@ -8,11 +8,7 @@ import Progress from './progress';
 
 import config from './../config';
 
-@connect(state => ({
-  photos: state.photos
-}))
-
-export default class Container extends React.Component {
+class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.object.isRequired
   }
@@ -62,3 +58,9 @@ export default class Container extends React.Component {
     );
   }
 }
+
+const ReduxContainer = connect(state => ({
+  photos: state.photos
+}))(Container);
+
+export default ReduxContainer;
