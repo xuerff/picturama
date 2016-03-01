@@ -13,7 +13,9 @@ import reducers from './../reducers';
 import Sidebar from './sidebar';
 import Container from './container';
 
-let store = createStore(reducers);
+
+//const reducer = combineReducers(reducers);
+const store = createStore(reducers);
 
 export default class Ansel extends React.Component {
 
