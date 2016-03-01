@@ -4,7 +4,8 @@ import React from 'react';
 
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import anselApp from './reducers';
+
+import reducers from './../reducers';
 
 //import PhotoActions from './../actions/photo-actions';
 //import DeviceActions from './../actions/device-actions';
@@ -12,9 +13,9 @@ import anselApp from './reducers';
 import Sidebar from './sidebar';
 import Container from './container';
 
-let store = createStore(anselApp);
+let store = createStore(reducers);
 
-class Ansel extends React.Component {
+export default class Ansel extends React.Component {
 
   constructor(props) {
     super(props);
@@ -41,29 +42,29 @@ class Ansel extends React.Component {
     //  DeviceActions.removeDevice(device);
     //});
 
-    this.keyboardListener = this.keyboardListener.bind(this);
+    //this.keyboardListener = this.keyboardListener.bind(this);
   }
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
   }
 
-  componentDidMount() {
-    document.addEventListener('keyup', this.keyboardListener);
-  }
+  //componentDidMount() {
+  //  document.addEventListener('keyup', this.keyboardListener);
+  //}
 
-  componentWillUnmount() {
-    document.removeEventListener('keyup', this.keyboardListener);
-  }
+  //componentWillUnmount() {
+  //  document.removeEventListener('keyup', this.keyboardListener);
+  //}
 
-  keyboardListener(e) {
-    let state = this.state;
+  //keyboardListener(e) {
+  //  let state = this.state;
 
-    if (e.keyCode == 9) // ESC key
-      state.showSidebar = !state.showSidebar;
+  //  if (e.keyCode == 9) // ESC key
+  //    state.showSidebar = !state.showSidebar;
 
-    this.setState(state);
-  }
+  //  this.setState(state);
+  //}
 
   render() {
     let sidebar = null;
@@ -76,15 +77,15 @@ class Ansel extends React.Component {
       sidebar = <Sidebar setDateFilter={this.handleDateFilter.bind(this)} />;
 
     return (
-      <Provider store={store} id="ansel">
-        {sidebar}
+      <Provider store={store}>
+        <div id="ansel">
+          {sidebar}
 
-        <Container
-          className={containerClass}
-          dateFilter={this.state.dateFilter} />
+          <Container
+            className={containerClass}
+            dateFilter={this.state.dateFilter} />
+        </div>
       </Provider>
     );
   }
 }
-
-export default Ansel;

@@ -11,6 +11,12 @@ import config from './../config';
 const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
+  static propTypes = {
+    closeExportDialog: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    title: React.PropTypes.string.isRequired
+  }
+
   constructor(props) {
     super(props);
 

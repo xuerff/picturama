@@ -7,6 +7,10 @@ import config from '../config';
 const dialog = remote.dialog;
 
 class Settings extends React.Component {
+  static propTypes = {
+    setSavedFile: React.PropType.func.isRequired
+  }
+
   constructor(props) {
     super(props);
 

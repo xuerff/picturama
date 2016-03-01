@@ -6,6 +6,12 @@ rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
 class Picture extends React.Component {
+  static propTypes = {
+    setCurrent: React.PropTypes.func.isRequired,
+    setHighlight: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    thumb_250: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);

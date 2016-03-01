@@ -2,7 +2,13 @@ import React from 'react';
 
 import DateMonth from './date-month';
 
-class DateYear extends React.Component {
+export default class DateYear extends React.Component {
+  static propTypes = {
+    setDate: React.PropTypes.func.isRequired,
+    year: React.PropTypes.object.isRequired,
+    months: React.PropTypes.array.isRequired,
+    currentDate: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -55,5 +61,3 @@ class DateYear extends React.Component {
   }
 
 }
-
-export default DateYear;

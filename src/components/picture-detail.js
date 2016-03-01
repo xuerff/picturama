@@ -21,7 +21,17 @@ var rotation = {};
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
-class PictureDetail extends React.Component {
+export default class PictureDetail extends React.Component {
+  static propTypes = {
+    setLeft: React.PropTypes.func.isRequired,
+    setRight: React.PropTypes.func.isRequired,
+    setCurrent: React.PropTypes.func.isRequired,
+    showDiff: React.PropTypes.func.isRequired,
+    isLast: React.PropTypes.func.isRequired,
+    toggleFlag: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    thumb: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -249,5 +259,3 @@ class PictureDetail extends React.Component {
     );
   }
 }
-
-export default PictureDetail;

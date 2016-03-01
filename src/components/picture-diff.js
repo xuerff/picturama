@@ -8,6 +8,11 @@ rotation[1] = '';
 rotation[8] = 'minus-ninety';
 
 class PictureDiff extends React.Component {
+  static propTypes = {
+    toggleDiff: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    id: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);

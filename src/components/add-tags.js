@@ -4,12 +4,23 @@ import TagsInput from 'react-tagsinput';
 import TagActions from './../actions/tag-actions';
 import TagStore from './../stores/tag-store';
 
-class AddTags extends React.Component {
+export default class AddTags extends React.Component {
+  static propTypes = {
+    closeTagDialog: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    tags: React.PropTypes.array.isRequired,
+    id: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = { tags: [] };
+    let tags = [];
+
+    if (this.props.photo.tags.length > 0)
+      tags = this.props.photo.tags.map((tag) => tag.title);
+
+    this.state = { tags: tags };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -26,15 +37,9 @@ class AddTags extends React.Component {
   componentDidMount() {
     this.refs.tags.focus();
 
-    let state = this.state;
 
     TagStore.listen(this.props.closeTagDialog);
     document.addEventListener('keyup', this.keyboardListener);
-
-    if (this.props.photo.tags.length > 0)
-      this.state.tags = this.props.photo.tags.map((tag) => tag.title);
-
-    this.setState(state);
   }
 
   componentWillUnmount() {
@@ -54,7 +59,7 @@ class AddTags extends React.Component {
   }
 
   render() {
-    var btnClass = `button button--raised button--colored`;
+    var btnClass = 'button button--raised button--colored';
 
     return (
       <div className="outer-modal">
@@ -78,5 +83,3 @@ class AddTags extends React.Component {
   }
 
 }
-
-export default AddTags;

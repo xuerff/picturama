@@ -1,7 +1,6 @@
 import fs from 'fs';
 import React from 'react';
-
-import PhotoStore from './../stores/photo-store';
+import { connect } from 'react-redux';
 
 import Library from './library';
 import Settings from './settings';
@@ -9,7 +8,15 @@ import Progress from './progress';
 
 import config from './../config';
 
-class Container extends React.Component {
+@connect(state => ({
+  photos: state.photos
+}))
+
+export default class Container extends React.Component {
+  static propTypes = {
+    className: React.PropTypes.object.isRequired
+  }
+
   constructor(props) {
     super(props);
 
@@ -36,7 +43,7 @@ class Container extends React.Component {
 
   componentDidMount() {
     this.areSettingsExisting();
-    PhotoStore.listen(this.handleImport.bind(this));
+    //PhotoStore.listen(this.handleImport.bind(this));
   }
 
   render() {
@@ -55,5 +62,3 @@ class Container extends React.Component {
     );
   }
 }
-
-export default Container;

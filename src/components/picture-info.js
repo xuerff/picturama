@@ -1,6 +1,11 @@
 import React from 'react';
 
 class PictureInfo extends React.Component {
+  static propTypes = {
+    photo: React.PropTypes.object.isRequired,
+    title: React.PropTypes.string.isRequired,
+    tags: React.PropTypes.array.isRequired
+  }
 
   constructor(props) {
     super(props);

@@ -1,6 +1,11 @@
 import React from 'react';
 
-class DateElement extends React.Component {
+export default class DateElement extends React.Component {
+  static propTypes = {
+    setDate: React.PropTypes.func.isRequired,
+    currentDate: React.PropTypes.string.isRequired,
+    date: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -26,5 +31,3 @@ class DateElement extends React.Component {
     );
   }
 }
-
-export default DateElement;

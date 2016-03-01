@@ -1,14 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import PhotoStore from './../stores/photo-store';
-import PhotoActions from './../actions/photo-actions';
+//import PhotoStore from './../stores/photo-store';
+//import PhotoActions from './../actions/photo-actions';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
 
 class Library extends React.Component {
+  static propTypes = {
+    setScrollTop: React.PropTypes.func.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -65,16 +68,18 @@ class Library extends React.Component {
   }
 
   componentDidMount() {
-    PhotoStore.listen(this.updatePhotos.bind(this));
-    PhotoActions.getPhotos();
+    //PhotoStore.listen(this.updatePhotos.bind(this));
+    //PhotoActions.getPhotos();
+
+    //console.log('redux', this.context.redux.getState());
   }
 
   updateCurrent() {
     var state = this.state;
     var current = this.state.current;
 
-    this.state.diff = false;
-    this.state.current = null;
+    state.diff = false;
+    state.current = null;
 
     state.photos.forEach(function(photo) {
       if (photo.id == current.id)
@@ -105,7 +110,7 @@ class Library extends React.Component {
 
   handleFlag() {
     console.log('handle flag');
-    PhotoActions.toggleFlag(this.state.current);
+    //PhotoActions.toggleFlag(this.state.current);
   }
 
   handleDiff() {
