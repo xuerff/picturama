@@ -26,16 +26,16 @@ class PhotoActions {
       });
   }
 
-  getPhotos() {
-    Photo
-      .query(function (qb) {
-        qb.limit(100).offset(0).orderBy('created_at', 'desc');
-      })
-      .fetchAll({ withRelated: ['versions', 'tags'] })
-      .then((photos) => {
-        this.actions.getPhotosSuccess({ photos });
-      });
-  }
+  //getPhotos() {
+  //  Photo
+  //    .query(function (qb) {
+  //      qb.limit(100).offset(0).orderBy('created_at', 'desc');
+  //    })
+  //    .fetchAll({ withRelated: ['versions', 'tags'] })
+  //    .then((photos) => {
+  //      this.actions.getPhotosSuccess({ photos });
+  //    });
+  //}
 
   getDates() {
     Photo.getDates().then((dates) => {
@@ -43,26 +43,26 @@ class PhotoActions {
     });
   }
 
-  getFlagged() {
-    new Photo()
-      .where({ flag: true })
-      .fetchAll({ withRelated: ['versions', 'tags'] })
-      .then((photos) => {
-        this.actions.getPhotosSuccess({ photos });
-      });
-  }
+  //getFlagged() {
+  //  new Photo()
+  //    .where({ flag: true })
+  //    .fetchAll({ withRelated: ['versions', 'tags'] })
+  //    .then((photos) => {
+  //      this.actions.getPhotosSuccess({ photos });
+  //    });
+  //}
 
-  getProcessed() {
-    Photo.forge()
-      .query((q) => {
-        q.join('versions', 'versions.photo_id', '=', 'photos.id');
-      })
-      .fetchAll({ withRelated: ['versions', 'tags'] })
-      .then((photos) => {
-        console.log('processed', photos);
-        this.actions.getPhotosSuccess({ photos });
-      });
-  }
+  //getProcessed() {
+  //  Photo.forge()
+  //    .query((q) => {
+  //      q.join('versions', 'versions.photo_id', '=', 'photos.id');
+  //    })
+  //    .fetchAll({ withRelated: ['versions', 'tags'] })
+  //    .then((photos) => {
+  //      console.log('processed', photos);
+  //      this.actions.getPhotosSuccess({ photos });
+  //    });
+  //}
 
   setDateFilter(date) {
     new Photo()

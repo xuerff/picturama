@@ -71,6 +71,7 @@ class Sidebar extends React.Component {
           </button>
 
           <button
+            onClick={this.props.actions.getProcessed}
             className="button">
             <i className="fa fa-pencil-square-o"></i> Processed
           </button>

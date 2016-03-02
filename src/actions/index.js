@@ -24,4 +24,17 @@ export const getFlagged = () => {
   };
 };
 
+export const getProcessed = () => {
+  return (dispatch) => {
+    Photo.forge()
+      .query((q) => {
+        q.join('versions', 'versions.photo_id', '=', 'photos.id');
+      })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+      });
+  };
+};
+
 
