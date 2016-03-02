@@ -4,6 +4,7 @@ import DateElement from './date-element';
 
 export default class DateMonth extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setDate: React.PropTypes.func.isRequired,
     month: React.PropTypes.object.isRequired,
     days: React.PropTypes.array.isRequired,
@@ -39,14 +40,12 @@ export default class DateMonth extends React.Component {
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this);
-    var currentDate = this.props.currentDate;
-
-    var dateElementsList = this.props.month.days.map(function(date) {
+    var dateElementsList = this.props.month.days.map((date) => {
       return (
         <DateElement
-          setDate={handleDate}
-          currentDate={currentDate}
+          actions={this.props.actions}
+          setDate={this.handleDate.bind(this)}
+          currentDate={this.props.currentDate}
           key={date.id}
           date={date.id} />
       );

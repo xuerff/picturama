@@ -26,6 +26,7 @@ import Container from './container';
 class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
+    dates: React.PropTypes.object.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
@@ -91,6 +92,7 @@ class Ansel extends React.Component {
       sidebar = (
         <Sidebar
           actions={actions}
+          dates={this.props.dates}
           setDateFilter={this.handleDateFilter.bind(this)} />
       );
 
@@ -109,7 +111,8 @@ class Ansel extends React.Component {
 }
 
 const ReduxAnsel = connect(state => ({
-  photos: state.photos
+  photos: state.photos,
+  dates: state.dates
 }))(Ansel);
 
 export default ReduxAnsel;

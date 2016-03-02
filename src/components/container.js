@@ -15,7 +15,6 @@ export default class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
-    dispatch: React.PropTypes.func.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
@@ -68,9 +67,3 @@ export default class Container extends React.Component {
     );
   }
 }
-
-//const ReduxContainer = connect(state => ({
-//  photos: state.photos
-//}))(Container);
-
-//export default ReduxContainer;

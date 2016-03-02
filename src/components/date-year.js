@@ -4,6 +4,7 @@ import DateMonth from './date-month';
 
 export default class DateYear extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setDate: React.PropTypes.func.isRequired,
     year: React.PropTypes.object.isRequired,
     months: React.PropTypes.array.isRequired,
@@ -42,6 +43,7 @@ export default class DateYear extends React.Component {
     let dateMonthsList = this.props.year.months.map((month) => {
       return (
         <DateMonth
+          actions={this.props.actions}
           setDate={this.handleDate.bind(this)}
           currentDate={this.props.currentDate}
           key={this.props.year.id+month.id}

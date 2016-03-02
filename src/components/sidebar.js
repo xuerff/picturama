@@ -16,6 +16,7 @@ if (fs.existsSync(config.settings))
 
 class Sidebar extends React.Component {
   static propTypes = {
+    dates: React.PropTypes.object.isRequired,
     actions: React.PropTypes.object.isRequired,
     getFlagged: React.PropTypes.func.isRequired
   }
@@ -24,21 +25,9 @@ class Sidebar extends React.Component {
     super(props);
   }
 
-  //clearFilters() {
-  //  PhotoActions.getPhotos();
-  //}
-
-  //filterFlagged() {
-  //  PhotoActions.getFlagged();
-  //}
-
-  //filterProcessed() {
-  //  PhotoActions.getProcessed();
-  //}
-
   render() {
     var menus = [
-      <Dates key="0" />,
+      <Dates key="0" actions={this.props.actions} dates={this.props.dates} />,
       <Tags key="1" />,
       <Devices key="2" />
     ];
@@ -47,9 +36,19 @@ class Sidebar extends React.Component {
       menus = [];
 
       settings.menus.forEach((menu, key) => {
-        if (menu == 'dates') menus.push(<Dates key={key} />);
-        else if (menu == 'tags') menus.push(<Tags key={key} />);
-        else if (menu == 'devices') menus.push(<Devices key={key} />);
+        if (menu == 'dates')
+          menus.push(
+            <Dates 
+              key={key} 
+              actions={this.props.actions}
+              dates={this.props.dates} />
+          );
+
+        else if (menu == 'tags')
+          menus.push(<Tags key={key} />);
+
+        else if (menu == 'devices')
+          menus.push(<Devices key={key} />);
       });
     }
 
