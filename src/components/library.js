@@ -10,7 +10,10 @@ import PictureDiff from './picture-diff';
 
 class Library extends React.Component {
   static propTypes = {
-    setScrollTop: React.PropTypes.func.isRequired
+    setScrollTop: React.PropTypes.func.isRequired,
+    actions: React.PropTypes.object.isRequired,
+    getPhotos: React.PropTypes.func.isRequired,
+    photos: React.PropTypes.array.isRequired
   }
 
   constructor(props) {
@@ -70,6 +73,7 @@ class Library extends React.Component {
   componentDidMount() {
     //PhotoStore.listen(this.updatePhotos.bind(this));
     //PhotoActions.getPhotos();
+    this.props.actions.getPhotos();
 
     //console.log('redux', this.context.redux.getState());
   }
@@ -144,8 +148,13 @@ class Library extends React.Component {
       , handleFlag = this.handleFlag.bind(this)
       , handleDiff = this.handleDiff.bind(this);
 
-    if (!this.state.current)
-      currentView = this.state.photos.map((photo) => {
+    console.log('lib photos', this.props.photos);
+
+    if (!this.props.photos || this.props.photos.length === 0)
+      currentView = <div>Nothing!</div>;
+
+    else if (!this.state.current)
+      currentView = this.props.photos.map((photo) => {
         return (
           <Picture
             key={photo.id}

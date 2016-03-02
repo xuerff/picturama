@@ -1,6 +1,9 @@
 import fs from 'fs';
 import React from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import * as action from './../actions';
 
 import Library from './library';
 import Settings from './settings';
@@ -10,7 +13,9 @@ import config from './../config';
 
 class Container extends React.Component {
   static propTypes = {
-    className: React.PropTypes.object.isRequired
+    className: React.PropTypes.object.isRequired,
+    dispatch: React.PropTypes.func.isRequired,
+    photos: React.PropTypes.array.isRequired
   }
 
   constructor(props) {
@@ -43,10 +48,18 @@ class Container extends React.Component {
   }
 
   render() {
+    console.log('photos', this.props.photos);
+
+    const actions = bindActionCreators(action, this.props.dispatch);
     let content = <Settings setSavedFile={this.areSettingsExisting}/>;
 
     if (this.state.settingsExists)
-      content = <Library setScrollTop={this.handleScrollTop.bind(this)}/>;
+      content = (
+        <Library 
+          actions={actions}
+          photos={this.props.photos}
+          setScrollTop={this.handleScrollTop.bind(this)}/>
+      );
 
     if (this.state.isImporting)
       content = <Progress />;

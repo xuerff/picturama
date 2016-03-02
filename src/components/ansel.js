@@ -1,9 +1,11 @@
 import classNames from 'classnames';
 import React from 'react';
+//import promiseMiddleware from 'redux-promise';
+import thunk from 'redux-thunk';
 //import {ipcRenderer} from 'electron';
 
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 
 import reducers from './../reducers';
 
@@ -15,7 +17,7 @@ import Container from './container';
 
 
 //const reducer = combineReducers(reducers);
-const store = createStore(reducers);
+const store = createStore(reducers, applyMiddleware(thunk));
 
 export default class Ansel extends React.Component {
 
