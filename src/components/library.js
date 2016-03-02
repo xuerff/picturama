@@ -49,23 +49,25 @@ class Library extends React.Component {
   }
 
   handleLeftCurrent() {
-    var state = this.state;
+    let state = this.state;
+    let photos = this.props.photos;
 
     state.diff = false;
 
-    if (state.photos.indexOf(state.current) >= 1) {
-      state.current = state.photos[state.photos.indexOf(state.current) - 1];
+    if (photos.indexOf(state.current) >= 1) {
+      state.current = photos[photos.indexOf(state.current) - 1];
       this.setState(state);
     }
   }
 
   handleRightCurrent() {
-    var state = this.state;
+    let state = this.state;
+    let photos = this.props.photos;
 
     state.diff = false;
 
-    if (state.photos.length > state.photos.indexOf(state.current) + 1) {
-      state.current = state.photos[state.photos.indexOf(state.current) + 1];
+    if (photos.length > photos.indexOf(state.current) + 1) {
+      state.current = photos[photos.indexOf(state.current) + 1];
       this.setState(state);
     }
   }
@@ -100,11 +102,11 @@ class Library extends React.Component {
   }
 
   isLast() {
-    let state = this.state;
+    let photos = this.props.photos;
 
-    if (state.photos.length == state.photos.indexOf(state.current) + 1)
+    if (photos.length == photos.indexOf(this.state.current) + 1)
       return true;
-    else if (state.photos.indexOf(state.current) == 0)
+    else if (photos.indexOf(this.state.current) == 0)
       return true;
     else
       return false;
@@ -116,7 +118,6 @@ class Library extends React.Component {
   }
 
   handleDiff() {
-    //console.log('start loader!');
     let state = this.state;
     state.diff = !this.state.diff;
     this.setState(state);
@@ -127,18 +128,6 @@ class Library extends React.Component {
 
     state.highlighted = [];
     state.highlighted.push(photo.id);
-
-    //this.props.photos.forEach((photoProp) => {
-    //  if (photo.id == )
-    //});
-    //state.photos = state.photos.map((statePhoto) => {
-    //  statePhoto.highlighted = false;
-
-    //  if (statePhoto.id == photo.id)
-    //    statePhoto.highlighted = true;
-
-    //  return statePhoto;
-    //});
 
     this.setState(state);
   }
