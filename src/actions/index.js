@@ -59,3 +59,9 @@ export const getDates = () => {
     });
   };
 };
+
+export const setImport = (status) => {
+  return (dispatch) => {
+    dispatch({ type: 'SET_IMPORT', status });
+  };
+};

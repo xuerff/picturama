@@ -12,92 +12,92 @@ class PhotoStore {
     this.progress = {};
   }
 
-  onGetPhotosSuccess(data) {
-    let photos = data.photos.toJSON();
+  //onGetPhotosSuccess(data) {
+  //  let photos = data.photos.toJSON();
 
-    if (data.hasOwnProperty('date'))
-      this.currentDate = data.date;
-    else
-      this.currentDate = null;
+  //  if (data.hasOwnProperty('date'))
+  //    this.currentDate = data.date;
+  //  else
+  //    this.currentDate = null;
 
-    this.importing = false;
-    this.photos = photos.map(function(photo) {
-      photo.versionNumber = 1;
+  //  this.importing = false;
+  //  this.photos = photos.map(function(photo) {
+  //    photo.versionNumber = 1;
 
-      if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
-        photo.versionNumber = 1 + photo.versions.length;
+  //    if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
+  //      photo.versionNumber = 1 + photo.versions.length;
 
-        let lastVersion = photo.versions[photo.versions.length - 1];
+  //      let lastVersion = photo.versions[photo.versions.length - 1];
 
-        photo.thumb = lastVersion.output;
-        photo.thumb_250 = lastVersion.thumbnail;
-      }
+  //      photo.thumb = lastVersion.output;
+  //      photo.thumb_250 = lastVersion.thumbnail;
+  //    }
 
-      return photo;
-    });
-  }
+  //    return photo;
+  //  });
+  //}
 
-  onGetDatesSuccess(data) {
-    var dates = { years: [] };
-    this.dates = {};
+  //onGetDatesSuccess(data) {
+  //  var dates = { years: [] };
+  //  this.dates = {};
 
-    data.forEach((date) => {
-      let [ year, month ] = date.date.split('-');
+  //  data.forEach((date) => {
+  //    let [ year, month ] = date.date.split('-');
 
-      // Year
-      if (dates.years.length === 0) {
-        dates.years.push({ id: year, months: [] });
+  //    // Year
+  //    if (dates.years.length === 0) {
+  //      dates.years.push({ id: year, months: [] });
 
-      } else {
-        let foundYear = false;
+  //    } else {
+  //      let foundYear = false;
 
-        dates.years.forEach((dateYear) => {
-          if (dateYear.id == year)
-            foundYear = true;
-        });
+  //      dates.years.forEach((dateYear) => {
+  //        if (dateYear.id == year)
+  //          foundYear = true;
+  //      });
 
-        if (!foundYear)
-          dates.years.push({ id: year, months: [] });
-      }
+  //      if (!foundYear)
+  //        dates.years.push({ id: year, months: [] });
+  //    }
 
-      // Month
-      dates.years = dates.years.map((dateYear) => {
-        if (dateYear.id == year) {
-          if (dateYear.months.length === 0) {
-            dateYear.months.push({ id: month, days: [] });
+  //    // Month
+  //    dates.years = dates.years.map((dateYear) => {
+  //      if (dateYear.id == year) {
+  //        if (dateYear.months.length === 0) {
+  //          dateYear.months.push({ id: month, days: [] });
 
-          } else {
-            let foundMonth = false;
+  //        } else {
+  //          let foundMonth = false;
 
-            dateYear.months.forEach((dateMonth) => {
-              if (dateMonth.id == month)
-                foundMonth = true;
-            });
+  //          dateYear.months.forEach((dateMonth) => {
+  //            if (dateMonth.id == month)
+  //              foundMonth = true;
+  //          });
 
-            if (!foundMonth)
-              dateYear.months.push({ id: month, days: [] });
-          }
-        }
+  //          if (!foundMonth)
+  //            dateYear.months.push({ id: month, days: [] });
+  //        }
+  //      }
 
-        return dateYear;
-      });
+  //      return dateYear;
+  //    });
 
-      // Day
-      dates.years = dates.years.map((dateYear) => {
-        if (dateYear.id == year)
-          dateYear.months.map((dateMonth) => {
-            if (dateMonth.id == month)
-              dateMonth.days.push({ id: date.date });
+  //    // Day
+  //    dates.years = dates.years.map((dateYear) => {
+  //      if (dateYear.id == year)
+  //        dateYear.months.map((dateMonth) => {
+  //          if (dateMonth.id == month)
+  //            dateMonth.days.push({ id: date.date });
 
-            return dateMonth;
-          });
+  //          return dateMonth;
+  //        });
 
-        return dateYear;
-      });
-    });
+  //      return dateYear;
+  //    });
+  //  });
 
-    this.dates = dates;
-  }
+  //  this.dates = dates;
+  //}
 
   onUpdatedPhotoSuccess(photo) {
     let updatedPhoto = photo.toJSON();

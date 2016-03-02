@@ -56,29 +56,29 @@ class Ansel extends React.Component {
     //  DeviceActions.removeDevice(device);
     //});
 
-    //this.keyboardListener = this.keyboardListener.bind(this);
+    this.keyboardListener = this.keyboardListener.bind(this);
   }
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
   }
 
-  //componentDidMount() {
-  //  document.addEventListener('keyup', this.keyboardListener);
-  //}
+  componentDidMount() {
+    document.addEventListener('keyup', this.keyboardListener);
+  }
 
-  //componentWillUnmount() {
-  //  document.removeEventListener('keyup', this.keyboardListener);
-  //}
+  componentWillUnmount() {
+    document.removeEventListener('keyup', this.keyboardListener);
+  }
 
-  //keyboardListener(e) {
-  //  let state = this.state;
+  keyboardListener(e) {
+    let state = this.state;
 
-  //  if (e.keyCode == 9) // ESC key
-  //    state.showSidebar = !state.showSidebar;
+    if (e.keyCode == 9) // ESC key
+      state.showSidebar = !state.showSidebar;
 
-  //  this.setState(state);
-  //}
+    this.setState(state);
+  }
 
   render() {
     const actions = bindActionCreators(action, this.props.dispatch);

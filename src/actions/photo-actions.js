@@ -64,14 +64,14 @@ class PhotoActions {
   //    });
   //}
 
-  setDateFilter(date) {
-    new Photo()
-      .where({ date: date })
-      .fetchAll({ withRelated: ['versions', 'tags'] })
-      .then((photos) => {
-        this.actions.getPhotosSuccess({ photos, date });
-      });
-  }
+  //setDateFilter(date) {
+  //  new Photo()
+  //    .where({ date: date })
+  //    .fetchAll({ withRelated: ['versions', 'tags'] })
+  //    .then((photos) => {
+  //      this.actions.getPhotosSuccess({ photos, date });
+  //    });
+  //}
 
   setTagFilter(tag) {
     new Tag({ id: tag.id })
