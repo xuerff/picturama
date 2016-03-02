@@ -37,11 +37,11 @@ class PhotoActions {
   //    });
   //}
 
-  getDates() {
-    Photo.getDates().then((dates) => {
-      this.actions.getDatesSuccess(dates);
-    });
-  }
+  //getDates() {
+  //  Photo.getDates().then((dates) => {
+  //    this.actions.getDatesSuccess(dates);
+  //  });
+  //}
 
   //getFlagged() {
   //  new Photo()

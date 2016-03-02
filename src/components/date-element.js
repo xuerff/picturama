@@ -3,7 +3,7 @@ import React from 'react';
 export default class DateElement extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    setDate: React.PropTypes.func.isRequired,
+    setDateFilter: React.PropTypes.func.isRequired,
     currentDate: React.PropTypes.string.isRequired,
     date: React.PropTypes.string.isRequired
   }
@@ -15,7 +15,7 @@ export default class DateElement extends React.Component {
   }
 
   handleClick() {
-    this.props.actions.setDate(this.props.date);
+    this.props.actions.setDateFilter(this.props.date);
   }
 
   isActive(date) {

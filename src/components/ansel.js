@@ -27,6 +27,7 @@ class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     dates: React.PropTypes.object.isRequired,
+    currentDate: React.PropTypes.string,
     photos: React.PropTypes.array.isRequired
   }
 
@@ -93,6 +94,7 @@ class Ansel extends React.Component {
         <Sidebar
           actions={actions}
           dates={this.props.dates}
+          currentDate={this.props.currentDate}
           setDateFilter={this.handleDateFilter.bind(this)} />
       );
 
@@ -112,7 +114,8 @@ class Ansel extends React.Component {
 
 const ReduxAnsel = connect(state => ({
   photos: state.photos,
-  dates: state.dates
+  dates: state.dates,
+  currentDate: state.currentDate
 }))(Ansel);
 
 export default ReduxAnsel;

@@ -8,14 +8,15 @@ import DateYear from './date-year';
 class Dates extends React.Component {
   static propTypes = {
     dates: React.PropTypes.object.isRequired,
-    years: React.PropTypes.array.isRequired,
-    actions: React.PropTypes.object.isRequired
+    //years: React.PropTypes.array.isRequired,
+    actions: React.PropTypes.object.isRequired,
+    currentDate: React.PropTypes.string.isRequired
   }
 
   constructor(props) {
     super(props);
 
-    this.state = { dates: { years: [] }};
+    this.state = {};
   }
 
   componentDidMount() {
@@ -51,7 +52,7 @@ class Dates extends React.Component {
             actions={this.props.actions}
             year={year}
             key={year.id}
-            currentDate={this.state.currentDate}
+            currentDate={this.props.currentDate}
             setDate={this.handleDate.bind(this)} />
         );
       });

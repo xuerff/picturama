@@ -7,7 +7,7 @@ export default class DateYear extends React.Component {
     actions: React.PropTypes.object.isRequired,
     setDate: React.PropTypes.func.isRequired,
     year: React.PropTypes.object.isRequired,
-    months: React.PropTypes.array.isRequired,
+    //months: React.PropTypes.array.isRequired,
     currentDate: React.PropTypes.string.isRequired
   }
 

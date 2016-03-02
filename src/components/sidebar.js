@@ -18,7 +18,7 @@ class Sidebar extends React.Component {
   static propTypes = {
     dates: React.PropTypes.object.isRequired,
     actions: React.PropTypes.object.isRequired,
-    getFlagged: React.PropTypes.func.isRequired
+    currentDate: React.PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -27,7 +27,11 @@ class Sidebar extends React.Component {
 
   render() {
     var menus = [
-      <Dates key="0" actions={this.props.actions} dates={this.props.dates} />,
+      <Dates 
+        key="0"
+        actions={this.props.actions}
+        currentDate={this.props.currentDate}
+        dates={this.props.dates} />,
       <Tags key="1" />,
       <Devices key="2" />
     ];
@@ -41,6 +45,7 @@ class Sidebar extends React.Component {
             <Dates 
               key={key} 
               actions={this.props.actions}
+              currentDate={this.props.currentDate}
               dates={this.props.dates} />
           );
 

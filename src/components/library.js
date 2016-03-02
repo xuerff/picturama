@@ -12,7 +12,7 @@ class Library extends React.Component {
   static propTypes = {
     setScrollTop: React.PropTypes.func.isRequired,
     actions: React.PropTypes.object.isRequired,
-    getPhotos: React.PropTypes.func.isRequired,
+    //getPhotos: React.PropTypes.func.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
