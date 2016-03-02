@@ -1,9 +1,5 @@
 import fs from 'fs';
 import React from 'react';
-//import { connect } from 'react-redux';
-//import { bindActionCreators } from 'redux';
-
-//import * as action from './../actions';
 
 import Library from './library';
 import Settings from './settings';
@@ -15,6 +11,8 @@ export default class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
+    progress: React.PropTypes.object.isRequired,
+    importing: React.PropTypes.bool.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
@@ -57,8 +55,8 @@ export default class Container extends React.Component {
           setScrollTop={this.handleScrollTop.bind(this)}/>
       );
 
-    if (this.state.isImporting)
-      content = <Progress />;
+    if (this.props.importing)
+      content = <Progress progress={this.props.progress} />;
 
     return (
       <div id="container" ref="container" className={this.props.className}>

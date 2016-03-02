@@ -4,7 +4,8 @@ const initialState = {
   importing: false,
   currentDate: null,
   photos: [],
-  dates: { years: [] }
+  dates: { years: [] },
+  progress: { processed: 0, total: 0 }
 };
 
 export default function reducers(state = initialState, action) {
@@ -12,6 +13,7 @@ export default function reducers(state = initialState, action) {
   case 'GET_PHOTOS_SUCCESS':
     return {
       ...state,
+      importing: false,
       currentDate: action.hasOwnProperty('date') ? action.date : null,
       photos: action.photos.map(function(photo) {
         photo.versionNumber = 1;
@@ -41,6 +43,11 @@ export default function reducers(state = initialState, action) {
       importing: action.status
     };
 
+  case 'SET_IMPORT_PROGRESS':
+    return {
+      ...state,
+      progress: action.progress
+    };
   default:
     return state;
   }

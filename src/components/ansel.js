@@ -1,49 +1,33 @@
+import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-//import promiseMiddleware from 'redux-promise';
-//import thunk from 'redux-thunk';
-//import {ipcRenderer} from 'electron';
-
-//import { Provider } from 'react-redux';
-//import { createStore, applyMiddleware } from 'redux';
-
-//import reducers from './../reducers';
-
-//import PhotoActions from './../actions/photo-actions';
-//import DeviceActions from './../actions/device-actions';
 
 import * as action from './../actions';
 
 import Sidebar from './sidebar';
 import Container from './container';
 
-
-//const reducer = combineReducers(reducers);
-//const store = createStore(reducers, applyMiddleware(thunk));
-
 class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     dates: React.PropTypes.object.isRequired,
+    importing: React.PropTypes.bool.isRequired,
+    progress: React.PropTypes.object.isRequired,
     currentDate: React.PropTypes.string,
     photos: React.PropTypes.array.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.state = { showSidebar: true };
+
+    this.state = {
+      showSidebar: true,
+      actions: bindActionCreators(action, this.props.dispatch)
+    };
 
     //ipcRenderer.on('new-version', PhotoActions.updatedPhoto);
-    //ipcRenderer.on('start-import', PhotoActions.startImport);
-    //ipcRenderer.on('progress', PhotoActions.importProgress);
-
-    //ipcRenderer.on('finish-import', () => {
-    //  PhotoActions.getPhotos();
-    //  PhotoActions.getDates();
-    //});
-
     //ipcRenderer.on('scanned-devices', (e, devices) => {
     //  DeviceActions.initDevices(devices);
     //});
@@ -64,6 +48,15 @@ class Ansel extends React.Component {
   }
 
   componentDidMount() {
+
+    ipcRenderer.on('start-import', this.state.actions.startImport);
+    ipcRenderer.on('progress', this.state.actions.importProgress);
+
+    ipcRenderer.on('finish-import', () => {
+      this.state.actions.getPhotos();
+      this.state.actions.getDates();
+    });
+
     document.addEventListener('keyup', this.keyboardListener);
   }
 
@@ -81,8 +74,6 @@ class Ansel extends React.Component {
   }
 
   render() {
-    const actions = bindActionCreators(action, this.props.dispatch);
-
     let sidebar = null;
 
     let containerClass = classNames({ 
@@ -92,7 +83,7 @@ class Ansel extends React.Component {
     if (this.state.showSidebar)
       sidebar = (
         <Sidebar
-          actions={actions}
+          actions={this.state.actions}
           dates={this.props.dates}
           currentDate={this.props.currentDate}
           setDateFilter={this.handleDateFilter.bind(this)} />
@@ -103,8 +94,10 @@ class Ansel extends React.Component {
         {sidebar}
 
         <Container
-          actions={actions}
+          actions={this.state.actions}
           photos={this.props.photos}
+          importing={this.props.importing}
+          progress={this.props.progress}
           className={containerClass}
           dateFilter={this.state.dateFilter} />
       </div>
@@ -115,7 +108,9 @@ class Ansel extends React.Component {
 const ReduxAnsel = connect(state => ({
   photos: state.photos,
   dates: state.dates,
-  currentDate: state.currentDate
+  currentDate: state.currentDate,
+  importing: state.importing,
+  progress: state.progress
 }))(Ansel);
 
 export default ReduxAnsel;

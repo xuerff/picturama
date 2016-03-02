@@ -128,15 +128,15 @@ class PhotoStore {
     });
   }
 
-  onSetImporting(isImporting) {
-    console.log('on set importing', isImporting);
-    this.importing = isImporting;
-  }
+  //onSetImporting(isImporting) {
+  //  console.log('on set importing', isImporting);
+  //  this.importing = isImporting;
+  //}
 
-  onSetImportProgress(progress) {
-    console.log('on set import progress', progress);
-    this.progress = progress;
-  }
+  //onSetImportProgress(progress) {
+  //  console.log('on set import progress', progress);
+  //  this.progress = progress;
+  //}
 }
 
 export default alt.createStore(PhotoStore);
