@@ -9,6 +9,7 @@ class Picture extends React.Component {
   static propTypes = {
     setCurrent: React.PropTypes.func.isRequired,
     setHighlight: React.PropTypes.func.isRequired,
+    highlighted: React.PropTypes.array.isRequired,
     photo: React.PropTypes.object.isRequired,
     thumb_250: React.PropTypes.string.isRequired
   }
@@ -26,14 +27,16 @@ class Picture extends React.Component {
   }
 
   render() {
+    let photo = this.props.photo;
+
     let anchorClass = classNames(
       'picture',
       'card',
-      { 'highlighted': this.props.photo.highlighted }
+      { 'highlighted': this.props.highlighted.indexOf(photo.id) != -1 }
     );
 
     let imgClass = classNames(
-      rotation[this.props.photo.orientation],
+      rotation[photo.orientation],
       'shadow--2dp'
     );
 
@@ -44,7 +47,7 @@ class Picture extends React.Component {
         <span className="v-align"></span>
         <img
           onClick={this.handleClick.bind(this)}
-          src={this.props.photo.thumb_250} 
+          src={photo.thumb_250} 
           className={imgClass} />
       </a>
     );

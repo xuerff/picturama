@@ -44,12 +44,9 @@ class Container extends React.Component {
 
   componentDidMount() {
     this.areSettingsExisting();
-    //PhotoStore.listen(this.handleImport.bind(this));
   }
 
   render() {
-    console.log('photos', this.props.photos);
-
     const actions = bindActionCreators(action, this.props.dispatch);
     let content = <Settings setSavedFile={this.areSettingsExisting}/>;
 

@@ -18,7 +18,7 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { photos: [], current: null, scrollTop: 0, diff: false };
+    this.state = { highlighted: [], current: null, scrollTop: 0, diff: false };
 
     this.updateCurrent = this.updateCurrent.bind(this);
   }
@@ -74,8 +74,6 @@ class Library extends React.Component {
     //PhotoStore.listen(this.updatePhotos.bind(this));
     //PhotoActions.getPhotos();
     this.props.actions.getPhotos();
-
-    //console.log('redux', this.context.redux.getState());
   }
 
   updateCurrent() {
@@ -127,14 +125,20 @@ class Library extends React.Component {
   handleHighlight(photo) {
     let state = this.state;
 
-    state.photos = state.photos.map((statePhoto) => {
-      statePhoto.highlighted = false;
+    state.highlighted = [];
+    state.highlighted.push(photo.id);
 
-      if (statePhoto.id == photo.id)
-        statePhoto.highlighted = true;
+    //this.props.photos.forEach((photoProp) => {
+    //  if (photo.id == )
+    //});
+    //state.photos = state.photos.map((statePhoto) => {
+    //  statePhoto.highlighted = false;
 
-      return statePhoto;
-    });
+    //  if (statePhoto.id == photo.id)
+    //    statePhoto.highlighted = true;
+
+    //  return statePhoto;
+    //});
 
     this.setState(state);
   }
@@ -148,8 +152,6 @@ class Library extends React.Component {
       , handleFlag = this.handleFlag.bind(this)
       , handleDiff = this.handleDiff.bind(this);
 
-    console.log('lib photos', this.props.photos);
-
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>Nothing!</div>;
 
@@ -160,6 +162,7 @@ class Library extends React.Component {
             key={photo.id}
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
+            highlighted={this.state.highlighted}
             setCurrent={handleCurrent} />
         );
       });
