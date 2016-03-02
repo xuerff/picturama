@@ -2,7 +2,7 @@ const initialState = [{}];
 
 export default function photos(state = initialState, action) {
   switch (action.type) {
-  case 'GET_PHOTOS':
+  case 'GET_PHOTOS_SUCCESS':
     return action.photos;
 
   default:

@@ -8,7 +8,20 @@ export const getPhotos = () => {
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        dispatch({ type: 'GET_PHOTOS', photos: photos.toJSON() });
+        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
       });
   };
 };
+
+export const getFlagged = () => {
+  return (dispatch) => {
+    new Photo()
+      .where({ flag: true })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+      });
+  };
+};
+
+

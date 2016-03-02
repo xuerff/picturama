@@ -1,7 +1,7 @@
 import fs from 'fs';
 import React from 'react';
+//import PhotoActions from './../actions/photo-actions';
 
-import PhotoActions from './../actions/photo-actions';
 
 import Tags from './tags';
 import Dates from './dates';
@@ -15,22 +15,26 @@ if (fs.existsSync(config.settings))
   settings = require(config.settings);
 
 class Sidebar extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    getFlagged: React.PropTypes.func.isRequired
+  }
 
   constructor(props) {
     super(props);
   }
 
-  clearFilters() {
-    PhotoActions.getPhotos();
-  }
+  //clearFilters() {
+  //  PhotoActions.getPhotos();
+  //}
 
-  filterFlagged() {
-    PhotoActions.getFlagged();
-  }
+  //filterFlagged() {
+  //  PhotoActions.getFlagged();
+  //}
 
-  filterProcessed() {
-    PhotoActions.getProcessed();
-  }
+  //filterProcessed() {
+  //  PhotoActions.getProcessed();
+  //}
 
   render() {
     var menus = [
@@ -55,19 +59,18 @@ class Sidebar extends React.Component {
 
         <div className="sidebar-content">
           <button 
-            onClick={this.clearFilters.bind(this)} 
+            onClick={this.props.actions.getPhotos}
             className="button">
             <i className="fa fa-book"></i> All content
           </button>
 
           <button
-            onClick={this.filterFlagged.bind(this)}
+            onClick={this.props.actions.getFlagged}
             className="button flagged">
             <i className="fa fa-flag"></i> Flagged
           </button>
 
           <button
-            onClick={this.filterProcessed.bind(this)}
             className="button">
             <i className="fa fa-pencil-square-o"></i> Processed
           </button>

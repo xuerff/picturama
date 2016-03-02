@@ -1,9 +1,9 @@
 import fs from 'fs';
 import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+//import { connect } from 'react-redux';
+//import { bindActionCreators } from 'redux';
 
-import * as action from './../actions';
+//import * as action from './../actions';
 
 import Library from './library';
 import Settings from './settings';
@@ -11,9 +11,10 @@ import Progress from './progress';
 
 import config from './../config';
 
-class Container extends React.Component {
+export default class Container extends React.Component {
   static propTypes = {
-    className: React.PropTypes.object.isRequired,
+    className: React.PropTypes.string.isRequired,
+    actions: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
     photos: React.PropTypes.array.isRequired
   }
@@ -47,13 +48,12 @@ class Container extends React.Component {
   }
 
   render() {
-    const actions = bindActionCreators(action, this.props.dispatch);
     let content = <Settings setSavedFile={this.areSettingsExisting}/>;
 
     if (this.state.settingsExists)
       content = (
         <Library 
-          actions={actions}
+          actions={this.props.actions}
           photos={this.props.photos}
           setScrollTop={this.handleScrollTop.bind(this)}/>
       );
@@ -69,8 +69,8 @@ class Container extends React.Component {
   }
 }
 
-const ReduxContainer = connect(state => ({
-  photos: state.photos
-}))(Container);
+//const ReduxContainer = connect(state => ({
+//  photos: state.photos
+//}))(Container);
 
-export default ReduxContainer;
+//export default ReduxContainer;

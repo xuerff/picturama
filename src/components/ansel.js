@@ -1,25 +1,33 @@
 import classNames from 'classnames';
 import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 //import promiseMiddleware from 'redux-promise';
-import thunk from 'redux-thunk';
+//import thunk from 'redux-thunk';
 //import {ipcRenderer} from 'electron';
 
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
+//import { Provider } from 'react-redux';
+//import { createStore, applyMiddleware } from 'redux';
 
-import reducers from './../reducers';
+//import reducers from './../reducers';
 
 //import PhotoActions from './../actions/photo-actions';
 //import DeviceActions from './../actions/device-actions';
+
+import * as action from './../actions';
 
 import Sidebar from './sidebar';
 import Container from './container';
 
 
 //const reducer = combineReducers(reducers);
-const store = createStore(reducers, applyMiddleware(thunk));
+//const store = createStore(reducers, applyMiddleware(thunk));
 
-export default class Ansel extends React.Component {
+class Ansel extends React.Component {
+  static propTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+    photos: React.PropTypes.array.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -71,6 +79,8 @@ export default class Ansel extends React.Component {
   //}
 
   render() {
+    const actions = bindActionCreators(action, this.props.dispatch);
+
     let sidebar = null;
 
     let containerClass = classNames({ 
@@ -78,18 +88,28 @@ export default class Ansel extends React.Component {
     });
 
     if (this.state.showSidebar)
-      sidebar = <Sidebar setDateFilter={this.handleDateFilter.bind(this)} />;
+      sidebar = (
+        <Sidebar
+          actions={actions}
+          setDateFilter={this.handleDateFilter.bind(this)} />
+      );
 
     return (
-      <Provider store={store}>
-        <div id="ansel">
-          {sidebar}
+      <div id="ansel">
+        {sidebar}
 
-          <Container
-            className={containerClass}
-            dateFilter={this.state.dateFilter} />
-        </div>
-      </Provider>
+        <Container
+          actions={actions}
+          photos={this.props.photos}
+          className={containerClass}
+          dateFilter={this.state.dateFilter} />
+      </div>
     );
   }
 }
+
+const ReduxAnsel = connect(state => ({
+  photos: state.photos
+}))(Ansel);
+
+export default ReduxAnsel;
