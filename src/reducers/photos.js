@@ -17,7 +17,7 @@ export default function photos(state = initialState, action) {
 
       return photo;
     });
- 
+
   default:
     return state;
   }

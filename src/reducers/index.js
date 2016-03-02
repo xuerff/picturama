@@ -1,29 +1,37 @@
-import { combineReducers } from 'redux';
+//import { combineReducers } from 'redux';
 
-import photos from './photos';
-//import tags from './tags';
+//import photos from './photos';
 
-const reducers = combineReducers({
-  photos
-});
+//const reducers = combineReducers({
+//  photos
+//});
 
-//import Photo from './../models/photo';
+//export default reducers;
+const initialState = {
+  photos: []
+};
 
-//const initialState = { photos: [] };
+export default function reducers(state = initialState, action) {
+  switch (action.type) {
+  case 'GET_PHOTOS_SUCCESS':
+    return {
+      photos: action.photos.map(function(photo) {
+        photo.versionNumber = 1;
 
-//const photos = (state = initialState, action) => {
-//  switch (action.type) {
-//  case 'GET_PHOTOS':
-//    return Photo
-//      .query(function (qb) {
-//        qb.limit(100).offset(0).orderBy('created_at', 'desc');
-//      })
-//      .fetchAll({ withRelated: ['versions', 'tags'] })
-//      .then((data) => {
-//        return { photos: data.photos.toJSON() };
-//      });
-//  }
-//};
+        if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
+          photo.versionNumber = 1 + photo.versions.length;
 
-//export { default as photos } from './photos';
-export default reducers;
+          let lastVersion = photo.versions[photo.versions.length - 1];
+
+          photo.thumb = lastVersion.output;
+          photo.thumb_250 = lastVersion.thumbnail;
+        }
+
+        return photo;
+      })
+    };
+
+  default:
+    return state;
+  }
+}
