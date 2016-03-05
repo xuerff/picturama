@@ -23,6 +23,7 @@ rotation[0] = 'minus-ninety';
 
 export default class PictureDetail extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setLeft: React.PropTypes.func.isRequired,
     setRight: React.PropTypes.func.isRequired,
     setCurrent: React.PropTypes.func.isRequired,
@@ -232,6 +233,7 @@ export default class PictureDetail extends React.Component {
       showModal = (
         <AddTags 
           photo={this.props.photo} 
+          actions={this.props.actions}
           closeTagDialog={this.closeDialog} />
       );
 

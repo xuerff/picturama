@@ -1,3 +1,5 @@
+import Promise from 'bluebird';
+
 import Photo from './../models/photo';
 import Tag from './../models/tag';
 
@@ -116,6 +118,33 @@ export const getTags = () => {
   return (dispatch) => {
     new Tag().fetchAll().then((tags) => {
       dispatch({ type: 'GET_TAGS_SUCCESS', tags: tags.toJSON() });
+    });
+  };
+};
+
+export const createTagsAndAssociateToPhoto = (tags, photoId) => {
+  return (dispatch) => {
+    new Photo({ id: photoId }).fetch().then((photo) => {
+      return Promise.map(tags, (tagName) => {
+        return new Tag({ title: tagName })
+          .fetch()
+          .then((tag) => {
+            console.log('fetched tag', tag);
+            if (tag)
+              return tag;
+            else
+              return new Tag({ title: tagName }).save();
+          })
+          .then((tag) => {
+            return tag
+              .photos()
+              .attach(photo)
+              .then(() => tag.toJSON());
+          });
+      });
+    })
+    .then((tags) => {
+      dispatch({ type: 'CREATE_TAGS_SUCCESS', tags });
     });
   };
 };

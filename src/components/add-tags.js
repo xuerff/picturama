@@ -1,11 +1,11 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
 
-import TagActions from './../actions/tag-actions';
 import TagStore from './../stores/tag-store';
 
 export default class AddTags extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     closeTagDialog: React.PropTypes.func.isRequired,
     photo: React.PropTypes.object.isRequired,
     tags: React.PropTypes.array.isRequired,
@@ -37,7 +37,6 @@ export default class AddTags extends React.Component {
   componentDidMount() {
     this.refs.tags.focus();
 
-
     TagStore.listen(this.props.closeTagDialog);
     document.addEventListener('keyup', this.keyboardListener);
   }
@@ -55,7 +54,9 @@ export default class AddTags extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     let tags = this.state.tags.map((tag) => tag.trim());
-    TagActions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
+
+    this.props.actions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
+    this.props.closeTagDialog();
   }
 
   render() {

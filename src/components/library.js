@@ -138,6 +138,7 @@ class Library extends React.Component {
     else
       currentView = <PictureDetail
                       photo={this.props.photos[this.state.current]}
+                      actions={this.props.actions}
                       toggleFlag={handleFlag}
                       setCurrent={handleCurrent}
                       showDiff={handleDiff}

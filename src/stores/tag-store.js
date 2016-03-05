@@ -13,22 +13,22 @@ class TagStore {
     this.tags.push(data.toJSON());
   }
 
-  onCreateTagsSuccess(data) {
-    let tags = data.map((tag) => {
-      let exists = false;
+  //onCreateTagsSuccess(data) {
+  //  let tags = data.map((tag) => {
+  //    let exists = false;
 
-      this.tags.forEach((storeTag) => {
-        if (tag.slug == storeTag.slug)
-          exists = true;
-      });
+  //    this.tags.forEach((storeTag) => {
+  //      if (tag.slug == storeTag.slug)
+  //        exists = true;
+  //    });
 
-      return (!exists) ? tag : null;
-    })
-    .filter((tag) => tag);
+  //    return (!exists) ? tag : null;
+  //  })
+  //  .filter((tag) => tag);
 
-    if (tags.length > 0)
-      this.tags = this.tags.concat(tags);
-  }
+  //  if (tags.length > 0)
+  //    this.tags = this.tags.concat(tags);
+  //}
 
   //onGetTagsSuccess(data) {
   //  this.tags = data.toJSON();

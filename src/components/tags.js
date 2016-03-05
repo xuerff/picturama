@@ -20,8 +20,6 @@ class Tags extends React.Component {
 
   componentDidMount() {
     this.props.actions.getTags();
-    //TagActions.getTags();
-    //TagStore.listen(this.appendTags.bind(this));
   }
 
   //handleTag(tag) {
@@ -39,19 +37,26 @@ class Tags extends React.Component {
   }
 
   render() {
-    var tagsList = this.props.tags.map((tag) => {
-      return (
-        <TagButton 
-          setTag={() => this.props.actions.setTagFilter(tag)}
-          key={tag}
-          tag={tag} />
-      );
-    });
+    //var tagsList = this.props.tags.map((tag) => {
+    //  return (
+    //    <TagButton 
+    //      setTag={() => this.props.actions.setTagFilter(tag)}
+    //      key={tag.slug}
+    //      tag={tag} />
+    //  );
+    //});
 
     return (
       <div className="tags">
         <h3><i className="fa fa-tags"></i> Tags</h3>
-        <ul>{tagsList}</ul>
+        <ul>
+          {this.props.tags.map(tag =>
+            <TagButton 
+              setTag={() => this.props.actions.setTagFilter(tag)}
+              key={tag.slug}
+              tag={tag} />
+          )}
+        </ul>
       </div>
     );
 

@@ -1,6 +1,22 @@
 import processDates from './../lib/process-dates';
 import updatePhotos from './../lib/update-photos';
 
+const processTags = (prevTags, nextTags) => {
+  let tags = nextTags.map((nextTag) => {
+    let exists = false;
+
+    prevTags.forEach((prevTag) => {
+      if (nextTag.slug == prevTag.slug)
+        exists = true;
+    });
+
+    return (!exists) ? nextTag : null;
+  })
+  .filter((tag) => tag);
+
+  return (tags.length > 0) ? prevTags.concat(tags) : [];
+};
+
 const initialState = {
   importing: false,
   currentDate: null,
@@ -61,6 +77,12 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       tags: action.tags
+    };
+
+  case 'CREATE_TAGS_SUCCESS':
+    return {
+      ...state,
+      tags: processTags(state.tags, action.tags)
     };
 
   default:
