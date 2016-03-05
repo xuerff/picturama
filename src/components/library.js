@@ -20,14 +20,18 @@ class Library extends React.Component {
     super(props);
     this.state = { highlighted: [], current: null, scrollTop: 0, diff: false };
 
-    this.updateCurrent = this.updateCurrent.bind(this);
+    //this.updateCurrent = this.updateCurrent.bind(this);
   }
 
-  handleCurrent(photo) {
+  handleCurrent(currentPhoto) {
     let state = this.state;
 
     state.diff = false;
-    state.current = photo;
+
+    this.props.photos.forEach((photo, index) => {
+      if (photo.id == currentPhoto.id)
+        state.current = index;
+    });
 
     if (state.current)
       state.scrollTop = ReactDOM
@@ -78,28 +82,28 @@ class Library extends React.Component {
     this.props.actions.getPhotos();
   }
 
-  updateCurrent() {
-    var state = this.state;
-    var current = this.state.current;
+  //updateCurrent() {
+  //  var state = this.state;
+  //  var current = this.state.current;
 
-    state.diff = false;
-    state.current = null;
+  //  state.diff = false;
+  //  state.current = null;
 
-    state.photos.forEach(function(photo) {
-      if (photo.id == current.id)
-        state.current = photo;
-    });
+  //  state.photos.forEach(function(photo) {
+  //    if (photo.id == current.id)
+  //      state.current = photo;
+  //  });
 
-    this.setState(state);
-  }
+  //  this.setState(state);
+  //}
 
-  updatePhotos(store) {
-    if (store.photos) {
-      this.setState({ photos: store.photos });
+  //updatePhotos(store) {
+  //  if (store.photos) {
+  //    this.setState({ photos: store.photos });
 
-      if (this.state.current) this.updateCurrent();
-    }
-  }
+  //    if (this.state.current) this.updateCurrent();
+  //  }
+  //}
 
   isLast() {
     let photos = this.props.photos;
@@ -163,7 +167,7 @@ class Library extends React.Component {
 
     else
       currentView = <PictureDetail
-                      photo={this.state.current}
+                      photo={this.props.photos[this.state.current]}
                       toggleFlag={handleFlag}
                       setCurrent={handleCurrent}
                       showDiff={handleDiff}
