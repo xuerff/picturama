@@ -1,9 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-//import PhotoStore from './../stores/photo-store';
-//import PhotoActions from './../actions/photo-actions';
-
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
@@ -19,14 +16,13 @@ class Library extends React.Component {
   constructor(props) {
     super(props);
     this.state = { highlighted: [], current: null, scrollTop: 0, diff: false };
-
-    //this.updateCurrent = this.updateCurrent.bind(this);
   }
 
   handleCurrent(currentPhoto) {
     let state = this.state;
 
     state.diff = false;
+    state.current = null;
 
     this.props.photos.forEach((photo, index) => {
       if (photo.id == currentPhoto.id)
@@ -54,12 +50,17 @@ class Library extends React.Component {
 
   handleLeftCurrent() {
     let state = this.state;
-    let photos = this.props.photos;
+    //let photos = this.props.photos;
 
     state.diff = false;
 
-    if (photos.indexOf(state.current) >= 1) {
-      state.current = photos[photos.indexOf(state.current) - 1];
+    //if (photos.indexOf(state.current) >= 1) {
+    //  state.current = photos[photos.indexOf(state.current) - 1];
+    //  this.setState(state);
+    //}
+
+    if (state.current >= 1) {
+      state.current--;
       this.setState(state);
     }
   }
@@ -70,40 +71,20 @@ class Library extends React.Component {
 
     state.diff = false;
 
-    if (photos.length > photos.indexOf(state.current) + 1) {
-      state.current = photos[photos.indexOf(state.current) + 1];
+    //if (photos.length > photos.indexOf(state.current) + 1) {
+    //  state.current = photos[photos.indexOf(state.current) + 1];
+    //  this.setState(state);
+    //}
+
+    if (photos.length > state.current + 1) {
+      state.current++;
       this.setState(state);
     }
   }
 
   componentDidMount() {
-    //PhotoStore.listen(this.updatePhotos.bind(this));
-    //PhotoActions.getPhotos();
     this.props.actions.getPhotos();
   }
-
-  //updateCurrent() {
-  //  var state = this.state;
-  //  var current = this.state.current;
-
-  //  state.diff = false;
-  //  state.current = null;
-
-  //  state.photos.forEach(function(photo) {
-  //    if (photo.id == current.id)
-  //      state.current = photo;
-  //  });
-
-  //  this.setState(state);
-  //}
-
-  //updatePhotos(store) {
-  //  if (store.photos) {
-  //    this.setState({ photos: store.photos });
-
-  //    if (this.state.current) this.updateCurrent();
-  //  }
-  //}
 
   isLast() {
     let photos = this.props.photos;
