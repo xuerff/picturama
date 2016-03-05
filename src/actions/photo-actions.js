@@ -1,6 +1,6 @@
 import alt from './../alt';
 
-import Photo from './../models/photo';
+//import Photo from './../models/photo';
 import Tag from './../models/tag';
 
 class PhotoActions {
@@ -92,22 +92,22 @@ class PhotoActions {
   //  this.actions.setImportProgress(progress);
   //}
 
-  toggleFlag(photo) {
-    console.log('photo', photo);
+  //toggleFlag(photo) {
+  //  console.log('photo', photo);
 
-    new Photo({ id: photo.id })
-      .save('flag', !photo.flag, { patch: true })
-      .then(() => {
-        return new Photo({ id: photo.id })
-          .fetch({ withRelated: ['versions', 'tags'] });
-      })
-      .then((photoModel) => {
-        this.actions.updatedPhotoSuccess(photoModel);
-      })
-      .catch((err) => {
-        console.log('err toggle flag', err);
-      });
-  }
+  //  new Photo({ id: photo.id })
+  //    .save('flag', !photo.flag, { patch: true })
+  //    .then(() => {
+  //      return new Photo({ id: photo.id })
+  //        .fetch({ withRelated: ['versions', 'tags'] });
+  //    })
+  //    .then((photoModel) => {
+  //      this.actions.updatedPhotoSuccess(photoModel);
+  //    })
+  //    .catch((err) => {
+  //      console.log('err toggle flag', err);
+  //    });
+  //}
 }
 
 export default alt.createActions(PhotoActions);

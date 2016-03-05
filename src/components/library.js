@@ -9,7 +9,6 @@ class Library extends React.Component {
   static propTypes = {
     setScrollTop: React.PropTypes.func.isRequired,
     actions: React.PropTypes.object.isRequired,
-    //getPhotos: React.PropTypes.func.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
@@ -50,14 +49,8 @@ class Library extends React.Component {
 
   handleLeftCurrent() {
     let state = this.state;
-    //let photos = this.props.photos;
 
     state.diff = false;
-
-    //if (photos.indexOf(state.current) >= 1) {
-    //  state.current = photos[photos.indexOf(state.current) - 1];
-    //  this.setState(state);
-    //}
 
     if (state.current >= 1) {
       state.current--;
@@ -70,11 +63,6 @@ class Library extends React.Component {
     let photos = this.props.photos;
 
     state.diff = false;
-
-    //if (photos.length > photos.indexOf(state.current) + 1) {
-    //  state.current = photos[photos.indexOf(state.current) + 1];
-    //  this.setState(state);
-    //}
 
     if (photos.length > state.current + 1) {
       state.current++;
@@ -99,6 +87,7 @@ class Library extends React.Component {
 
   handleFlag() {
     console.log('handle flag');
+    this.props.actions.toggleFlag(this.props.photos[this.state.current]);
     //PhotoActions.toggleFlag(this.state.current);
   }
 

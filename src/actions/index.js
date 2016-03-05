@@ -81,3 +81,18 @@ export const updatedPhoto = (e, version) => {
       });
   };
 };
+
+export const toggleFlag = (photo) => {
+  return (dispatch) => {
+    new Photo({ id: photo.id })
+      .save('flag', !photo.flag, { patch: true })
+      .then(() => {
+        return new Photo({ id: photo.id })
+          .fetch({ withRelated: ['versions', 'tags'] });
+      })
+      .then((photoModel) => {
+        dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() });
+      });
+ 
+  };
+};
