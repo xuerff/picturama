@@ -1,4 +1,5 @@
 import Photo from './../models/photo';
+import Tag from './../models/tag';
 
 export const getPhotos = () => {
   return (dispatch) => {
@@ -93,6 +94,20 @@ export const toggleFlag = (photo) => {
       .then((photoModel) => {
         dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() });
       });
- 
+  };
+};
+
+export const setTagFilter = (tag) => {
+  return (dispatch) => {
+    new Tag({ id: tag.id })
+      .fetch({ withRelated: ['photos'] })
+      .then((tag) => {
+        let photos = tag.related('photos');
+
+        dispatch({ 
+          type: 'GET_PHOTOS_SUCCESS', 
+          photos: photos.toJSON()
+        });
+      });
   };
 };

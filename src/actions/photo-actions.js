@@ -73,14 +73,14 @@ class PhotoActions {
   //    });
   //}
 
-  setTagFilter(tag) {
-    new Tag({ id: tag.id })
-      .fetch({ withRelated: ['photos'] })
-      .then((tag) => {
-        let photos = tag.related('photos');
-        this.actions.getPhotosSuccess({ photos });
-      });
-  }
+  //setTagFilter(tag) {
+  //  new Tag({ id: tag.id })
+  //    .fetch({ withRelated: ['photos'] })
+  //    .then((tag) => {
+  //      let photos = tag.related('photos');
+  //      this.actions.getPhotosSuccess({ photos });
+  //    });
+  //}
 
   //startImport() {
   //  console.log('start import');

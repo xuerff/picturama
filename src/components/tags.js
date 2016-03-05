@@ -3,16 +3,19 @@ import React from 'react';
 import TagStore from './../stores/tag-store';
 
 import TagActions from './../actions/tag-actions';
-import PhotoActions from './../actions/photo-actions';
+//import PhotoActions from './../actions/photo-actions';
 
 import TagButton from './tag-button';
 
 class Tags extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = { tags: [], currentTag: null };
+    this.state = { tags: [] };
   }
 
   componentDidMount() {
@@ -20,13 +23,13 @@ class Tags extends React.Component {
     TagStore.listen(this.appendTags.bind(this));
   }
 
-  handleTag(tag) {
-    let state = this.state;
-    state.currentTag = tag;
+  //handleTag(tag) {
+  //  let state = this.state;
+  //  state.currentTag = tag;
 
-    PhotoActions.setTagFilter(tag);
-    this.setState(state);
-  }
+  //  PhotoActions.setTagFilter(tag);
+  //  this.setState(state);
+  //}
 
   appendTags(data) {
     let state = this.state;
@@ -38,7 +41,7 @@ class Tags extends React.Component {
     var tagsList = this.state.tags.map((tag) => {
       return (
         <TagButton 
-          setTag={this.handleTag.bind(this)} 
+          setTag={() => this.props.actions.setTagFilter(tag)}
           key={tag}
           tag={tag} />
       );

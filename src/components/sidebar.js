@@ -32,7 +32,7 @@ class Sidebar extends React.Component {
         actions={this.props.actions}
         currentDate={this.props.currentDate}
         dates={this.props.dates} />,
-      <Tags key="1" />,
+      <Tags key="1" actions={this.props.actions} />,
       <Devices key="2" />
     ];
 
@@ -50,7 +50,7 @@ class Sidebar extends React.Component {
           );
 
         else if (menu == 'tags')
-          menus.push(<Tags key={key} />);
+          menus.push(<Tags key={key} actions={this.props.actions} />);
 
         else if (menu == 'devices')
           menus.push(<Devices key={key} />);
