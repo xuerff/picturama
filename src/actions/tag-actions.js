@@ -58,11 +58,11 @@ class TagActions {
     });
   }
 
-  getTags() {
-    new Tag().fetchAll().then((tags) => {
-      this.actions.getTagsSuccess(tags);
-    });
-  }
+  //getTags() {
+  //  new Tag().fetchAll().then((tags) => {
+  //    this.actions.getTagsSuccess(tags);
+  //  });
+  //}
 
 }
 

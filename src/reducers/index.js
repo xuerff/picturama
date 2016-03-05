@@ -5,6 +5,7 @@ const initialState = {
   importing: false,
   currentDate: null,
   photos: [],
+  tags: [],
   dates: { years: [] },
   progress: { processed: 0, total: 0 }
 };
@@ -54,6 +55,12 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       progress: action.progress
+    };
+
+  case 'GET_TAGS_SUCCESS':
+    return {
+      ...state,
+      tags: action.tags
     };
 
   default:

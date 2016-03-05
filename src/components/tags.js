@@ -1,14 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import TagStore from './../stores/tag-store';
-
-import TagActions from './../actions/tag-actions';
-//import PhotoActions from './../actions/photo-actions';
+//import TagStore from './../stores/tag-store';
+//import TagActions from './../actions/tag-actions';
 
 import TagButton from './tag-button';
 
 class Tags extends React.Component {
   static propTypes = {
+    tags: React.PropTypes.array.isRequired,
     actions: React.PropTypes.object.isRequired
   }
 
@@ -19,8 +19,9 @@ class Tags extends React.Component {
   }
 
   componentDidMount() {
-    TagActions.getTags();
-    TagStore.listen(this.appendTags.bind(this));
+    this.props.actions.getTags();
+    //TagActions.getTags();
+    //TagStore.listen(this.appendTags.bind(this));
   }
 
   //handleTag(tag) {
@@ -38,7 +39,7 @@ class Tags extends React.Component {
   }
 
   render() {
-    var tagsList = this.state.tags.map((tag) => {
+    var tagsList = this.props.tags.map((tag) => {
       return (
         <TagButton 
           setTag={() => this.props.actions.setTagFilter(tag)}
@@ -57,4 +58,8 @@ class Tags extends React.Component {
   }
 }
 
-export default Tags;
+const ReduxTags = connect(state => ({
+  tags: state.tags
+}))(Tags);
+
+export default ReduxTags;

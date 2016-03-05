@@ -30,9 +30,9 @@ class TagStore {
       this.tags = this.tags.concat(tags);
   }
 
-  onGetTagsSuccess(data) {
-    this.tags = data.toJSON();
-  }
+  //onGetTagsSuccess(data) {
+  //  this.tags = data.toJSON();
+  //}
 
 }
 
