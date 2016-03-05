@@ -16,15 +16,15 @@ class PhotoActions {
     );
   }
 
-  updatedPhoto(e, version) {
-    console.log('photo actions new version', version, this);
+  //updatedPhoto(e, version) {
+  //  console.log('photo actions new version', version, this);
 
-    new Photo({ id: version.attributes.photo_id })
-      .fetch({ withRelated: ['versions', 'tags'] })
-      .then((photo) => {
-        this.actions.updatedPhotoSuccess(photo);
-      });
-  }
+  //  new Photo({ id: version.attributes.photo_id })
+  //    .fetch({ withRelated: ['versions', 'tags'] })
+  //    .then((photo) => {
+  //      this.actions.updatedPhotoSuccess(photo);
+  //    });
+  //}
 
   //getPhotos() {
   //  Photo
@@ -82,15 +82,15 @@ class PhotoActions {
       });
   }
 
-  startImport() {
-    console.log('start import');
-    this.actions.setImporting(true);
-  }
+  //startImport() {
+  //  console.log('start import');
+  //  this.actions.setImporting(true);
+  //}
 
-  importProgress(e, progress) {
-    console.log('import progress', progress);
-    this.actions.setImportProgress(progress);
-  }
+  //importProgress(e, progress) {
+  //  console.log('import progress', progress);
+  //  this.actions.setImportProgress(progress);
+  //}
 
   toggleFlag(photo) {
     console.log('photo', photo);

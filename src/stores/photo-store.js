@@ -99,34 +99,34 @@ class PhotoStore {
   //  this.dates = dates;
   //}
 
-  onUpdatedPhotoSuccess(photo) {
-    let updatedPhoto = photo.toJSON();
-    let lastVersion = null;
+  //onUpdatedPhotoSuccess(photo) {
+  //  let updatedPhoto = photo.toJSON();
+  //  let lastVersion = null;
 
-    if (updatedPhoto.hasOwnProperty('versions') && updatedPhoto.versions.length > 0) {
-      var versionNumber = updatedPhoto.versions.length;
-      lastVersion = updatedPhoto.versions.pop();
-    }
+  //  if (updatedPhoto.hasOwnProperty('versions') && updatedPhoto.versions.length > 0) {
+  //    var versionNumber = updatedPhoto.versions.length;
+  //    lastVersion = updatedPhoto.versions.pop();
+  //  }
 
-    console.log('updated photo', updatedPhoto);
+  //  console.log('updated photo', updatedPhoto);
 
-    this.photos = this.photos.map(function(photo) {
-      photo.versionNumber = 1;
+  //  this.photos = this.photos.map(function(photo) {
+  //    photo.versionNumber = 1;
 
-      if (photo.id == updatedPhoto.id) {
-        photo = updatedPhoto;
+  //    if (photo.id == updatedPhoto.id) {
+  //      photo = updatedPhoto;
 
-        if (lastVersion) {
-          console.log('last version', lastVersion);
-          photo.thumb = lastVersion.output;
-          photo.thumb_250 = lastVersion.thumbnail;
-          photo.versionNumber += versionNumber;
-        }
-      }
+  //      if (lastVersion) {
+  //        console.log('last version', lastVersion);
+  //        photo.thumb = lastVersion.output;
+  //        photo.thumb_250 = lastVersion.thumbnail;
+  //        photo.versionNumber += versionNumber;
+  //      }
+  //    }
 
-      return photo;
-    });
-  }
+  //    return photo;
+  //  });
+  //}
 
   //onSetImporting(isImporting) {
   //  console.log('on set importing', isImporting);

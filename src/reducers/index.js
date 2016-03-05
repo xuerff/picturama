@@ -1,5 +1,32 @@
 import processDates from './../lib/process-dates';
 
+const updatePhotos = (photos, updatedPhoto) => {
+
+  let lastVersion = null;
+
+  if (updatedPhoto.hasOwnProperty('versions') && updatedPhoto.versions.length > 0) {
+    var versionNumber = updatedPhoto.versions.length;
+    lastVersion = updatedPhoto.versions.pop();
+  }
+
+  return photos.map((photo) => {
+    photo.versionNumber = 1;
+
+    if (photo.id == updatedPhoto.id) {
+      photo = updatedPhoto;
+
+      if (lastVersion) {
+        console.log('last version', lastVersion);
+        photo.thumb = lastVersion.output;
+        photo.thumb_250 = lastVersion.thumbnail;
+        photo.versionNumber += versionNumber;
+      }
+    }
+
+    return photo;
+  });
+};
+
 const initialState = {
   importing: false,
   currentDate: null,
@@ -31,6 +58,12 @@ export default function reducers(state = initialState, action) {
       })
     };
 
+  case 'UPDATED_PHOTO_SUCCESS':
+    return {
+      ...state,
+      photos: updatePhotos(state.photos, action.photo)
+    };
+
   case 'GET_DATES_SUCCESS':
     return {
       ...state,
@@ -48,6 +81,7 @@ export default function reducers(state = initialState, action) {
       ...state,
       progress: action.progress
     };
+
   default:
     return state;
   }

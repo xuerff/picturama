@@ -71,3 +71,13 @@ export const importProgress = (e, progress) => {
     dispatch({ type: 'SET_IMPORT_PROGRESS', progress });
   };
 };
+
+export const updatedPhoto = (e, version) => {
+  return (dispatch) => {
+    new Photo({ id: version.attributes.photo_id })
+      .fetch({ withRelated: ['versions', 'tags'] })
+      .then((photo) => {
+        dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photo.toJSON() });
+      });
+  };
+};

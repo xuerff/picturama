@@ -27,7 +27,6 @@ class Ansel extends React.Component {
       actions: bindActionCreators(action, this.props.dispatch)
     };
 
-    //ipcRenderer.on('new-version', PhotoActions.updatedPhoto);
     //ipcRenderer.on('scanned-devices', (e, devices) => {
     //  DeviceActions.initDevices(devices);
     //});
@@ -56,6 +55,8 @@ class Ansel extends React.Component {
       this.state.actions.getPhotos();
       this.state.actions.getDates();
     });
+
+    ipcRenderer.on('new-version', this.state.actions.updatedPhoto);
 
     document.addEventListener('keyup', this.keyboardListener);
   }

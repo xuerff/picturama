@@ -48,7 +48,7 @@ export default class PictureDetail extends React.Component {
 
   updateVersion(store) {
     console.log('state & store', this.state, store);
-    //if (store.version) this.setState(store);
+  //  //if (store.version) this.setState(store);
   }
 
   keyboardListener(e) {
