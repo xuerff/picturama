@@ -8,6 +8,7 @@ import * as action from './../actions';
 
 import Sidebar from './sidebar';
 import Container from './container';
+import DevTools from './dev-tools';
 
 class Ansel extends React.Component {
   static propTypes = {
@@ -101,6 +102,8 @@ class Ansel extends React.Component {
           progress={this.props.progress}
           className={containerClass}
           dateFilter={this.state.dateFilter} />
+
+        <DevTools visibleOnLoad={false} />
       </div>
     );
   }
