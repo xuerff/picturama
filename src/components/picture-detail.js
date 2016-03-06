@@ -49,7 +49,6 @@ export default class PictureDetail extends React.Component {
 
   updateVersion(store) {
     console.log('state & store', this.state, store);
-  //  //if (store.version) this.setState(store);
   }
 
   keyboardListener(e) {
@@ -59,7 +58,7 @@ export default class PictureDetail extends React.Component {
       this.unbindEventListeners();
 
     if (e.keyCode == 27 && this.state.modal == 'none') // escape
-      this.props.setCurrent(null);
+      this.props.setCurrent(-1);
 
     else if (e.keyCode == 27 && this.state.modal != 'none') // escape
       this.closeDialog();

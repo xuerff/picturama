@@ -1,7 +1,5 @@
 import fs from 'fs';
 import React from 'react';
-//import PhotoActions from './../actions/photo-actions';
-
 
 import Tags from './tags';
 import Dates from './dates';

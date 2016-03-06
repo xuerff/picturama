@@ -14,19 +14,17 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { highlighted: [], current: null, scrollTop: 0, diff: false };
+    this.state = { highlighted: [], current: -1, scrollTop: 0, diff: false };
   }
 
-  handleCurrent(currentPhoto) {
+  handleCurrent(current) {
     let state = this.state;
 
     state.diff = false;
-    state.current = null;
+    state.current = -1;
 
-    this.props.photos.forEach((photo, index) => {
-      if (photo.id == currentPhoto.id)
-        state.current = index;
-    });
+    if (current <= this.props.photos.length && current >= 0)
+      state.current = current;
 
     if (state.current)
       state.scrollTop = ReactDOM
@@ -88,7 +86,6 @@ class Library extends React.Component {
   handleFlag() {
     console.log('handle flag');
     this.props.actions.toggleFlag(this.props.photos[this.state.current]);
-    //PhotoActions.toggleFlag(this.state.current);
   }
 
   handleDiff() {
@@ -97,11 +94,12 @@ class Library extends React.Component {
     this.setState(state);
   }
 
-  handleHighlight(photo) {
+  handleHighlight(index) {
+    console.log('handle highlight', index);
     let state = this.state;
 
     state.highlighted = [];
-    state.highlighted.push(photo.id);
+    state.highlighted.push(index);
 
     this.setState(state);
   }
@@ -118,14 +116,15 @@ class Library extends React.Component {
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>Nothing!</div>;
 
-    else if (!this.state.current)
-      currentView = this.props.photos.map((photo) => {
+    else if (this.state.current == -1)
+      currentView = this.props.photos.map((photo, index) => {
         return (
           <Picture
-            key={photo.id}
+            key={index}
+            index={index}
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
-            highlighted={this.state.highlighted}
+            highlighted={this.state.highlighted.indexOf(index) != -1}
             setCurrent={handleCurrent} />
         );
       });

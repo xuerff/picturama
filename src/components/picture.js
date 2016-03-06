@@ -11,6 +11,7 @@ class Picture extends React.Component {
     setHighlight: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.array.isRequired,
     photo: React.PropTypes.object.isRequired,
+    index: React.PropTypes.number.isRequired,
     thumb_250: React.PropTypes.string.isRequired
   }
 
@@ -19,11 +20,12 @@ class Picture extends React.Component {
   }
 
   handleDblClick() {
-    this.props.setCurrent(this.props.photo);
+    this.props.setCurrent(this.props.index);
   }
 
   handleClick() {
-    this.props.setHighlight(this.props.photo);
+    console.log('picture props', this.props, this.key);
+    this.props.setHighlight(this.props.index);
   }
 
   render() {
@@ -32,7 +34,7 @@ class Picture extends React.Component {
     let anchorClass = classNames(
       'picture',
       'card',
-      { 'highlighted': this.props.highlighted.indexOf(photo.id) != -1 }
+      { 'highlighted': this.props.highlighted }
     );
 
     let imgClass = classNames(
