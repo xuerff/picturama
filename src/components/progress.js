@@ -1,7 +1,6 @@
 import fs from 'fs';
 import React from 'react';
-
-//import PhotoStore from './../stores/photo-store';
+import { connect } from 'react-redux';
 
 import config from './../config';
 
@@ -25,16 +24,6 @@ class Progress extends React.Component {
       progress: { processed: 0, total: 0 }, timer: new Date().getTime()
     };
   }
-
-  //componentDidMount() {
-  //  PhotoStore.listen(this.handleProgress.bind(this));
-  //}
-
-  //handleProgress(store) {
-  //  let state = this.state;
-  //  state.progress = store.progress;
-  //  this.setState(state);
-  //}
 
   getProgress() {
     let progress = this.props.progress;
@@ -64,4 +53,8 @@ class Progress extends React.Component {
   }
 }
 
-export default Progress;
+const ReduxProgress = connect(state => ({
+  progress: state.progress
+}))(Progress);
+
+export default ReduxProgress;

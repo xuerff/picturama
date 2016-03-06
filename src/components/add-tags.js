@@ -1,7 +1,7 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
 
-import TagStore from './../stores/tag-store';
+//import TagStore from './../stores/tag-store';
 
 export default class AddTags extends React.Component {
   static propTypes = {
@@ -37,7 +37,6 @@ export default class AddTags extends React.Component {
   componentDidMount() {
     this.refs.tags.focus();
 
-    TagStore.listen(this.props.closeTagDialog);
     document.addEventListener('keyup', this.keyboardListener);
   }
 

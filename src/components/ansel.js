@@ -15,7 +15,6 @@ class Ansel extends React.Component {
     dispatch: React.PropTypes.func.isRequired,
     dates: React.PropTypes.object.isRequired,
     importing: React.PropTypes.bool.isRequired,
-    progress: React.PropTypes.object.isRequired,
     currentDate: React.PropTypes.string,
     photos: React.PropTypes.array.isRequired
   }
@@ -99,7 +98,6 @@ class Ansel extends React.Component {
           actions={this.state.actions}
           photos={this.props.photos}
           importing={this.props.importing}
-          progress={this.props.progress}
           className={containerClass}
           dateFilter={this.state.dateFilter} />
 
@@ -113,8 +111,7 @@ const ReduxAnsel = connect(state => ({
   photos: state.photos,
   dates: state.dates,
   currentDate: state.currentDate,
-  importing: state.importing,
-  progress: state.progress
+  importing: state.importing
 }))(Ansel);
 
 export default ReduxAnsel;

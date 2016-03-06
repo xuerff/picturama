@@ -11,7 +11,6 @@ export default class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
-    progress: React.PropTypes.object.isRequired,
     importing: React.PropTypes.bool.isRequired,
     photos: React.PropTypes.array.isRequired
   }
@@ -56,7 +55,7 @@ export default class Container extends React.Component {
       );
 
     if (this.props.importing)
-      content = <Progress progress={this.props.progress} />;
+      content = <Progress />;
 
     return (
       <div id="container" ref="container" className={this.props.className}>
