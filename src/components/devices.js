@@ -1,8 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import DeviceStore from './../stores/device-store';
+//import DeviceStore from './../stores/device-store';
 
 class Devices extends React.Component {
+  static propTypes = {
+    devices: React.PropTypes.array.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -10,9 +14,9 @@ class Devices extends React.Component {
     this.state = { devices: [] };
   }
 
-  componentDidMount() {
-    DeviceStore.listen(this.appendDevices.bind(this));
-  }
+  //componentDidMount() {
+  //  DeviceStore.listen(this.appendDevices.bind(this));
+  //}
 
   appendDevices(data) {
     let state = this.state;
@@ -21,20 +25,26 @@ class Devices extends React.Component {
   }
 
   render() {
-    var devicesList = this.state.devices.map((device) => {
-      return (
-        <li>{device.name}</li>
-      );
-    });
+    //var devicesList = this.props.devices.map((device) => {
+    //  return (
+    //    <li>{device.name}</li>
+    //  );
+    //});
 
     return (
       <div className="devices">
         <h3><i className="fa fa-usb"></i> Devices</h3>
-        <ul>{devicesList}</ul>
+        <ul>
+          {this.props.devices.map((device) => <li>{device.name}</li>)}
+        </ul>
       </div>
     );
   }
 
 }
 
-export default Devices;
+const ReduxDevices = connect(state => ({
+  devices: state.devices
+}))(Devices);
+
+export default ReduxDevices;

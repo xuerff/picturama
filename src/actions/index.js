@@ -148,3 +148,21 @@ export const createTagsAndAssociateToPhoto = (tags, photoId) => {
     });
   };
 };
+
+export const initDevices = (devices) => {
+  return (dispatch) => {
+    dispatch({ type: 'INIT_DEVICES_SUCCESS', devices });
+  };
+};
+
+export const addDevice = (device) => {
+  return (dispatch) => {
+    dispatch({ type: 'ADD_DEVICE_SUCCESS', device });
+  };
+};
+
+export const removeDevice = (device) => {
+  return (dispatch) => {
+    dispatch({ type: 'REMOVE_DEVICE_SUCCESS', device });
+  };
+};

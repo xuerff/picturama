@@ -22,6 +22,7 @@ const initialState = {
   currentDate: null,
   photos: [],
   tags: [],
+  devices: [],
   dates: { years: [] },
   progress: { processed: 0, total: 0 }
 };
@@ -84,6 +85,15 @@ export default function reducers(state = initialState, action) {
       ...state,
       tags: processTags(state.tags, action.tags)
     };
+
+  case 'INIT_DEVICES_SUCCESS':
+    return {
+      ...state,
+      devices: action.devices
+    };
+
+  case 'ADD_DEVICE_SUCCESS':
+  case 'REMOVE_DEVICE_SUCCESS':
 
   default:
     return state;

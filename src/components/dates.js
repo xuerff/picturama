@@ -1,14 +1,10 @@
 import React from 'react';
 
-//import PhotoStore from './../stores/photo-store';
-//import PhotoActions from './../actions/photo-actions';
-
 import DateYear from './date-year';
 
 class Dates extends React.Component {
   static propTypes = {
     dates: React.PropTypes.object.isRequired,
-    //years: React.PropTypes.array.isRequired,
     actions: React.PropTypes.object.isRequired,
     currentDate: React.PropTypes.string.isRequired
   }
@@ -21,24 +17,11 @@ class Dates extends React.Component {
 
   componentDidMount() {
     this.props.actions.getDates();
-    //PhotoActions.getDates();
-    //PhotoStore.listen(this.appendDates.bind(this));
   }
-
-  //appendDates(data) {
-  //  let state = this.state;
-
-  //  state.dates = data.dates;
-  //  state.currentDate = data.currentDate;
-
-  //  this.setState(state);
-  //}
 
   handleDate(date) {
     let state = this.state;
-
     state.currentDate = date;
-    //PhotoActions.setDateFilter(date);
     this.setState(state);
   }
 
