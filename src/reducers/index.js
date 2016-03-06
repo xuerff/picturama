@@ -17,6 +17,20 @@ const processTags = (prevTags, nextTags) => {
   return (tags.length > 0) ? prevTags.concat(tags) : [];
 };
 
+const rmDevice = (devices, rmDevice) => {
+  let pos = -1;
+
+  devices.forEach((device, index) => {
+    if (device.id == rmDevice.id)
+      pos = index;
+  });
+
+  return [
+    ...devices.slice(0, pos),
+    ...devices.slice(pos + 1)
+  ];
+};
+
 const initialState = {
   importing: false,
   currentDate: null,
@@ -93,7 +107,19 @@ export default function reducers(state = initialState, action) {
     };
 
   case 'ADD_DEVICE_SUCCESS':
+    return {
+      ...state,
+      devices: [
+        ...state.devices,
+        action.device
+      ]
+    };
+
   case 'REMOVE_DEVICE_SUCCESS':
+    return {
+      ...state,
+      devices: rmDevice(state.devices, action.device)
+    };
 
   default:
     return state;
