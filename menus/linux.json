@@ -49,6 +49,14 @@
         "enabled": false,
         "click": "addTags"
       }]
+    },
+    {
+      "label": "Developer",
+      "submenu": [{
+        "label": "Toggle DevTools",
+        "accelerator": "Shift+Ctrl+I",
+        "click": "toggleDevTools"
+      }]
     }
   ]
 }

@@ -10,7 +10,6 @@
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "alt": "^0.17.9",
     "bluebird": "^2.9.34",
     "bookshelf": "^0.9.1",
     "child-process-promise": "^1.1.0",
@@ -19,7 +18,6 @@
     "exif": "^0.4.0",
     "font-awesome": "^4.5.0",
     "fs.extra": "^1.3.2",
-    "immutable": "^3.7.6",
     "knex": "^0.9.0",
     "libraw": "0.1.1",
     "moment": "^2.10.6",
@@ -32,7 +30,9 @@
     "react-redux": "^4.4.0",
     "react-tagsinput": "^3.0.3",
     "redux": "^3.3.1",
-    "redux-actions": "^0.9.1",
+    "redux-devtools": "^3.1.1",
+    "redux-devtools-dock-monitor": "^1.1.0",
+    "redux-devtools-log-monitor": "^1.0.5",
     "redux-thunk": "^1.0.3",
     "sharp": "0.13.0",
     "shortid": "^2.2.2",
@@ -60,9 +60,6 @@
     "gulp-concat": "^2.6.0",
     "gulp-env": "^0.2.0",
     "gulp-eslint": "^2.0.0",
-    "gulp-less": "^3.0.3",
-    "redux-devtools": "^3.1.1",
-    "redux-devtools-dock-monitor": "^1.1.0",
-    "redux-devtools-log-monitor": "^1.0.5"
+    "gulp-less": "^3.0.3"
   }
 }
