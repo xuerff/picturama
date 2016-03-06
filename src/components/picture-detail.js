@@ -5,8 +5,10 @@ import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
 
-import VersionStore from './../stores/version-store';
-import VersionActions from './../actions/version-actions';
+//import VersionStore from './../stores/version-store';
+//import VersionActions from './../actions/version-actions';
+
+import createVersionAndOpenWith from './../create-version';
 
 import remote from 'remote';
 
@@ -47,9 +49,9 @@ export default class PictureDetail extends React.Component {
     this.finishLoading = this.finishLoading.bind(this);
   }
 
-  updateVersion(store) {
-    console.log('state & store', this.state, store);
-  }
+  //updateVersion(store) {
+  //  console.log('state & store', this.state, store);
+  //}
 
   keyboardListener(e) {
     e.preventDefault();
@@ -85,7 +87,7 @@ export default class PictureDetail extends React.Component {
   }
 
   openWithRawtherapee() {
-    VersionActions.createVersionAndOpenWith(
+    createVersionAndOpenWith(
       this.props.photo, 
       'RAW', 
       'rawtherapee'
@@ -93,7 +95,7 @@ export default class PictureDetail extends React.Component {
   }
 
   openWithDarktable() {
-    VersionActions.createVersionAndOpenWith(
+    createVersionAndOpenWith(
       this.props.photo, 
       'RAW', 
       'darktable'
@@ -101,7 +103,7 @@ export default class PictureDetail extends React.Component {
   }
 
   openWithGimp() {
-    VersionActions.createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
+    createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
   }
 
   addRawtherapeeMenu() {
@@ -150,8 +152,6 @@ export default class PictureDetail extends React.Component {
   }
 
   componentDidMount() {
-    VersionStore.listen(this.updateVersion.bind(this));
-
     this.menu = new Menu();
 
     this.menu.append(new MenuItem({ 
