@@ -15,8 +15,7 @@ class Ansel extends React.Component {
     dispatch: React.PropTypes.func.isRequired,
     dates: React.PropTypes.object.isRequired,
     importing: React.PropTypes.bool.isRequired,
-    currentDate: React.PropTypes.string,
-    photos: React.PropTypes.array.isRequired
+    currentDate: React.PropTypes.string
   }
 
   constructor(props) {
@@ -26,10 +25,6 @@ class Ansel extends React.Component {
       showSidebar: true,
       actions: bindActionCreators(action, this.props.dispatch)
     };
-
-    //ipcRenderer.on('remove-device', (e, device) => {
-    //  DeviceActions.removeDevice(device);
-    //});
 
     this.keyboardListener = this.keyboardListener.bind(this);
   }
@@ -91,10 +86,8 @@ class Ansel extends React.Component {
 
         <Container
           actions={this.state.actions}
-          photos={this.props.photos}
           importing={this.props.importing}
-          className={containerClass}
-          dateFilter={this.state.dateFilter} />
+          className={containerClass} />
 
         <DevTools visibleOnLoad={false} />
       </div>
@@ -103,7 +96,6 @@ class Ansel extends React.Component {
 }
 
 const ReduxAnsel = connect(state => ({
-  photos: state.photos,
   dates: state.dates,
   currentDate: state.currentDate,
   importing: state.importing

@@ -11,8 +11,7 @@ export default class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
-    importing: React.PropTypes.bool.isRequired,
-    photos: React.PropTypes.array.isRequired
+    importing: React.PropTypes.bool.isRequired
   }
 
   constructor(props) {
@@ -50,7 +49,6 @@ export default class Container extends React.Component {
       content = (
         <Library 
           actions={this.props.actions}
-          photos={this.props.photos}
           setScrollTop={this.handleScrollTop.bind(this)}/>
       );
 

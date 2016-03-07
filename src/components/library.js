@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
@@ -153,4 +154,8 @@ class Library extends React.Component {
   }
 }
 
-export default Library;
+const ReduxLibrary = connect(state => ({
+  photos: state.photos
+}))(Library);
+
+export default ReduxLibrary;
