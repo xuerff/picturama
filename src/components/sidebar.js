@@ -14,9 +14,9 @@ if (fs.existsSync(config.settings))
 
 class Sidebar extends React.Component {
   static propTypes = {
-    dates: React.PropTypes.object.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string.isRequired
+    //dates: React.PropTypes.object.isRequired,
+    actions: React.PropTypes.object.isRequired
+    //currentDate: React.PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -27,9 +27,7 @@ class Sidebar extends React.Component {
     var menus = [
       <Dates 
         key="0"
-        actions={this.props.actions}
-        currentDate={this.props.currentDate}
-        dates={this.props.dates} />,
+        actions={this.props.actions} />,
       <Tags key="1" actions={this.props.actions} />,
       <Devices key="2" />
     ];
@@ -42,9 +40,7 @@ class Sidebar extends React.Component {
           menus.push(
             <Dates 
               key={key} 
-              actions={this.props.actions}
-              currentDate={this.props.currentDate}
-              dates={this.props.dates} />
+              actions={this.props.actions} />
           );
 
         else if (menu == 'tags')

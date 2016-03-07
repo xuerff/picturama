@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import DateYear from './date-year';
 
@@ -53,4 +54,9 @@ class Dates extends React.Component {
 
 }
 
-export default Dates;
+const ReduxDates = connect(state => ({
+  dates: state.dates,
+  currentDate: state.currentDate
+}))(Dates);
+
+export default ReduxDates;
