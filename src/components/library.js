@@ -27,7 +27,7 @@ class Library extends React.Component {
     if (current <= this.props.photos.length && current >= 0)
       state.current = current;
 
-    if (state.current)
+    if (state.current != -1)
       state.scrollTop = ReactDOM
         .findDOMNode(this)
         .parentNode
@@ -39,7 +39,7 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (!state.current && state.scrollTop > 0) {
+    if (state.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
       this.setState(state);

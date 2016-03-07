@@ -14,9 +14,7 @@ if (fs.existsSync(config.settings))
 
 class Sidebar extends React.Component {
   static propTypes = {
-    //dates: React.PropTypes.object.isRequired,
     actions: React.PropTypes.object.isRequired
-    //currentDate: React.PropTypes.string.isRequired
   }
 
   constructor(props) {

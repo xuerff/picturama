@@ -94,8 +94,6 @@ class Ansel extends React.Component {
 }
 
 const ReduxAnsel = connect(state => ({
-  //dates: state.dates,
-  //currentDate: state.currentDate,
   importing: state.importing
 }))(Ansel);
 
