@@ -32,8 +32,7 @@ export default class PictureDetail extends React.Component {
     showDiff: React.PropTypes.func.isRequired,
     isLast: React.PropTypes.func.isRequired,
     toggleFlag: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired,
-    thumb: React.PropTypes.string.isRequired
+    photo: React.PropTypes.object.isRequired
   }
 
   constructor(props) {

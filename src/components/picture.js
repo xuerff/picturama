@@ -9,10 +9,9 @@ class Picture extends React.Component {
   static propTypes = {
     setCurrent: React.PropTypes.func.isRequired,
     setHighlight: React.PropTypes.func.isRequired,
-    highlighted: React.PropTypes.array.isRequired,
+    highlighted: React.PropTypes.bool.isRequired,
     photo: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    thumb_250: React.PropTypes.string.isRequired
+    index: React.PropTypes.number.isRequired
   }
 
   constructor(props) {
@@ -24,7 +23,6 @@ class Picture extends React.Component {
   }
 
   handleClick() {
-    console.log('picture props', this.props, this.key);
     this.props.setHighlight(this.props.index);
   }
 

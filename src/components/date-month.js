@@ -7,8 +7,7 @@ export default class DateMonth extends React.Component {
     actions: React.PropTypes.object.isRequired,
     setDate: React.PropTypes.func.isRequired,
     month: React.PropTypes.object.isRequired,
-    days: React.PropTypes.array.isRequired,
-    currentDate: React.PropTypes.string.isRequired
+    currentDate: React.PropTypes.string
   }
 
   constructor(props) {

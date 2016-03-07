@@ -7,7 +7,7 @@ class Dates extends React.Component {
   static propTypes = {
     dates: React.PropTypes.object.isRequired,
     actions: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string.isRequired
+    currentDate: React.PropTypes.string
   }
 
   constructor(props) {

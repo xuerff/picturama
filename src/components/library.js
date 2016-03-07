@@ -85,7 +85,6 @@ class Library extends React.Component {
   }
 
   handleFlag() {
-    console.log('handle flag');
     this.props.actions.toggleFlag(this.props.photos[this.state.current]);
   }
 
@@ -96,7 +95,6 @@ class Library extends React.Component {
   }
 
   handleHighlight(index) {
-    console.log('handle highlight', index);
     let state = this.state;
 
     state.highlighted = [];

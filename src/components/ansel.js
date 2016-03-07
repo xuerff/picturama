@@ -13,9 +13,7 @@ import DevTools from './dev-tools';
 class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
-    dates: React.PropTypes.object.isRequired,
-    importing: React.PropTypes.bool.isRequired,
-    currentDate: React.PropTypes.string
+    importing: React.PropTypes.bool.isRequired
   }
 
   constructor(props) {

@@ -3,8 +3,7 @@ import React from 'react';
 export default class DateElement extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    setDateFilter: React.PropTypes.func.isRequired,
-    currentDate: React.PropTypes.string.isRequired,
+    currentDate: React.PropTypes.string,
     date: React.PropTypes.string.isRequired
   }
 
