@@ -132,7 +132,7 @@ class Library extends React.Component {
     else if (this.state.diff)
       currentView = <PictureDiff
                       toggleDiff={handleDiff}
-                      photo={this.state.current} />;
+                      photo={this.props.photos[this.state.current]} />;
 
     else
       currentView = <PictureDetail
