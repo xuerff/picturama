@@ -34,6 +34,8 @@ const rmDevice = (devices, rmDevice) => {
 const initialState = {
   importing: false,
   currentDate: null,
+  current: -1,
+  diff: false,
   photos: [],
   tags: [],
   devices: [],
@@ -46,6 +48,8 @@ export default function reducers(state = initialState, action) {
   case 'GET_PHOTOS_SUCCESS':
     return {
       ...state,
+      diff: false,
+      current: -1,
       importing: false,
       currentDate: action.hasOwnProperty('date') ? action.date : null,
       photos: action.photos.map(function(photo) {
@@ -119,6 +123,33 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       devices: rmDevice(state.devices, action.device)
+    };
+
+  case 'SET_CURRENT_SUCCESS':
+    return {
+      ...state,
+      diff: false,
+      current: (action.current <= state.photos.length && action.current >= 0) ? action.current : -1
+    };
+
+  case 'SET_CURRENT_LEFT_SUCCESS':
+    return {
+      ...state,
+      diff: false,
+      current: (state.current >= 1) ? state.current -1 : state.current
+    };
+
+  case 'SET_CURRENT_RIGHT_SUCCESS':
+    return {
+      ...state,
+      diff: false,
+      current: (state.photos.length > state.current+1) ? state.current+1 : state.current
+    };
+
+  case 'TOGGLE_DIFF_SUCCESS':
+    return {
+      ...state,
+      diff: !state.diff
     };
 
   default:

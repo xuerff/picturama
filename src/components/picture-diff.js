@@ -9,7 +9,7 @@ rotation[8] = 'minus-ninety';
 
 class PictureDiff extends React.Component {
   static propTypes = {
-    toggleDiff: React.PropTypes.func.isRequired,
+    actions: React.PropTypes.object.isRequired,
     photo: React.PropTypes.object.isRequired
   }
 
@@ -70,9 +70,9 @@ class PictureDiff extends React.Component {
     e.preventDefault();
 
     if ([27, 89].indexOf(e.keyCode) != -1) {
-      console.log('picture diff', e.keyCode);
+      //console.log('picture diff', e.keyCode);
       this.unbindEventListeners();
-      this.props.toggleDiff();
+      this.props.actions.toggleDiff();
     }
   }
 

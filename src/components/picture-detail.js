@@ -26,8 +26,8 @@ rotation[0] = 'minus-ninety';
 export default class PictureDetail extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    setLeft: React.PropTypes.func.isRequired,
-    setRight: React.PropTypes.func.isRequired,
+    //setLeft: React.PropTypes.func.isRequired,
+    //setRight: React.PropTypes.func.isRequired,
     setCurrent: React.PropTypes.func.isRequired,
     showDiff: React.PropTypes.func.isRequired,
     isLast: React.PropTypes.func.isRequired,
@@ -65,16 +65,16 @@ export default class PictureDetail extends React.Component {
       this.closeDialog();
 
     else if (e.keyCode == 37) // Left
-      this.props.setLeft();
+      this.props.actions.setCurrentLeft();
 
     else if (e.keyCode == 39 && !this.props.isLast()) // Right
-      this.props.setRight();
+      this.props.actions.setCurrentRight();
 
     else if (e.keyCode == 80) // p
       this.props.toggleFlag();
 
     else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
-      this.props.showDiff();
+      this.props.actions.toggleDiff();
 
     else if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();

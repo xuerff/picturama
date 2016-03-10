@@ -10,22 +10,25 @@ class Library extends React.Component {
   static propTypes = {
     setScrollTop: React.PropTypes.func.isRequired,
     actions: React.PropTypes.object.isRequired,
+    current: React.PropTypes.number,
+    diff: React.PropTypes.bool.isRequired,
     photos: React.PropTypes.array.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.state = { highlighted: [], current: -1, scrollTop: 0, diff: false };
+    this.state = { highlighted: [], scrollTop: 0, diff: false };
   }
 
   handleCurrent(current) {
     let state = this.state;
 
-    state.diff = false;
-    state.current = -1;
+    //state.diff = false;
+    //state.current = -1;
 
-    if (current <= this.props.photos.length && current >= 0)
-      state.current = current;
+    this.props.actions.setCurrent(current);
+    //if (current <= this.props.photos.length && current >= 0)
+    //  state.current = current;
 
     if (state.current != -1)
       state.scrollTop = ReactDOM
@@ -46,28 +49,28 @@ class Library extends React.Component {
     }
   }
 
-  handleLeftCurrent() {
-    let state = this.state;
+  //handleLeftCurrent() {
+  //  let state = this.state;
 
-    state.diff = false;
+  //  state.diff = false;
 
-    if (state.current >= 1) {
-      state.current--;
-      this.setState(state);
-    }
-  }
+  //  if (this.props.current >= 1) {
+  //    state.current--;
+  //    this.setState(state);
+  //  }
+  //}
 
-  handleRightCurrent() {
-    let state = this.state;
-    let photos = this.props.photos;
+  //handleRightCurrent() {
+  //  let state = this.state;
+  //  let photos = this.props.photos;
 
-    state.diff = false;
+  //  state.diff = false;
 
-    if (photos.length > state.current + 1) {
-      state.current++;
-      this.setState(state);
-    }
-  }
+  //  if (photos.length > state.current + 1) {
+  //    state.current++;
+  //    this.setState(state);
+  //  }
+  //}
 
   componentDidMount() {
     this.props.actions.getPhotos();
@@ -88,11 +91,11 @@ class Library extends React.Component {
     this.props.actions.toggleFlag(this.props.photos[this.state.current]);
   }
 
-  handleDiff() {
-    let state = this.state;
-    state.diff = !this.state.diff;
-    this.setState(state);
-  }
+  //handleDiff() {
+  //  let state = this.state;
+  //  state.diff = !this.state.diff;
+  //  this.setState(state);
+  //}
 
   handleHighlight(index) {
     let state = this.state;
@@ -106,16 +109,16 @@ class Library extends React.Component {
   render() {
     let currentView
       , handleCurrent = this.handleCurrent.bind(this)
-      , handleLeftCurrent = this.handleLeftCurrent.bind(this)
-      , handleRightCurrent = this.handleRightCurrent.bind(this)
-      , isLast = this.isLast.bind(this)
-      , handleFlag = this.handleFlag.bind(this)
-      , handleDiff = this.handleDiff.bind(this);
+      //, handleLeftCurrent = this.handleLeftCurrent.bind(this)
+      //, handleRightCurrent = this.handleRightCurrent.bind(this)
+      , isLast = this.isLast.bind(this);
+      //, handleFlag = this.handleFlag.bind(this);
+      //, handleDiff = this.handleDiff.bind(this);
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>Nothing!</div>;
 
-    else if (this.state.current == -1)
+    else if (this.props.current == -1)
       currentView = this.props.photos.map((photo, index) => {
         return (
           <Picture
@@ -128,21 +131,18 @@ class Library extends React.Component {
         );
       });
 
-    else if (this.state.diff)
+    else if (this.props.diff)
       currentView = <PictureDiff
-                      toggleDiff={handleDiff}
-                      photo={this.props.photos[this.state.current]} />;
+                      actions={this.props.actions}
+                      photo={this.props.photos[this.props.current]} />;
 
     else
       currentView = <PictureDetail
-                      photo={this.props.photos[this.state.current]}
+                      photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
-                      toggleFlag={handleFlag}
+                      toggleFlag={this.handleFlag.bind(this)}
                       setCurrent={handleCurrent}
-                      showDiff={handleDiff}
-                      isLast={isLast}
-                      setLeft={handleLeftCurrent}
-                      setRight={handleRightCurrent} />;
+                      isLast={isLast} />;
 
     return (
       <div id="library">
@@ -153,7 +153,9 @@ class Library extends React.Component {
 }
 
 const ReduxLibrary = connect(state => ({
-  photos: state.photos
+  photos: state.photos,
+  current: state.current,
+  diff: state.diff
 }))(Library);
 
 export default ReduxLibrary;

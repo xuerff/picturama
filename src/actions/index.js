@@ -167,3 +167,27 @@ export const removeDevice = (e, device) => {
     dispatch({ type: 'REMOVE_DEVICE_SUCCESS', device });
   };
 };
+
+export const setCurrent = (current) => {
+  return (dispatch) => {
+    dispatch({ type: 'SET_CURRENT_SUCCESS', current });
+  };
+};
+
+export const setCurrentLeft = () => {
+  return (dispatch) => {
+    dispatch({ type: 'SET_CURRENT_LEFT_SUCCESS' });
+  };
+};
+
+export const setCurrentRight = () => {
+  return (dispatch) => {
+    dispatch({ type: 'SET_CURRENT_RIGHT_SUCCESS' });
+  };
+};
+
+export const toggleDiff = () => {
+  return (dispatch) => {
+    dispatch({ type: 'TOGGLE_DIFF_SUCCESS' });
+  };
+};
