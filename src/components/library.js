@@ -17,18 +17,13 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { highlighted: [], scrollTop: 0, diff: false };
+    this.state = { highlighted: [], scrollTop: 0 };
   }
 
   handleCurrent(current) {
     let state = this.state;
 
-    //state.diff = false;
-    //state.current = -1;
-
     this.props.actions.setCurrent(current);
-    //if (current <= this.props.photos.length && current >= 0)
-    //  state.current = current;
 
     if (state.current != -1)
       state.scrollTop = ReactDOM
@@ -49,29 +44,6 @@ class Library extends React.Component {
     }
   }
 
-  //handleLeftCurrent() {
-  //  let state = this.state;
-
-  //  state.diff = false;
-
-  //  if (this.props.current >= 1) {
-  //    state.current--;
-  //    this.setState(state);
-  //  }
-  //}
-
-  //handleRightCurrent() {
-  //  let state = this.state;
-  //  let photos = this.props.photos;
-
-  //  state.diff = false;
-
-  //  if (photos.length > state.current + 1) {
-  //    state.current++;
-  //    this.setState(state);
-  //  }
-  //}
-
   componentDidMount() {
     this.props.actions.getPhotos();
   }
@@ -91,12 +63,6 @@ class Library extends React.Component {
     this.props.actions.toggleFlag(this.props.photos[this.state.current]);
   }
 
-  //handleDiff() {
-  //  let state = this.state;
-  //  state.diff = !this.state.diff;
-  //  this.setState(state);
-  //}
-
   handleHighlight(index) {
     let state = this.state;
 
@@ -107,13 +73,7 @@ class Library extends React.Component {
   }
 
   render() {
-    let currentView
-      , handleCurrent = this.handleCurrent.bind(this)
-      //, handleLeftCurrent = this.handleLeftCurrent.bind(this)
-      //, handleRightCurrent = this.handleRightCurrent.bind(this)
-      , isLast = this.isLast.bind(this);
-      //, handleFlag = this.handleFlag.bind(this);
-      //, handleDiff = this.handleDiff.bind(this);
+    let currentView;
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>Nothing!</div>;
@@ -127,7 +87,7 @@ class Library extends React.Component {
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
             highlighted={this.state.highlighted.indexOf(index) != -1}
-            setCurrent={handleCurrent} />
+            setCurrent={this.handleCurrent.bind(this)} />
         );
       });
 
@@ -141,8 +101,8 @@ class Library extends React.Component {
                       photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}
-                      setCurrent={handleCurrent}
-                      isLast={isLast} />;
+                      setCurrent={this.handleCurrent.bind(this)}
+                      isLast={this.isLast.bind(this)} />;
 
     return (
       <div id="library">

@@ -3,16 +3,16 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 
-import DevTools from './dev-tools';
+//import DevTools from './dev-tools';
 import Ansel from './ansel';
 
 import reducers from './../reducers';
 
 const enhancer = compose(
   // Middleware you want to use in development:
-  applyMiddleware(thunk),
+  applyMiddleware(thunk)
   // Required! Enable Redux DevTools with the monitors you chose
-  DevTools.instrument()
+  //DevTools.instrument()
 );
 
 //const store = createStore(reducers, applyMiddleware(thunk));

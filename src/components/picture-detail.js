@@ -26,10 +26,7 @@ rotation[0] = 'minus-ninety';
 export default class PictureDetail extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    //setLeft: React.PropTypes.func.isRequired,
-    //setRight: React.PropTypes.func.isRequired,
     setCurrent: React.PropTypes.func.isRequired,
-    showDiff: React.PropTypes.func.isRequired,
     isLast: React.PropTypes.func.isRequired,
     toggleFlag: React.PropTypes.func.isRequired,
     photo: React.PropTypes.object.isRequired

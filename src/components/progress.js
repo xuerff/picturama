@@ -11,7 +11,6 @@ if (fs.existsSync(config.settings))
 
 class Progress extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
     progress: React.PropTypes.object.isRequired
   }
 

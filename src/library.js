@@ -116,7 +116,6 @@ class Library {
   }
 
   importRaw(file) {
-    console.log('raw', file.path);
     let waitFor;
 
     if (file.hasOwnProperty('imgPath'))
@@ -246,7 +245,6 @@ class Library {
   }
 
   onImportedStep() {
-    console.log('on import step');
     this.progress.processed++;
     this.mainWindow.webContents.send('progress', this.progress);
     return true;

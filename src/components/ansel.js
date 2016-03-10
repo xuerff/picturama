@@ -85,7 +85,6 @@ class Ansel extends React.Component {
           importing={this.props.importing}
           className={containerClass} />
 
-        <DevTools visibleOnLoad={false} />
       </div>
     );
   }
