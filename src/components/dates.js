@@ -44,7 +44,7 @@ class Dates extends React.Component {
     return (
       <div className="dates">
         <h3>
-          <i className="fa fa-calendar"></i> Date Captured <i className="fa fa-angle-down"></i>
+          <i className="fa fa-calendar"></i> Date Captured
         </h3>
 
         <ul>{dateYearsList}</ul>

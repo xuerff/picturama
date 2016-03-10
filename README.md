@@ -1,7 +1,3 @@
-## Configuring development environment
-
-Install libvips-dev from the provided script in sharp.
-
-Install various development libraries:
+In order to be able to run, ansel requires the following libraries:
 
 ```sudo apt-get install libudev-dev libraw-dev```
