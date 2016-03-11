@@ -1,29 +1,47 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
 
-import TagActions from './../actions/tag-actions';
-import TagStore from './../stores/tag-store';
+//import TagStore from './../stores/tag-store';
 
-class AddTags extends React.Component {
+export default class AddTags extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    closeTagDialog: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    tags: React.PropTypes.array.isRequired,
+    id: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = { tags: [] };
+    let tags = [];
+
+    if (this.props.photo.tags.length > 0)
+      tags = this.props.photo.tags.map((tag) => tag.title);
+
+    this.state = { tags: tags };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.keyboardListener = this.keyboardListener.bind(this);
+  }
+
+  keyboardListener(e) {
+    e.preventDefault();
+
+    if (e.keyCode == 27) // escape
+      this.props.closeTagDialog();
   }
 
   componentDidMount() {
-    let state = this.state;
+    this.refs.tags.focus();
 
-    TagStore.listen(this.props.closeTagDialog);
+    document.addEventListener('keyup', this.keyboardListener);
+  }
 
-    if (this.props.photo.tags.length > 0)
-      this.state.tags = this.props.photo.tags.map((tag) => tag.title);
-
-    this.setState(state);
+  componentWillUnmount() {
+    document.removeEventListener('keyup', this.keyboardListener);
   }
 
   handleChange(tags) {
@@ -35,11 +53,13 @@ class AddTags extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     let tags = this.state.tags.map((tag) => tag.trim());
-    TagActions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
+
+    this.props.actions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
+    this.props.closeTagDialog();
   }
 
   render() {
-    var btnClass = `button button--raised button--colored`;
+    var btnClass = 'button button--raised button--colored';
 
     return (
       <div className="outer-modal">
@@ -50,6 +70,7 @@ class AddTags extends React.Component {
             <div className="textfield">
               <TagsInput
                 id="tags"
+                ref="tags"
                 value={this.state.tags}
                 onChange={this.handleChange} />
             </div>
@@ -62,5 +83,3 @@ class AddTags extends React.Component {
   }
 
 }
-
-export default AddTags;

@@ -1,13 +1,18 @@
 import {app, screen} from 'electron';
 import BrowserWindow from 'browser-window';
+import fs from 'fs';
 
 import MainMenu from './main-menu';
 import Library from './library';
 import Usb from './usb';
+import config from './config';
 
 require('crash-reporter').start();
 
 var mainWindow = null;
+
+if (!fs.existsSync(config.dotAnsel))
+  fs.mkdirSync(config.dotAnsel);
 
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin')
@@ -24,7 +29,8 @@ app.on('ready', () => {
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
 
-  let library = new Library(mainWindow, app.getAppPath());
+  //let library = new Library(mainWindow, app.getAppPath());
+  let library = new Library(mainWindow);
 
   new MainMenu(mainWindow, library);
 
@@ -44,6 +50,10 @@ app.on('ready', () => {
   });
 
   library.watch();
+
+  //ipcMain.on('openFolder', () => {
+  //  dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
+  //});
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

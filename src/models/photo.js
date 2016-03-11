@@ -21,7 +21,6 @@ var Photo = anselBookshelf.Model.extend({
 
   initialize: function() {
     this.on('creating', (model) => {
-      console.log('creating');
       model.set('id', shortid.generate());
     });
   }
@@ -29,10 +28,6 @@ var Photo = anselBookshelf.Model.extend({
 }, {
   getDates: function() {
     return this.query().distinct('date').orderBy('date', 'desc');
-  },
-
-  getByDate: function(date) {
-    return this.query().where({ date: date });
   }
 });
 

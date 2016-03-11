@@ -1,6 +1,10 @@
 import React from 'react';
 
-class TagButton extends React.Component {
+export default class TagButton extends React.Component {
+  static propTypes = {
+    tag: React.PropTypes.object.isRequired,
+    setTag: React.PropTypes.func.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -21,5 +25,3 @@ class TagButton extends React.Component {
   }
 
 }
-
-export default TagButton;

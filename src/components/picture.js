@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 
 var rotation = {};
@@ -5,31 +6,49 @@ rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
 class Picture extends React.Component {
+  static propTypes = {
+    setCurrent: React.PropTypes.func.isRequired,
+    setHighlight: React.PropTypes.func.isRequired,
+    highlighted: React.PropTypes.bool.isRequired,
+    photo: React.PropTypes.object.isRequired,
+    index: React.PropTypes.number.isRequired
+  }
 
   constructor(props) {
     super(props);
-    this.getImgClass = this.getImgClass.bind(this);
+  }
+
+  handleDblClick() {
+    this.props.setCurrent(this.props.index);
   }
 
   handleClick() {
-    console.log('this', this);
-    console.log('this props', this.props);
-    this.props.setCurrent(this.props.photo);
-  }
-
-  getImgClass() {
-    return [
-      rotation[this.props.photo.orientation],
-      'shadow--2dp'
-    ].join(' ');
+    this.props.setHighlight(this.props.index);
   }
 
   render() {
+    let photo = this.props.photo;
+
+    let anchorClass = classNames(
+      'picture',
+      'card',
+      { 'highlighted': this.props.highlighted }
+    );
+
+    let imgClass = classNames(
+      rotation[photo.orientation],
+      'shadow--2dp'
+    );
+
     return (
-      <a className="picture card " onClick={this.handleClick.bind(this)}>
+      <a
+        className={anchorClass}
+        onDoubleClick={this.handleDblClick.bind(this)}>
+        <span className="v-align"></span>
         <img
-          src={this.props.photo.thumb_250} 
-          className={this.getImgClass()} />
+          onClick={this.handleClick.bind(this)}
+          src={photo.thumb_250} 
+          className={imgClass} />
       </a>
     );
   }

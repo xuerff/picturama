@@ -2,7 +2,13 @@ import React from 'react';
 
 import DateMonth from './date-month';
 
-class DateYear extends React.Component {
+export default class DateYear extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    setDate: React.PropTypes.func.isRequired,
+    year: React.PropTypes.object.isRequired,
+    currentDate: React.PropTypes.string
+  }
 
   constructor(props) {
     super(props);
@@ -25,7 +31,6 @@ class DateYear extends React.Component {
   }
 
   getClasses() {
-    console.log('get class', this.state.showDropdown);
     return (this.state.showDropdown) ? '' : 'hide';
   }
 
@@ -34,14 +39,13 @@ class DateYear extends React.Component {
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this);
-    var currentDate = this.props.currentDate;
-
-    var dateMonthsList = this.props.year.months.map(function(month) {
+    let dateMonthsList = this.props.year.months.map((month) => {
       return (
         <DateMonth
-          setDate={handleDate}
-          currentDate={currentDate}
+          actions={this.props.actions}
+          setDate={this.handleDate.bind(this)}
+          currentDate={this.props.currentDate}
+          key={this.props.year.id+month.id}
           month={month} />
       );
     });
@@ -58,5 +62,3 @@ class DateYear extends React.Component {
   }
 
 }
-
-export default DateYear;

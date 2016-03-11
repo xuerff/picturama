@@ -7,6 +7,7 @@ node_modules/
 static/bundle.css
 dist/
 dot-ansel/
+build/
 
 npm-debug.log
 db.sqlite
@@ -19,5 +20,6 @@ udev.*
 *.swn
 *.swm
 
+*.tar.gz
 *.old
 *~

@@ -1,14 +1,19 @@
 import {spawn} from 'child_process';
 import {ipcRenderer} from 'electron';
 
+import classNames from 'classnames';
 import React from 'react';
+import Loader from 'react-loader';
 
-import VersionStore from './../stores/version-store';
-import VersionActions from './../actions/version-actions';
+//import VersionStore from './../stores/version-store';
+//import VersionActions from './../actions/version-actions';
+
+import createVersionAndOpenWith from './../create-version';
 
 import remote from 'remote';
 
 import AddTags from './add-tags';
+import Export from './export';
 import PictureInfo from './picture-info';
 
 var Menu = remote.require('menu');
@@ -18,49 +23,57 @@ var rotation = {};
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
-class PictureDetail extends React.Component {
+export default class PictureDetail extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    setCurrent: React.PropTypes.func.isRequired,
+    isLast: React.PropTypes.func.isRequired,
+    toggleFlag: React.PropTypes.func.isRequired,
+    photo: React.PropTypes.object.isRequired
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = { binded: false, modalIsOpen: false };
+    this.state = { binded: false, modal: 'none', loaded: false };
 
     this.keyboardListener = this.keyboardListener.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
-    this.closeTagDialog = this.closeTagDialog.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
+    this.finishLoading = this.finishLoading.bind(this);
   }
 
-  updateVersion(store) {
-    if (store.version) this.setState(store);
-  }
+  //updateVersion(store) {
+  //  console.log('state & store', this.state, store);
+  //}
 
   keyboardListener(e) {
+    e.preventDefault();
+
     if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
-    if (e.keyCode == 27 && !this.state.modalIsOpen) // escape
-      this.props.setCurrent(null);
+    if (e.keyCode == 27 && this.state.modal == 'none') // escape
+      this.props.setCurrent(-1);
 
-    else if (e.keyCode == 27 && this.state.modalIsOpen) // escape
-      this.closeTagDialog();
+    else if (e.keyCode == 27 && this.state.modal != 'none') // escape
+      this.closeDialog();
 
     else if (e.keyCode == 37) // Left
-      this.props.setLeft();
+      this.props.actions.setCurrentLeft();
 
-    else if (e.keyCode == 39) // Right
-      this.props.setRight();
+    else if (e.keyCode == 39 && !this.props.isLast()) // Right
+      this.props.actions.setCurrentRight();
 
     else if (e.keyCode == 80) // p
       this.props.toggleFlag();
 
-    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) { // y
-      this.props.showDiff();
-      this.unbindEventListeners();
-    }
+    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
+      this.props.actions.toggleDiff();
 
-    if (this.props.isLast() && !this.state.binded)
+    else if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();
   }
 
@@ -70,21 +83,36 @@ class PictureDetail extends React.Component {
   }
 
   openWithRawtherapee() {
-    VersionActions.createVersionAndOpenWith(
+    createVersionAndOpenWith(
       this.props.photo, 
       'RAW', 
       'rawtherapee'
     );
   }
 
+  openWithDarktable() {
+    createVersionAndOpenWith(
+      this.props.photo, 
+      'RAW', 
+      'darktable'
+    );
+  }
+
   openWithGimp() {
-    VersionActions.createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
+    createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
   }
 
   addRawtherapeeMenu() {
     this.menu.append(new MenuItem({ 
       label: 'Open with Rawtherapee', 
       click: this.openWithRawtherapee.bind(this)
+    }));
+  }
+
+  addDarktableMenu() {
+    this.menu.append(new MenuItem({ 
+      label: 'Open with Darktable', 
+      click: this.openWithDarktable.bind(this)
     }));
   }
 
@@ -96,21 +124,30 @@ class PictureDetail extends React.Component {
   }
 
   showTagDialog() {
+    this.unbindEventListeners();
+
     var state = this.state;
-    console.log('show tag dialog', state);
-    state.modalIsOpen = true;
+    state.modal = 'addTags';
     this.setState(state);
   }
 
-  closeTagDialog() {
+  closeDialog() {
+    this.bindEventListeners();
+
     var state = this.state;
-    state.modalIsOpen = false;
+    state.modal = 'none';
+    this.setState(state);
+  }
+
+  showExportDialog() {
+    this.unbindEventListeners();
+
+    var state = this.state;
+    state.modal = 'export';
     this.setState(state);
   }
 
   componentDidMount() {
-    VersionStore.listen(this.updateVersion.bind(this));
-
     this.menu = new Menu();
 
     this.menu.append(new MenuItem({ 
@@ -123,12 +160,20 @@ class PictureDetail extends React.Component {
     }));
 
     let rawtherapeeCmd = spawn('which', ['rawtherapee']);
+    let darktableCmd = spawn('which', ['darktable']);
     let gimpCmd = spawn('which', ['gimp']);
 
     rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
+    darktableCmd.stdout.on('data', this.addDarktableMenu.bind(this));
     gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
     this.bindEventListeners();
+  }
+
+  finishLoading() {
+    let state = this.state;
+    state.loaded = true;
+    this.setState(state);
   }
 
   componentWillReceiveProps() {
@@ -150,7 +195,10 @@ class PictureDetail extends React.Component {
     document.addEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', true);
+    ipcRenderer.send('toggleExportMenu', true);
+
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
+    ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
   }
 
   unbindEventListeners() {
@@ -162,37 +210,49 @@ class PictureDetail extends React.Component {
     document.removeEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', false);
+    ipcRenderer.send('toggleExportMenu', false);
+
+    ipcRenderer.removeAllListeners('addTagClicked');
+    ipcRenderer.removeAllListeners('exportClicked');
   }
 
   render() {
-    var className = [
+    let imgClass = classNames(
       'shadow--2dp',
       rotation[this.props.photo.orientation] 
-    ].join(' ');
+    );
 
     var showModal;
 
-    if (this.state.modalIsOpen)
+    if (this.state.modal == 'addTags')
       showModal = (
         <AddTags 
           photo={this.props.photo} 
-          closeTagDialog={this.closeTagDialog} />
+          actions={this.props.actions}
+          closeTagDialog={this.closeDialog} />
+      );
+
+    else if (this.state.modal == 'export')
+      showModal = (
+        <Export
+          photo={this.props.photo} 
+          closeExportDialog={this.closeDialog} />
       );
 
     return (
-      <div className="picture-detail">
+      <div className="picture-detail" ref="pictureDetail">
         <div className="v-align">
           <img
             src={this.props.photo.thumb} 
-            className={className} />
+            onLoad={this.finishLoading}
+            className={imgClass} />
         </div>
 
         <PictureInfo photo={this.props.photo} />
+        <Loader loaded={this.state.loaded} />
 
         {showModal}
       </div>
     );
   }
 }
-
-export default PictureDetail;

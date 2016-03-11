@@ -4,6 +4,12 @@
       "label": "File",
       "submenu": [
         {
+          "label": "Export picture(s)",
+          "accelerator": "Ctrl+Shift+E",
+          "enabled": false,
+          "click": "export"
+        },
+        {
           "label": "Scan",
           "accelerator": "Ctrl+R",
           "click": "scan"
@@ -21,7 +27,7 @@
         {
           "label": "Reload",
           "accelerator": "Shift+Ctrl+R",
-          "click": "fullscreen"
+          "click": "reload"
         },
         {
           "label": "Enter Fullscreen",
@@ -42,6 +48,14 @@
         "accelerator": "Ctrl+T",
         "enabled": false,
         "click": "addTags"
+      }]
+    },
+    {
+      "label": "Developer",
+      "submenu": [{
+        "label": "Toggle DevTools",
+        "accelerator": "Shift+Ctrl+I",
+        "click": "toggleDevTools"
       }]
     }
   ]

@@ -1,6 +1,11 @@
 import React from 'react';
 
-class DateElement extends React.Component {
+export default class DateElement extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    currentDate: React.PropTypes.string,
+    date: React.PropTypes.string.isRequired
+  }
 
   constructor(props) {
     super(props);
@@ -9,7 +14,7 @@ class DateElement extends React.Component {
   }
 
   handleClick() {
-    this.props.setDate(this.props.date);
+    this.props.actions.setDateFilter(this.props.date);
   }
 
   isActive(date) {
@@ -26,5 +31,3 @@ class DateElement extends React.Component {
     );
   }
 }
-
-export default DateElement;

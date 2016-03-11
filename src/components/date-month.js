@@ -2,7 +2,13 @@ import React from 'react';
 
 import DateElement from './date-element';
 
-class DateMonth extends React.Component {
+export default class DateMonth extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired,
+    setDate: React.PropTypes.func.isRequired,
+    month: React.PropTypes.object.isRequired,
+    currentDate: React.PropTypes.string
+  }
 
   constructor(props) {
     super(props);
@@ -29,19 +35,17 @@ class DateMonth extends React.Component {
   }
 
   getBtnClasses() {
-    console.log('show dropdown', this.state.showDropdown);
     return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this);
-    var currentDate = this.props.currentDate;
-
-    var dateElementsList = this.props.month.days.map(function(date) {
+    var dateElementsList = this.props.month.days.map((date) => {
       return (
         <DateElement
-          setDate={handleDate}
-          currentDate={currentDate}
+          actions={this.props.actions}
+          setDate={this.handleDate.bind(this)}
+          currentDate={this.props.currentDate}
+          key={date.id}
           date={date.id} />
       );
     });
@@ -58,5 +62,3 @@ class DateMonth extends React.Component {
   }
 
 }
-
-export default DateMonth;

@@ -1,139 +1,108 @@
 import React from 'react';
-
-import PhotoStore from './../stores/photo-store';
-import PhotoActions from './../actions/photo-actions';
+import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
 
 class Library extends React.Component {
+  static propTypes = {
+    setScrollTop: React.PropTypes.func.isRequired,
+    actions: React.PropTypes.object.isRequired,
+    current: React.PropTypes.number,
+    diff: React.PropTypes.bool.isRequired,
+    photos: React.PropTypes.array.isRequired
+  }
 
   constructor(props) {
     super(props);
-    this.state = { photos: [], current: null, scrollTop: 0, diff: false };
-
-    this.updateCurrent = this.updateCurrent.bind(this);
+    this.state = { highlighted: [], scrollTop: 0 };
   }
 
-  handleCurrent(photo) {
+  handleCurrent(current) {
     let state = this.state;
 
-    state.diff = false;
-    state.current = photo;
+    this.props.actions.setCurrent(current);
 
-    if (state.current)
-      state.scrollTop = React.findDOMNode(this).parentNode.scrollTop;
-    else
-      this.props.setScrollTop(state.scrollTop);
+    if (state.current != -1)
+      state.scrollTop = ReactDOM
+        .findDOMNode(this)
+        .parentNode
+        .scrollTop;
 
     this.setState(state);
   }
 
-  handleLeftCurrent() {
-    var state = this.state;
+  componentDidUpdate() {
+    let state = this.state;
 
-    state.diff = false;
-
-    if (state.photos.indexOf(state.current) >= 1) {
-      state.current = state.photos[state.photos.indexOf(state.current) - 1];
-      this.setState(state);
-    }
-  }
-
-  handleRightCurrent() {
-    var state = this.state;
-
-    state.diff = false;
-
-    if (state.photos.length > state.photos.indexOf(state.current) + 1) {
-      state.current = state.photos[state.photos.indexOf(state.current) + 1];
+    if (state.current == -1 && state.scrollTop > 0) {
+      this.props.setScrollTop(state.scrollTop);
+      state.scrollTop = 0;
       this.setState(state);
     }
   }
 
   componentDidMount() {
-    PhotoStore.listen(this.updatePhotos.bind(this));
-    PhotoActions.getPhotos();
-  }
-
-  updateCurrent() {
-    var state = this.state;
-    var current = this.state.current;
-
-    this.state.diff = false;
-    this.state.current = null;
-
-    state.photos.forEach(function(photo) {
-      if (photo.id == current.id)
-        state.current = photo;
-    });
-
-    this.setState(state);
-  }
-
-  updatePhotos(store) {
-    if (store.photos) {
-      this.setState({ photos: store.photos });
-
-      if (this.state.current) this.updateCurrent();
-    }
+    this.props.actions.getPhotos();
   }
 
   isLast() {
-    let state = this.state;
+    let photos = this.props.photos;
 
-    if (state.photos.length == state.photos.indexOf(state.current) + 1)
+    if (photos.length == photos.indexOf(this.state.current) + 1)
       return true;
-    else if (state.photos.indexOf(state.current) == 0)
+    else if (photos.indexOf(this.state.current) == 0)
       return true;
     else
       return false;
   }
 
   handleFlag() {
-    console.log('handle flag');
-    PhotoActions.toggleFlag(this.state.current);
+    this.props.actions.toggleFlag(this.props.photos[this.state.current]);
   }
 
-  handleDiff() {
+  handleHighlight(index) {
     let state = this.state;
-    state.diff = !this.state.diff;
+
+    state.highlighted = [];
+    state.highlighted.push(index);
+
     this.setState(state);
   }
 
   render() {
-    let currentView
-      , handleCurrent = this.handleCurrent.bind(this)
-      , handleLeftCurrent = this.handleLeftCurrent.bind(this)
-      , handleRightCurrent = this.handleRightCurrent.bind(this)
-      , isLast = this.isLast.bind(this)
-      , handleFlag = this.handleFlag.bind(this)
-      , handleDiff = this.handleDiff.bind(this);
+    let currentView;
 
-    if (!this.state.current)
-      currentView = this.state.photos.map(function(photo) {
+    if (!this.props.photos || this.props.photos.length === 0)
+      currentView = <div>Nothing!</div>;
+
+    else if (this.props.current == -1)
+      currentView = this.props.photos.map((photo, index) => {
         return (
           <Picture
+            key={index}
+            index={index}
             photo={photo}
-            setCurrent={handleCurrent} />
+            setHighlight={this.handleHighlight.bind(this)}
+            highlighted={this.state.highlighted.indexOf(index) != -1}
+            setCurrent={this.handleCurrent.bind(this)} />
         );
       });
 
-    else if (this.state.diff)
+    else if (this.props.diff)
       currentView = <PictureDiff
-                      toggleDiff={handleDiff}
-                      photo={this.state.current} />;
+                      actions={this.props.actions}
+                      photo={this.props.photos[this.props.current]} />;
 
     else
       currentView = <PictureDetail
-                      photo={this.state.current}
-                      toggleFlag={handleFlag}
-                      setCurrent={handleCurrent}
-                      showDiff={handleDiff}
-                      isLast={isLast}
-                      setLeft={handleLeftCurrent}
-                      setRight={handleRightCurrent} />;
+                      photo={this.props.photos[this.props.current]}
+                      actions={this.props.actions}
+                      toggleFlag={this.handleFlag.bind(this)}
+                      setCurrent={this.handleCurrent.bind(this)}
+                      isLast={this.isLast.bind(this)} />;
 
     return (
       <div id="library">
@@ -143,4 +112,10 @@ class Library extends React.Component {
   }
 }
 
-export default Library;
+const ReduxLibrary = connect(state => ({
+  photos: state.photos,
+  current: state.current,
+  diff: state.diff
+}))(Library);
+
+export default ReduxLibrary;

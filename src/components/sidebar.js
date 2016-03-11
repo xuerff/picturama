@@ -1,118 +1,53 @@
+import fs from 'fs';
 import React from 'react';
 
-import PhotoStore from './../stores/photo-store';
-import TagStore from './../stores/tag-store';
-import DeviceStore from './../stores/device-store';
+import Tags from './tags';
+import Dates from './dates';
+import Devices from './devices';
 
-import PhotoActions from './../actions/photo-actions';
-import TagActions from './../actions/tag-actions';
+import config from './../config';
 
-import DateYear from './date-year';
-import TagButton from './tag-button';
+var settings;
+
+if (fs.existsSync(config.settings))
+  settings = require(config.settings);
 
 class Sidebar extends React.Component {
+  static propTypes = {
+    actions: React.PropTypes.object.isRequired
+  }
 
   constructor(props) {
     super(props);
-
-    this.state = { 
-      dates: { years: [] }, 
-      devices: [],
-      currentDate: null, 
-      currentTag: null,
-      tags: [] 
-    };
-  }
-
-  componentDidMount() {
-    PhotoActions.getDates();
-    TagActions.getTags();
-    PhotoStore.listen(this.appendDates.bind(this));
-    TagStore.listen(this.appendTags.bind(this));
-    DeviceStore.listen(this.appendDevices.bind(this));
-  }
-
-  appendDevices(data) {
-    console.log('append devices', data);
-    let state = this.state;
-    state.devices = data.devices;
-    this.setState(state);
-  }
-
-  appendDates(data) {
-    let state = this.state;
-    state.dates = data.dates;
-    this.setState(state);
-  }
-
-  appendTags(data) {
-    console.log('append tags', data);
-    let state = this.state;
-    state.tags = data.tags;
-    this.setState(state);
-  }
-
-  clearFilters() {
-    let state = this.state;
-
-    this.state.currentDate = null;
-    this.setState(state);
-
-    PhotoActions.getPhotos();
-  }
-
-  handleDate(date) {
-    console.log(date);
-    let state = this.state;
-
-    state.currentDate = date;
-    PhotoActions.setDateFilter(date);
-    this.setState(state);
-  }
-
-  handleTag(tag) {
-    let state = this.state;
-    state.currentTag = tag;
-
-    PhotoActions.setTagFilter(tag);
-    this.setState(state);
-  }
-
-  filterFlagged() {
-    console.log('filter flagged');
-    PhotoActions.getFlagged();
-  }
-
-  isActive(date) {
-    return (date.date == this.state.currentDate) ? 'active' : '';
   }
 
   render() {
-    var handleDate = this.handleDate.bind(this)
-      , currentDate = this.state.currentDate;
+    var menus = [
+      <Dates 
+        key="0"
+        actions={this.props.actions} />,
+      <Tags key="1" actions={this.props.actions} />,
+      <Devices key="2" />
+    ];
 
-    var dateYearsList = this.state.dates.years.map(function(year) {
-      return (
-        <DateYear
-          year={year}
-          currentDate={currentDate}
-          setDate={handleDate} />
-      );
-    });
+    if (settings && settings.hasOwnProperty('menus')) {
+      menus = [];
 
-    var tagsList = this.state.tags.map((tag) => {
-      return (
-        <TagButton 
-          setTag={this.handleTag.bind(this)} 
-          tag={tag} />
-      );
-    });
+      settings.menus.forEach((menu, key) => {
+        if (menu == 'dates')
+          menus.push(
+            <Dates 
+              key={key} 
+              actions={this.props.actions} />
+          );
 
-    var devicesList = this.state.devices.map((device) => {
-      return (
-        <li>{device.name}</li>
-      );
-    });
+        else if (menu == 'tags')
+          menus.push(<Tags key={key} actions={this.props.actions} />);
+
+        else if (menu == 'devices')
+          menus.push(<Devices key={key} />);
+      });
+    }
 
     return (
       <div id="sidebar">
@@ -120,34 +55,24 @@ class Sidebar extends React.Component {
 
         <div className="sidebar-content">
           <button 
-            onClick={this.clearFilters.bind(this)} 
+            onClick={this.props.actions.getPhotos}
             className="button">
             <i className="fa fa-book"></i> All content
           </button>
 
           <button
-            onClick={this.filterFlagged.bind(this)}
+            onClick={this.props.actions.getFlagged}
             className="button flagged">
             <i className="fa fa-flag"></i> Flagged
           </button>
 
-          <div className="dates">
-            <h3>
-              <i className="fa fa-calendar"></i> Date Captured <i class="fa fa-angle-down"></i>
-            </h3>
+          <button
+            onClick={this.props.actions.getProcessed}
+            className="button">
+            <i className="fa fa-pencil-square-o"></i> Processed
+          </button>
 
-            <ul>{dateYearsList}</ul>
-          </div>
-
-          <div className="tags">
-            <h3><i className="fa fa-tags"></i> Tags</h3>
-            <ul>{tagsList}</ul>
-          </div>
-
-          <div className="devices">
-            <h3><i className="fa fa-usb"></i> Devices</h3>
-            <ul>{devicesList}</ul>
-          </div>
+          {menus}
         </div>
       </div>
     );
