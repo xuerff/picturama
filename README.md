@@ -1,6 +1,6 @@
 # Ansel
 
-![](ansel.png)
+![](ansel.jpg)
 
 In order to be able to run, ansel requires the following libraries:
 
