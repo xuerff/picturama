@@ -54,10 +54,6 @@ gulp.task('clear-build', () => {
   return del([ 'build/**/*' ]);
 });
 
-gulp.task('migrate', [ 'clear-db' ], () => {
-  return knex.migrate.latest();
-});
-
 gulp.task('set-env', () => {
   env({
     vars: {
