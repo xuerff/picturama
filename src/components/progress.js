@@ -1,13 +1,7 @@
-//import fs from 'fs';
 import React from 'react';
 import { connect } from 'react-redux';
 
 import config from './../config';
-
-//var settings = {};
-
-//if (fs.existsSync(config.settings))
-//  settings = require(config.settings);
 
 class Progress extends React.Component {
   static propTypes = {
@@ -24,9 +18,6 @@ class Progress extends React.Component {
       progress: { processed: 0, total: 0 }, 
       timer: new Date().getTime()
     };
-
-    //if (fs.existsSync(config.settings))
-    //  this.state.settings = require(config.settings);
   }
 
   getProgress() {

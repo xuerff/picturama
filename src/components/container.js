@@ -1,11 +1,8 @@
-//import fs from 'fs';
 import React from 'react';
 
 import Library from './library';
 import Settings from './settings';
 import Progress from './progress';
-
-//import config from './../config';
 
 export default class Container extends React.Component {
   static propTypes = {

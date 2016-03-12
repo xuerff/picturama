@@ -73,6 +73,8 @@ class Settings extends React.Component {
           <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
             Photos directory {this.state.directories.photos}
           </button>
+
+          <p>Photo folder to digest</p>
         </div>
 
         <div>
@@ -81,6 +83,8 @@ class Settings extends React.Component {
           <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
             Versions directory {this.state.directories.versions}
           </button>
+
+          <p>Version folder where you put all your externally processed photos</p>
         </div>
 
         <button onClick={this.save.bind(this)}>Save</button>
