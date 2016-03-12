@@ -1,11 +1,19 @@
-import {app, screen} from 'electron';
+import {app, screen, ipcMain} from 'electron';
 import BrowserWindow from 'browser-window';
 import fs from 'fs';
 
 import MainMenu from './main-menu';
-import Library from './library';
 import Usb from './usb';
 import config from './config';
+
+const initLibrary = (mainWindow) => {
+  console.log('init lib');
+  const Library = require('./library').default;
+  let library = new Library(mainWindow);
+
+  new MainMenu(mainWindow, library);
+  library.watch();
+};
 
 require('crash-reporter').start();
 
@@ -29,10 +37,22 @@ app.on('ready', () => {
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
 
-  //let library = new Library(mainWindow, app.getAppPath());
-  let library = new Library(mainWindow);
+  if (fs.existsSync(config.settings))
+    initLibrary(mainWindow);
+  else {
+    var knex = require('knex')({
+      client: 'sqlite3',
+      connection: {
+        filename: config.dbFile
+      }
+    });
 
-  new MainMenu(mainWindow, library);
+    if (!fs.existsSync(config.dbFile))
+      knex.migrate.latest().finally(() => {
+        console.log('migration complete');
+        return knex.destroy(); //works
+      });
+  }
 
   let usb = new Usb();
 
@@ -49,11 +69,11 @@ app.on('ready', () => {
       mainWindow.webContents.send('remove-device', drive);
   });
 
-  library.watch();
-
   //ipcMain.on('openFolder', () => {
   //  dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
   //});
+
+  ipcMain.on('settings-created', () => initLibrary(mainWindow));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

@@ -109,6 +109,7 @@ class Library {
   }
 
   walk(file) {
+    console.log('begin walking');
     if (file.isRaw)
       return this.importRaw(file);
     else
@@ -256,6 +257,7 @@ class Library {
   }
 
   scan() {
+    console.log('start scan', this.path, this.versionsPath);
     var start = new Date().getTime();
     this.mainWindow.webContents.send('start-import', true);
 
