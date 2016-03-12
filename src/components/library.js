@@ -76,7 +76,7 @@ class Library extends React.Component {
     let currentView;
 
     if (!this.props.photos || this.props.photos.length === 0)
-      currentView = <div>Nothing!</div>;
+      currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;
 
     else if (this.props.current == -1)
       currentView = this.props.photos.map((photo, index) => {

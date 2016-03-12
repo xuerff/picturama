@@ -1,4 +1,4 @@
-import fs from 'fs';
+//import fs from 'fs';
 
 import config from './../config';
 
@@ -9,7 +9,7 @@ var knex = require('knex')({
   }
 });
 
-if (!fs.existsSync(config.dbFile))
-  knex.migrate.latest();
+//if (!fs.existsSync(config.dbFile))
+//  knex.migrate.latest();
 
 export default require('bookshelf')(knex);

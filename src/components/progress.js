@@ -1,16 +1,11 @@
-import fs from 'fs';
 import React from 'react';
 import { connect } from 'react-redux';
 
 import config from './../config';
 
-var settings = {};
-
-if (fs.existsSync(config.settings))
-  settings = require(config.settings);
-
 class Progress extends React.Component {
   static propTypes = {
+    settingsExists: React.PropTypes.bool.isRequired,
     progress: React.PropTypes.object.isRequired
   }
 
@@ -20,7 +15,8 @@ class Progress extends React.Component {
     this.getProgress = this.getProgress.bind(this);
 
     this.state = {
-      progress: { processed: 0, total: 0 }, timer: new Date().getTime()
+      progress: { processed: 0, total: 0 }, 
+      timer: new Date().getTime()
     };
   }
 
@@ -32,8 +28,8 @@ class Progress extends React.Component {
   render() {
     let photosDir = '';
 
-    if (settings)
-      photosDir = settings.directories.photos;
+    if (this.props.settingsExists)
+      photosDir = require(config.settings).directories.photos;
 
     return (
       <div id="progress">
@@ -53,7 +49,8 @@ class Progress extends React.Component {
 }
 
 const ReduxProgress = connect(state => ({
-  progress: state.progress
+  progress: state.progress,
+  settingsExists: state.settingsExists
 }))(Progress);
 
 export default ReduxProgress;

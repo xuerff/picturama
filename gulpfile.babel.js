@@ -11,11 +11,7 @@ import env from 'gulp-env';
 import packager from 'electron-packager';
 
 import config from './src/config';
-import knexFile from './knexfile';
-
 import npmPkgs from './package.json';
-
-let knex = require('knex')(knexFile.development);
 
 gulp.task("babel", ['lint'], () => {
   return gulp.src("src/**/*.js")
@@ -53,10 +49,6 @@ gulp.task('clear-db', () => {
 
 gulp.task('clear-build', () => {
   return del([ 'build/**/*' ]);
-});
-
-gulp.task('migrate', [ 'clear-db' ], () => {
-  return knex.migrate.latest();
 });
 
 gulp.task('set-env', () => {
@@ -106,7 +98,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
     dir: './build/prepared',
-    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample|tests)/i,
+    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|tests)/i,
     platform: 'linux',
     asar: false,
     out: './build',

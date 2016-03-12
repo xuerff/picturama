@@ -1,3 +1,7 @@
+import fs from 'fs';
+
+import config from './../config';
+
 import processDates from './../lib/process-dates';
 import updatePhotos from './../lib/update-photos';
 
@@ -36,6 +40,7 @@ const initialState = {
   currentDate: null,
   current: -1,
   diff: false,
+  settingsExists: false,
   photos: [],
   tags: [],
   devices: [],
@@ -150,6 +155,13 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       diff: !state.diff
+    };
+
+  case 'SETTINGS_EXISTS_SUCCESS':
+    console.log('reducer', fs.existsSync(config.settings));
+    return {
+      ...state,
+      settingsExists: fs.existsSync(config.settings)
     };
 
   default:

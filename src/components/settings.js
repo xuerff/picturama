@@ -1,4 +1,4 @@
-import {remote} from 'electron';
+import {remote, ipcRenderer} from 'electron';
 import fs from 'fs';
 import React from 'react';
 
@@ -8,6 +8,7 @@ const dialog = remote.dialog;
 
 class Settings extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setSavedFile: React.PropTypes.func.isRequired
   }
 
@@ -51,15 +52,14 @@ class Settings extends React.Component {
 
   save() {
     let settings = JSON.stringify(this.state, null, 2);
-    //fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
-    fs.writeFile(config.settings, settings, this.props.setSavedFile);
+    fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
   }
 
   onSavedFile(err) {
-    if (!err)
-      console.log('file saved');
-    else
-      console.log('err', err);
+    if (!err) {
+      ipcRenderer.send('settings-created', true);
+      this.props.actions.areSettingsExisting();
+    }
   }
 
   render() {
@@ -73,6 +73,8 @@ class Settings extends React.Component {
           <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
             Photos directory {this.state.directories.photos}
           </button>
+
+          <p>Photo folder to digest</p>
         </div>
 
         <div>
@@ -81,6 +83,8 @@ class Settings extends React.Component {
           <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
             Versions directory {this.state.directories.versions}
           </button>
+
+          <p>Version folder where you put all your externally processed photos</p>
         </div>
 
         <button onClick={this.save.bind(this)}>Save</button>

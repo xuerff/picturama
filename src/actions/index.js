@@ -191,3 +191,9 @@ export const toggleDiff = () => {
     dispatch({ type: 'TOGGLE_DIFF_SUCCESS' });
   };
 };
+
+export const areSettingsExisting = () => {
+  return (dispatch) => {
+    dispatch({ type: 'SETTINGS_EXISTS_SUCCESS' });
+  };
+};
