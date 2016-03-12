@@ -85,7 +85,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
     dir: './build/prepared',
-    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|sample|tests)/i,
+    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|tests)/i,
     platform: 'linux',
     asar: false,
     out: './build',
