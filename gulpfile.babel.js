@@ -77,18 +77,9 @@ gulp.task('set-env', () => {
 gulp.task('test', ['babel-tests'], () => {
   return childProcess.spawn(
     electron, 
-    ['tests-dist/run-tests.js', '--test'], 
+    ['tests-dist/run-tests.js'], 
     { stdio: 'inherit' }
   ); 
-  //return gulp.src('tests-dist/**/*.spec.js', { read: false })
-  //  .pipe(mocha({
-  //    compilers: {
-  //      js: babel
-  //    }
-  //  }))
-  //  .once('end', () => {
-  //    process.exit();
-  //  });
 });
 
 gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 

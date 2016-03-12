@@ -1,6 +1,5 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-//import sinon from 'sinon';
 import {expect} from 'chai';
 
 import PictureInfo from './../../dist/components/picture-info';
@@ -15,6 +14,7 @@ describe('<PictureInfo />', () => {
   it('renders an `.picture-info`', () => {
     let photo = { iso: 400, aperture: 2.8 };
     const wrapper = shallow(<PictureInfo photo={photo} />);
+
     expect(wrapper.find('.picture-info')).to.have.length(1);
   });
 
