@@ -4,6 +4,7 @@ import less from 'gulp-less';
 import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
+import electronMocha from 'gulp-electron-mocha';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -75,11 +76,16 @@ gulp.task('set-env', () => {
 });
 
 gulp.task('test', ['babel-tests'], () => {
-  return childProcess.spawn(
-    electron, 
-    ['tests-dist/run-tests.js'], 
-    { stdio: 'inherit' }
-  ); 
+  //return childProcess.spawn(
+  //  electron, 
+  //  ['tests-dist/run-tests.js'], 
+  //  { stdio: 'inherit' }
+  //); 
+  return gulp.src('tests-dist/**/*.spec.js', { read: false })
+    .pipe(electronMocha({ 
+      electronPath: electron, 
+      electronMocha: { renderer: true }
+    }));
 });
 
 gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 
