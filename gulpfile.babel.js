@@ -10,11 +10,7 @@ import env from 'gulp-env';
 import packager from 'electron-packager';
 
 import config from './src/config';
-import knexFile from './knexfile';
-
 import npmPkgs from './package.json';
-
-let knex = require('knex')(knexFile.development);
 
 gulp.task("babel", ['lint'], () => {
   return gulp.src("src/**/*.js")
