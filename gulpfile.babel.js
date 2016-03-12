@@ -76,11 +76,6 @@ gulp.task('set-env', () => {
 });
 
 gulp.task('test', ['babel-tests'], () => {
-  //return childProcess.spawn(
-  //  electron, 
-  //  ['tests-dist/run-tests.js'], 
-  //  { stdio: 'inherit' }
-  //); 
   return gulp.src('tests-dist/**/*.spec.js', { read: false })
     .pipe(electronMocha({ 
       electronPath: electron, 

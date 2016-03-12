@@ -18,5 +18,14 @@ describe('<Settings />', () => {
     expect(wrapper.find('.picture-info')).to.have.length(1);
   });
 
+  //it('should display the tags', () => {
+  //  let photo = { tags: [
+  //    { title: 'my' },
+  //    { title: 'fantastic' },
+  //    { title: 'tags' },
+  //  ] };
+
+  //  const wrapper = shallow(<Settings />);
+  //});
 });
 

@@ -38,7 +38,7 @@ class PictureInfo extends React.Component {
           <li>v#: {this.props.photo.versionNumber}</li>
           <li>Orientation: {this.props.photo.orientation}</li>
           <li>Flag: {this.props.photo.flag}</li>
-          <li>Tags: {this.displayTags()}</li>
+          <li className="tags">Tags: {this.displayTags()}</li>
         </ul>
       </div>
     );
