@@ -10,8 +10,8 @@ In order to be able to run, ansel requires the following libraries:
 
 ## Build from sources
 
-`
+```
 sudo npm install -g gulp
 npm install
 gulp
-`
+```
