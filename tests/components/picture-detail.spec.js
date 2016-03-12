@@ -6,7 +6,7 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import {expect} from 'chai';
 
-import PictureDetail from './../../src/components/picture-detail';
+import PictureDetail from './../../tests/components/picture-detail';
 
 describe('PictureDetail Component', () => {
   jsdom({ skipWindowCheck: true });

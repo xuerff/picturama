@@ -19,6 +19,13 @@ gulp.task("babel", ['lint'], () => {
     .pipe(gulp.dest("dist"));
 });
 
+//gulp.task("babel-tests", ['lint-tests'], () => {
+gulp.task("babel-tests", () => {
+  return gulp.src("tests/**/*.js")
+    .pipe(babel())
+    .pipe(gulp.dest("tests-dist"));
+});
+
 gulp.task('styles', ['lint'], () => {
   return gulp.src('src/source.less')
     .pipe(less())
@@ -31,6 +38,14 @@ gulp.task('lint', () => {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
+
+gulp.task('lint-tests', () => {
+  return gulp.src('./tests/**/*.js')
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
 
 gulp.task('run', [ 'babel', 'styles' ],
   () => {
@@ -59,16 +74,21 @@ gulp.task('set-env', () => {
   })
 });
 
-gulp.task('test', () => {
-  return gulp.src('tests/**/*.spec.js', { read: false })
-    .pipe(mocha({
-      compilers: {
-        js: babel
-      }
-    }))
-    .once('end', () => {
-      process.exit();
-    });
+gulp.task('test', ['babel-tests'], () => {
+  return childProcess.spawn(
+    electron, 
+    ['tests-dist/run-tests.js', '--test'], 
+    { stdio: 'inherit' }
+  ); 
+  //return gulp.src('tests-dist/**/*.spec.js', { read: false })
+  //  .pipe(mocha({
+  //    compilers: {
+  //      js: babel
+  //    }
+  //  }))
+  //  .once('end', () => {
+  //    process.exit();
+  //  });
 });
 
 gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 

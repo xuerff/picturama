@@ -6,7 +6,7 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import {expect} from 'chai';
 
-import Picture from './../../src/components/picture';
+import Picture from './../../dist/components/picture';
 
 describe('Picture Component', () => {
   jsdom({ skipWindowCheck: true });

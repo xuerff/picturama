@@ -6,8 +6,8 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import {expect} from 'chai';
 
-import PictureDetail from './../../src/components/picture-detail';
-import AddTag from './../../src/components/add-tag';
+import PictureDetail from './../../dist/components/picture-detail';
+import AddTag from './../../dist/components/add-tag';
 
 describe('AddTag Component', () => {
   jsdom({ skipWindowCheck: true });
