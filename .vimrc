@@ -1,4 +1,4 @@
-let g:ctrlp_custom_ignore = 'dist'
+let g:ctrlp_custom_ignore = ['dist', 'tests-dist']
 let g:jsx_ext_required = 0
 
 " Babel es6 support
