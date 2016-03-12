@@ -16,7 +16,7 @@ describe('<PictureInfo />', () => {
     let photo = { name: 'test', iso: '400', aperture: 2, tags: [
       { title: 'my' },
       { title: 'fantastic' },
-      { title: 'tags' },
+      { title: 'tags' }
     ] };
 
     const wrapper = render(<PictureInfo photo={photo} />);
