@@ -1,4 +1,4 @@
-import {remote} from 'electron';
+import {remote, ipcRenderer} from 'electron';
 import fs from 'fs';
 import React from 'react';
 
@@ -8,6 +8,7 @@ const dialog = remote.dialog;
 
 class Settings extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setSavedFile: React.PropTypes.func.isRequired
   }
 
@@ -51,15 +52,14 @@ class Settings extends React.Component {
 
   save() {
     let settings = JSON.stringify(this.state, null, 2);
-    //fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
-    fs.writeFile(config.settings, settings, this.props.setSavedFile);
+    fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
   }
 
   onSavedFile(err) {
-    if (!err)
-      console.log('file saved');
-    else
-      console.log('err', err);
+    if (!err) {
+      ipcRenderer.send('settings-created', true);
+      this.props.actions.areSettingsExisting();
+    }
   }
 
   render() {

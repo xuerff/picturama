@@ -12,6 +12,7 @@ import Container from './container';
 class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
+    settingsExists: React.PropTypes.bool.isRequired,
     importing: React.PropTypes.bool.isRequired
   }
 
@@ -65,10 +66,10 @@ class Ansel extends React.Component {
     let sidebar = null;
 
     let containerClass = classNames({ 
-      'no-sidebar': !this.state.showSidebar
+      'no-sidebar': !this.state.showSidebar || !this.props.settingsExists
     });
 
-    if (this.state.showSidebar)
+    if (this.state.showSidebar && this.props.settingsExists)
       sidebar = (
         <Sidebar
           actions={this.state.actions}
@@ -80,6 +81,7 @@ class Ansel extends React.Component {
         {sidebar}
 
         <Container
+          settingsExists={this.props.settingsExists}
           actions={this.state.actions}
           importing={this.props.importing}
           className={containerClass} />
@@ -90,7 +92,8 @@ class Ansel extends React.Component {
 }
 
 const ReduxAnsel = connect(state => ({
-  importing: state.importing
+  importing: state.importing,
+  settingsExists: state.settingsExists
 }))(Ansel);
 
 export default ReduxAnsel;

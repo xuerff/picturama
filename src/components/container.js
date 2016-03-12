@@ -1,35 +1,28 @@
-import fs from 'fs';
+//import fs from 'fs';
 import React from 'react';
 
 import Library from './library';
 import Settings from './settings';
 import Progress from './progress';
 
-import config from './../config';
+//import config from './../config';
 
 export default class Container extends React.Component {
   static propTypes = {
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
+    settingsExists: React.PropTypes.bool.isRequired,
     importing: React.PropTypes.bool.isRequired
   }
 
   constructor(props) {
     super(props);
 
-    this.areSettingsExisting = this.areSettingsExisting.bind(this);
-
-    this.state = { settingsExists: false, scrollTop: 0, isImporting: false };
+    this.state = { scrollTop: 0, isImporting: false };
   }
 
   handleScrollTop(scrollTop) {
     this.refs.container.scrollTop = scrollTop;
-  }
-
-  areSettingsExisting() {
-    let state = this.state;
-    state.settingsExists = fs.existsSync(config.settings);
-    this.setState(state);
   }
 
   handleImport(store) {
@@ -39,13 +32,15 @@ export default class Container extends React.Component {
   }
 
   componentDidMount() {
-    this.areSettingsExisting();
+    this.props.actions.areSettingsExisting();
   }
 
   render() {
-    let content = <Settings setSavedFile={this.areSettingsExisting}/>;
+    console.log('settings exists', this.props.settingsExists);
 
-    if (this.state.settingsExists)
+    let content = <Settings actions={this.props.actions} />;
+
+    if (this.props.settingsExists)
       content = (
         <Library 
           actions={this.props.actions}

@@ -158,6 +158,7 @@ export default function reducers(state = initialState, action) {
     };
 
   case 'SETTINGS_EXISTS_SUCCESS':
+    console.log('reducer', fs.existsSync(config.settings));
     return {
       ...state,
       settingsExists: fs.existsSync(config.settings)
