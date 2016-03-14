@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 
 import store from './../../dist/store';
-import Tags from './../../dist/components/tags';
+import { Tags } from './../../dist/components/tags';
 import TagButton from './../../dist/components/tag-button';
 
 describe('<Tags />', () => {
@@ -16,9 +16,7 @@ describe('<Tags />', () => {
     ];
 
     const wrapper = shallow(
-      <Provider store={store}>
-        <Tags tags={tags} />
-      </Provider>
+      <Tags tags={tags} />
     );
 
     expect(wrapper.find(TagButton)).to.have.length(3);
