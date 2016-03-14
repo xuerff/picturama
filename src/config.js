@@ -1,7 +1,10 @@
 let dotAnsel = `${process.env.HOME}/.ansel`;
+let migrationsFolder = `${process.resourcesPath}/app/migrations`;
 
-if (process.env.ANSEL_DEV_MODE)
+if (process.env.ANSEL_DEV_MODE) {
   dotAnsel = `${process.env.INIT_CWD}/dot-ansel`;
+  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
+}
 
 export default {
   characters: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZéè',
@@ -15,5 +18,16 @@ export default {
   thumbsPath: `${dotAnsel}/thumbs`,
   thumbs250Path: `${dotAnsel}/thumbs-250`,
   tmp: '/tmp/ansel',
-  concurrency: 3
+  concurrency: 3,
+
+  knex: {
+    client: 'sqlite3',
+    connection: {
+      filename: `${dotAnsel}/db.sqlite3`
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: migrationsFolder
+    }
+  }
 };
