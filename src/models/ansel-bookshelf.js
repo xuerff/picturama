@@ -2,14 +2,6 @@
 
 import config from './../config';
 
-var knex = require('knex')({
-  client: 'sqlite3',
-  connection: {
-    filename: config.dbFile
-  }
-});
-
-//if (!fs.existsSync(config.dbFile))
-//  knex.migrate.latest();
+var knex = require('knex')(config.knex);
 
 export default require('bookshelf')(knex);

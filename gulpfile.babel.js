@@ -99,7 +99,7 @@ gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ],
 
 gulp.task('prepare-modules', [ 'prepare-src' ], () => {
   let modulesSrc = Object.keys(npmPkgs.dependencies)
-    .filter((dependency) => (dependency != 'electron-prebuilt'))
+    //.filter((dependency) => (dependency != 'electron-prebuilt'))
     .map((dependency) => `node_modules/${dependency}/**/*`)
 
   return gulp.src(modulesSrc, { base: 'node_modules' })
@@ -114,7 +114,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
     platform: 'linux',
     asar: false,
     out: './build',
-    version: npmPkgs.dependencies['electron-prebuilt']
+    version: npmPkgs.devDependencies['electron-prebuilt']
   };
 
   packager(opts, function done (err, appPath) { 

@@ -40,12 +40,7 @@ app.on('ready', () => {
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
   else {
-    var knex = require('knex')({
-      client: 'sqlite3',
-      connection: {
-        filename: config.dbFile
-      }
-    });
+    var knex = require('knex')(config.knex);
 
     if (!fs.existsSync(config.dbFile))
       knex.migrate.latest().finally(() => {
