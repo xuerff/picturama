@@ -7,7 +7,6 @@ import Usb from './usb';
 import config from './config';
 
 const initLibrary = (mainWindow) => {
-  console.log('init lib');
   const Library = require('./library').default;
   let library = new Library(mainWindow);
 

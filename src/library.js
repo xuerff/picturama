@@ -10,15 +10,11 @@ import exiv2 from 'exiv2';
 import config from './config';
 import metadata from './metadata';
 
-//import exifParser from './lib/exif-parser';
 import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/photo';
-//import Tag from './models/tag';
 import Version from './models/version';
-
-//console.log('metadata', metadata);
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
@@ -43,8 +39,6 @@ class Library {
 
     this.importRaw = this.importRaw.bind(this);
     this.importImg = this.importImg.bind(this);
-    //this.populateTags = this.populateTags.bind(this);
-    //this.processXMP = this.processXMP.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -155,14 +149,8 @@ class Library {
         return exGetImgTags(file.path).then(metadata.process);
       })
       .then((xmp) => {
-        //console.log('RAW Xmp', xmp);
-
+        console.log('xmp RAW', xmp);
         let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
-
-        //let orientation = 1;
-
-        //if (exifData.image.hasOwnProperty('Orientation'))
-        //  orientation = exifData.image.Orientation;
 
         return new Photo({ title: file.name }).fetch().then((photo) => {
           if (photo)
@@ -191,51 +179,6 @@ class Library {
       });
   }
 
-  //processXMP(exData) {
-  //  let xmp = {
-  //    exposureTime: eval(exData['Exif.Image.ExposureTime']),
-  //    iso: parseInt(exData['Exif.Image.ISOSpeedRating']),
-  //    focalLength: eval(exData['Exif.Image.FocalLength']),
-  //    aperture: eval(exData['Exif.Image.FNumber']),
-  //    tags: this.populateTags(exData)
-  //  };
-
-  //  if (exData.hasOwnProperty('Exif.Image.DateTime'))
-  //    xmp.createdAt = moment(
-  //      exData['Exif.Image.DateTime'],
-  //      'YYYY:MM:DD HH:mm:ss'
-  //    );
-
-  //  if (exData.hasOwnProperty('Exif.Image.Orientation'))
-  //    xmp.orientation = parseInt(exData['Exif.Image.Orientation']);
-  //  else
-  //    xmp.orientation = 1;
-
-  //  let id = matches(Object.keys(exData), 'ExposureTime');
-  //  console.log('ex data', exData);
-  //  console.log(
-  //    'exposure time', 
-  //    exData[Object.keys(exData)[id]]
-  //  );
-  //  return xmp;
-  //}
-
-  //populateTags(exData) {
-  //  if (exData && exData.hasOwnProperty('Xmp.dc.subject'))
-  //    return Promise.map(exData['Xmp.dc.subject'].split(', '), (tagName) => {
-  //      return new Tag({ title: tagName })
-  //        .fetch()
-  //        .then((tag) => {
-  //          if (tag)
-  //            return tag;
-  //          else
-  //            return new Tag({ title: tagName }).save();
-  //        });
-  //    });
-
-  //  else return [];
-  //}
-
   importImg(file) {
     return Promise.join(
       sharp(file.path)
@@ -243,30 +186,19 @@ class Library {
         .max()
         .quality(100)
         .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
-      //sharp(file.path).metadata(),
-      exGetImgTags(file.path).then(this.populateTags),
+      exGetImgTags(file.path).then(metadata.process),
       (img, xmp) => {
-        //let createdAt;
+        //console.log('xmp JPG', xmp);
 
-        let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
-        //if (exifData.image.hasOwnProperty('ModifyDate'))
-        //  createdAt = moment(
-        //    exifData.image.ModifyDate,
-        //    'YYYY:MM:DD HH:mm:ss'
-        //  );
-        //else
-        //  createdAt = moment(
-        //    fs.statSync(file.path).birthtime
-        //  );
+        let createdAt;
 
-        //let orientation = 1;
-
-        //if (exifData.image.hasOwnProperty('Orientation'))
-        //  orientation = exifData.image.Orientation;
-        //else if (metadata.width < metadata.height)
-        //  orientation = 0;
-
-        // TODO: How to determine orientation from a JPG file?
+        if (xmp.hasOwnProperty('createdAt'))
+          createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
+        else {
+          let fileDate = fs.statSync(file.path);
+          createdAt = moment(fileDate.birthtime);
+          //console.log('file stat', fileDate.birthtime);
+        }
 
         return new Photo({ title: file.name }).fetch().then((photo) => {
           if (photo)
