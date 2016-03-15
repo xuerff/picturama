@@ -14,6 +14,7 @@ import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/photo';
+import Tag from './models/tag';
 import Version from './models/version';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
@@ -221,13 +222,20 @@ class Library {
             .save();
         })
         .then((photo) => {
-          if (xmp.tags && xmp.tags.length > 0)
-            return Promise.map(xmp.tags, (tag) => {
-              return tag
-                .photos()
-                .attach(photo);
+          if (xmp.tags.length > 0)
+            return Promise.each(xmp.tags, (tagName) => {
+              return new Tag({ title: tagName })
+                .fetch()
+                .then((tag) => {
+                  if (tag)
+                    return tag;
+                  else
+                    return new Tag({ title: tagName }).save();
+                })
+                .then(tag => tag.photos().attach(photo));
             })
             .then(() => photo);
+
 
           else return photo;
         });
