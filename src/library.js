@@ -264,6 +264,14 @@ class Library {
               thumb: file.path
             })
             .save();
+        })
+        .then((photo) => {
+          return Promise.map(tags, (tag) => {
+            return tag
+              .photos()
+              .attach(photo)
+              .then(() => photo);
+          });
         });
       }
     )
