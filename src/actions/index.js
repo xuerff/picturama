@@ -108,7 +108,8 @@ export const setTagFilter = (tag) => {
 
         dispatch({ 
           type: 'GET_PHOTOS_SUCCESS', 
-          photos: photos.toJSON()
+          photos: photos.toJSON(),
+          tagId: tag.id
         });
       });
   };

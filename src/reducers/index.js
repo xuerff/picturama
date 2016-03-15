@@ -38,6 +38,7 @@ const rmDevice = (devices, rmDevice) => {
 const initialState = {
   importing: false,
   currentDate: null,
+  currentTag: null,
   current: -1,
   diff: false,
   settingsExists: false,
@@ -57,6 +58,7 @@ export default function reducers(state = initialState, action) {
       current: -1,
       importing: false,
       currentDate: action.hasOwnProperty('date') ? action.date : null,
+      currentTag: action.hasOwnProperty('tagId') ? action.tagId : null,
       photos: action.photos.map(function(photo) {
         photo.versionNumber = 1;
 
