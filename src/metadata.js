@@ -10,7 +10,8 @@ const process = (exData) => {
     exposureTime: eval(accessByMatch(exData, 'ExposureTime')),
     iso: parseInt(accessByMatch(exData, 'ISOSpeedRating')),
     focalLength: eval(accessByMatch(exData, 'FocalLength')),
-    aperture: eval(accessByMatch(exData, 'FNumber'))
+    aperture: eval(accessByMatch(exData, 'FNumber')),
+    tags: []
   };
 
   if (exData.hasOwnProperty('Xmp.dc.subject'))

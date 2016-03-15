@@ -40,6 +40,7 @@ class Library {
 
     this.importRaw = this.importRaw.bind(this);
     this.importImg = this.importImg.bind(this);
+    this.populateTags = this.populateTags.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -150,7 +151,6 @@ class Library {
         return exGetImgTags(file.path).then(metadata.process);
       })
       .then((xmp) => {
-        console.log('xmp RAW', xmp);
         let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
 
         return new Photo({ title: file.name }).fetch().then((photo) => {
@@ -172,7 +172,8 @@ class Library {
               thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
             })
             .save();
-        });
+        })
+        .then(photo => this.populateTags(photo, xmp.tags));
       })
       .then(this.onImportedStep.bind(this))
       .catch((err) => {
@@ -221,24 +222,24 @@ class Library {
             })
             .save();
         })
-        .then((photo) => {
-          if (xmp.tags.length > 0)
-            return Promise.each(xmp.tags, (tagName) => {
-              return new Tag({ title: tagName })
-                .fetch()
-                .then((tag) => {
-                  if (tag)
-                    return tag;
-                  else
-                    return new Tag({ title: tagName }).save();
-                })
-                .then(tag => tag.photos().attach(photo));
-            })
-            .then(() => photo);
+        .then(photo => this.populateTags(photo, xmp.tags));
+        //  if (xmp.tags.length > 0)
+        //    return Promise.each(xmp.tags, (tagName) => {
+        //      return new Tag({ title: tagName })
+        //        .fetch()
+        //        .then((tag) => {
+        //          if (tag)
+        //            return tag;
+        //          else
+        //            return new Tag({ title: tagName }).save();
+        //        })
+        //        .then(tag => tag.photos().attach(photo));
+        //    })
+        //    .then(() => photo);
 
 
-          else return photo;
-        });
+        //  else return photo;
+        //});
       }
     )
     .then(this.onImportedStep.bind(this))
@@ -246,6 +247,24 @@ class Library {
       console.log('err', err);
       return false;
     });
+  }
+
+  populateTags(photo, tags) {
+    if (tags.length > 0)
+      return Promise.each(tags, (tagName) => {
+        return new Tag({ title: tagName })
+          .fetch()
+          .then((tag) => {
+            if (tag)
+              return tag;
+            else
+              return new Tag({ title: tagName }).save();
+          })
+          .then(tag => tag.photos().attach(photo));
+      })
+      .then(() => photo);
+
+    else return photo;
   }
 
   onImportedStep() {
