@@ -5,6 +5,7 @@ import notifier from 'node-notifier';
 import fs from 'fs';
 import Promise from 'bluebird';
 import libraw from 'libraw';
+import exiv2 from 'exiv2';
 
 import config from './config';
 
@@ -13,8 +14,10 @@ import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/photo';
+import Tag from './models/tag';
 import Version from './models/version';
 
+const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
@@ -37,6 +40,7 @@ class Library {
 
     this.importRaw = this.importRaw.bind(this);
     this.importImg = this.importImg.bind(this);
+    this.populateTags = this.populateTags.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -109,7 +113,6 @@ class Library {
   }
 
   walk(file) {
-    console.log('begin walking');
     if (file.isRaw)
       return this.importRaw(file);
     else
@@ -145,9 +148,14 @@ class Library {
           .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
       })
       .then(() => {
-        return exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`);
+        return [
+          exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`),
+          sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`).metadata()
+        ];
       })
-      .then((exifData) => {
+      .spread((exifData, metadata) => {
+        console.log('meta data', metadata);
+
         let createdAt = moment(
           exifData.image.ModifyDate,
           'YYYY:MM:DD HH:mm:ss'
@@ -185,6 +193,23 @@ class Library {
       });
   }
 
+  populateTags(exData) {
+    if (exData.hasOwnProperty('Xmp.dc.subject'))
+      return Promise.map(exData['Xmp.dc.subject'].split(', '), (tagName) => {
+        return new Tag({ title: tagName })
+          .fetch()
+          .then((tag) => {
+            console.log('fetched tag', tag);
+            if (tag)
+              return tag;
+            else
+              return new Tag({ title: tagName }).save();
+          });
+      });
+
+    else return [];
+  }
+
   importImg(file) {
     return Promise.join(
       sharp(file.path)
@@ -194,7 +219,11 @@ class Library {
         .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
       exifParser(file.path),
       sharp(file.path).metadata(),
-      (img, exifData, metadata) => {
+      exGetImgTags(file.path).then(this.populateTags),
+      (img, exifData, metadata, tags) => {
+        //console.log('metadata', exifData.image);
+        console.log('exiv2', tags);
+
         let createdAt;
 
         if (exifData.image.hasOwnProperty('ModifyDate'))
