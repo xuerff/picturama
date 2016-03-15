@@ -157,10 +157,7 @@ class Library {
       .then((xmp) => {
         //console.log('RAW Xmp', xmp);
 
-        //let createdAt = moment(
-        //  exifData.image.ModifyDate,
-        //  'YYYY:MM:DD HH:mm:ss'
-        //);
+        let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
 
         //let orientation = 1;
 
@@ -175,8 +172,8 @@ class Library {
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
               orientation: xmp.orientation,
-              date: xmp.createdAt.format('YYYY-MM-DD'),
-              created_at: xmp.createdAt.toDate(),
+              date: createdAt.format('YYYY-MM-DD'),
+              created_at: createdAt.toDate(),
               exposure_time: xmp.exposureTime,
               iso: xmp.iso,
               aperture: xmp.fNumber,
@@ -251,6 +248,7 @@ class Library {
       (img, xmp) => {
         //let createdAt;
 
+        let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
         //if (exifData.image.hasOwnProperty('ModifyDate'))
         //  createdAt = moment(
         //    exifData.image.ModifyDate,
@@ -278,8 +276,8 @@ class Library {
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
               orientation: xmp.orientation,
-              date: xmp.createdAt.format('YYYY-MM-DD'),
-              created_at: xmp.createdAt.toDate(),
+              date: createdAt.format('YYYY-MM-DD'),
+              created_at: createdAt.toDate(),
               exposure_time: xmp.exposureTime,
               iso: xmp.iso,
               aperture: xmp.fNumber,
@@ -291,7 +289,7 @@ class Library {
             .save();
         })
         .then((photo) => {
-          if (xmp.tags.length > 0)
+          if (xmp.tags && xmp.tags.length > 0)
             return Promise.map(xmp.tags, (tag) => {
               return tag
                 .photos()

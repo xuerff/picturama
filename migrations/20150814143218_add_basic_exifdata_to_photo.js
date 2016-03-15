@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
     t.float('exposure_time');
     t.integer('iso');
     t.integer('focal_length');
-    t.integer('aperture');
+    t.float('aperture');
   });
 };
 

@@ -1,4 +1,4 @@
-import moment from 'moment';
+//import moment from 'moment';
 import Promise from 'bluebird';
 
 import Tag from './models/tag';
@@ -35,10 +35,9 @@ const process = (exData) => {
   };
 
   if (exData.hasOwnProperty('Exif.Image.DateTime'))
-    xmp.createdAt = moment(
-      exData['Exif.Image.DateTime'],
-      'YYYY:MM:DD HH:mm:ss'
-    );
+    xmp.createdAt = exData['Exif.Image.DateTime'];
+  else
+    console.log('no date time', exData);
 
   if (exData.hasOwnProperty('Exif.Image.Orientation'))
     xmp.orientation = parseInt(exData['Exif.Image.Orientation']);
