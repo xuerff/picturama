@@ -8,14 +8,17 @@ import libraw from 'libraw';
 import exiv2 from 'exiv2';
 
 import config from './config';
+import metadata from './metadata';
 
-import exifParser from './lib/exif-parser';
+//import exifParser from './lib/exif-parser';
 import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/photo';
-import Tag from './models/tag';
+//import Tag from './models/tag';
 import Version from './models/version';
+
+//console.log('metadata', metadata);
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
@@ -40,7 +43,8 @@ class Library {
 
     this.importRaw = this.importRaw.bind(this);
     this.importImg = this.importImg.bind(this);
-    this.populateTags = this.populateTags.bind(this);
+    //this.populateTags = this.populateTags.bind(this);
+    //this.processXMP = this.processXMP.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -148,23 +152,20 @@ class Library {
           .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
       })
       .then(() => {
-        return [
-          exifParser(`${config.thumbsPath}/${file.name}.thumb.jpg`),
-          sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`).metadata()
-        ];
+        return exGetImgTags(file.path).then(metadata.process);
       })
-      .spread((exifData, metadata) => {
-        console.log('meta data', metadata);
+      .then((xmp) => {
+        //console.log('RAW Xmp', xmp);
 
-        let createdAt = moment(
-          exifData.image.ModifyDate,
-          'YYYY:MM:DD HH:mm:ss'
-        );
+        //let createdAt = moment(
+        //  exifData.image.ModifyDate,
+        //  'YYYY:MM:DD HH:mm:ss'
+        //);
 
-        let orientation = 1;
+        //let orientation = 1;
 
-        if (exifData.image.hasOwnProperty('Orientation'))
-          orientation = exifData.image.Orientation;
+        //if (exifData.image.hasOwnProperty('Orientation'))
+        //  orientation = exifData.image.Orientation;
 
         return new Photo({ title: file.name }).fetch().then((photo) => {
           if (photo)
@@ -173,13 +174,13 @@ class Library {
             return Photo.forge({
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
-              orientation,
-              date: createdAt.format('YYYY-MM-DD'),
-              created_at: createdAt.toDate(),
-              exposure_time: exifData.exif.ExposureTime,
-              iso: exifData.exif.ISO,
-              aperture: exifData.exif.FNumber,
-              focal_length: exifData.exif.FocalLength,
+              orientation: xmp.orientation,
+              date: xmp.createdAt.format('YYYY-MM-DD'),
+              created_at: xmp.createdAt.toDate(),
+              exposure_time: xmp.exposureTime,
+              iso: xmp.iso,
+              aperture: xmp.fNumber,
+              focal_length: xmp.focalLength,
               master: `${file.path}`,
               thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
               thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
@@ -193,22 +194,50 @@ class Library {
       });
   }
 
-  populateTags(exData) {
-    if (exData.hasOwnProperty('Xmp.dc.subject'))
-      return Promise.map(exData['Xmp.dc.subject'].split(', '), (tagName) => {
-        return new Tag({ title: tagName })
-          .fetch()
-          .then((tag) => {
-            console.log('fetched tag', tag);
-            if (tag)
-              return tag;
-            else
-              return new Tag({ title: tagName }).save();
-          });
-      });
+  //processXMP(exData) {
+  //  let xmp = {
+  //    exposureTime: eval(exData['Exif.Image.ExposureTime']),
+  //    iso: parseInt(exData['Exif.Image.ISOSpeedRating']),
+  //    focalLength: eval(exData['Exif.Image.FocalLength']),
+  //    aperture: eval(exData['Exif.Image.FNumber']),
+  //    tags: this.populateTags(exData)
+  //  };
 
-    else return [];
-  }
+  //  if (exData.hasOwnProperty('Exif.Image.DateTime'))
+  //    xmp.createdAt = moment(
+  //      exData['Exif.Image.DateTime'],
+  //      'YYYY:MM:DD HH:mm:ss'
+  //    );
+
+  //  if (exData.hasOwnProperty('Exif.Image.Orientation'))
+  //    xmp.orientation = parseInt(exData['Exif.Image.Orientation']);
+  //  else
+  //    xmp.orientation = 1;
+
+  //  let id = matches(Object.keys(exData), 'ExposureTime');
+  //  console.log('ex data', exData);
+  //  console.log(
+  //    'exposure time', 
+  //    exData[Object.keys(exData)[id]]
+  //  );
+  //  return xmp;
+  //}
+
+  //populateTags(exData) {
+  //  if (exData && exData.hasOwnProperty('Xmp.dc.subject'))
+  //    return Promise.map(exData['Xmp.dc.subject'].split(', '), (tagName) => {
+  //      return new Tag({ title: tagName })
+  //        .fetch()
+  //        .then((tag) => {
+  //          if (tag)
+  //            return tag;
+  //          else
+  //            return new Tag({ title: tagName }).save();
+  //        });
+  //    });
+
+  //  else return [];
+  //}
 
   importImg(file) {
     return Promise.join(
@@ -217,31 +246,27 @@ class Library {
         .max()
         .quality(100)
         .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
-      exifParser(file.path),
-      sharp(file.path).metadata(),
+      //sharp(file.path).metadata(),
       exGetImgTags(file.path).then(this.populateTags),
-      (img, exifData, metadata, tags) => {
-        //console.log('metadata', exifData.image);
-        console.log('exiv2', tags);
+      (img, xmp) => {
+        //let createdAt;
 
-        let createdAt;
+        //if (exifData.image.hasOwnProperty('ModifyDate'))
+        //  createdAt = moment(
+        //    exifData.image.ModifyDate,
+        //    'YYYY:MM:DD HH:mm:ss'
+        //  );
+        //else
+        //  createdAt = moment(
+        //    fs.statSync(file.path).birthtime
+        //  );
 
-        if (exifData.image.hasOwnProperty('ModifyDate'))
-          createdAt = moment(
-            exifData.image.ModifyDate,
-            'YYYY:MM:DD HH:mm:ss'
-          );
-        else
-          createdAt = moment(
-            fs.statSync(file.path).birthtime
-          );
+        //let orientation = 1;
 
-        let orientation = 1;
-
-        if (exifData.image.hasOwnProperty('Orientation'))
-          orientation = exifData.image.Orientation;
-        else if (metadata.width < metadata.height)
-          orientation = 0;
+        //if (exifData.image.hasOwnProperty('Orientation'))
+        //  orientation = exifData.image.Orientation;
+        //else if (metadata.width < metadata.height)
+        //  orientation = 0;
 
         // TODO: How to determine orientation from a JPG file?
 
@@ -252,13 +277,13 @@ class Library {
             return Photo.forge({
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
-              orientation,
-              date: createdAt.format('YYYY-MM-DD'),
-              created_at: createdAt.toDate(),
-              exposure_time: exifData.exif.ExposureTime,
-              iso: exifData.exif.ISO,
-              aperture: exifData.exif.FNumber,
-              focal_length: exifData.exif.FocalLength,
+              orientation: xmp.orientation,
+              date: xmp.createdAt.format('YYYY-MM-DD'),
+              created_at: xmp.createdAt.toDate(),
+              exposure_time: xmp.exposureTime,
+              iso: xmp.iso,
+              aperture: xmp.fNumber,
+              focal_length: xmp.focalLength,
               master: file.path,
               thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
               thumb: file.path
@@ -266,12 +291,15 @@ class Library {
             .save();
         })
         .then((photo) => {
-          return Promise.map(tags, (tag) => {
-            return tag
-              .photos()
-              .attach(photo)
-              .then(() => photo);
-          });
+          if (xmp.tags.length > 0)
+            return Promise.map(xmp.tags, (tag) => {
+              return tag
+                .photos()
+                .attach(photo);
+            })
+            .then(() => photo);
+
+          else return photo;
         });
       }
     )
