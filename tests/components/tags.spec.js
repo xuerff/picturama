@@ -15,9 +15,7 @@ describe('<Tags />', () => {
       { title: 'tags' }
     ];
 
-    const wrapper = shallow(
-      <Tags tags={tags} />
-    );
+    const wrapper = shallow(<Tags tags={tags} />);
 
     expect(wrapper.find(TagButton)).to.have.length(3);
   });
