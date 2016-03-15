@@ -3,6 +3,8 @@ import babel from "gulp-babel";
 import less from 'gulp-less';
 import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
+import mocha from 'gulp-mocha';
+import electronMocha from 'gulp-electron-mocha';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -18,6 +20,13 @@ gulp.task("babel", ['lint'], () => {
     .pipe(gulp.dest("dist"));
 });
 
+//gulp.task("babel-tests", ['lint-tests'], () => {
+gulp.task("babel-tests", () => {
+  return gulp.src("tests/**/*.js")
+    .pipe(babel())
+    .pipe(gulp.dest("tests-dist"));
+});
+
 gulp.task('styles', ['lint'], () => {
   return gulp.src('src/source.less')
     .pipe(less())
@@ -30,6 +39,14 @@ gulp.task('lint', () => {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
+
+gulp.task('lint-tests', () => {
+  return gulp.src('./tests/**/*.js')
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
 
 gulp.task('run', [ 'babel', 'styles' ],
   () => {
@@ -56,6 +73,14 @@ gulp.task('set-env', () => {
       ANSEL_DEV_MODE: true
     }
   })
+});
+
+gulp.task('test', ['babel-tests'], () => {
+  return gulp.src('tests-dist/**/*.spec.js', { read: false })
+    .pipe(electronMocha({ 
+      electronPath: electron, 
+      electronMocha: { renderer: true }
+    }));
 });
 
 gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 

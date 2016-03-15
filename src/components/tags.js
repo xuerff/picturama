@@ -48,3 +48,4 @@ const ReduxTags = connect(state => ({
 }))(Tags);
 
 export default ReduxTags;
+export { Tags };
