@@ -117,9 +117,12 @@ export const setTagFilter = (tag) => {
 
 export const getTags = () => {
   return (dispatch) => {
-    new Tag().fetchAll().then((tags) => {
-      dispatch({ type: 'GET_TAGS_SUCCESS', tags: tags.toJSON() });
-    });
+    new Tag()
+      .query((q) => q.orderBy('slug', 'ASC'))
+      .fetchAll()
+      .then((tags) => {
+        dispatch({ type: 'GET_TAGS_SUCCESS', tags: tags.toJSON() });
+      });
   };
 };
 
