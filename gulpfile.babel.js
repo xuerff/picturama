@@ -20,7 +20,6 @@ gulp.task("babel", ['lint'], () => {
     .pipe(gulp.dest("dist"));
 });
 
-//gulp.task("babel-tests", ['lint-tests'], () => {
 gulp.task("babel-tests", () => {
   return gulp.src("tests/**/*.js")
     .pipe(babel())
@@ -110,7 +109,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
     dir: './build/prepared',
-    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|tests)/i,
+    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|tests|node_modules\/libraw\/vendor|node_modules\/exiv2\/vendor)/i,
     platform: 'linux',
     asar: false,
     out: './build',
