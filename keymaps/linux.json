@@ -1,5 +1,9 @@
 {
   "body": {
     "tab": "toggleSidebar"
+  },
+
+  "#add-tags": {
+    "escape": "add-tags:quit"
   }
 }

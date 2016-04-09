@@ -1,8 +1,6 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
 
-//import TagStore from './../stores/tag-store';
-
 export default class AddTags extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
@@ -24,24 +22,16 @@ export default class AddTags extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.keyboardListener = this.keyboardListener.bind(this);
-  }
-
-  keyboardListener(e) {
-    e.preventDefault();
-
-    if (e.keyCode == 27) // escape
-      this.props.closeTagDialog();
   }
 
   componentDidMount() {
     this.refs.tags.focus();
 
-    document.addEventListener('keyup', this.keyboardListener);
+    window.addEventListener('add-tags:quit', this.props.closeTagDialog);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keyup', this.keyboardListener);
+    window.removeEventListener('add-tags:quit', this.props.closeTagDialog);
   }
 
   handleChange(tags) {
@@ -62,7 +52,7 @@ export default class AddTags extends React.Component {
     var btnClass = 'button button--raised button--colored';
 
     return (
-      <div className="outer-modal">
+      <div className="outer-modal" id="add-tags">
         <div className="modal shadow--2dp">
           <form onSubmit={this.handleSubmit}>
             <h3>Add a tag</h3>

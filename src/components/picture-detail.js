@@ -5,9 +5,6 @@ import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
 
-//import VersionStore from './../stores/version-store';
-//import VersionActions from './../actions/version-actions';
-
 import createVersionAndOpenWith from './../create-version';
 
 import remote from 'remote';
@@ -44,10 +41,6 @@ export default class PictureDetail extends React.Component {
     this.closeDialog = this.closeDialog.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
   }
-
-  //updateVersion(store) {
-  //  console.log('state & store', this.state, store);
-  //}
 
   keyboardListener(e) {
     e.preventDefault();
