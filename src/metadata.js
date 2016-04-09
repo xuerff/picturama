@@ -1,11 +1,11 @@
 import matches from './lib/matches';
 
-const accessByMatch = (obj, key) => {
+var accessByMatch = (obj, key) => {
   let id = matches(Object.keys(obj), key);
   return obj[Object.keys(obj)[id]];
 };
 
-const process = (exData) => {
+var process = (exData) => {
   let xmp = {
     exposureTime: eval(accessByMatch(exData, 'ExposureTime')),
     iso: parseInt(accessByMatch(exData, 'ISOSpeedRating')),
