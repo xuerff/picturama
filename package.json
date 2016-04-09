@@ -11,6 +11,7 @@
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "atom-keymap": "^6.3.2",
     "bluebird": "^2.9.34",
     "bookshelf": "^0.9.2",
     "child-process-promise": "^1.1.0",

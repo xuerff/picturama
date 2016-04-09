@@ -24,7 +24,8 @@ class Ansel extends React.Component {
       actions: bindActionCreators(action, this.props.dispatch)
     };
 
-    this.keyboardListener = this.keyboardListener.bind(this);
+    //this.keyboardListener = this.keyboardListener.bind(this);
+    this.toggleSidebar = this.toggleSidebar.bind(this);
   }
 
   handleDateFilter(date) {
@@ -32,7 +33,6 @@ class Ansel extends React.Component {
   }
 
   componentDidMount() {
-
     ipcRenderer.on('start-import', this.state.actions.startImport);
     ipcRenderer.on('progress', this.state.actions.importProgress);
 
@@ -47,19 +47,16 @@ class Ansel extends React.Component {
     ipcRenderer.on('add-device', this.state.actions.addDevice);
     ipcRenderer.on('remove-device', this.state.actions.removeDevice);
 
-    document.addEventListener('keyup', this.keyboardListener);
+    window.addEventListener('toggleSidebar', this.toggleSidebar);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keyup', this.keyboardListener);
+    window.removeEventListener('toggleSidebar', this.toggleSidebar);
   }
 
-  keyboardListener(e) {
+  toggleSidebar() {
     let state = this.state;
-
-    if (e.keyCode == 9) // ESC key
-      state.showSidebar = !state.showSidebar;
-
+    state.showSidebar = !state.showSidebar;
     this.setState(state);
   }
 
