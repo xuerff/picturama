@@ -2,6 +2,7 @@ import Menu from 'menu';
 import {ipcMain} from 'electron';
 
 import template from './../menus/linux.json';
+import npmPackage from './../package.json';
 
 class MainMenu {
   constructor(mainWindow, library) {
@@ -21,6 +22,9 @@ class MainMenu {
       menu.submenu = menu.submenu.map((submenu) => {
         if (this.hasOwnProperty(submenu.click))
           submenu.click = this[submenu.click];
+
+        if (submenu.label.toLowerCase() == 'version')
+          submenu.label = `Version ${npmPackage.version}`;
 
         return submenu;
       });

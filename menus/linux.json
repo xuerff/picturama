@@ -57,6 +57,13 @@
         "accelerator": "Shift+Ctrl+I",
         "click": "toggleDevTools"
       }]
+    },
+    {
+      "label": "Help",
+      "submenu": [{
+        "label": "Version",
+        "enabled": false
+      }]
     }
   ]
 }
