@@ -22,26 +22,16 @@ class Export extends React.Component {
 
     this.state = { folder: null, quality: 90, format: config.exportFormats[0] };
 
-    //this.keyboardListener = this.keyboardListener.bind(this);
     this.processImg = this.processImg.bind(this);
   }
 
   componentDidMount() {
-    //document.addEventListener('keyup', this.keyboardListener);
     window.addEventListener('core:cancel', this.props.closeExportDialog);
   }
 
   componentWillUnmount() {
-    //document.removeEventListener('keyup', this.keyboardListener);
     window.removeEventListener('core:cancel', this.props.closeExportDialog);
   }
-
-  //keyboardListener(e) {
-  //  e.preventDefault();
-
-  //  if (e.keyCode == 27) // escape
-  //    this.props.closeExportDialog();
-  //}
 
   onFolderSelection(filenames) {
     console.log('filenames', filenames);

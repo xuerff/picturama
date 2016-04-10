@@ -135,6 +135,11 @@ export default class PictureDetail extends React.Component {
     }));
 
     this.menu.append(new MenuItem({ 
+      label: 'Export', 
+      click: this.showExportDialog.bind(this)
+    }));
+
+    this.menu.append(new MenuItem({ 
       type: 'separator'
     }));
 
