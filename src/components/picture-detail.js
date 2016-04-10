@@ -58,11 +58,11 @@ export default class PictureDetail extends React.Component {
     //else if (e.keyCode == 27 && this.state.modal != 'none') // escape
     //  this.closeDialog();
 
-    else if (e.keyCode == 37) // Left
-      this.props.actions.setCurrentLeft();
+    //else if (e.keyCode == 37) // Left
+    //  this.props.actions.setCurrentLeft();
 
-    else if (e.keyCode == 39 && !this.props.isLast()) // Right
-      this.props.actions.setCurrentRight();
+    //else if (e.keyCode == 39 && !this.props.isLast()) // Right
+    //  this.props.actions.setCurrentRight();
 
     //else if (e.keyCode == 80) // p
     //  this.props.toggleFlag();
@@ -180,6 +180,16 @@ export default class PictureDetail extends React.Component {
     window.addEventListener('detail:diff', this.toggleDiff);
     window.addEventListener('detail:flag', this.props.toggleFlag);
 
+    window.addEventListener(
+      'detail:moveLeft',
+      this.props.actions.setCurrentLeft
+    );
+
+    window.addEventListener(
+      'detail:moveRight',
+      this.props.actions.setCurrentRight
+    );
+
     keymapManager.bind(this.refs.detail);
     this.bindEventListeners();
   }
@@ -201,6 +211,16 @@ export default class PictureDetail extends React.Component {
     window.removeEventListener('detail:diff', this.toggleDiff);
     window.removeEventListener('detail:flag', this.props.toggleFlag);
 
+    window.removeEventListener(
+      'detail:moveLeft',
+      this.props.actions.setCurrentLeft
+    );
+
+    window.removeEventListener(
+      'detail:moveRight',
+      this.props.actions.setCurrentRight
+    );
+
     keymapManager.unbind();
     delete this.menu;
   }
@@ -210,7 +230,7 @@ export default class PictureDetail extends React.Component {
     state.binded = true;
     this.setState(state);
 
-    document.addEventListener('keyup', this.keyboardListener);
+    //document.addEventListener('keyup', this.keyboardListener);
     document.addEventListener('contextmenu', this.contextMenu);
     //window.addEventListener('core:cancel', (e) => {
     //  console.log('picture detail quit', e);
@@ -228,7 +248,7 @@ export default class PictureDetail extends React.Component {
     state.binded = false;
     this.setState(state);
 
-    document.removeEventListener('keyup', this.keyboardListener);
+    //document.removeEventListener('keyup', this.keyboardListener);
     document.removeEventListener('contextmenu', this.contextMenu);
 
     ipcRenderer.send('toggleAddTagMenu', false);

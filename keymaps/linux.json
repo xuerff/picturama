@@ -5,7 +5,9 @@
   },
   ".picture-detail": {
     "y": "detail:diff",
-    "p": "detail:flag"
+    "p": "detail:flag",
+    "left": "detail:moveLeft",
+    "right": "detail:moveRight"
   },
   ".picture-diff": {
     "y": "diff:cancel"
