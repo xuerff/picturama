@@ -24,7 +24,6 @@ class Ansel extends React.Component {
       actions: bindActionCreators(action, this.props.dispatch)
     };
 
-    //this.keyboardListener = this.keyboardListener.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
   }
 
