@@ -86,6 +86,7 @@ export const updatedPhoto = (e, version) => {
 };
 
 export const toggleFlag = (photo) => {
+  console.log('toggle flag', photo);
   return (dispatch) => {
     new Photo({ id: photo.id })
       .save('flag', !photo.flag, { patch: true })

@@ -49,7 +49,7 @@ export default class PictureDetail extends React.Component {
     e.preventDefault();
 
     //if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
-    if ([37, 39, 80].indexOf(e.keyCode) != -1)
+    if ([37, 39].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
     //if (e.keyCode == 27 && this.state.modal == 'none') // escape
@@ -64,8 +64,8 @@ export default class PictureDetail extends React.Component {
     else if (e.keyCode == 39 && !this.props.isLast()) // Right
       this.props.actions.setCurrentRight();
 
-    else if (e.keyCode == 80) // p
-      this.props.toggleFlag();
+    //else if (e.keyCode == 80) // p
+    //  this.props.toggleFlag();
 
     //else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
     //  this.props.actions.toggleDiff();
@@ -178,6 +178,7 @@ export default class PictureDetail extends React.Component {
 
     window.addEventListener('core:cancel', this.cancelEvent);
     window.addEventListener('detail:diff', this.toggleDiff);
+    window.addEventListener('detail:flag', this.props.toggleFlag);
 
     keymapManager.bind(this.refs.detail);
     this.bindEventListeners();
@@ -198,6 +199,7 @@ export default class PictureDetail extends React.Component {
 
     window.removeEventListener('core:cancel', this.cancelEvent);
     window.removeEventListener('detail:diff', this.toggleDiff);
+    window.removeEventListener('detail:flag', this.props.toggleFlag);
 
     keymapManager.unbind();
     delete this.menu;

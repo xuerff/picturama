@@ -4,7 +4,8 @@
     "escape": "core:cancel"
   },
   ".picture-detail": {
-    "y": "detail:diff"
+    "y": "detail:diff",
+    "p": "detail:flag"
   },
   ".picture-diff": {
     "y": "diff:cancel"

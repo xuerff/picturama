@@ -60,7 +60,7 @@ class Library extends React.Component {
   }
 
   handleFlag() {
-    this.props.actions.toggleFlag(this.props.photos[this.state.current]);
+    this.props.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
   handleHighlight(index) {

@@ -40,13 +40,6 @@ class PictureDiff extends React.Component {
     window.addEventListener('diff:cancel', this.props.actions.toggleDiff);
 
     keymapManager.bind(this.refs.diff);
-    //let keymaps = new KeymapManager();
-    //keymaps.defaultTarget = this.refs.diff;
-    //keymaps.loadKeymap(`${__dirname}/../../keymaps/linux.json`);
-
-    //document.addEventListener('keydown', function(event) {
-    //  keymaps.handleKeyboardEvent(event);
-    //});
   }
 
   updateState(photo) {
