@@ -1,9 +1,12 @@
 {
-  ".picture-diff": {
-    "y": "diff:cancel"
-  },
   "body": {
     "tab": "core:toggleSidebar",
     "escape": "core:cancel"
+  },
+  ".picture-detail": {
+    "y": "detail:diff"
+  },
+  ".picture-diff": {
+    "y": "diff:cancel"
   }
 }

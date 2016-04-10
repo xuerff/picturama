@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
 
+import keymapManager from './../keymap-manager';
 import createVersionAndOpenWith from './../create-version';
 
 import remote from 'remote';
@@ -40,19 +41,22 @@ export default class PictureDetail extends React.Component {
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
+    this.cancelEvent = this.cancelEvent.bind(this);
+    this.toggleDiff = this.toggleDiff.bind(this);
   }
 
   keyboardListener(e) {
     e.preventDefault();
 
-    if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
+    //if ([27, 37, 39, 80].indexOf(e.keyCode) != -1)
+    if ([37, 39, 80].indexOf(e.keyCode) != -1)
       this.unbindEventListeners();
 
-    if (e.keyCode == 27 && this.state.modal == 'none') // escape
-      this.props.setCurrent(-1);
+    //if (e.keyCode == 27 && this.state.modal == 'none') // escape
+    //  this.props.setCurrent(-1);
 
-    else if (e.keyCode == 27 && this.state.modal != 'none') // escape
-      this.closeDialog();
+    //else if (e.keyCode == 27 && this.state.modal != 'none') // escape
+    //  this.closeDialog();
 
     else if (e.keyCode == 37) // Left
       this.props.actions.setCurrentLeft();
@@ -63,8 +67,8 @@ export default class PictureDetail extends React.Component {
     else if (e.keyCode == 80) // p
       this.props.toggleFlag();
 
-    else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
-      this.props.actions.toggleDiff();
+    //else if (e.keyCode == 89 && this.props.photo.versionNumber > 1) // y
+    //  this.props.actions.toggleDiff();
 
     else if (this.props.isLast() && !this.state.binded)
       this.bindEventListeners();
@@ -140,6 +144,18 @@ export default class PictureDetail extends React.Component {
     this.setState(state);
   }
 
+  cancelEvent() {
+    if (this.state.modal == 'none') // escape
+      this.props.setCurrent(-1);
+    else
+      this.closeDialog();
+  }
+
+  toggleDiff() {
+    if (this.props.photo.versionNumber > 1)
+      this.props.actions.toggleDiff();
+  }
+
   componentDidMount() {
     this.menu = new Menu();
 
@@ -160,6 +176,10 @@ export default class PictureDetail extends React.Component {
     darktableCmd.stdout.on('data', this.addDarktableMenu.bind(this));
     gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
 
+    window.addEventListener('core:cancel', this.cancelEvent);
+    window.addEventListener('detail:diff', this.toggleDiff);
+
+    keymapManager.bind(this.refs.detail);
     this.bindEventListeners();
   }
 
@@ -176,6 +196,10 @@ export default class PictureDetail extends React.Component {
   componentWillUnmount() {
     this.unbindEventListeners();
 
+    window.removeEventListener('core:cancel', this.cancelEvent);
+    window.removeEventListener('detail:diff', this.toggleDiff);
+
+    keymapManager.unbind();
     delete this.menu;
   }
 
@@ -186,6 +210,9 @@ export default class PictureDetail extends React.Component {
 
     document.addEventListener('keyup', this.keyboardListener);
     document.addEventListener('contextmenu', this.contextMenu);
+    //window.addEventListener('core:cancel', (e) => {
+    //  console.log('picture detail quit', e);
+    //});
 
     ipcRenderer.send('toggleAddTagMenu', true);
     ipcRenderer.send('toggleExportMenu', true);
@@ -233,7 +260,7 @@ export default class PictureDetail extends React.Component {
       );
 
     return (
-      <div className="picture-detail" ref="pictureDetail">
+      <div className="picture-detail" ref="detail">
         <div className="v-align">
           <img
             src={this.props.photo.thumb} 

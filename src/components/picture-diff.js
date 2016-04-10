@@ -1,8 +1,8 @@
-import keymapManager from './../keymap-manager';
 //import KeymapManager from 'atom-keymap';
 import React from 'react';
 import Loader from 'react-loader';
 
+import keymapManager from './../keymap-manager';
 import Photo from './../models/photo';
 
 var rotation = {};

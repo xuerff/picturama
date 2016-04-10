@@ -191,6 +191,7 @@ export const setCurrentRight = () => {
 };
 
 export const toggleDiff = () => {
+  console.log('toggle diff');
   return (dispatch) => {
     dispatch({ type: 'TOGGLE_DIFF_SUCCESS' });
   };
