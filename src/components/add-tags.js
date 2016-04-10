@@ -27,11 +27,11 @@ export default class AddTags extends React.Component {
   componentDidMount() {
     this.refs.tags.focus();
 
-    window.addEventListener('add-tags:quit', this.props.closeTagDialog);
+    window.addEventListener('core:cancel', this.props.closeTagDialog);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('add-tags:quit', this.props.closeTagDialog);
+    window.removeEventListener('core:cancel', this.props.closeTagDialog);
   }
 
   handleChange(tags) {

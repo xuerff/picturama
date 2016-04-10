@@ -47,11 +47,11 @@ class Ansel extends React.Component {
     ipcRenderer.on('add-device', this.state.actions.addDevice);
     ipcRenderer.on('remove-device', this.state.actions.removeDevice);
 
-    window.addEventListener('toggleSidebar', this.toggleSidebar);
+    window.addEventListener('core:toggleSidebar', this.toggleSidebar);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('toggleSidebar', this.toggleSidebar);
+    window.removeEventListener('core:toggleSidebar', this.toggleSidebar);
   }
 
   toggleSidebar() {

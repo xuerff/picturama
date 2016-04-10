@@ -1,9 +1,9 @@
 {
-  "body": {
-    "tab": "toggleSidebar"
+  ".picture-diff": {
+    "y": "diff:cancel"
   },
-
-  "#add-tags": {
-    "escape": "add-tags:quit"
+  "body": {
+    "tab": "core:toggleSidebar",
+    "escape": "core:cancel"
   }
 }

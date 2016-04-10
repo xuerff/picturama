@@ -1,3 +1,5 @@
+import keymapManager from './../keymap-manager';
+//import KeymapManager from 'atom-keymap';
 import React from 'react';
 import Loader from 'react-loader';
 
@@ -34,7 +36,17 @@ class PictureDiff extends React.Component {
       .fetch({ withRelated: ['versions'] })
       .then(this.updateState);
 
-    this.bindEventListeners();
+    window.addEventListener('core:cancel', this.props.actions.toggleDiff);
+    window.addEventListener('diff:cancel', this.props.actions.toggleDiff);
+
+    keymapManager.bind(this.refs.diff);
+    //let keymaps = new KeymapManager();
+    //keymaps.defaultTarget = this.refs.diff;
+    //keymaps.loadKeymap(`${__dirname}/../../keymaps/linux.json`);
+
+    //document.addEventListener('keydown', function(event) {
+    //  keymaps.handleKeyboardEvent(event);
+    //});
   }
 
   updateState(photo) {
@@ -55,22 +67,23 @@ class PictureDiff extends React.Component {
   }
 
   componentWillUnmount() {
-    this.unbindEventListeners();
+    window.removeEventListener('core:cancel', this.props.actions.toggleDiff);
+    window.removeEventListener('diff:cancel', this.props.actions.toggleDiff);
+    keymapManager.unbind();
   }
 
   bindEventListeners() {
-    document.addEventListener('keyup', this.keyboardListener);
+    //document.addEventListener('keyup', this.keyboardListener);
   }
 
   unbindEventListeners() {
-    document.removeEventListener('keyup', this.keyboardListener);
+    //document.removeEventListener('keyup', this.keyboardListener);
   }
 
   keyboardListener(e) {
     e.preventDefault();
 
     if ([27, 89].indexOf(e.keyCode) != -1) {
-      //console.log('picture diff', e.keyCode);
       this.unbindEventListeners();
       this.props.actions.toggleDiff();
     }
@@ -88,7 +101,7 @@ class PictureDiff extends React.Component {
       last = this.state.photo.versions[this.state.photo.versions.length - 1];
 
     return (
-      <div className="picture-diff">
+      <div className="picture-diff" ref="diff">
         <div className="before v-align">
           <h3>Before</h3>
           <img
