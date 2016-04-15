@@ -17,7 +17,9 @@ var process = (exData) => {
   if (exData.hasOwnProperty('Xmp.dc.subject'))
     xmp.tags = exData['Xmp.dc.subject'].split(', ');
 
-  if (exData.hasOwnProperty('Exif.Image.DateTime'))
+  if (exData.hasOwnProperty('Exif.Photo.DateTimeOriginal'))
+    xmp.createdAt = exData['Exif.Photo.DateTimeOriginal'];
+  else if (exData.hasOwnProperty('Exif.Image.DateTime'))
     xmp.createdAt = exData['Exif.Image.DateTime'];
 
   if (exData.hasOwnProperty('Exif.Image.Orientation'))
