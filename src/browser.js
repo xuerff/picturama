@@ -27,7 +27,8 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', () => {
-  let workAreaSize = screen.getPrimaryDisplay().workAreaSize;
+  let cursorPos = screen.getCursorScreenPoint();
+  let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize;
 
   mainWindow = new BrowserWindow({ width: 1356, height: 768 });
 

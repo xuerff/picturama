@@ -130,6 +130,7 @@ export const getTags = () => {
 export const createTagsAndAssociateToPhoto = (tags, photoId) => {
   return (dispatch) => {
     new Photo({ id: photoId }).fetch().then((photo) => {
+      // TODO: Remove all the previous tag before adding the new one
       return Promise.map(tags, (tagName) => {
         return new Tag({ title: tagName })
           .fetch()

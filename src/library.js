@@ -190,8 +190,6 @@ class Library {
         .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
       exGetImgTags(file.path).then(metadata.process),
       (img, xmp) => {
-        //console.log('xmp JPG', xmp);
-
         let createdAt;
 
         if (xmp.hasOwnProperty('createdAt'))
@@ -199,7 +197,6 @@ class Library {
         else {
           let fileDate = fs.statSync(file.path);
           createdAt = moment(fileDate.birthtime);
-          //console.log('file stat', fileDate.birthtime);
         }
 
         return new Photo({ title: file.name }).fetch().then((photo) => {
