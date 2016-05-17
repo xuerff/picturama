@@ -11,6 +11,7 @@ class MainMenu {
 
     this.render = this.render.bind(this);
     this.scan = this.scan.bind(this);
+    this.scanForTags = this.scanForTags.bind(this);
     this.close = this.close.bind(this);
     this.reload = this.reload.bind(this);
     this.fullscreen = this.fullscreen.bind(this);
@@ -45,6 +46,11 @@ class MainMenu {
 
   scan() {
     this.library.scan();
+  }
+
+  scanForTags() {
+    console.log('scan for tags listener');
+    this.library.scanForTags();
   }
 
   close() {

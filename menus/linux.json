@@ -48,6 +48,11 @@
         "accelerator": "Ctrl+T",
         "enabled": false,
         "click": "addTags"
+      },
+      {
+        "label": "Scan for tags",
+        "accelerator": "Shift+Ctrl+R",
+        "click": "scanForTags"
       }]
     },
     {

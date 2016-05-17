@@ -38,6 +38,7 @@ class Library {
     this.mainWindow = mainWindow;
     this.progress = { processed: 0, total: 0 };
 
+    this.scanForTags = this.scanForTags.bind(this);
     this.importRaw = this.importRaw.bind(this);
     this.importImg = this.importImg.bind(this);
     this.populateTags = this.populateTags.bind(this);
@@ -117,6 +118,30 @@ class Library {
       return this.importRaw(file);
     else
       return this.importImg(file);
+  }
+
+  walkForTags(file) {
+    return exGetImgTags(file.path)
+      .then(metadata.process)
+      .then((data) => {
+        if (data.tags.length > 0)
+          return data.tags;
+        else
+          throw('no-tag');
+      })
+      .each((tagName) => {
+        return new Tag({ title: tagName })
+          .fetch()
+          .then((tag) => {
+            if (tag)
+              return tag;
+            else
+              return new Tag({ title: tagName }).save();
+          });
+      })
+      .catch(() => {
+        return false;
+      });
   }
 
   importRaw(file) {
@@ -220,23 +245,6 @@ class Library {
             .save();
         })
         .then(photo => this.populateTags(photo, xmp.tags));
-        //  if (xmp.tags.length > 0)
-        //    return Promise.each(xmp.tags, (tagName) => {
-        //      return new Tag({ title: tagName })
-        //        .fetch()
-        //        .then((tag) => {
-        //          if (tag)
-        //            return tag;
-        //          else
-        //            return new Tag({ title: tagName }).save();
-        //        })
-        //        .then(tag => tag.photos().attach(photo));
-        //    })
-        //    .then(() => photo);
-
-
-        //  else return photo;
-        //});
       }
     )
     .then(this.onImportedStep.bind(this))
@@ -308,6 +316,41 @@ class Library {
       'title': 'Ansel',
       'message': 'Start import'
     });
+  }
+
+  scanForTags() {
+    console.log('scan for tags');
+    var start = new Date().getTime();
+    this.mainWindow.webContents.send('start-import', true);
+
+    if (!this.path || !this.versionsPath)
+      return false;
+
+    walker(this.path, [ this.versionsPath ])
+      .then(this.prepare.bind(this))
+      .then(this.setTotal.bind(this))
+      .map(this.walkForTags.bind(this), {
+        concurrency: config.concurrency
+      })
+      .then((pics) => {
+        let end = new Date().getTime();
+        let time = moment.duration(end - start);
+
+        this.mainWindow.webContents.send('finish-import', true);
+
+        console.log(`Finish importing tags ${pics.length} in ${time.humanize()}`);
+
+        notifier.notify({
+          'title': 'Ansel',
+          'message': `Finish importing tags ${pics.length} in ${time.humanize()}`
+        });
+      });
+
+    notifier.notify({
+      'title': 'Ansel',
+      'message': 'Start import'
+    });
+ 
   }
 
   watch() {
