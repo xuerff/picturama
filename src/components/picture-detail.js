@@ -1,5 +1,5 @@
 import {spawn} from 'child_process';
-import {ipcRenderer} from 'electron';
+import {ipcRenderer, remote} from 'electron';
 
 import classNames from 'classnames';
 import React from 'react';
@@ -8,14 +8,11 @@ import Loader from 'react-loader';
 import keymapManager from './../keymap-manager';
 import createVersionAndOpenWith from './../create-version';
 
-import remote from 'remote';
-
 import AddTags from './add-tags';
 import Export from './export';
 import PictureInfo from './picture-info';
 
-var Menu = remote.require('menu');
-var MenuItem = remote.require('menu-item');
+const {Menu, MenuItem} = remote;
 
 var rotation = {};
 rotation[1] = '';

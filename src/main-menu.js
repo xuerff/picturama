@@ -1,5 +1,5 @@
-import Menu from 'menu';
-import {ipcMain} from 'electron';
+//import Menu from 'menu';
+import {ipcMain, Menu} from 'electron';
 
 import template from './../menus/linux.json';
 import npmPackage from './../package.json';

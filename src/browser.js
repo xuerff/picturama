@@ -1,5 +1,10 @@
-import {app, screen, ipcMain} from 'electron';
-import BrowserWindow from 'browser-window';
+import {
+  app,
+  screen,
+  ipcMain,
+  BrowserWindow
+} from 'electron';
+
 import fs from 'fs';
 
 import MainMenu from './main-menu';
@@ -13,8 +18,6 @@ const initLibrary = (mainWindow) => {
   new MainMenu(mainWindow, library);
   library.watch();
 };
-
-require('crash-reporter').start();
 
 var mainWindow = null;
 
@@ -63,10 +66,6 @@ app.on('ready', () => {
     else
       mainWindow.webContents.send('remove-device', drive);
   });
-
-  //ipcMain.on('openFolder', () => {
-  //  dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
-  //});
 
   ipcMain.on('settings-created', () => initLibrary(mainWindow));
 
