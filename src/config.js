@@ -6,6 +6,16 @@ if (process.env.ANSEL_DEV_MODE) {
   migrationsFolder = `${process.env.INIT_CWD}/migrations`;
 }
 
+if (process.env.ANSEL_TEST_MODE) {
+  const testsPath = '/tmp/ansel-tests';
+
+  if (!fs.existsSync(testsPath))
+    fs.mkdirSync(testsPath);
+
+  dotAnsel = `${testsPath}/dot-ansel`;
+  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
+}
+
 export default {
   characters: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZéè',
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
