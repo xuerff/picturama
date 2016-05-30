@@ -9,6 +9,11 @@ let app;
 before(function() {
   this.timeout(10000)
 
+  const testsPath = '/tmp/ansel-tests';
+
+  if (!fs.existsSync(testsPath))
+    fs.mkdirSync(testsPath);
+
   app = new Application({
     path: 'node_modules/.bin/electron',
     args: ['.'],
@@ -44,3 +49,11 @@ describe('application launch', function () {
     });
   });
 })
+
+describe('Settings screen', function() {
+  it('should fill out the photo folder', function() {
+    return app.client.click('#photos-dir').then(function() {
+      console.log('hi');
+    });
+  });
+});
