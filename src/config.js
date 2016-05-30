@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 let dotAnsel = `${process.env.HOME}/.ansel`;
 let migrationsFolder = `${process.resourcesPath}/app/migrations`;
 

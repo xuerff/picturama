@@ -8,4 +8,7 @@ import App from './../dist/components/app';
 if (process.env.ANSEL_DEV_MODE)
   document.title = 'Ansel - DEV MODE';
 
+else if (process.env.ANSEL_TEST_MODE)
+  document.title = 'Ansel - TEST MODE';
+
 ReactDOM.render(React.createElement(App), document.getElementById('app'));
