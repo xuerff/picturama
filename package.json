@@ -10,7 +10,7 @@
     "rebuild-udev": "cd node_modules/udev && node-gyp configure --module_name=udev --module_path=../lib/binding/electron-v1.1-linux-x64 && node-gyp rebuild --target=1.1.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=udev --module_path=../lib/binding/electron-v1.1-linux-x64",
     "rebuild-exiv2": "cd node_modules/exiv2 && node-gyp configure --module_name=exiv2 --module_path=../lib/binding/electron-v1.1-linux-x64 && node-gyp rebuild --target=1.1.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=exiv2 --module_path=../lib/binding/electron-v1.1-linux-x64",
     "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.1-linux-x64 && node-gyp rebuild --target=1.1.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.1-linux-x64",
-    "spectron": "node specs/run.js"
+    "test": "./node_modules/.bin/mocha specs/**/*.spec.js"
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "MIT",
