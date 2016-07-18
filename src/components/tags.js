@@ -7,7 +7,7 @@ import TagButton from './tag-button';
 class Tags extends React.Component {
   static propTypes = {
     tags: React.PropTypes.array.isRequired,
-    currentTag: React.PropTypes.number.isRequired,
+    currentTag: React.PropTypes.number,
     actions: React.PropTypes.object.isRequired
   }
 
