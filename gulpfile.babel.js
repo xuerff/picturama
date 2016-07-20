@@ -89,6 +89,7 @@ gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ],
         "dist/**/*", 
         "static/**/*",
         "menus/**/*",
+        "keymaps/**/*",
         "migrations/**/*",
         "knexfile.js",
         "package.json"
