@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "atom-keymap": "^6.3.2",
+    "babel-runtime": "^6.9.2",
     "bluebird": "^3.4.1",
     "bookshelf": "^0.10.0",
     "child-process-promise": "^2.0.3",
