@@ -22,6 +22,7 @@ export default {
 
   knex: {
     client: 'sqlite3',
+    useNullAsDefault: true,
     connection: {
       filename: `${dotAnsel}/db.sqlite3`
     },
