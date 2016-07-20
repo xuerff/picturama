@@ -1,5 +1,7 @@
 import KeymapManager from 'atom-keymap';
 
+import config from './config';
+
 let keymaps;
 
 const eventListener = (event) => {
@@ -9,8 +11,9 @@ const eventListener = (event) => {
 const bind = (el) => {
   keymaps = new KeymapManager();
   keymaps.defaultTarget = el;
-  keymaps.loadKeymap(`${__dirname}/../keymaps/linux.json`);
+  keymaps.loadKeymap(`${config.keymapsFolder}/linux.json`);
 
+  console.log(`${config.menusFolder}/linux.json`);
   keymaps.onDidMatchBinding((e) => console.log('match', e));
   //keymaps.onDidPartiallyMatchBindings((e) => console.log('partially', e));
   //keymaps.onDidFailToMatchBinding((e) => console.log('fail', e));

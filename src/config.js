@@ -1,9 +1,11 @@
 let dotAnsel = `${process.env.HOME}/.ansel`;
 let migrationsFolder = `${process.resourcesPath}/app/migrations`;
+let anselFolder = `${process.resourcesPath}/app`;
 
 if (process.env.ANSEL_DEV_MODE) {
   dotAnsel = `${process.env.INIT_CWD}/dot-ansel`;
   migrationsFolder = `${process.env.INIT_CWD}/migrations`;
+  anselFolder = `${process.env.INIT_CWD}`;
 }
 
 export default {
@@ -13,6 +15,8 @@ export default {
   watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
   exportFormats: [ 'jpg', 'png' ],
   dotAnsel,
+  menusFolder: `${anselFolder}/menus`,
+  keymapsFolder: `${anselFolder}/keymaps`,
   dbFile: `${dotAnsel}/db.sqlite3`,
   settings: `${dotAnsel}/settings.json`,
   thumbsPath: `${dotAnsel}/thumbs`,
