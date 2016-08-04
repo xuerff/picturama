@@ -1,3 +1,4 @@
+import { remote } from 'electron';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
@@ -5,6 +6,8 @@ import { connect } from 'react-redux';
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
+
+const {Menu, MenuItem} = remote;
 
 class Library extends React.Component {
   static propTypes = {
@@ -17,7 +20,13 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
+    this.contextMenu = this.contextMenu.bind(this);
     this.state = { highlighted: [], scrollTop: 0 };
+  }
+
+  contextMenu(e) {
+    e.preventDefault();
+    this.menu.popup(remote.getCurrentWindow());
   }
 
   handleCurrent(current) {
@@ -34,6 +43,10 @@ class Library extends React.Component {
     this.setState(state);
   }
 
+  handleFlagging() {
+    console.log('flag it!', this.state.highlighted);
+  }
+
   componentDidUpdate() {
     let state = this.state;
 
@@ -46,6 +59,19 @@ class Library extends React.Component {
 
   componentDidMount() {
     this.props.actions.getPhotos();
+
+    this.menu = new Menu();
+
+    this.menu.append(new MenuItem({ 
+      label: 'Flag picture(s)', 
+      click: this.handleFlagging.bind(this)
+    }));
+
+    document.addEventListener('contextmenu', this.contextMenu);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('contextmenu', this.contextMenu);
   }
 
   isLast() {
