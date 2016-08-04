@@ -22,8 +22,8 @@ class Picture extends React.Component {
     this.props.setCurrent(this.props.index);
   }
 
-  handleClick() {
-    this.props.setHighlight(this.props.index);
+  handleClick(e) {
+    this.props.setHighlight(this.props.index, e.ctrlKey);
   }
 
   render() {

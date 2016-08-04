@@ -63,10 +63,12 @@ class Library extends React.Component {
     this.props.actions.toggleFlag(this.props.photos[this.props.current[0]]);
   }
 
-  handleHighlight(index) {
+  handleHighlight(index, ctrlKey) {
     let state = this.state;
 
-    state.highlighted = [];
+    if (!ctrlKey)
+      state.highlighted = [];
+
     state.highlighted.push(index);
 
     this.setState(state);
