@@ -34,7 +34,7 @@ class Library extends React.Component {
 
     this.props.actions.setCurrent(current);
 
-    if (this.props.current.length > 0)
+    if (this.props.current != -1)
       state.scrollTop = ReactDOM
         .findDOMNode(this)
         .parentNode
@@ -50,7 +50,7 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.current.length == 0 && state.scrollTop > 0) {
+    if (this.props.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
       this.setState(state);
@@ -77,16 +77,16 @@ class Library extends React.Component {
   isLast() {
     let photos = this.props.photos;
 
-    if (photos.length == photos.indexOf(this.props.current[0]) + 1)
+    if (photos.length == photos.indexOf(this.props.current) + 1)
       return true;
-    else if (photos.indexOf(this.props.current[0]) == 0)
+    else if (photos.indexOf(this.props.current) == 0)
       return true;
     else
       return false;
   }
 
   handleFlag() {
-    this.props.actions.toggleFlag(this.props.photos[this.props.current[0]]);
+    this.props.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
   handleHighlight(index, ctrlKey) {
@@ -107,7 +107,7 @@ class Library extends React.Component {
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;
 
-    else if (this.props.current.length == 0)
+    else if (this.props.current == -1)
       currentView = this.props.photos.map((photo, index) => {
         return (
           <Picture
@@ -123,11 +123,11 @@ class Library extends React.Component {
     else if (this.props.diff)
       currentView = <PictureDiff
                       actions={this.props.actions}
-                      photo={this.props.photos[this.props.current[0]]} />;
+                      photo={this.props.photos[this.props.current]} />;
 
     else
       currentView = <PictureDetail
-                      photo={this.props.photos[this.props.current[0]]}
+                      photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}
                       setCurrent={this.handleCurrent.bind(this)}

@@ -39,7 +39,7 @@ const initialState = {
   importing: false,
   currentDate: null,
   currentTag: null,
-  current: [],
+  current: -1,
   diff: false,
   settingsExists: false,
   photos: [],
@@ -55,7 +55,7 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       diff: false,
-      current: [],
+      current: -1,
       importing: false,
       currentDate: action.hasOwnProperty('date') ? action.date : null,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : null,
@@ -136,21 +136,21 @@ export default function reducers(state = initialState, action) {
     return {
       ...state,
       diff: false,
-      current: (action.current <= state.photos.length && action.current >= 0) ? [ action.current ] : []
+      current: (action.current <= state.photos.length && action.current >= 0) ? action.current : -1
     };
 
   case 'SET_CURRENT_LEFT_SUCCESS':
     return {
       ...state,
       diff: false,
-      current: [ (state.current[0] >= 1) ? state.current[0] -1 : state.current[0] ]
+      current: (state.current >= 1) ? state.current -1 : state.current
     };
 
   case 'SET_CURRENT_RIGHT_SUCCESS':
     return {
       ...state,
       diff: false,
-      current: [ (state.photos.length > state.current[0]+1) ? state.current[0]+1 : state.current[0] ]
+      current: (state.photos.length > state.current+1) ? state.current+1 : state.current
     };
 
   case 'TOGGLE_DIFF_SUCCESS':
