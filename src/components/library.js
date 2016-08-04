@@ -45,6 +45,12 @@ class Library extends React.Component {
 
   handleFlagging() {
     console.log('flag it!', this.state.highlighted);
+
+    let flagSet = this.props.photos
+      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+
+    console.log('flag set', flagSet);
+    this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
   componentDidUpdate() {
