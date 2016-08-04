@@ -37,6 +37,7 @@ var Version = anselBookshelf.Model.extend({
           return copy(photo.master, fileNamePath);
 
         } else {
+          console.log('standard', fileNamePath);
           let fileNamePath = `${config.tmp}/${fileName}`;
           model.set('master', `${fileNamePath}.tiff`);
 
