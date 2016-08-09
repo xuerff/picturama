@@ -1,6 +1,6 @@
 import { remote } from 'electron';
 import React from 'react';
-import ReactDOM from 'react-dom';
+//import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import Picture from './picture';
@@ -20,8 +20,10 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.contextMenu = this.contextMenu.bind(this);
-    this.state = { highlighted: [], scrollTop: 0 };
+
+    this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
 
   contextMenu(e) {
@@ -35,10 +37,11 @@ class Library extends React.Component {
     this.props.actions.setCurrent(current);
 
     if (this.props.current != -1)
-      state.scrollTop = ReactDOM
-        .findDOMNode(this)
-        .parentNode
-        .scrollTop;
+      state.scrollTop = this.node.parentNode.scrolltTop;
+      //state.scrollTop = ReactDOM
+      //  .findDOMNode(this)
+      //  .parentNode
+      //  .scrollTop;
 
     this.setState(state);
   }
@@ -51,6 +54,9 @@ class Library extends React.Component {
 
     console.log('flag set', flagSet);
     this.props.actions.flagSet(this.props.photos, flagSet, true);
+  }
+
+  handleExport() {
   }
 
   componentDidUpdate() {
@@ -71,6 +77,11 @@ class Library extends React.Component {
     this.menu.append(new MenuItem({ 
       label: 'Flag picture(s)', 
       click: this.handleFlagging.bind(this)
+    }));
+
+    this.menu.append(new MenuItem({ 
+      label: 'Export picture(s)', 
+      click: this.handleExport.bind(this)
     }));
 
     document.addEventListener('contextmenu', this.contextMenu);
