@@ -5,6 +5,7 @@ import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
 import electronMocha from 'gulp-electron-mocha';
+import bumpBuildNumber from 'gulp-buildnum';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -124,6 +125,12 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   });
 });
 
+gulp.task('increment-buildnum', (cb) => {
+  return gulp.src('./package.json')
+    .pipe(bumpBuildNumber({key: "buildnum"}))
+    .pipe(gulp.dest('./'));
+});
+
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
 
 gulp.task('build', [ 
@@ -131,9 +138,10 @@ gulp.task('build', [
   'clear-build', 
   'babel', 
   'styles', 
+  'increment-buildnum',
   'prepare-src', 
   'prepare-modules', 
-  'package' 
+  'package'
 ]);
 
 gulp.task('clear', [

@@ -1,6 +1,7 @@
 {
   "name": "ansel",
   "version": "0.3.0",
+  "buildnum": "1",
   "description": "",
   "main": "dist/browser.js",
   "scripts": {
@@ -69,6 +70,8 @@
     "estraverse-fb": "^1.3.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-bump": "^2.4.0",
+    "gulp-buildnum": "git+https://github.com/m0g/gulp-buildnum",
     "gulp-concat": "^2.6.0",
     "gulp-electron-mocha": "^1.2.3",
     "gulp-env": "^0.4.0",
