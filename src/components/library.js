@@ -45,12 +45,9 @@ class Library extends React.Component {
   }
 
   handleFlagging() {
-    console.log('flag it!', this.state.highlighted);
-
     let flagSet = this.props.photos
       .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
 
-    console.log('flag set', flagSet);
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
@@ -70,10 +67,6 @@ class Library extends React.Component {
   componentDidMount() {
     this.props.actions.getPhotos();
   }
-
-  //componentWillUnmount() {
-  //  console.log('unmount library component');
-  //}
 
   mountContextMenu() {
     this.menu = new Menu();
@@ -123,7 +116,6 @@ class Library extends React.Component {
 
   render() {
     let currentView;
-    console.log('current', this.props.current);
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;

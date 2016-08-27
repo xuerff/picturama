@@ -13,12 +13,6 @@ const bind = (el) => {
   keymaps.defaultTarget = el;
   keymaps.loadKeymap(`${config.keymapsFolder}/linux.json`);
 
-  console.log(`${config.menusFolder}/linux.json`);
-  keymaps.onDidMatchBinding((e) => console.log('match', e));
-  //keymaps.onDidPartiallyMatchBindings((e) => console.log('partially', e));
-  //keymaps.onDidFailToMatchBinding((e) => console.log('fail', e));
-  //keymaps.onDidFailToReadFile((e) => console.log('fail read', e));
-
   document.addEventListener('keydown', eventListener);
 };
 
