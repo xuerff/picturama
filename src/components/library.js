@@ -48,6 +48,7 @@ class Library extends React.Component {
     let flagSet = this.props.photos
       .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
 
+    console.log('handle flagging', flagSet);
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
@@ -68,25 +69,25 @@ class Library extends React.Component {
     this.props.actions.getPhotos();
   }
 
-  mountContextMenu() {
-    this.menu = new Menu();
+  //mountContextMenu() {
+  //  this.menu = new Menu();
 
-    this.menu.append(new MenuItem({ 
-      label: 'Flag picture(s)', 
-      click: this.handleFlagging.bind(this)
-    }));
+  //  this.menu.append(new MenuItem({ 
+  //    label: 'Flag picture(s)', 
+  //    click: this.handleFlagging.bind(this)
+  //  }));
 
-    this.menu.append(new MenuItem({ 
-      label: 'Export picture(s)', 
-      click: this.handleExport.bind(this)
-    }));
+  //  this.menu.append(new MenuItem({ 
+  //    label: 'Export picture(s)', 
+  //    click: this.handleExport.bind(this)
+  //  }));
 
-    document.addEventListener('contextmenu', this.contextMenu);
-  }
+  //  document.addEventListener('contextmenu', this.contextMenu);
+  //}
 
-  unmountContextMenu() {
-    document.removeEventListener('contextmenu', this.contextMenu);
-  }
+  //unmountContextMenu() {
+  //  document.removeEventListener('contextmenu', this.contextMenu);
+  //}
 
   isLast() {
     let photos = this.props.photos;
@@ -129,6 +130,7 @@ class Library extends React.Component {
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
             highlighted={this.state.highlighted.indexOf(index) != -1}
+            setFlagging={this.handleFlagging.bind(this)}
             setCurrent={this.handleCurrent.bind(this)} />
         );
       });
@@ -146,10 +148,10 @@ class Library extends React.Component {
                       setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
 
-    if (this.props.current == -1)
-      this.mountContextMenu();
-    else
-      this.unmountContextMenu();
+    //if (this.props.current == -1)
+    //  this.mountContextMenu();
+    //else
+    //  this.unmountContextMenu();
 
     return (
       <div id="library">
