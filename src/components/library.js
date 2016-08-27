@@ -1,13 +1,9 @@
-import { remote } from 'electron';
 import React from 'react';
-//import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
-
-const {Menu, MenuItem} = remote;
 
 class Library extends React.Component {
   static propTypes = {
@@ -21,16 +17,7 @@ class Library extends React.Component {
   constructor(props) {
     super(props);
 
-    this.contextMenu = this.contextMenu.bind(this);
-    this.mountContextMenu = this.mountContextMenu.bind(this);
-    this.unmountContextMenu = this.unmountContextMenu.bind(this);
-
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
-  }
-
-  contextMenu(e) {
-    e.preventDefault();
-    this.menu.popup(remote.getCurrentWindow());
   }
 
   handleCurrent(current) {
@@ -48,7 +35,6 @@ class Library extends React.Component {
     let flagSet = this.props.photos
       .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
 
-    console.log('handle flagging', flagSet);
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
@@ -68,26 +54,6 @@ class Library extends React.Component {
   componentDidMount() {
     this.props.actions.getPhotos();
   }
-
-  //mountContextMenu() {
-  //  this.menu = new Menu();
-
-  //  this.menu.append(new MenuItem({ 
-  //    label: 'Flag picture(s)', 
-  //    click: this.handleFlagging.bind(this)
-  //  }));
-
-  //  this.menu.append(new MenuItem({ 
-  //    label: 'Export picture(s)', 
-  //    click: this.handleExport.bind(this)
-  //  }));
-
-  //  document.addEventListener('contextmenu', this.contextMenu);
-  //}
-
-  //unmountContextMenu() {
-  //  document.removeEventListener('contextmenu', this.contextMenu);
-  //}
 
   isLast() {
     let photos = this.props.photos;
@@ -147,11 +113,6 @@ class Library extends React.Component {
                       toggleFlag={this.handleFlag.bind(this)}
                       setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
-
-    //if (this.props.current == -1)
-    //  this.mountContextMenu();
-    //else
-    //  this.unmountContextMenu();
 
     return (
       <div id="library">
