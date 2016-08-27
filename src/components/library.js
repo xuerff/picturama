@@ -22,6 +22,8 @@ class Library extends React.Component {
     super(props);
 
     this.contextMenu = this.contextMenu.bind(this);
+    this.mountContextMenu = this.mountContextMenu.bind(this);
+    this.unmountContextMenu = this.unmountContextMenu.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
@@ -38,10 +40,6 @@ class Library extends React.Component {
 
     if (this.props.current != -1)
       state.scrollTop = this.node.parentNode.scrolltTop;
-      //state.scrollTop = ReactDOM
-      //  .findDOMNode(this)
-      //  .parentNode
-      //  .scrollTop;
 
     this.setState(state);
   }
@@ -71,7 +69,13 @@ class Library extends React.Component {
 
   componentDidMount() {
     this.props.actions.getPhotos();
+  }
 
+  //componentWillUnmount() {
+  //  console.log('unmount library component');
+  //}
+
+  mountContextMenu() {
     this.menu = new Menu();
 
     this.menu.append(new MenuItem({ 
@@ -87,7 +91,7 @@ class Library extends React.Component {
     document.addEventListener('contextmenu', this.contextMenu);
   }
 
-  componentWillUnmount() {
+  unmountContextMenu() {
     document.removeEventListener('contextmenu', this.contextMenu);
   }
 
@@ -149,6 +153,11 @@ class Library extends React.Component {
                       toggleFlag={this.handleFlag.bind(this)}
                       setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
+
+    if (this.props.current == -1)
+      this.mountContextMenu();
+    else
+      this.unmountContextMenu();
 
     return (
       <div id="library">
