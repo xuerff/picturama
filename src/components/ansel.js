@@ -60,28 +60,22 @@ class Ansel extends React.Component {
   }
 
   render() {
-    let sidebar = null;
-
-    let containerClass = classNames({ 
+    let noSidebarClass = classNames({ 
       'no-sidebar': !this.state.showSidebar || !this.props.settingsExists
     });
 
-    if (this.state.showSidebar && this.props.settingsExists)
-      sidebar = (
-        <Sidebar
-          actions={this.state.actions}
-          setDateFilter={this.handleDateFilter.bind(this)} />
-      );
-
     return (
       <div id="ansel">
-        {sidebar}
+        <Sidebar
+          actions={this.state.actions}
+          className={noSidebarClass}
+          setDateFilter={this.handleDateFilter.bind(this)} />
 
         <Container
           settingsExists={this.props.settingsExists}
           actions={this.state.actions}
           importing={this.props.importing}
-          className={containerClass} />
+          className={noSidebarClass} />
 
       </div>
     );

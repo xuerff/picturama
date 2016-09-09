@@ -133,12 +133,13 @@ div.outer-modal {
 #container {
   position: relative;
   z-index: 1;
-  float: left;
+  float: right;
   width: ~"calc(100% - 300px)";
   height: 100%;
   background: @blue-grey-100;
   color: @white;
   overflow-y: auto;
+  transition: width 0.4s ease-in;
 
   #library {
     height: 100%;
@@ -258,7 +259,10 @@ div.outer-modal {
   }
 }
 
-#container.no-sidebar { width: 100%; }
+#container.no-sidebar { 
+  width: 100%;
+  transition: width 0.4s ease-out;
+}
 
 #progress {
   color: @blue-grey-900;
