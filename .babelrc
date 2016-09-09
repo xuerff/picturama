@@ -1,9 +1,7 @@
 {
   "presets": [
-    "chrome-49",
-    "stage-0",
     "stage-1",
     "react"
   ],
-   "plugins": ["syntax-decorators"]
+   "plugins": ["syntax-decorators", "transform-es2015-modules-commonjs"]
 }
