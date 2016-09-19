@@ -239,6 +239,7 @@ div.outer-modal {
       height: 247px;
       display: block;
       text-align: center;
+      transition: background-color 0.2s ease-in;
 
       span.v-align {
         display: inline-block;
@@ -256,6 +257,12 @@ div.outer-modal {
     a.picture.highlighted {
       background: @deep-orange-500;
     }
+  }
+
+  #library.grid {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: repeat(4, 100px);
   }
 }
 

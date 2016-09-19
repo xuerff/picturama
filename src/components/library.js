@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
@@ -84,6 +85,8 @@ class Library extends React.Component {
   render() {
     let currentView;
 
+    let libraryClass = classNames({ 'grid': this.props.current == -1 });
+
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;
 
@@ -115,7 +118,7 @@ class Library extends React.Component {
                       isLast={this.isLast.bind(this)} />;
 
     return (
-      <div id="library">
+      <div id="library" className={libraryClass}>
         {currentView}
       </div>
     );
