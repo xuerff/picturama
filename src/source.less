@@ -239,6 +239,7 @@ div.outer-modal {
       height: 247px;
       display: block;
       text-align: center;
+      transition: background-color 0.2s ease-in;
 
       span.v-align {
         display: inline-block;
@@ -283,3 +284,88 @@ div.outer-modal {
     }
   }
 }
+
+#container #library.grid {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: repeat(4, 247px);
+  justify-items: center;
+
+  width: 988px;
+  margin: auto;
+}
+
+#container.no-sidebar #library.grid {
+  grid-template-columns: repeat(5, 247px);
+  width: 1235px;
+}
+
+@media (max-width: 1920px) and (min-width: 1367px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(7, 247px);
+    width: 1729px;
+  }
+
+  #container #library.grid {
+    grid-template-columns: repeat(6, 247px);
+    width: 1482px;
+  }
+}
+
+@media (max-width: 1366px) and (min-width: 1275px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(5, 247px);
+    width: 1235px;
+  }
+
+  #container #library.grid {
+    grid-template-columns: repeat(4, 247px);
+    width: 988px;
+  }
+}
+
+@media (max-width: 1275px) and (min-width: 1056px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(4, 247px);
+    width: 988px;
+  }
+
+  #container #library.grid {
+    grid-template-columns: repeat(3, 247px);
+    width: 741px;
+  }
+}
+
+@media (max-width: 1055px) and (min-width: 811px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(3, 247px);
+    width: 741px;
+  }
+
+  #container #library.grid {
+    grid-template-columns: repeat(2, 247px);
+    width: 494px;
+  }
+}
+
+@media (max-width: 810px) and (min-width: 516px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(2, 247px);
+    width: 494px;
+  }
+}
+
+@media (max-width: 810px) {
+  #container #library.grid {
+    grid-template-columns: repeat(1, 247px);
+    width: 247px;
+  }
+}
+
+@media (max-width: 515px) {
+  #container.no-sidebar #library.grid {
+    grid-template-columns: repeat(1, 247px);
+    width: 247px;
+  }
+}
+

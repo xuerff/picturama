@@ -4,7 +4,7 @@
 
 ## Prerequistes
 
-As of today, only **Ubuntu 14.04 LTS** 64-bits is supported.
+As of today, only **Ubuntu 14.04 & 16.04 LTS** 64-bits are supported.
 
 In order to be able to run, ansel requires the following libraries:
 
