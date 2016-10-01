@@ -17,3 +17,9 @@ sudo npm install -g gulp
 npm install
 gulp
 ```
+
+## Supported cameras
+
+- [ ] Fuji X100
+- [x] Fuji X100T
+- [ ] Canon 5D Mark II
