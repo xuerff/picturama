@@ -13,8 +13,7 @@ const readFile = Promise.promisify(fs.readFile);
 class Export extends React.Component {
   static propTypes = {
     closeExportDialog: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired,
-    title: React.PropTypes.string.isRequired
+    photo: React.PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -102,8 +101,8 @@ class Export extends React.Component {
   }
 
   render() {
-    let formats = config.exportFormats.map((exportFormat) => {
-      return <option value={exportFormat}>{exportFormat}</option>;
+    let formats = config.exportFormats.map((exportFormat, i) => {
+      return <option key={i} value={exportFormat}>{exportFormat}</option>;
     });
 
     return (

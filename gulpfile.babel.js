@@ -5,6 +5,7 @@ import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
 import electronMocha from 'gulp-electron-mocha';
+import bumpBuildNumber from 'gulp-buildnum';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -74,6 +75,15 @@ gulp.task('set-env', () => {
   })
 });
 
+gulp.task('set-env-test', () => {
+  env({
+    vars: {
+      ANSEL_DEV_MODE: true,
+      ANSEL_TEST_MODE: true
+    }
+  })
+});
+
 gulp.task('test', ['babel-tests'], () => {
   return gulp.src('tests-dist/**/*.spec.js', { read: false })
     .pipe(electronMocha({ 
@@ -89,6 +99,7 @@ gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ],
         "dist/**/*", 
         "static/**/*",
         "menus/**/*",
+        "keymaps/**/*",
         "migrations/**/*",
         "knexfile.js",
         "package.json"
@@ -109,7 +120,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   let opts = {
     arch: 'x64',
     dir: './build/prepared',
-    ignore: /(txt$|md$|jpg$|jpeg$|cc$|license|example|tests|node_modules\/libraw\/vendor|node_modules\/exiv2\/vendor)/i,
+    ignore: /(txt$|md$|jpg$|jpeg$|\.cc$|license|example|tests|node_modules\/libraw\/vendor|node_modules\/exiv2\/vendor)/i,
     platform: 'linux',
     asar: false,
     out: './build',
@@ -123,6 +134,17 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
   });
 });
 
+gulp.task('increment-buildnum', (cb) => {
+  return gulp.src('./package.json')
+    .pipe(bumpBuildNumber({key: "buildnum"}))
+    .pipe(gulp.dest('./'));
+});
+
+gulp.task('mocha', () => {
+  gulp.src('specs/run.spec.js', {read: false})
+    .pipe(mocha({reporter: 'nyan'}))
+});
+
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
 
 gulp.task('build', [ 
@@ -130,9 +152,10 @@ gulp.task('build', [
   'clear-build', 
   'babel', 
   'styles', 
+  'increment-buildnum',
   'prepare-src', 
   'prepare-modules', 
-  'package' 
+  'package'
 ]);
 
 gulp.task('clear', [
@@ -142,3 +165,5 @@ gulp.task('clear', [
   'styles',
   'run'
 ]);
+
+gulp.task('tests', ['set-env-test', 'lint', 'babel', 'styles', 'mocha']);

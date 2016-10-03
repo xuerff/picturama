@@ -14,6 +14,7 @@ if (fs.existsSync(config.settings))
 
 class Sidebar extends React.Component {
   static propTypes = {
+    className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired
   }
 
@@ -50,7 +51,7 @@ class Sidebar extends React.Component {
     }
 
     return (
-      <div id="sidebar">
+      <div id="sidebar" className={this.props.className}>
         <h2><i className="fa fa-camera-retro"></i> Library</h2>
 
         <div className="sidebar-content">

@@ -23,7 +23,7 @@ class Devices extends React.Component {
       <div className="devices">
         <h3><i className="fa fa-usb"></i> Devices</h3>
         <ul>
-          {this.props.devices.map((device) => <li>{device.name}</li>)}
+          {this.props.devices.map((device, i) => <li key={i}>{device.name}</li>)}
         </ul>
       </div>
     );

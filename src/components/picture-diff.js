@@ -19,7 +19,6 @@ class PictureDiff extends React.Component {
     super(props);
 
     this.updateState = this.updateState.bind(this);
-    //this.keyboardListener = this.keyboardListener.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.onImgLoad = this.onImgLoad.bind(this);
@@ -45,7 +44,6 @@ class PictureDiff extends React.Component {
   updateState(photo) {
     let state = this.state;
     state.photo = photo.toJSON();
-    console.log('updated state', state);
     this.setState(state);
   }
 

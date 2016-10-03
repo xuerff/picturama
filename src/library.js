@@ -202,7 +202,7 @@ class Library {
       })
       .then(this.onImportedStep.bind(this))
       .catch((err) => {
-        console.log('ERR', file, err);
+        console.log('ERR knex', file, err);
       });
   }
 
@@ -363,7 +363,6 @@ class Library {
       listener: (action, filePath) => {
         // on action:create then parse file and update version
         if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
-
           Version.updateImage(filePath.match(allowed)).then(function(version) {
             console.log('version done', version);
 

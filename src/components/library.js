@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import Picture from './picture';
 import PictureDetail from './picture-detail';
@@ -17,7 +17,8 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { highlighted: [], scrollTop: 0 };
+
+    this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
 
   handleCurrent(current) {
@@ -25,19 +26,26 @@ class Library extends React.Component {
 
     this.props.actions.setCurrent(current);
 
-    if (state.current != -1)
-      state.scrollTop = ReactDOM
-        .findDOMNode(this)
-        .parentNode
-        .scrollTop;
+    if (this.props.current != -1)
+      state.scrollTop = this.node.parentNode.scrolltTop;
 
     this.setState(state);
+  }
+
+  handleFlagging() {
+    let flagSet = this.props.photos
+      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+
+    this.props.actions.flagSet(this.props.photos, flagSet, true);
+  }
+
+  handleExport() {
   }
 
   componentDidUpdate() {
     let state = this.state;
 
-    if (state.current == -1 && state.scrollTop > 0) {
+    if (this.props.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
       this.setState(state);
@@ -51,9 +59,9 @@ class Library extends React.Component {
   isLast() {
     let photos = this.props.photos;
 
-    if (photos.length == photos.indexOf(this.state.current) + 1)
+    if (photos.length == photos.indexOf(this.props.current) + 1)
       return true;
-    else if (photos.indexOf(this.state.current) == 0)
+    else if (photos.indexOf(this.props.current) == 0)
       return true;
     else
       return false;
@@ -63,10 +71,12 @@ class Library extends React.Component {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
-  handleHighlight(index) {
+  handleHighlight(index, ctrlKey) {
     let state = this.state;
 
-    state.highlighted = [];
+    if (!ctrlKey)
+      state.highlighted = [];
+
     state.highlighted.push(index);
 
     this.setState(state);
@@ -74,6 +84,8 @@ class Library extends React.Component {
 
   render() {
     let currentView;
+
+    let libraryClass = classNames({ 'grid': this.props.current == -1 });
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;
@@ -87,6 +99,7 @@ class Library extends React.Component {
             photo={photo}
             setHighlight={this.handleHighlight.bind(this)}
             highlighted={this.state.highlighted.indexOf(index) != -1}
+            setFlagging={this.handleFlagging.bind(this)}
             setCurrent={this.handleCurrent.bind(this)} />
         );
       });
@@ -105,7 +118,7 @@ class Library extends React.Component {
                       isLast={this.isLast.bind(this)} />;
 
     return (
-      <div id="library">
+      <div id="library" className={libraryClass}>
         {currentView}
       </div>
     );

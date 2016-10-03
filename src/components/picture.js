@@ -1,5 +1,8 @@
+import { remote } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
+
+const {Menu, MenuItem} = remote;
 
 var rotation = {};
 rotation[1] = '';
@@ -9,6 +12,7 @@ class Picture extends React.Component {
   static propTypes = {
     setCurrent: React.PropTypes.func.isRequired,
     setHighlight: React.PropTypes.func.isRequired,
+    setFlagging: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.bool.isRequired,
     photo: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired
@@ -16,14 +20,59 @@ class Picture extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = { showContextMenu: false };
+
+    this.contextMenu = this.contextMenu.bind(this);
+  }
+
+  contextMenu(e) {
+    let state = this.state;
+
+    e.preventDefault();
+
+    if (!this.props.highlighted)
+      this.props.setHighlight(this.props.index, e.ctrlKey);
+
+    state.showContextMenu = true;
+
+    this.setState(state);
+  }
+
+  componentDidMount() {
+    this.menu = new Menu();
+
+    this.menu.append(new MenuItem({ 
+      label: 'Flag picture(s)', 
+      click: this.props.setFlagging
+    }));
+
+    this.menu.append(new MenuItem({ 
+      label: 'Export picture(s)', 
+      //click: this.handleExport.bind(this)
+      click: () => console.log('export, bitch!')
+    }));
+  }
+
+  componentDidUpdate() {
+    let state = this.state;
+
+    if (this.state.showContextMenu && this.props.highlighted) {
+      // If no timeout the menu will appears before the highlight
+      setTimeout(() => this.menu.popup(remote.getCurrentWindow()), 10);
+      state.showContextMenu = false;
+
+      this.setState(state);
+    }
   }
 
   handleDblClick() {
     this.props.setCurrent(this.props.index);
   }
 
-  handleClick() {
-    this.props.setHighlight(this.props.index);
+  handleClick(e) {
+    e.preventDefault();
+    this.props.setHighlight(this.props.index, e.ctrlKey);
   }
 
   render() {
@@ -47,6 +96,7 @@ class Picture extends React.Component {
         <span className="v-align"></span>
         <img
           onClick={this.handleClick.bind(this)}
+          onContextMenu={this.contextMenu}
           src={photo.thumb_250} 
           className={imgClass} />
       </a>

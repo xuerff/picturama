@@ -100,6 +100,33 @@ export const toggleFlag = (photo) => {
   };
 };
 
+export const flagSet = (photos, flaggedPhotos, flag) => {
+  return (dispatch) => {
+    Promise.each(flaggedPhotos, (photo) => {
+      return new Photo({ id: photo.id })
+        .save('flag', flag, { patch: true });
+    })
+    .then(() => {
+      return photos;
+    })
+    .map((photo) => {
+      return new Photo({ id: photo.id })
+        .fetch({ withRelated: ['versions', 'tags'] })
+        .then((photo) => photo.toJSON());
+    })
+    //.then((photoIds) => {
+    //  new Photo.where('id', 'IN', photoIds)
+    //    .fetchAll({ withRelated: ['versions', 'tags'] });
+    //})
+    .then((photos) => {
+      dispatch({ 
+        type: 'GET_PHOTOS_SUCCESS', 
+        photos: photos
+      });
+    });
+  };
+};
+
 export const setTagFilter = (tag) => {
   return (dispatch) => {
     new Tag({ id: tag.id })

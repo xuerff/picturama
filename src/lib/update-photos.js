@@ -4,11 +4,14 @@ export default function updatePhotos(photos, updatedPhoto) {
 
   if (updatedPhoto.hasOwnProperty('versions') && updatedPhoto.versions.length > 0) {
     var versionNumber = updatedPhoto.versions.length;
-    //lastVersion = updatedPhoto.versions.pop();
     lastVersion = updatedPhoto.versions[updatedPhoto.versions.length - 1];
     updatedPhoto.thumb = lastVersion.output;
     updatedPhoto.thumb_250 = lastVersion.thumbnail;
-    updatedPhoto.versionNumber += versionNumber;
+
+    if (Number.isInteger(updatedPhoto.versionNumber))
+      updatedPhoto.versionNumber += versionNumber;
+    else
+      updatedPhoto.versionNumber = versionNumber + 1;
   }
 
   photos.forEach((photo, index) => {
@@ -16,30 +19,9 @@ export default function updatePhotos(photos, updatedPhoto) {
       updatedPhotoPos = index;
   });
 
-  console.log('upd photo', photos, updatedPhoto, updatedPhotoPos);
-
   return [
     ...photos.slice(0, updatedPhotoPos),
     Object.assign({}, updatedPhotoPos, updatedPhoto),
     ...photos.slice(updatedPhotoPos + 1)
   ];
-
-  //return photos.map((photo) => {
-  //  photo.versionNumber = 1;
-
-  //  if (photo.id == updatedPhoto.id) {
-  //    photo = updatedPhoto;
-
-  //    if (lastVersion) {
-  //      console.log('last version', lastVersion);
-  //      photo.thumb = lastVersion.output;
-  //      photo.thumb_250 = lastVersion.thumbnail;
-  //      photo.versionNumber += versionNumber;
-  //    }
-  //  }
-
-  //  return photo;
-  //});
-
-
 }

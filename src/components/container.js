@@ -33,8 +33,6 @@ export default class Container extends React.Component {
   }
 
   render() {
-    console.log('settings exists', this.props.settingsExists);
-
     let content = <Settings actions={this.props.actions} />;
 
     if (this.props.settingsExists)
