@@ -1,5 +1,4 @@
 os: linux
-dist: xenial
 language: node_js
 node_js:
   - "4.6"
@@ -9,6 +8,8 @@ script: gulp tests
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - xvfb
       - build-essential
