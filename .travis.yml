@@ -12,6 +12,11 @@ addons:
     packages:
       - xvfb
       - build-essential
+      - libudev-dev
+      - clang-3.3
+      - fakeroot
+      - git
+      - libgnome-keyring-dev
 
 before_install: if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
 install:
