@@ -9,7 +9,7 @@ const rimraf = require('rimraf');
 const testsPath = '/tmp/ansel-tests';
 
 describe('application launch', function () {
-  this.timeout(20000);
+  this.timeout(200000);
 
   before(function() {
     if (!fs.existsSync(testsPath))
