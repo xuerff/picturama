@@ -1,7 +1,6 @@
 import {ipcMain, Menu} from 'electron';
 
 import config from './config';
-//import template from config.menusFolder;
 import npmPackage from './../package.json';
 
 const template = require(`${config.menusFolder}/linux.json`);
