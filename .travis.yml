@@ -21,6 +21,8 @@ addons:
       - rpm
       - libxkbcommon-dev
       - x11-xkb-utils
+      - libx11-dev
+      - libxtst-dev
 
 env:
   - CXX=g++-4.8
