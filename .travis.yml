@@ -20,6 +20,8 @@ addons:
       - xz-utils
       - rpm
       - libxkbcommon-dev
+      - libxkbcommon-x11-0
+      - x11-xkb-utils
 
 env:
   - CXX=g++-4.8
