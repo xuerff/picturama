@@ -9,10 +9,14 @@ var process = (exData) => {
   let xmp = {
     exposureTime: eval(accessByMatch(exData, 'ExposureTime')),
     iso: parseInt(accessByMatch(exData, 'ISOSpeedRating')),
-    focalLength: eval(accessByMatch(exData, 'FocalLength')),
     aperture: eval(accessByMatch(exData, 'FNumber')),
     tags: []
   };
+
+  if (exData.hasOwnProperty('Exif.Photo.FocalLength'))
+    xmp.focalLength = eval(exData['Exif.Photo.FocalLength']);
+  else
+    xmp.focalLength = eval(accessByMatch(exData, 'FocalLength'));
 
   if (exData.hasOwnProperty('Xmp.dc.subject'))
     xmp.tags = exData['Xmp.dc.subject'].split(', ');
