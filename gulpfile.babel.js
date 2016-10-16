@@ -142,7 +142,7 @@ gulp.task('increment-buildnum', (cb) => {
 
 gulp.task('mocha', () => {
   gulp.src('specs/run.spec.js', {read: false})
-    .pipe(mocha({reporter: 'nyan'}))
+    .pipe(mocha({reporter: 'list'}))
 });
 
 gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
