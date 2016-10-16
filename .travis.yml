@@ -19,6 +19,7 @@ addons:
       - sqlite3
       - xz-utils
       - rpm
+      - libxkbcommon-x11-dev
 
 env:
   - CXX=g++-4.8
