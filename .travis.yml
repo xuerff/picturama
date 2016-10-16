@@ -24,10 +24,7 @@ addons:
       - libx11-dev
       - libxtst-dev
 
-env:
-  - CXX=g++-4.8
-  - ANSEL_DEV_MODE: true
-  - ANSEL_TEST_MODE: true
+env: CXX=g++-4.8 ANSEL_DEV_MODE=true ANSEL_TEST_MODE=true
 
 before_install: 
   - if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
