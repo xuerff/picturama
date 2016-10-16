@@ -23,6 +23,7 @@ addons:
       - x11-xkb-utils
       - libx11-dev
       - libxtst-dev
+      - libxkbfile-dev
 
 env: CXX=g++-4.8 ANSEL_DEV_MODE=true ANSEL_TEST_MODE=true
 
