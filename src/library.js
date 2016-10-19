@@ -1,3 +1,4 @@
+import { ipcMain } from 'electron';
 import moment from 'moment';
 import watchr from 'watchr';
 import sharp from 'sharp';
@@ -58,6 +59,11 @@ class Library {
 
     if (!fs.existsSync(config.tmp))
       fs.mkdirSync(config.tmp);
+
+    ipcMain.on('start-scanning', () => {
+      console.log('start import!');
+      this.scan();
+    });
   }
 
   prepare(filePaths) {

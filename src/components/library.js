@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron';
 import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
@@ -82,13 +83,27 @@ class Library extends React.Component {
     this.setState(state);
   }
 
+  startScanning() {
+    ipcRenderer.send('start-scanning');
+  }
+
   render() {
     let currentView;
 
     let libraryClass = classNames({ 'grid': this.props.current == -1 });
 
     if (!this.props.photos || this.props.photos.length === 0)
-      currentView = <div>No photos imported. press Ctrl+R to start scanning</div>;
+      currentView = (
+        <div>
+          <p>
+            <span>No photos imported. press Ctrl+R or </span>
+            <button 
+              id="start-import"
+              onClick={this.startScanning.bind(this)}>click here</button>
+            <span> to start scanning</span>
+          </p>
+        </div>
+      );
 
     else if (this.props.current == -1)
       currentView = this.props.photos.map((photo, index) => {
