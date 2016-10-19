@@ -15,7 +15,9 @@
     "rebuild-udev": "cd node_modules/udev && node-gyp configure --module_name=udev --module_path=../lib/binding/electron-v1.4-linux-x64 && node-gyp rebuild --target=1.4.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=udev --module_path=../lib/binding/electron-v1.4-linux-x64",
     "rebuild-exiv2": "cd node_modules/exiv2 && node-gyp configure --module_name=exiv2 --module_path=../lib/binding/electron-v1.4-linux-x64 && node-gyp rebuild --target=1.4.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=exiv2 --module_path=../lib/binding/electron-v1.4-linux-x64",
     "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.4-linux-x64 && node-gyp rebuild --target=1.4.1 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.4-linux-x64",
-    "test": "./node_modules/.bin/gulp tests"
+    "test": "./node_modules/.bin/gulp tests",
+    "build": "gulp increment-buildnum && ./scripts/build.sh",
+    "start": "./node_modules/.bin/gulp"
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "MIT",
@@ -94,6 +96,7 @@
     "jsdom": "^9.5.0",
     "mocha": "^3.0.2",
     "mocha-jsdom": "^1.0.0",
+    "node-gyp": "^3.4.0",
     "react-addons-test-utils": "^15.3.1",
     "rimraf": "^2.5.4",
     "spectron": "^3.4.0"
