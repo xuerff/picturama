@@ -3,6 +3,9 @@
     "tab": "core:toggleSidebar",
     "escape": "core:cancel"
   },
+  "#library": {
+    "right": "library:right"
+  },
   ".picture-detail": {
     "y": "detail:diff",
     "p": "detail:flag",
