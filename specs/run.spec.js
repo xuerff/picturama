@@ -51,18 +51,14 @@ describe('application launch', function () {
 
     // Since we're populating manually the settings.json
     // we need to run the migration manually
-
-    knex.migrate.latest().finally(() => {
-      console.log('migration complete');
-      return knex.destroy(); //works
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
-
-    return this.app.start()
+    return knex.migrate.latest()
+      .finally(() => {
+        return knex.destroy();
+      })
       .then(() => {
-        //console.log(this.app.process);
+        return this.app.start();
+      })
+      .then(() => {
         return this.app.client.getMainProcessLogs()
       })
       .then(function (logs) {
@@ -94,24 +90,28 @@ describe('application launch', function () {
   });
 
   it('should start the import', function() {
-    return this.app.electron.ipcRenderer.send('start-scanning');
+    return this.app.client.waitForExist('#start-scanning')
+      .then(() => this.app.client.click('#start-scanning'));
   });
 
   it('should wait for the import to finish', function() {
     return this.app.client.waitForExist('#library', 10000);
   });
-  //it('should fill out the photo folder', function() {
-  //  return this.app.client.setValue("#photos-dir", `${__dirname}/photos`);
-  //  //return this.app.client.click('#photos-dir').then(function() {
-  //  //  console.log('hi');
-  //  //});
-  //});
+
+  it('should show a particular photo', function() {
+    return this.app.client.doubleClick('a.picture')
+      .then(() => this.app.client.waitForExist('.picture-detail img'));
+  });
 
   after(function (done) {
     if (this.app && this.app.isRunning()) {
-      this.app.stop().then(() => {
-        rimraf(testsPath, done);
-      });
+      this.app.stop()
+        .then(() => {
+          return knex.destroy();
+        })
+        .then(() => {
+          rimraf(testsPath, done);
+        });
     }
   });
 });

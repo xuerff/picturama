@@ -98,7 +98,7 @@ class Library extends React.Component {
           <p>
             <span>No photos imported. press Ctrl+R or </span>
             <button 
-              id="start-import"
+              id="start-scanning"
               onClick={this.startScanning.bind(this)}>click here</button>
             <span> to start scanning</span>
           </p>
