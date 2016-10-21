@@ -8,6 +8,15 @@ const rimraf = require('rimraf');
 
 const testsPath = '/tmp/ansel-tests';
 
+if (!fs.existsSync(testsPath))
+  fs.mkdirSync(testsPath);
+
+if (!fs.existsSync(`${testsPath}/dot-ansel`))
+  fs.mkdirSync(`${testsPath}/dot-ansel`);
+
+if (!fs.existsSync(`${testsPath}/versions`))
+  fs.mkdirSync(`${testsPath}/versions`);
+
 var knex = require('knex')({
   client: 'sqlite3',
   useNullAsDefault: true,
@@ -27,20 +36,10 @@ const settings = {
   }
 };
 
-
 describe('application launch', function () {
   this.timeout(200000);
 
   before(function() {
-    if (!fs.existsSync(testsPath))
-      fs.mkdirSync(testsPath);
-
-    if (!fs.existsSync(`${testsPath}/dot-ansel`))
-      fs.mkdirSync(`${testsPath}/dot-ansel`);
-
-    if (!fs.existsSync(`${testsPath}/versions`))
-      fs.mkdirSync(`${testsPath}/versions`);
-
     fs.writeFileSync(`${testsPath}/dot-ansel/settings.json`, JSON.stringify(settings));
 
     this.app = new Application({
