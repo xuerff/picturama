@@ -5,7 +5,8 @@
   },
   "#library": {
     "left": "library:left",
-    "right": "library:right"
+    "right": "library:right",
+    "enter": "library:enter"
   },
   ".picture-detail": {
     "y": "detail:diff",

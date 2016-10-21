@@ -22,6 +22,7 @@ class Library extends React.Component {
 
     this.moveHighlightRight = this.moveHighlightRight.bind(this);
     this.moveHighlightLeft = this.moveHighlightLeft.bind(this);
+    this.pressedEnter = this.pressedEnter.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
@@ -44,7 +45,9 @@ class Library extends React.Component {
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
-  handleExport() {
+  pressedEnter() {
+    if (this.state.highlighted.length == 1)
+      this.handleCurrent(this.state.highlighted[0]);
   }
 
   componentDidUpdate() {
@@ -62,6 +65,7 @@ class Library extends React.Component {
 
     window.addEventListener('library:left', this.moveHighlightLeft);
     window.addEventListener('library:right', this.moveHighlightRight);
+    window.addEventListener('library:enter', this.pressedEnter);
 
     keymapManager.bind(this.refs.library);
   }
@@ -69,6 +73,7 @@ class Library extends React.Component {
   componentWillUnmount() {
     window.removeEventListener('library:left', this.moveHighlightLeft);
     window.removeEventListener('library:right', this.moveHighlightRight);
+    window.removeEventListener('library:enter', this.pressedEnter);
 
     keymapManager.unbind();
   }
