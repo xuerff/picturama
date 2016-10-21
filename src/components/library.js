@@ -32,7 +32,7 @@ class Library extends React.Component {
     this.props.actions.setCurrent(current);
 
     if (this.props.current != -1)
-      state.scrollTop = this.node.parentNode.scrolltTop;
+      state.scrollTop = this.node.parentNode.scrollTop;
 
     this.setState(state);
   }
