@@ -50,7 +50,6 @@ app.on('ready', () => {
 
     if (!fs.existsSync(config.dbFile))
       knex.migrate.latest().finally(() => {
-        console.log('migration complete');
         return knex.destroy(); //works
       });
   }
