@@ -3,6 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
+import keymapManager from './../keymap-manager';
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
@@ -18,7 +19,7 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
-
+    this.moveHighlightRight = this.moveHighlightRight.bind(this);
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
 
@@ -55,6 +56,15 @@ class Library extends React.Component {
 
   componentDidMount() {
     this.props.actions.getPhotos();
+
+    window.addEventListener('library:right', this.moveHighlightRight);
+
+    keymapManager.bind(this.refs.library);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('library:right', this.moveHighlightRight);
+    keymapManager.unbind();
   }
 
   isLast() {
@@ -70,6 +80,16 @@ class Library extends React.Component {
 
   handleFlag() {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
+  }
+
+  moveHighlightRight() {
+    let state = this.state;
+    let currentPos = this.state.highlighted[0];
+
+    if (currentPos+1 < this.props.photos.length)
+      state.highlighted = [currentPos+1];
+
+    this.setState(state);
   }
 
   handleHighlight(index, ctrlKey) {
@@ -98,7 +118,7 @@ class Library extends React.Component {
           <p>
             <span>No photos imported. press Ctrl+R or </span>
             <button 
-              id="start-import"
+              id="start-scanning"
               onClick={this.startScanning.bind(this)}>click here</button>
             <span> to start scanning</span>
           </p>
@@ -133,7 +153,7 @@ class Library extends React.Component {
                       isLast={this.isLast.bind(this)} />;
 
     return (
-      <div id="library" className={libraryClass}>
+      <div id="library" className={libraryClass} ref="library">
         {currentView}
       </div>
     );
