@@ -4,6 +4,7 @@
     "escape": "core:cancel"
   },
   "#library": {
+    "left": "library:left",
     "right": "library:right"
   },
   ".picture-detail": {

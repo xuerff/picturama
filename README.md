@@ -20,6 +20,7 @@ gulp
 
 ## Supported cameras
 
-- [ ] Fuji X100
+- [x] Fuji X100
+- [x] Fuji X100S
 - [x] Fuji X100T
-- [ ] Canon 5D Mark II
+- [x] Canon 5D Mark I

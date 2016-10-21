@@ -19,7 +19,10 @@ class Library extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.moveHighlightRight = this.moveHighlightRight.bind(this);
+    this.moveHighlightLeft = this.moveHighlightLeft.bind(this);
+
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
 
@@ -57,13 +60,16 @@ class Library extends React.Component {
   componentDidMount() {
     this.props.actions.getPhotos();
 
+    window.addEventListener('library:left', this.moveHighlightLeft);
     window.addEventListener('library:right', this.moveHighlightRight);
 
     keymapManager.bind(this.refs.library);
   }
 
   componentWillUnmount() {
+    window.removeEventListener('library:left', this.moveHighlightLeft);
     window.removeEventListener('library:right', this.moveHighlightRight);
+
     keymapManager.unbind();
   }
 
@@ -80,6 +86,16 @@ class Library extends React.Component {
 
   handleFlag() {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
+  }
+
+  moveHighlightLeft() {
+    let state = this.state;
+    let currentPos = this.state.highlighted[0];
+
+    if (currentPos-1 >= 0)
+      state.highlighted = [currentPos-1];
+
+    this.setState(state);
   }
 
   moveHighlightRight() {
