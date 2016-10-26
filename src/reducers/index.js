@@ -1,7 +1,3 @@
-//import fs from 'fs';
-
-//import config from './../config';
-
 import processDates from './../lib/process-dates';
 import updatePhotos from './../lib/update-photos';
 
