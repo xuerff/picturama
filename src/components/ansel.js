@@ -13,7 +13,8 @@ class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     settingsExists: React.PropTypes.bool.isRequired,
-    importing: React.PropTypes.bool.isRequired
+    importing: React.PropTypes.bool.isRequired,
+    splashed: React.PropTypes.bool.isRequired
   }
 
   constructor(props) {
@@ -29,6 +30,14 @@ class Ansel extends React.Component {
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
+  }
+
+  componentDidUpdate() {
+    if (this.props.splashed === true) {
+      let splash = document.getElementById('splash');
+      if (splash) splash.parentNode.removeChild(splash);
+    }
+
   }
 
   componentDidMount() {
@@ -84,6 +93,7 @@ class Ansel extends React.Component {
 
 const ReduxAnsel = connect(state => ({
   importing: state.importing,
+  splashed: state.splashed,
   settingsExists: state.settingsExists
 }))(Ansel);
 
