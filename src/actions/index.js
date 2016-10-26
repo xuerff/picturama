@@ -1,5 +1,7 @@
 import Promise from 'bluebird';
+import fs from 'fs';
 
+import config from './../config';
 import Photo from './../models/photo';
 import Tag from './../models/tag';
 
@@ -228,6 +230,11 @@ export const toggleDiff = () => {
 
 export const areSettingsExisting = () => {
   return (dispatch) => {
-    dispatch({ type: 'SETTINGS_EXISTS_SUCCESS' });
+    fs.access(config.settings, fs.constants.R_OK | fs.constants.W_OK, (err) => {
+      if (err)
+        dispatch({ type: 'SETTINGS_EXISTS_ERROR' });
+      else
+        dispatch({ type: 'SETTINGS_EXISTS_SUCCESS' });
+    });
   };
 };

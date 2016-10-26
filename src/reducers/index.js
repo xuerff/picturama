@@ -1,6 +1,6 @@
-import fs from 'fs';
+//import fs from 'fs';
 
-import config from './../config';
+//import config from './../config';
 
 import processDates from './../lib/process-dates';
 import updatePhotos from './../lib/update-photos';
@@ -36,6 +36,7 @@ const rmDevice = (devices, rmDevice) => {
 };
 
 const initialState = {
+  splashed: false,
   importing: false,
   currentDate: null,
   currentTag: null,
@@ -57,6 +58,7 @@ export default function reducers(state = initialState, action) {
       diff: false,
       current: -1,
       importing: false,
+      splashed: true,
       currentDate: action.hasOwnProperty('date') ? action.date : null,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : null,
       photos: action.photos.map(function(photo) {
@@ -162,7 +164,14 @@ export default function reducers(state = initialState, action) {
   case 'SETTINGS_EXISTS_SUCCESS':
     return {
       ...state,
-      settingsExists: fs.existsSync(config.settings)
+      settingsExists: true
+    };
+
+  case 'SETTINGS_EXISTS_ERROR':
+    return {
+      ...state,
+      splashed: true,
+      settingsExists: false
     };
 
   default:
