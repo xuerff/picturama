@@ -108,6 +108,7 @@ input.textfield {
 }
 
 @import "less/sidebar.less";
+@import "less/header.less";
 
 div.outer-modal {
   position: fixed;
@@ -132,18 +133,25 @@ div.outer-modal {
 }
 
 #container {
+  padding-top: 48px;
   position: relative;
   z-index: 1;
   float: right;
   width: ~"calc(100% - 300px)";
-  height: 100%;
+  height: ~"calc(100% - 48px)";
   background: @blue-grey-100;
   color: @white;
-  overflow-y: auto;
+  /*overflow-y: auto;*/
   transition: width 0.4s ease-in;
 
   #library {
     height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    ::webkit-scrollbar {
+      margin-right: -20px;
+    }
 
     /* create a full-height inline block pseudo=element */
     div.picture-diff div.before:before, 
@@ -369,5 +377,4 @@ div.outer-modal {
     width: 247px;
   }
 }
-
 
