@@ -141,7 +141,7 @@ div.outer-modal {
   background: @blue-grey-100;
   color: @white;
   overflow-y: auto;
-  transition: width 0.4s ease-in;
+  transition: width @transition-time ease-in;
 
   #library {
     /* create a full-height inline block pseudo=element */
@@ -262,7 +262,7 @@ div.outer-modal {
 
 #container.no-sidebar { 
   width: 100%;
-  transition: width 0.4s ease-out;
+  transition: width @transition-time ease-out;
 }
 
 #progress {
