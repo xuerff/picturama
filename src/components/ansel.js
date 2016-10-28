@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 
 import * as action from './../actions';
 
+import Header from './header';
 import Sidebar from './sidebar';
 import Container from './container';
 
@@ -80,7 +81,7 @@ class Ansel extends React.Component {
           className={noSidebarClass}
           setDateFilter={this.handleDateFilter.bind(this)} />
 
-        <header id="top-bar" className={noSidebarClass}></header>
+        <Header className={noSidebarClass}></Header>
 
         <Container
           settingsExists={this.props.settingsExists}

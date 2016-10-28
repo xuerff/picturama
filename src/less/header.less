@@ -9,9 +9,25 @@
   z-index: 2;
   box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.5);
   transition: width @transition-time ease-in;
+
+  button {
+    font-size: 2em;
+    padding: 1px 12px;
+    /*display: none;*/
+    opacity: 0;
+    height: 0;
+    transition: opacity @transition-time ease-out;
+  }
 }
 
 #top-bar.no-sidebar { 
   width: 100%;
   transition: width @transition-time ease-out;
+
+  button {
+    /*display: block;*/
+    opacity: 1;
+    height: auto;
+    transition: opacity @transition-time ease-in;
+  }
 }
