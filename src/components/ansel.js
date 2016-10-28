@@ -80,6 +80,8 @@ class Ansel extends React.Component {
           className={noSidebarClass}
           setDateFilter={this.handleDateFilter.bind(this)} />
 
+        <header id="top-bar" className={noSidebarClass}></header>
+
         <Container
           settingsExists={this.props.settingsExists}
           actions={this.state.actions}

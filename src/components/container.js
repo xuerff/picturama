@@ -47,7 +47,6 @@ export default class Container extends React.Component {
 
     return (
       <div id="container" ref="container" className={this.props.className}>
-        <header id="top-bar"></header>
         {content}
       </div>
     );
