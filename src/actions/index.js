@@ -18,6 +18,21 @@ export const getPhotos = () => {
   };
 };
 
+export const toggleFlagged = (date) => {
+  let where = { flag: true };
+
+  if (date) where.date = date;
+
+  return (dispatch) => {
+    new Photo()
+      .where(where)
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+      });
+  };
+};
+
 export const getFlagged = () => {
   return (dispatch) => {
     new Photo()
@@ -28,6 +43,7 @@ export const getFlagged = () => {
       });
   };
 };
+
 
 export const getProcessed = () => {
   return (dispatch) => {

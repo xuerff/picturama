@@ -13,7 +13,9 @@
   button {
     font-size: 2em;
     padding: 1px 12px;
-    /*display: none;*/
+  }
+
+  button#hamburger {
     opacity: 0;
     height: 0;
     transition: opacity @transition-time ease-out;
@@ -24,8 +26,7 @@
   width: 100%;
   transition: width @transition-time ease-out;
 
-  button {
-    /*display: block;*/
+  button#hamburger {
     opacity: 1;
     height: auto;
     transition: opacity @transition-time ease-in;
