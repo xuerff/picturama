@@ -6,6 +6,7 @@ class Header extends React.Component {
     className: React.PropTypes.string.isRequired,
     currentTag: React.PropTypes.number,
     currentDate: React.PropTypes.string,
+    showOnlyFlagged: React.PropTypes.bool.isRequired,
     actions: React.PropTypes.object.isRequired
   }
 
@@ -14,8 +15,12 @@ class Header extends React.Component {
   }
 
   toggleFlagged() {
-    console.log(this.props.currentDate, this.props.currentTag);
-    this.props.actions.toggleFlagged(this.props.currentDate);
+    console.log(this.props.currentDate, this.props.currentTag, this.props.showOnlyFlagged);
+
+    this.props.actions.toggleFlagged(
+      this.props.currentDate,
+      !this.props.showOnlyFlagged
+    );
   }
 
   render() {
@@ -39,7 +44,8 @@ class Header extends React.Component {
 
 const ReduxHeader = connect(state => ({
   currentTag: state.currentTag,
-  currentDate: state.currentDate
+  currentDate: state.currentDate,
+  showOnlyFlagged: state.showOnlyFlagged
 }))(Header);
 
 export default ReduxHeader;

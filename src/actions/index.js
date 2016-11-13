@@ -18,8 +18,8 @@ export const getPhotos = () => {
   };
 };
 
-export const toggleFlagged = (date) => {
-  let where = { flag: true };
+export const toggleFlagged = (date, showOnlyFlagged) => {
+  let where = { flag: showOnlyFlagged };
 
   if (date) where.date = date;
 
@@ -28,7 +28,11 @@ export const toggleFlagged = (date) => {
       .where(where)
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+        dispatch({ 
+          type: 'GET_PHOTOS_SUCCESS', 
+          photos: photos.toJSON(),
+          showOnlyFlagged
+        });
       });
   };
 };

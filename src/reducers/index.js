@@ -36,6 +36,7 @@ const initialState = {
   importing: false,
   currentDate: null,
   currentTag: null,
+  showOnlyFlagged: false,
   current: -1,
   diff: false,
   settingsExists: false,
@@ -55,8 +56,9 @@ export default function reducers(state = initialState, action) {
       current: -1,
       importing: false,
       splashed: true,
-      currentDate: action.hasOwnProperty('date') ? action.date : null,
-      currentTag: action.hasOwnProperty('tagId') ? action.tagId : null,
+      currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
+      currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
+      showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
       photos: action.photos.map(function(photo) {
         photo.versionNumber = 1;
 
