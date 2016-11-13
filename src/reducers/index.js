@@ -59,7 +59,7 @@ export default function reducers(state = initialState, action) {
       currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
       showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
-      photos: action.photos.map(function(photo) {
+      photos: action.photos.map((photo) => {
         photo.versionNumber = 1;
 
         if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {

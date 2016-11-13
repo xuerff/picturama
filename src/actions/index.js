@@ -8,7 +8,7 @@ import Tag from './../models/tag';
 export const getPhotos = () => {
   return (dispatch) => {
     Photo
-      .query(function (qb) {
+      .query((qb) => {
         qb.limit(100).offset(0).orderBy('created_at', 'desc');
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })

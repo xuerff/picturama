@@ -18,7 +18,7 @@ export default function createVersionAndOpenWith(photo, type, targetSoftware) {
   }).save().then((version) => {
     createVersionSuccessOpenWith({ version, targetSoftware });
 
-  }).catch(function(err) {
+  }).catch((err) => {
     console.log('err', err);
   });
 }
