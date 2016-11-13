@@ -28,7 +28,7 @@ gulp.task("babel-tests", () => {
 });
 
 gulp.task('styles', ['lint'], () => {
-  return gulp.src('src/source.less')
+  return gulp.src('src/less/index.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
 });
