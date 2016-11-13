@@ -12,7 +12,7 @@ mkdir $ANSEL_PATH/build
 mkdir $PREPARED_PATH
 
 babel $ANSEL_PATH/src --out-dir $ANSEL_PATH/dist
-lessc $ANSEL_PATH/src/source.less $ANSEL_PATH/dist/source.css
+lessc $ANSEL_PATH/src/less/index.less $ANSEL_PATH/dist/index.css
 
 cp $ANSEL_PATH/dist $PREPARED_PATH -r
 cp $ANSEL_PATH/package.json $PREPARED_PATH
