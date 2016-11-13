@@ -54,7 +54,7 @@ var Version = anselBookshelf.Model.extend({
     });
   }
 }, {
-  updateImage: function(data) {
+  updateImage: (data) => {
     let filename = [data[1], data[2], data[3]].join('-');
     console.log('fileName', filename);
     let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`;
@@ -82,8 +82,8 @@ var Version = anselBookshelf.Model.extend({
         else
           throw 'not-found';
       })
-      .catch(function(err) {
-        console.log('err', err);
+      .catch((err) => {
+        console.log(err);
         return null;
       });
   }

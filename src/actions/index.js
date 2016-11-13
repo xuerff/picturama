@@ -1,17 +1,38 @@
 import Promise from 'bluebird';
+import fs from 'fs';
 
+import config from './../config';
 import Photo from './../models/photo';
 import Tag from './../models/tag';
 
 export const getPhotos = () => {
   return (dispatch) => {
     Photo
-      .query(function (qb) {
+      .query((qb) => {
         qb.limit(100).offset(0).orderBy('created_at', 'desc');
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+      });
+  };
+};
+
+export const toggleFlagged = (date, showOnlyFlagged) => {
+  let where = { flag: showOnlyFlagged };
+
+  if (date) where.date = date;
+
+  return (dispatch) => {
+    new Photo()
+      .where(where)
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        dispatch({ 
+          type: 'GET_PHOTOS_SUCCESS', 
+          photos: photos.toJSON(),
+          showOnlyFlagged
+        });
       });
   };
 };
@@ -26,6 +47,7 @@ export const getFlagged = () => {
       });
   };
 };
+
 
 export const getProcessed = () => {
   return (dispatch) => {
@@ -228,6 +250,11 @@ export const toggleDiff = () => {
 
 export const areSettingsExisting = () => {
   return (dispatch) => {
-    dispatch({ type: 'SETTINGS_EXISTS_SUCCESS' });
+    fs.access(config.settings, fs.constants.R_OK | fs.constants.W_OK, (err) => {
+      if (err)
+        dispatch({ type: 'SETTINGS_EXISTS_ERROR' });
+      else
+        dispatch({ type: 'SETTINGS_EXISTS_SUCCESS' });
+    });
   };
 };

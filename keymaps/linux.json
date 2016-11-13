@@ -4,7 +4,9 @@
     "escape": "core:cancel"
   },
   "#library": {
-    "right": "library:right"
+    "left": "library:left",
+    "right": "library:right",
+    "enter": "library:enter"
   },
   ".picture-detail": {
     "y": "detail:diff",

@@ -46,12 +46,12 @@ class Usb {
   watch(callback) {
     let monitor = udev.monitor();
 
-    monitor.on('add', function (device) {
+    monitor.on('add', (device) => {
       let devName = device.DEVNAME;
       let devId = device.ID_MODEL || device.ID_SERIAL;
       let devModel = device.ID_FS_UUID || device.ID_NAME;
 
-      setTimeout(function() {
+      setTimeout(() => {
         njdsDrives()
           .then((drives) => {
             return njdsDrivesDetail(drives);
@@ -68,7 +68,7 @@ class Usb {
       }, 200);
     });
 
-    monitor.on('remove', function (device) {
+    monitor.on('remove', (device) => {
       let devId = device.ID_MODEL || device.ID_SERIAL;
 
       //console.log('monitor remove', devId);
