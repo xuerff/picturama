@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
 
@@ -24,6 +25,12 @@ class Header extends React.Component {
   }
 
   render() {
+    let btnClass = classNames({
+      'button': true,
+      'flagged': true,
+      'active': this.props.showOnlyFlagged
+    });
+
     return (
       <header className={this.props.className} id="top-bar">
         <button onClick={this.showSidebar.bind(this)} id="hamburger">
@@ -32,7 +39,7 @@ class Header extends React.Component {
 
         <div className="pull-right">
           <button
-            className="button flagged"
+            className={btnClass}
             onClick={this.toggleFlagged.bind(this)}>
             <i className="fa fa-flag" aria-hidden="true"></i>
           </button>
