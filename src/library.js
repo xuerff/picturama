@@ -1,13 +1,11 @@
 import { ipcMain } from 'electron';
 import moment from 'moment';
-//import watchr from 'watchr';
 import sharp from 'sharp';
 import notifier from 'node-notifier';
 import fs from 'fs';
 import Promise from 'bluebird';
 import libraw from 'libraw';
 import exiv2 from 'exiv2';
-import chokidar from 'chokidar';
 
 import config from './config';
 import metadata from './metadata';
@@ -17,7 +15,6 @@ import matches from './lib/matches';
 
 import Photo from './models/photo';
 import Tag from './models/tag';
-import Version from './models/version';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
@@ -357,43 +354,6 @@ class Library {
       'title': 'Ansel',
       'message': 'Start import'
     });
- 
-  }
-
-  watch() {
-    let self = this;
-    let allowed = config.watchedFormats;
-
-    let watcher = chokidar.watch(self.versionsPath, { awaitWriteFinish: true, ignoreInitial: true });
-    //let watcher = chokidar.watch(`${self.versionsPath}/**/${config.watchedFormatsGlob}`);
-    //console.log(`${self.versionsPath}/**/${config.watchedFormatsGlob}`);
-
-    watcher.on('add', path => {
-      console.log('add', path);
-      if (path.match(allowed))
-        Version.updateImage(path.match(allowed)).then((version) => {
-          console.log('version done', version);
-
-          if (version)
-            this.mainWindow.webContents.send('new-version', version);
-        });
-    });
-
-    //watchr.watch({
-    //  paths: [ self.path, self.versionsPath, config.thumbsPath ],
-
-    //  listener: (action, filePath) => {
-    //    // on action:create then parse file and update version
-    //    if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
-    //      Version.updateImage(filePath.match(allowed)).then((version) => {
-    //        console.log('version done', version);
-
-    //        if (version)
-    //          self.mainWindow.webContents.send('new-version', version);
-    //      });
-    //    }
-    //  }
-    //});
   }
 }
 
