@@ -39,21 +39,22 @@ rm -r $PREPARED_PATH/node_modules/exiv2/examples
 rm -r $PREPARED_PATH/node_modules/exiv2/test
 rm -r $PREPARED_PATH/node_modules/sqlite3/src
 rm -r $PREPARED_PATH/node_modules/react/dist
-rm -r $PREPARED_PATH/node_modules/bookshelf/tests
+rm -r $PREPARED_PATH/node_modules/bookshelf/test
 rm -r $PREPARED_PATH/node_modules/bookshelf/tutorials
 
-rm $PREPARED_PATH/node_modules/**/*.md
-rm $PREPARED_PATH/node_modules/**/*.txt
-rm $PREPARED_PATH/node_modules/**/*.log
-rm $PREPARED_PATH/node_modules/**/LICENSE
-rm $PREPARED_PATH/node_modules/**/CHANGES
-rm $PREPARED_PATH/node_modules/**/PATENTS
-rm $PREPARED_PATH/node_modules/**/CNAME
-rm $PREPARED_PATH/node_modules/**/license
-rm $PREPARED_PATH/node_modules/**/appveyor.yml
-rm $PREPARED_PATH/node_modules/**/.travis.yml
-rm $PREPARED_PATH/node_modules/**/.jshintrc
-rm $PREPARED_PATH/node_modules/**/.npmignore
+find $PREPARED_PATH/node_modules/ -type f -name '*.md' -delete
+find $PREPARED_PATH/node_modules/ -type f -name '*.txt' -delete
+find $PREPARED_PATH/node_modules/ -type f -name '*.log' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'license' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'LICENSE' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'CHANGES' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'CHANGELOG' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'PATENTS' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'CNAME' -delete
+find $PREPARED_PATH/node_modules/ -type f -name 'appveyor.yml' -delete
+find $PREPARED_PATH/node_modules/ -type f -name '.travis.yml' -delete
+find $PREPARED_PATH/node_modules/ -type f -name '.jshintrc' -delete
+find $PREPARED_PATH/node_modules/ -type f -name '.npmignore' -delete
 
 cd $ANSEL_PATH/build
 electron-packager $PREPARED_PATH ansel --platform=linux --arch=x64 --no-prune --out=$ANSEL_PATH/build
