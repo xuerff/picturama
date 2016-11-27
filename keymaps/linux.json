@@ -4,6 +4,8 @@
     "escape": "core:cancel"
   },
   "#library": {
+    "up": "library:up",
+    "down": "library:down",
     "left": "library:left",
     "right": "library:right",
     "enter": "library:enter"

@@ -22,6 +22,8 @@ class Library extends React.Component {
 
     this.moveHighlightRight = this.moveHighlightRight.bind(this);
     this.moveHighlightLeft = this.moveHighlightLeft.bind(this);
+    this.moveHighlightUp = this.moveHighlightUp.bind(this);
+    this.moveHighlightDown = this.moveHighlightDown.bind(this);
     this.pressedEnter = this.pressedEnter.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
@@ -65,6 +67,8 @@ class Library extends React.Component {
 
     window.addEventListener('library:left', this.moveHighlightLeft);
     window.addEventListener('library:right', this.moveHighlightRight);
+    window.addEventListener('library:up', this.moveHighlightUp);
+    window.addEventListener('library:down', this.moveHighlightDown);
     window.addEventListener('library:enter', this.pressedEnter);
 
     keymapManager.bind(this.refs.library);
@@ -73,6 +77,8 @@ class Library extends React.Component {
   componentWillUnmount() {
     window.removeEventListener('library:left', this.moveHighlightLeft);
     window.removeEventListener('library:right', this.moveHighlightRight);
+    window.removeEventListener('library:up', this.moveHighlightUp);
+    window.removeEventListener('library:down', this.moveHighlightDown);
     window.removeEventListener('library:enter', this.pressedEnter);
 
     keymapManager.unbind();
@@ -109,6 +115,36 @@ class Library extends React.Component {
 
     if (currentPos+1 < this.props.photos.length)
       state.highlighted = [currentPos+1];
+
+    this.setState(state);
+  }
+
+  moveHighlightUp(e) {
+    e.preventDefault();
+
+    let state = this.state;
+    let currentPos = this.state.highlighted[0];
+    let gridWidth = this.refs.library.getBoundingClientRect().width;
+    let elWidth = this.refs.library.children[0].getBoundingClientRect().width;
+    let jumpSize = gridWidth / elWidth;
+
+    if (currentPos - jumpSize > 0)
+      state.highlighted = [currentPos - jumpSize];
+
+    this.setState(state);
+  }
+
+  moveHighlightDown(e) {
+    e.preventDefault();
+
+    let state = this.state;
+    let currentPos = this.state.highlighted[0];
+    let gridWidth = this.refs.library.getBoundingClientRect().width;
+    let elWidth = this.refs.library.children[0].getBoundingClientRect().width;
+    let jumpSize = gridWidth / elWidth;
+
+    if (currentPos + jumpSize < this.props.photos.length)
+      state.highlighted = [currentPos + jumpSize];
 
     this.setState(state);
   }
