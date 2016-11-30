@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron';
 import moment from 'moment';
-import watchr from 'watchr';
 import sharp from 'sharp';
 import notifier from 'node-notifier';
 import fs from 'fs';
@@ -16,7 +15,6 @@ import matches from './lib/matches';
 
 import Photo from './models/photo';
 import Tag from './models/tag';
-import Version from './models/version';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
@@ -355,28 +353,6 @@ class Library {
     notifier.notify({
       'title': 'Ansel',
       'message': 'Start import'
-    });
- 
-  }
-
-  watch() {
-    let self = this;
-    let allowed = config.watchedFormats;
-
-    watchr.watch({
-      paths: [ self.path, self.versionsPath, config.thumbsPath ],
-
-      listener: (action, filePath) => {
-        // on action:create then parse file and update version
-        if ((action == 'create' || action == 'update') && filePath.match(allowed)) {
-          Version.updateImage(filePath.match(allowed)).then(function(version) {
-            console.log('version done', version);
-
-            if (version)
-              self.mainWindow.webContents.send('new-version', version);
-          });
-        }
-      }
     });
   }
 }

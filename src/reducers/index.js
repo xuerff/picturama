@@ -1,7 +1,3 @@
-import fs from 'fs';
-
-import config from './../config';
-
 import processDates from './../lib/process-dates';
 import updatePhotos from './../lib/update-photos';
 
@@ -36,9 +32,11 @@ const rmDevice = (devices, rmDevice) => {
 };
 
 const initialState = {
+  splashed: false,
   importing: false,
   currentDate: null,
   currentTag: null,
+  showOnlyFlagged: false,
   current: -1,
   diff: false,
   settingsExists: false,
@@ -57,9 +55,11 @@ export default function reducers(state = initialState, action) {
       diff: false,
       current: -1,
       importing: false,
-      currentDate: action.hasOwnProperty('date') ? action.date : null,
-      currentTag: action.hasOwnProperty('tagId') ? action.tagId : null,
-      photos: action.photos.map(function(photo) {
+      splashed: true,
+      currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
+      currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
+      showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
+      photos: action.photos.map((photo) => {
         photo.versionNumber = 1;
 
         if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
@@ -162,7 +162,14 @@ export default function reducers(state = initialState, action) {
   case 'SETTINGS_EXISTS_SUCCESS':
     return {
       ...state,
-      settingsExists: fs.existsSync(config.settings)
+      settingsExists: true
+    };
+
+  case 'SETTINGS_EXISTS_ERROR':
+    return {
+      ...state,
+      splashed: true,
+      settingsExists: false
     };
 
   default:

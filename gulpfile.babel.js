@@ -28,7 +28,7 @@ gulp.task("babel-tests", () => {
 });
 
 gulp.task('styles', ['lint'], () => {
-  return gulp.src('src/source.less')
+  return gulp.src('src/less/index.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
 });
@@ -141,7 +141,7 @@ gulp.task('increment-buildnum', (cb) => {
 });
 
 gulp.task('mocha', () => {
-  gulp.src('specs/run.spec.js', {read: false})
+  gulp.src('specs/**/*.spec.js', {read: false})
     .pipe(mocha({reporter: 'list'}))
 });
 

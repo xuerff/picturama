@@ -57,6 +57,21 @@ class Picture extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
+    if (this.props.highlighted) {
+      let rect = this.refs.picture.getBoundingClientRect();
+      let container = this.refs.picture.parentNode.parentNode;
+      let containerRect = container.getBoundingClientRect();
+      console.log('rect',  rect, containerRect);
+
+      if (rect.bottom > containerRect.bottom) {
+        console.log('should scroll yo!', container.scrollTop);
+        container.scrollTop += rect.bottom - containerRect.bottom;
+        console.log('should still scroll yo!', container.scrollTop);
+      }
+      else if (rect.top < 0) 
+        container.scrollTop += rect.top;
+    }
+
     if (this.state.showContextMenu && this.props.highlighted) {
       // If no timeout the menu will appears before the highlight
       setTimeout(() => this.menu.popup(remote.getCurrentWindow()), 10);
@@ -91,6 +106,7 @@ class Picture extends React.Component {
 
     return (
       <a
+        ref="picture"
         className={anchorClass}
         onDoubleClick={this.handleDblClick.bind(this)}>
         <span className="v-align"></span>

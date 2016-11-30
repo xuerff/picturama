@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 
 import * as action from './../actions';
 
+import Header from './header';
 import Sidebar from './sidebar';
 import Container from './container';
 
@@ -13,7 +14,8 @@ class Ansel extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     settingsExists: React.PropTypes.bool.isRequired,
-    importing: React.PropTypes.bool.isRequired
+    importing: React.PropTypes.bool.isRequired,
+    splashed: React.PropTypes.bool.isRequired
   }
 
   constructor(props) {
@@ -29,6 +31,14 @@ class Ansel extends React.Component {
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
+  }
+
+  componentDidUpdate() {
+    if (this.props.splashed === true) {
+      let splash = document.getElementById('splash');
+      if (splash) splash.parentNode.removeChild(splash);
+    }
+
   }
 
   componentDidMount() {
@@ -71,6 +81,10 @@ class Ansel extends React.Component {
           className={noSidebarClass}
           setDateFilter={this.handleDateFilter.bind(this)} />
 
+        <Header
+          actions={this.state.actions}
+          className={noSidebarClass} />
+
         <Container
           settingsExists={this.props.settingsExists}
           actions={this.state.actions}
@@ -84,6 +98,7 @@ class Ansel extends React.Component {
 
 const ReduxAnsel = connect(state => ({
   importing: state.importing,
+  splashed: state.splashed,
   settingsExists: state.settingsExists
 }))(Ansel);
 
