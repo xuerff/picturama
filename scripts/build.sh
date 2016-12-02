@@ -23,14 +23,16 @@ cp $ANSEL_PATH/static $PREPARED_PATH -r
 cp $ANSEL_PATH/node_modules $PREPARED_PATH -r
 
 cd $PREPARED_PATH
-npm prune --production --ignore-scripts
-npm dedupe
+#npm prune --production --ignore-scripts
+#npm dedupe
 
 cp $ANSEL_PATH/node_modules/libraw $PREPARED_PATH/node_modules -r
 cp $ANSEL_PATH/node_modules/sharp $PREPARED_PATH/node_modules -r
 cp $ANSEL_PATH/node_modules/udev $PREPARED_PATH/node_modules -r
 cp $ANSEL_PATH/node_modules/exiv2 $PREPARED_PATH/node_modules -r
 cp $ANSEL_PATH/node_modules/sqlite3 $PREPARED_PATH/node_modules -r
+
+yarn install --production --ignore-scripts --prefer-offline
 
 # Trimming fat
 rm -r $PREPARED_PATH/node_modules/sharp/docs

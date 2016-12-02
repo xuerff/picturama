@@ -1,7 +1,7 @@
 {
   "name": "ansel",
   "version": "0.3.0",
-  "buildnum": "5",
+  "buildnum": "7",
   "description": "",
   "main": "dist/browser.js",
   "engines": {
