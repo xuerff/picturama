@@ -99,5 +99,6 @@
     "react-addons-test-utils": "^15.3.1",
     "rimraf": "^2.5.4",
     "spectron": "^3.4.0"
-  }
+  },
+  "repository": "git@github.com:m0g/ansel.git"
 }
