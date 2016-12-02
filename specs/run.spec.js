@@ -37,13 +37,26 @@ describe('application launch', function () {
     return this.app.client.waitForExist('#library', 10000);
   });
 
+  it('should navigate on the right', function() {
+    return this.app.client.click('a.picture')
+      .then(() => this.app.webContents.sendInputEvent({ type: 'keydown', keyCode: 'Right' }))
+      .then(() => {
+        return this.app.webContents.executeJavaScript(
+          `document.querySelector("a.picture").className`, true
+        );
+      })
+      //.then((result) => console.log(result))
+      .then((attr, other) => console.log('attr', attr));
+  });
+
   it('should show a particular photo', function() {
     return this.app.client.doubleClick('a.picture')
       .then(() => this.app.client.waitForExist('.picture-detail img'));
   });
 
   it('should go back to the library view', function() {
-    return this.app.client.keys('esc');
+    return this.app.webContents.sendInputEvent({ type: 'keydown', keyCode: 'Escape' })
+      .then(() => this.app.client.waitForExist('#library a.picture'));
   });
 
   after(app.stop);
