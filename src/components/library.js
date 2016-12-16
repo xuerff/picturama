@@ -27,6 +27,9 @@ class Library extends React.Component {
     this.moveHighlightDown = this.moveHighlightDown.bind(this);
     this.pressedEnter = this.pressedEnter.bind(this);
     this.handleExport = this.handleExport.bind(this);
+    this.bindEventListeners = this.bindEventListeners.bind(this);
+    this.unbindEventListeners = this.unbindEventListeners.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
@@ -49,6 +52,22 @@ class Library extends React.Component {
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
 
+  handleFlag() {
+    this.props.actions.toggleFlag(this.props.photos[this.props.current]);
+  }
+
+  handleExport() {
+    this.unbindEventListeners();
+    //console.log('handle export', this.state.highlighted);
+    let state = this.state;
+
+    state.modal = 'export';
+    state.photosToExport = this.props.photos
+      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+
+    this.setState(state);
+  }
+
   pressedEnter() {
     if (this.state.highlighted.length == 1)
       this.handleCurrent(this.state.highlighted[0]);
@@ -64,24 +83,31 @@ class Library extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.props.actions.getPhotos();
-
+  bindEventListeners() {
     window.addEventListener('library:left', this.moveHighlightLeft);
     window.addEventListener('library:right', this.moveHighlightRight);
     window.addEventListener('library:up', this.moveHighlightUp);
     window.addEventListener('library:down', this.moveHighlightDown);
     window.addEventListener('library:enter', this.pressedEnter);
-
-    keymapManager.bind(this.refs.library);
   }
 
-  componentWillUnmount() {
+  unbindEventListeners() {
     window.removeEventListener('library:left', this.moveHighlightLeft);
     window.removeEventListener('library:right', this.moveHighlightRight);
     window.removeEventListener('library:up', this.moveHighlightUp);
     window.removeEventListener('library:down', this.moveHighlightDown);
     window.removeEventListener('library:enter', this.pressedEnter);
+  }
+
+  componentDidMount() {
+    this.props.actions.getPhotos();
+    this.bindEventListeners();
+
+    keymapManager.bind(this.refs.library);
+  }
+
+  componentWillUnmount() {
+    this.unbindEventListeners();
 
     keymapManager.unbind();
   }
@@ -95,21 +121,6 @@ class Library extends React.Component {
       return true;
     else
       return false;
-  }
-
-  handleFlag() {
-    this.props.actions.toggleFlag(this.props.photos[this.props.current]);
-  }
-
-  handleExport() {
-    console.log('handle export', this.state.highlighted);
-    let state = this.state;
-
-    state.modal = 'export';
-    state.photosToExport = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
-
-    this.setState(state);
   }
 
   moveHighlightLeft() {
@@ -178,7 +189,14 @@ class Library extends React.Component {
   }
 
   closeDialog() {
+    console.log('close dialog');
+    this.bindEventListeners();
+
+    var state = this.state;
+    state.modal = 'none';
+    this.setState(state);
   }
+
 
   render() {
     let currentView;
