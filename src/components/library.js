@@ -76,6 +76,14 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
+    if (state.highlighted.length > 0) {
+      ipcRenderer.send('toggleExportMenu', true);
+      ipcRenderer.on('exportClicked', this.handleExport.bind(this));
+    } else {
+      ipcRenderer.send('toggleExportMenu', false);
+      ipcRenderer.removeAllListeners('exportClicked');
+    }
+
     if (this.props.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
@@ -90,9 +98,10 @@ class Library extends React.Component {
     window.addEventListener('library:down', this.moveHighlightDown);
     window.addEventListener('library:enter', this.pressedEnter);
 
-    ipcRenderer.send('toggleExportMenu', true);
-
-    ipcRenderer.on('exportClicked', this.handleExport.bind(this));
+    if (this.state.highlighted.length > 0) {
+      ipcRenderer.send('toggleExportMenu', true);
+      ipcRenderer.on('exportClicked', this.handleExport.bind(this));
+    }
   }
 
   unbindEventListeners() {
