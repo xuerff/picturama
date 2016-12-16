@@ -30,6 +30,8 @@ class Library extends React.Component {
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
+    this.activateExportAccelerator = this.activateExportAccelerator.bind(this);
+    this.deactivateExportAccelerator = this.deactivateExportAccelerator.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
@@ -73,16 +75,23 @@ class Library extends React.Component {
       this.handleCurrent(this.state.highlighted[0]);
   }
 
+  activateExportAccelerator() {
+    ipcRenderer.send('toggleExportMenu', true);
+    ipcRenderer.on('exportClicked', this.handleExport.bind(this));
+  }
+
+  deactivateExportAccelerator() {
+    ipcRenderer.send('toggleExportMenu', false);
+    ipcRenderer.removeAllListeners('exportClicked');
+  }
+
   componentDidUpdate() {
     let state = this.state;
 
-    if (state.highlighted.length > 0) {
-      ipcRenderer.send('toggleExportMenu', true);
-      ipcRenderer.on('exportClicked', this.handleExport.bind(this));
-    } else {
-      ipcRenderer.send('toggleExportMenu', false);
-      ipcRenderer.removeAllListeners('exportClicked');
-    }
+    if (state.highlighted.length > 0)
+      this.activateExportAccelerator();
+    else
+      this.deactivateExportAccelerator();
 
     if (this.props.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
@@ -98,10 +107,8 @@ class Library extends React.Component {
     window.addEventListener('library:down', this.moveHighlightDown);
     window.addEventListener('library:enter', this.pressedEnter);
 
-    if (this.state.highlighted.length > 0) {
-      ipcRenderer.send('toggleExportMenu', true);
-      ipcRenderer.on('exportClicked', this.handleExport.bind(this));
-    }
+    if (this.state.highlighted.length > 0)
+      this.activateExportAccelerator();
   }
 
   unbindEventListeners() {
@@ -111,9 +118,7 @@ class Library extends React.Component {
     window.removeEventListener('library:down', this.moveHighlightDown);
     window.removeEventListener('library:enter', this.pressedEnter);
 
-    ipcRenderer.send('toggleExportMenu', false);
-
-    ipcRenderer.removeAllListeners('exportClicked');
+    this.deactivateExportAccelerator();
   }
 
   componentDidMount() {
