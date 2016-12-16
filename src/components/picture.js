@@ -13,6 +13,7 @@ class Picture extends React.Component {
     setCurrent: React.PropTypes.func.isRequired,
     setHighlight: React.PropTypes.func.isRequired,
     setFlagging: React.PropTypes.func.isRequired,
+    setExport: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.bool.isRequired,
     photo: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired
@@ -49,8 +50,7 @@ class Picture extends React.Component {
 
     this.menu.append(new MenuItem({ 
       label: 'Export picture(s)', 
-      //click: this.handleExport.bind(this)
-      click: () => console.log('export, bitch!')
+      click: this.props.setExport
     }));
   }
 

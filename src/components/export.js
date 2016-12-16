@@ -47,8 +47,6 @@ class Export extends React.Component {
   }
 
   processImg(photo, source) {
-    //let photo = this.props.photo;
-
     return sharp(source)
       .rotate()
       .withMetadata()
@@ -60,7 +58,6 @@ class Export extends React.Component {
   afterExport() {
     notifier.notify({
       'title': 'Ansel',
-      //'message': `Finish exporting ${this.props.photo.title}`
       'message': `Finish exporting ${this.props.photos.length} photo(s)`
     });
 
@@ -69,10 +66,8 @@ class Export extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    //console.log('save', this.state, this.props.photo);
 
     Promise.each(this.props.photos, (photo) => {
-      //let photos = this.props.photos;
       let extension = photo.extension.toLowerCase();
 
       if (!this.state.folder)

@@ -7,6 +7,7 @@ import keymapManager from './../keymap-manager';
 import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
+import Export from './export';
 
 class Library extends React.Component {
   static propTypes = {
@@ -25,6 +26,7 @@ class Library extends React.Component {
     this.moveHighlightUp = this.moveHighlightUp.bind(this);
     this.moveHighlightDown = this.moveHighlightDown.bind(this);
     this.pressedEnter = this.pressedEnter.bind(this);
+    this.handleExport = this.handleExport.bind(this);
 
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
@@ -99,6 +101,17 @@ class Library extends React.Component {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
+  handleExport() {
+    console.log('handle export', this.state.highlighted);
+    let state = this.state;
+
+    state.modal = 'export';
+    state.photosToExport = this.props.photos
+      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+
+    this.setState(state);
+  }
+
   moveHighlightLeft() {
     let state = this.state;
     let currentPos = this.state.highlighted[0];
@@ -164,10 +177,21 @@ class Library extends React.Component {
     ipcRenderer.send('start-scanning');
   }
 
+  closeDialog() {
+  }
+
   render() {
     let currentView;
+    let showModal;
 
     let libraryClass = classNames({ 'grid': this.props.current == -1 });
+
+    if (this.state.modal == 'export')
+      showModal = (
+        <Export
+          photos={this.state.photosToExport}
+          closeExportDialog={this.closeDialog} />
+      );
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = (
@@ -192,6 +216,7 @@ class Library extends React.Component {
             setHighlight={this.handleHighlight.bind(this)}
             highlighted={this.state.highlighted.indexOf(index) != -1}
             setFlagging={this.handleFlagging.bind(this)}
+            setExport={this.handleExport.bind(this)}
             setCurrent={this.handleCurrent.bind(this)} />
         );
       });
@@ -212,6 +237,7 @@ class Library extends React.Component {
     return (
       <div id="library" className={libraryClass} ref="library">
         {currentView}
+        {showModal}
       </div>
     );
   }
