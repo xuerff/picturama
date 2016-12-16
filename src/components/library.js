@@ -89,6 +89,10 @@ class Library extends React.Component {
     window.addEventListener('library:up', this.moveHighlightUp);
     window.addEventListener('library:down', this.moveHighlightDown);
     window.addEventListener('library:enter', this.pressedEnter);
+
+    ipcRenderer.send('toggleExportMenu', true);
+
+    ipcRenderer.on('exportClicked', this.handleExport.bind(this));
   }
 
   unbindEventListeners() {
@@ -97,6 +101,10 @@ class Library extends React.Component {
     window.removeEventListener('library:up', this.moveHighlightUp);
     window.removeEventListener('library:down', this.moveHighlightDown);
     window.removeEventListener('library:enter', this.pressedEnter);
+
+    ipcRenderer.send('toggleExportMenu', false);
+
+    ipcRenderer.removeAllListeners('exportClicked');
   }
 
   componentDidMount() {
