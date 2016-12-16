@@ -13,7 +13,7 @@ const readFile = Promise.promisify(fs.readFile);
 class Export extends React.Component {
   static propTypes = {
     closeExportDialog: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired
+    photos: React.PropTypes.array.isRequired
   }
 
   constructor(props) {
@@ -46,10 +46,10 @@ class Export extends React.Component {
     );
   }
 
-  processImg(img) {
-    let photo = this.props.photo;
+  processImg(photo, source) {
+    //let photo = this.props.photo;
 
-    return sharp(img)
+    return sharp(source)
       .rotate()
       .withMetadata()
       .quality(this.state.quality)
@@ -60,7 +60,8 @@ class Export extends React.Component {
   afterExport() {
     notifier.notify({
       'title': 'Ansel',
-      'message': `Finish exporting ${this.props.photo.title}`
+      //'message': `Finish exporting ${this.props.photo.title}`
+      'message': `Finish exporting ${this.props.photos.length} photo(s)`
     });
 
     this.props.closeExportDialog();
@@ -68,24 +69,26 @@ class Export extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log('save', this.state, this.props.photo);
+    //console.log('save', this.state, this.props.photo);
 
-    let photo = this.props.photo;
-    let extension = photo.extension.toLowerCase();
+    Promise.each(this.props.photos, (photo) => {
+      //let photos = this.props.photos;
+      let extension = photo.extension.toLowerCase();
 
-    if (!this.state.folder)
-      return false;
+      if (!this.state.folder)
+        return false;
 
-    else if (photo.versions.length > 0)
-      return this.processImg(photo.thumb);
+      else if (photo.versions.length > 0)
+        return this.processImg(photo, photo.thumb);
 
-    else if (config.acceptedRawFormats.indexOf(extension) != -1)
-      return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
-        .then((imgPath) => readFile(imgPath))
-        .then(this.processImg);
+      else if (config.acceptedRawFormats.indexOf(extension) != -1)
+        return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
+          .then((imgPath) => readFile(imgPath))
+          .then(img => this.processImg(photo, img));
 
-    else
-      return this.processImg(photo.thumb);
+      else
+        return this.processImg(photo, photo.thumb);
+    });
   }
 
   updateQuality() {
