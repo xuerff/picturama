@@ -25,7 +25,7 @@ class Export extends React.Component {
       folder: null,
       quality: 90,
       format: config.exportFormats[0],
-      progress: { processed: 0, total: 0 }
+      showProgress: false
     };
 
     this.onEachPhoto = this.onEachPhoto.bind(this);
@@ -35,9 +35,9 @@ class Export extends React.Component {
   componentDidMount() {
     window.addEventListener('core:cancel', this.props.closeExportDialog);
 
-    let state = this.state;
-    state.progress.total = this.props.photos.length;
-    this.setState(state);
+    //let state = this.state;
+    //state.progress.total = this.props.photos.length;
+    //this.setState(state);
   }
 
   componentWillUnmount() {
@@ -80,7 +80,6 @@ class Export extends React.Component {
   }
 
   onEachPhoto(photo, i) {
-    //let state = this.state;
     let extension = photo.extension.toLowerCase();
 
     if (!this.state.folder)
@@ -107,8 +106,11 @@ class Export extends React.Component {
   }
 
   handleSubmit(e) {
-    console.log('handle submit');
     e.preventDefault();
+
+    let state = this.state;
+    state.showProgress = true;
+    this.setState(state);
 
     Promise.each(this.props.photos, this.onEachPhoto)
       .then(this.afterExport.bind(this));
@@ -172,7 +174,7 @@ class Export extends React.Component {
             <button>Save</button>
           </form>
 
-          <Progress />
+          {this.state.showProgress ? (<Progress />) : null}
         </div>
       </div>
     );
