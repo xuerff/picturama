@@ -47,6 +47,7 @@ class Library {
 
       this.path = settings.directories.photos;
       this.versionsPath = settings.directories.versions;
+      this.progress.photosDir = this.path;
 
       if (!fs.existsSync(config.thumbsPath))
         fs.mkdirSync(config.thumbsPath);

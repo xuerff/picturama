@@ -87,7 +87,11 @@ class Export extends React.Component {
       return false;
 
     else {
-      this.props.actions.importProgress(null, { processed: i+1, total: this.props.photos.length });
+      this.props.actions.importProgress(null, {
+        processed: i+1,
+        total: this.props.photos.length,
+        photosDir: this.state.folder
+      });
 
       if (photo.versions.length > 0)
         return this.processImg(photo, photo.thumb);

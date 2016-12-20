@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import config from './../config';
+//import config from './../config';
 
 class Progress extends React.Component {
   static propTypes = {
-    settingsExists: React.PropTypes.bool.isRequired,
+    //settingsExists: React.PropTypes.bool.isRequired,
     progress: React.PropTypes.object.isRequired
   }
 
@@ -26,14 +26,14 @@ class Progress extends React.Component {
   }
 
   render() {
-    let photosDir = '';
+    //let photosDir = '';
 
-    if (this.props.settingsExists)
-      photosDir = require(config.settings).directories.photos;
+    //if (this.props.settingsExists)
+      //photosDir = require(config.settings).directories.photos;
 
     return (
       <div id="progress">
-        <h2>scanning: {photosDir}</h2>
+        <h2>scanning: {this.props.progress.photosDir}</h2>
 
         <div className="progress-bar">
           <div 
@@ -49,8 +49,8 @@ class Progress extends React.Component {
 }
 
 const ReduxProgress = connect(state => ({
-  progress: state.progress,
-  settingsExists: state.settingsExists
+  progress: state.progress
+  //settingsExists: state.settingsExists
 }))(Progress);
 
 export default ReduxProgress;
