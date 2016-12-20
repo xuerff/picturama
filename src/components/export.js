@@ -34,10 +34,6 @@ class Export extends React.Component {
 
   componentDidMount() {
     window.addEventListener('core:cancel', this.props.closeExportDialog);
-
-    //let state = this.state;
-    //state.progress.total = this.props.photos.length;
-    //this.setState(state);
   }
 
   componentWillUnmount() {
@@ -45,8 +41,6 @@ class Export extends React.Component {
   }
 
   onFolderSelection(filenames) {
-
-    console.log('filenames', filenames);
     let state = this.state;
     state.folder = filenames[0];
     this.setState(state);
@@ -70,7 +64,6 @@ class Export extends React.Component {
   }
 
   afterExport() {
-    console.log('after export');
     notifier.notify({
       'title': 'Ansel',
       'message': `Finish exporting ${this.props.photos.length} photo(s)`

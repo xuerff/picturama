@@ -61,13 +61,9 @@ class Picture extends React.Component {
       let rect = this.refs.picture.getBoundingClientRect();
       let container = this.refs.picture.parentNode.parentNode;
       let containerRect = container.getBoundingClientRect();
-      console.log('rect',  rect, containerRect);
 
-      if (rect.bottom > containerRect.bottom) {
-        console.log('should scroll yo!', container.scrollTop);
+      if (rect.bottom > containerRect.bottom)
         container.scrollTop += rect.bottom - containerRect.bottom;
-        console.log('should still scroll yo!', container.scrollTop);
-      }
       else if (rect.top < 0) 
         container.scrollTop += rect.top;
     }

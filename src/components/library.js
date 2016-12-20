@@ -60,7 +60,6 @@ class Library extends React.Component {
 
   handleExport() {
     this.unbindEventListeners();
-    //console.log('handle export', this.state.highlighted);
     let state = this.state;
 
     state.modal = 'export';
@@ -211,7 +210,6 @@ class Library extends React.Component {
   }
 
   closeDialog() {
-    console.log('close dialog');
     this.bindEventListeners();
 
     var state = this.state;

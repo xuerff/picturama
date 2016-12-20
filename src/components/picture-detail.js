@@ -208,7 +208,7 @@ export default class PictureDetail extends React.Component {
     ipcRenderer.send('toggleExportMenu', true);
 
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
-    ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
+    //ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
   }
 
   unbindEventListeners() {
@@ -222,7 +222,7 @@ export default class PictureDetail extends React.Component {
     ipcRenderer.send('toggleExportMenu', false);
 
     ipcRenderer.removeAllListeners('addTagClicked');
-    ipcRenderer.removeAllListeners('exportClicked');
+    //ipcRenderer.removeAllListeners('exportClicked');
   }
 
   render() {
