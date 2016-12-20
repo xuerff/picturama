@@ -230,6 +230,7 @@ class Library extends React.Component {
       showModal = (
         <Export
           photos={this.state.photosToExport}
+          actions={this.props.actions}
           closeExportDialog={this.closeDialog} />
       );
 

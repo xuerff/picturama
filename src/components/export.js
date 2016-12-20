@@ -7,25 +7,37 @@ import sharp from 'sharp';
 import React from 'react';
 
 import config from './../config';
+import Progress from './progress';
 
 const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   static propTypes = {
     closeExportDialog: React.PropTypes.func.isRequired,
-    photos: React.PropTypes.array.isRequired
+    photos: React.PropTypes.array.isRequired,
+    actions: React.PropTypes.object.isRequired
   }
 
   constructor(props) {
     super(props);
 
-    this.state = { folder: null, quality: 90, format: config.exportFormats[0] };
+    this.state = {
+      folder: null,
+      quality: 90,
+      format: config.exportFormats[0],
+      progress: { processed: 0, total: 0 }
+    };
 
+    this.onEachPhoto = this.onEachPhoto.bind(this);
     this.processImg = this.processImg.bind(this);
   }
 
   componentDidMount() {
     window.addEventListener('core:cancel', this.props.closeExportDialog);
+
+    let state = this.state;
+    state.progress.total = this.props.photos.length;
+    this.setState(state);
   }
 
   componentWillUnmount() {
@@ -33,13 +45,16 @@ class Export extends React.Component {
   }
 
   onFolderSelection(filenames) {
+
     console.log('filenames', filenames);
     let state = this.state;
     state.folder = filenames[0];
     this.setState(state);
   }
 
-  openFolderDialog() {
+  openFolderDialog(e) {
+    e.preventDefault();
+
     remote.dialog.showOpenDialog(
       { properties: [ 'openDirectory' ]},
       this.onFolderSelection.bind(this)
@@ -51,11 +66,11 @@ class Export extends React.Component {
       .rotate()
       .withMetadata()
       .quality(this.state.quality)
-      .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`)
-      .then(this.afterExport.bind(this));
+      .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 
   afterExport() {
+    console.log('after export');
     notifier.notify({
       'title': 'Ansel',
       'message': `Finish exporting ${this.props.photos.length} photo(s)`
@@ -64,16 +79,17 @@ class Export extends React.Component {
     this.props.closeExportDialog();
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
+  onEachPhoto(photo, i) {
+    //let state = this.state;
+    let extension = photo.extension.toLowerCase();
 
-    Promise.each(this.props.photos, (photo) => {
-      let extension = photo.extension.toLowerCase();
+    if (!this.state.folder)
+      return false;
 
-      if (!this.state.folder)
-        return false;
+    else {
+      this.props.actions.importProgress(null, { processed: i+1, total: this.props.photos.length });
 
-      else if (photo.versions.length > 0)
+      if (photo.versions.length > 0)
         return this.processImg(photo, photo.thumb);
 
       else if (config.acceptedRawFormats.indexOf(extension) != -1)
@@ -83,7 +99,15 @@ class Export extends React.Component {
 
       else
         return this.processImg(photo, photo.thumb);
-    });
+    }
+  }
+
+  handleSubmit(e) {
+    console.log('handle submit');
+    e.preventDefault();
+
+    Promise.each(this.props.photos, this.onEachPhoto)
+      .then(this.afterExport.bind(this));
   }
 
   updateQuality() {
@@ -143,6 +167,8 @@ class Export extends React.Component {
 
             <button>Save</button>
           </form>
+
+          <Progress />
         </div>
       </div>
     );
