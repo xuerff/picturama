@@ -13,6 +13,7 @@ class Picture extends React.Component {
     setCurrent: React.PropTypes.func.isRequired,
     setHighlight: React.PropTypes.func.isRequired,
     setFlagging: React.PropTypes.func.isRequired,
+    setExport: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.bool.isRequired,
     photo: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired
@@ -49,8 +50,7 @@ class Picture extends React.Component {
 
     this.menu.append(new MenuItem({ 
       label: 'Export picture(s)', 
-      //click: this.handleExport.bind(this)
-      click: () => console.log('export, bitch!')
+      click: this.props.setExport
     }));
   }
 
@@ -61,13 +61,9 @@ class Picture extends React.Component {
       let rect = this.refs.picture.getBoundingClientRect();
       let container = this.refs.picture.parentNode.parentNode;
       let containerRect = container.getBoundingClientRect();
-      console.log('rect',  rect, containerRect);
 
-      if (rect.bottom > containerRect.bottom) {
-        console.log('should scroll yo!', container.scrollTop);
+      if (rect.bottom > containerRect.bottom)
         container.scrollTop += rect.bottom - containerRect.bottom;
-        console.log('should still scroll yo!', container.scrollTop);
-      }
       else if (rect.top < 0) 
         container.scrollTop += rect.top;
     }

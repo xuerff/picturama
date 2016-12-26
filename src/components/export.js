@@ -7,20 +7,28 @@ import sharp from 'sharp';
 import React from 'react';
 
 import config from './../config';
+import Progress from './progress';
 
 const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   static propTypes = {
     closeExportDialog: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired
+    photos: React.PropTypes.array.isRequired,
+    actions: React.PropTypes.object.isRequired
   }
 
   constructor(props) {
     super(props);
 
-    this.state = { folder: null, quality: 90, format: config.exportFormats[0] };
+    this.state = {
+      folder: null,
+      quality: 90,
+      format: config.exportFormats[0],
+      showProgress: false
+    };
 
+    this.onEachPhoto = this.onEachPhoto.bind(this);
     this.processImg = this.processImg.bind(this);
   }
 
@@ -33,59 +41,72 @@ class Export extends React.Component {
   }
 
   onFolderSelection(filenames) {
-    console.log('filenames', filenames);
     let state = this.state;
     state.folder = filenames[0];
     this.setState(state);
   }
 
-  openFolderDialog() {
+  openFolderDialog(e) {
+    e.preventDefault();
+
     remote.dialog.showOpenDialog(
       { properties: [ 'openDirectory' ]},
       this.onFolderSelection.bind(this)
     );
   }
 
-  processImg(img) {
-    let photo = this.props.photo;
-
-    return sharp(img)
+  processImg(photo, source) {
+    return sharp(source)
       .rotate()
       .withMetadata()
       .quality(this.state.quality)
-      .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`)
-      .then(this.afterExport.bind(this));
+      .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 
   afterExport() {
     notifier.notify({
       'title': 'Ansel',
-      'message': `Finish exporting ${this.props.photo.title}`
+      'message': `Finish exporting ${this.props.photos.length} photo(s)`
     });
 
     this.props.closeExportDialog();
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
-    console.log('save', this.state, this.props.photo);
-
-    let photo = this.props.photo;
+  onEachPhoto(photo, i) {
     let extension = photo.extension.toLowerCase();
 
     if (!this.state.folder)
       return false;
 
-    else if (photo.versions.length > 0)
-      return this.processImg(photo.thumb);
+    else {
+      this.props.actions.importProgress(null, {
+        processed: i+1,
+        total: this.props.photos.length,
+        photosDir: this.state.folder
+      });
 
-    else if (config.acceptedRawFormats.indexOf(extension) != -1)
-      return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
-        .then((imgPath) => readFile(imgPath))
-        .then(this.processImg);
+      if (photo.versions.length > 0)
+        return this.processImg(photo, photo.thumb);
 
-    else
-      return this.processImg(photo.thumb);
+      else if (config.acceptedRawFormats.indexOf(extension) != -1)
+        return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
+          .then((imgPath) => readFile(imgPath))
+          .then(img => this.processImg(photo, img));
+
+      else
+        return this.processImg(photo, photo.thumb);
+    }
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+
+    let state = this.state;
+    state.showProgress = true;
+    this.setState(state);
+
+    Promise.each(this.props.photos, this.onEachPhoto)
+      .then(this.afterExport.bind(this));
   }
 
   updateQuality() {
@@ -145,6 +166,8 @@ class Export extends React.Component {
 
             <button>Save</button>
           </form>
+
+          {this.state.showProgress ? (<Progress />) : null}
         </div>
       </div>
     );
