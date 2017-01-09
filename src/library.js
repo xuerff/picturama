@@ -7,29 +7,30 @@ import Promise from 'bluebird';
 import libraw from 'libraw';
 import exiv2 from 'exiv2';
 
+import Scanner from './scanner';
 import config from './config';
 import metadata from './metadata';
 
 import walker from './lib/walker';
-import matches from './lib/matches';
+//import matches from './lib/matches';
 
 import Photo from './models/photo';
 import Tag from './models/tag';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 const readFile = Promise.promisify(fs.readFile);
-const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
-const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
+//const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
+//const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
 
-const extract = new RegExp(
-  '([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$',
-  'i'
-);
+//const extract = new RegExp(
+//  '([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$',
+//  'i'
+//);
 
-const extractImg = new RegExp(
-  '([^\/]+)\.(' + config.acceptedImgFormats.join('|') + ')$',
-  'i'
-);
+//const extractImg = new RegExp(
+//  '([^\/]+)\.(' + config.acceptedImgFormats.join('|') + ')$',
+//  'i'
+//);
 
 class Library {
 
@@ -60,57 +61,56 @@ class Library {
       fs.mkdirSync(config.tmp);
 
     ipcMain.on('start-scanning', () => {
-      console.log('start import!');
       this.scan();
     });
   }
 
-  prepare(filePaths) {
-    let rawFiles = filePaths.map((filePath) => {
-      if (filePath.match(allowed))
-        return filePath;
-    })
-    .filter((filePath) => (filePath));
+  //prepare(filePaths) {
+  //  let rawFiles = filePaths.map((filePath) => {
+  //    if (filePath.match(allowed))
+  //      return filePath;
+  //  })
+  //  .filter((filePath) => (filePath));
 
-    let imgFiles = filePaths.map((filePath) => {
-      if (filePath.match(allowedImg))
-        return filePath;
-    })
-    .filter((filePath) => (filePath));
+  //  let imgFiles = filePaths.map((filePath) => {
+  //    if (filePath.match(allowedImg))
+  //      return filePath;
+  //  })
+  //  .filter((filePath) => (filePath));
 
-    let preparedFiles = rawFiles.map((rawFile) => {
-      let filename = rawFile.match(extract)[1];
-      let imgPos = matches(imgFiles, filename);
+  //  let preparedFiles = rawFiles.map((rawFile) => {
+  //    let filename = rawFile.match(extract)[1];
+  //    let imgPos = matches(imgFiles, filename);
 
-      let element = {
-        path: rawFile,
-        name: filename,
-        isRaw: true
-      };
+  //    let element = {
+  //      path: rawFile,
+  //      name: filename,
+  //      isRaw: true
+  //    };
 
-      if (imgPos != -1) {
-        element.imgPath = imgFiles[imgPos];
+  //    if (imgPos != -1) {
+  //      element.imgPath = imgFiles[imgPos];
 
-        imgFiles = imgFiles.filter((imgFile) => {
-          return (imgFile != imgFiles[imgPos]);
-        });
-      }
+  //      imgFiles = imgFiles.filter((imgFile) => {
+  //        return (imgFile != imgFiles[imgPos]);
+  //      });
+  //    }
 
-      return element;
-    });
+  //    return element;
+  //  });
 
-    imgFiles.forEach((imgFile) => {
-      let filename = imgFile.match(extractImg)[1];
+  //  imgFiles.forEach((imgFile) => {
+  //    let filename = imgFile.match(extractImg)[1];
 
-      preparedFiles.push({
-        path: imgFile,
-        name: filename,
-        isRaw: false
-      });
-    });
+  //    preparedFiles.push({
+  //      path: imgFile,
+  //      name: filename,
+  //      isRaw: false
+  //    });
+  //  });
 
-    return preparedFiles;
-  }
+  //  return preparedFiles;
+  //}
 
   filterStoredPhoto(file) {
     return new Photo({ master: file.path })
@@ -289,27 +289,26 @@ class Library {
   }
 
   scan() {
-    console.log('start scan', this.path, this.versionsPath);
     var start = new Date().getTime();
     this.mainWindow.webContents.send('start-import', true);
 
     if (!this.path || !this.versionsPath)
       return false;
 
-    walker(this.path, [ this.versionsPath ])
-      .then(this.prepare.bind(this))
-      .filter(this.filterStoredPhoto.bind(this))
-      .then(this.setTotal.bind(this))
-      .map(this.walk.bind(this), {
-        concurrency: config.concurrency
-      })
+    new Scanner(this.path, this.versionsPath)
+      .scanPictures()
+    //walker(this.path, [ this.versionsPath ])
+    //  .then(this.prepare.bind(this))
+    //  .filter(this.filterStoredPhoto.bind(this))
+    //  .then(this.setTotal.bind(this))
+    //  .map(this.walk.bind(this), {
+    //    concurrency: config.concurrency
+    //  })
       .then((pics) => {
         let end = new Date().getTime();
         let time = moment.duration(end - start);
 
         this.mainWindow.webContents.send('finish-import', true);
-
-        console.log(`Finish importing ${pics.length} in ${time.humanize()}`);
 
         notifier.notify({
           'title': 'Ansel',
@@ -324,7 +323,6 @@ class Library {
   }
 
   scanForTags() {
-    console.log('scan for tags');
     var start = new Date().getTime();
     this.mainWindow.webContents.send('start-import', true);
 
@@ -342,8 +340,6 @@ class Library {
         let time = moment.duration(end - start);
 
         this.mainWindow.webContents.send('finish-import', true);
-
-        console.log(`Finish importing tags ${pics.length} in ${time.humanize()}`);
 
         notifier.notify({
           'title': 'Ansel',
