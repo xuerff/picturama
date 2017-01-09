@@ -10,13 +10,16 @@ import fs from 'fs';
 import MainMenu from './main-menu';
 import Usb from './usb';
 import config from './config';
+import Watch from './watch';
 
 const initLibrary = (mainWindow) => {
   const Library = require('./library').default;
   let library = new Library(mainWindow);
+  let watcher = new Watch(mainWindow);
 
   new MainMenu(mainWindow, library);
-  library.watch();
+  //library.watch();
+  watcher.watch();
 };
 
 var mainWindow = null;
