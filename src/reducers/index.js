@@ -2,6 +2,12 @@ import { combineReducers } from 'redux';
 
 import photos from './photos';
 import dates from './dates';
+import tags from './tags';
+import settings from './settings';
+import importation from './importation';
+import current from './current';
+import devices from './devices';
+import diff from './diff';
 
 //import processDates from './../lib/process-dates';
 //import updatePhotos from './../lib/update-photos';
@@ -54,7 +60,13 @@ import dates from './dates';
 
 export default combineReducers({
   photos,
-  dates
+  dates,
+  tags,
+  settings,
+  importation,
+  current,
+  devices,
+  diff
 });
 
 //export default function reducers(state = initialState, action) {

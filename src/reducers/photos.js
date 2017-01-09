@@ -1,5 +1,5 @@
 import updatePhotos from './../lib/update-photos';
-import initialState from './../initial-state.js';
+//import initialState from './../initial-state.js';
 
 //const initialState = {
 //  splashed: false,
@@ -17,8 +17,19 @@ import initialState from './../initial-state.js';
 //  progress: { processed: 0, total: 0 }
 //};
 
+const initialState = {
+  diff: false,
+  current: -1,
+  importing: false,
+  splashed: true,
+  currentDate: null,
+  currentTag: null,
+  showOnlyFlagged: false,
+  photos: []
+};
 
 function photos (state = initialState, action) {
+  //console.log('photo initial state', state);
   switch (action.type) {
   case 'GET_PHOTOS_SUCCESS':
     return {
