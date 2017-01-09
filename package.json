@@ -49,7 +49,7 @@
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-loader": "^2.4.0",
-    "react-redux": "^4.4.5",
+    "react-redux": "^5.0.1",
     "react-tagsinput": "git+https://github.com/olahol/react-tagsinput#master",
     "readable-stream": "^2.2.1",
     "redux": "^3.6.0",
@@ -97,6 +97,7 @@
     "mocha-jsdom": "^1.0.0",
     "node-gyp": "^3.4.0",
     "react-addons-test-utils": "^15.3.1",
+    "redux-logger": "^2.7.4",
     "rimraf": "^2.5.4",
     "spectron": "^3.4.0"
   },

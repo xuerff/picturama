@@ -1,4 +1,6 @@
 const initialState = {
+  importing: false,
+  progress: { processed: 0, total: 0 }
 };
 
 export default (state = initialState, action) => {
