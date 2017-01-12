@@ -1,5 +1,3 @@
-import processDates from './../lib/process-dates';
-
 const rmDevice = (devices, rmDevice) => {
   let pos = -1;
 
@@ -16,14 +14,28 @@ const rmDevice = (devices, rmDevice) => {
 
 export default function reducers(state, action) {
   switch (action.type) {
-  case 'GET_DATES_SUCCESS':
+  case 'INIT_DEVICES_SUCCESS':
     return {
       ...state,
-      dates: processDates(action.dates)
+      devices: action.devices
+    };
+
+  case 'ADD_DEVICE_SUCCESS':
+    return {
+      ...state,
+      devices: [
+        ...state.devices,
+        action.device
+      ]
+    };
+
+  case 'REMOVE_DEVICE_SUCCESS':
+    return {
+      ...state,
+      devices: rmDevice(state.devices, action.device)
     };
 
   default:
     return state;
   }
 }
-
