@@ -1,6 +1,11 @@
-import photos from './photos';
+import current from './current';
+import dates from './dates';
+import devices from './devices';
+import diff from './diff';
 import importation from './importation';
-import others from './others';
+import photos from './photos';
+import settings from './settings';
+import tags from './tags';
 
 const initialState = {
   splashed: false,
@@ -30,8 +35,13 @@ const runReducers = (state, action, reducers) => {
 
 export default function reducers(state = initialState, action) {
   return runReducers(state, action, {
-    photos,
+    current,
+    dates,
+    devices,
+    diff,
     importation,
-    others
+    photos,
+    settings,
+    tags
   });
 }
