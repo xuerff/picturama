@@ -1,18 +1,6 @@
 import updatePhotos from './../lib/update-photos';
 
-const initialState = {
-  diff: false,
-  current: -1,
-  importing: false,
-  splashed: true,
-  currentDate: null,
-  currentTag: null,
-  showOnlyFlagged: false,
-  photos: []
-};
-
-function photos (state = initialState, action) {
-  //console.log('photo initial state', state);
+export default function reducers(state, action) {
   switch (action.type) {
   case 'GET_PHOTOS_SUCCESS':
     return {
@@ -50,5 +38,3 @@ function photos (state = initialState, action) {
     return state;
   }
 }
-
-export default photos;

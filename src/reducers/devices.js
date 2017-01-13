@@ -12,11 +12,7 @@ const rmDevice = (devices, rmDevice) => {
   ];
 };
 
-const initialState = {
-  devices: []
-};
-
-export default (state = initialState, action) => {
+export default function reducers(state, action) {
   switch (action.type) {
   case 'INIT_DEVICES_SUCCESS':
     return {
@@ -42,4 +38,4 @@ export default (state = initialState, action) => {
   default:
     return state;
   }
-};
+}

@@ -1,9 +1,4 @@
-const initialState = {
-  diff: false,
-  current: -1
-};
-
-export default (state = initialState, action) => {
+export default function reducers(state, action) {
   switch (action.type) {
   case 'SET_CURRENT_SUCCESS':
     return {
@@ -29,5 +24,4 @@ export default (state = initialState, action) => {
   default:
     return state;
   }
-};
-
+}

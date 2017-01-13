@@ -1,9 +1,4 @@
-const initialState = {
-  importing: false,
-  progress: { processed: 0, total: 0 }
-};
-
-export default (state = initialState, action) => {
+export default function reducers(state, action) {
   switch (action.type) {
   case 'SET_IMPORT':
     return {
@@ -20,4 +15,4 @@ export default (state = initialState, action) => {
   default:
     return state;
   }
-};
+}

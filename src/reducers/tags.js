@@ -14,14 +14,9 @@ const processTags = (prevTags, nextTags) => {
   return (tags.length > 0) ? prevTags.concat(tags) : [];
 };
 
-const initialState = {
-  tags: []
-};
-
-export default (state = initialState, action) => {
+export default function reducers(state, action) {
   switch (action.type) {
   case 'GET_TAGS_SUCCESS':
-    console.log('get tags', state, action.tags);
     return {
       ...state,
       tags: action.tags
@@ -36,4 +31,4 @@ export default (state = initialState, action) => {
   default:
     return state;
   }
-};
+}

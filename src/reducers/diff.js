@@ -1,8 +1,4 @@
-const initialState = {
-  diff: false
-};
-
-export default (state = initialState, action) => {
+export default function reducers(state, action) {
   switch (action.type) {
   case 'TOGGLE_DIFF_SUCCESS':
     return {
@@ -13,6 +9,4 @@ export default (state = initialState, action) => {
   default:
     return state;
   }
-};
-
-
+}
