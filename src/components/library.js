@@ -87,10 +87,11 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (state.highlighted.length > 0)
-      this.activateExportAccelerator();
-    else
+    if (this.props.current != -1 || this.state.modal != 'none')
       this.deactivateExportAccelerator();
+
+    else if (state.highlighted.length > 0)
+      this.activateExportAccelerator();
 
     if (this.props.current == -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
