@@ -141,6 +141,11 @@ export default class PictureDetail extends React.Component {
       click: this.showExportDialog.bind(this)
     }));
 
+    this.menu.append(new MenuItem({
+      label: 'Move to trash',
+      click: this.moveToTrash
+    }));
+
     this.menu.append(new MenuItem({ 
       type: 'separator'
     }));
