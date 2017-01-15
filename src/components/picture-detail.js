@@ -120,7 +120,7 @@ export default class PictureDetail extends React.Component {
   }
 
   moveToTrash() {
-    console.log('Move To trash');
+    this.props.actions.moveToTrash(this.props.photo);
   }
 
   toggleDiff() {

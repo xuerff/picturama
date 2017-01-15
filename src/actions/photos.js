@@ -4,7 +4,11 @@ export const getPhotos = () => {
   return (dispatch) => {
     Photo
       .query((qb) => {
-        qb.limit(100).offset(0).orderBy('created_at', 'desc');
+        qb
+          .limit(100)
+          .offset(0)
+          .where({ trashed: false })
+          .orderBy('created_at', 'desc');
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
@@ -23,3 +27,16 @@ export const updatedPhoto = (e, version) => {
   };
 };
 
+export const moveToTrash = (photo) => {
+  return (dispatch) => {
+    new Photo({ id: photo.id })
+      .save('trashed', true, { patch: true })
+      .then(() => {
+        return new Photo({ id: photo.id })
+          .fetch({ withRelated: ['versions', 'tags'] });
+      })
+      .then((photoModel) => {
+        dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() });
+      });
+  };
+};
