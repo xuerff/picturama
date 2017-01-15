@@ -34,13 +34,13 @@ class Tags extends React.Component {
       <div className="tags">
         <h3><i className="fa fa-tags"></i> Tags</h3>
         <ul>
-          {this.props.tags.map(tag =>
+          {(this.props.tags.length > 0) ? this.props.tags.map(tag =>
             <TagButton 
               setTag={() => this.props.actions.setTagFilter(tag)}
               className={classNames({ 'active': tag.id == currentTag })}
               key={tag.id}
               tag={tag} />
-          )}
+          ) : ''}
         </ul>
       </div>
     );
