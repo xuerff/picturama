@@ -40,3 +40,16 @@ export const moveToTrash = (photo) => {
       });
   };
 };
+
+export const getTrashed = () => {
+  return (dispatch) => {
+    new Photo()
+      .where({ trashed: 1 })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+      });
+  };
+};
+
+
