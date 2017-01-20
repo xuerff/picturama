@@ -15,6 +15,7 @@ export const getProcessed = () => {
   return (dispatch) => {
     Photo.forge()
       .query((q) => {
+        q.where({ trashed: 0 });
         q.join('versions', 'versions.photo_id', '=', 'photos.id');
       })
       .fetchAll({ withRelated: ['versions', 'tags'] })

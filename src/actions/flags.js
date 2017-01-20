@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import Photo from './../models/photo';
 
 export const toggleFlagged = (date, showOnlyFlagged) => {
-  let where = { flag: showOnlyFlagged };
+  let where = { flag: showOnlyFlagged, trashed: 0 };
 
   if (date) where.date = date;
 
@@ -24,7 +24,7 @@ export const toggleFlagged = (date, showOnlyFlagged) => {
 export const getFlagged = () => {
   return (dispatch) => {
     new Photo()
-      .where({ flag: true })
+      .where({ flag: true, trashed: 0 })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
@@ -58,6 +58,7 @@ export const flagSet = (photos, flaggedPhotos, flag) => {
     })
     .map((photo) => {
       return new Photo({ id: photo.id })
+        .where({ trashed: 0 })
         .fetch({ withRelated: ['versions', 'tags'] })
         .then((photo) => photo.toJSON());
     })
