@@ -124,14 +124,14 @@ export default class Scanner {
         return sharp(img)
           .rotate()
           .withMetadata()
-          .toFile(`${config.thumbsPath}/${file.name}.thumb.jpg`);
+          .toFile(`${config.thumbsPath}/${file.name}.thumb.webp`);
       })
       .then(() => {
-        return sharp(`${config.thumbsPath}/${file.name}.thumb.jpg`)
+        return sharp(`${config.thumbsPath}/${file.name}.thumb.webp`)
           .resize(250, 250)
           .max()
           .quality(100)
-          .toFile(`${config.thumbs250Path}/${file.name}.jpg`);
+          .toFile(`${config.thumbs250Path}/${file.name}.webp`);
       })
       .then(() => {
         return exGetImgTags(file.path).then(metadata.process);
@@ -154,8 +154,8 @@ export default class Scanner {
               aperture: xmp.fNumber,
               focal_length: xmp.focalLength,
               master: `${file.path}`,
-              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
-              thumb: `${config.thumbsPath}/${file.name}.thumb.jpg`
+              thumb_250: `${config.thumbs250Path}/${file.name}.webp`,
+              thumb: `${config.thumbsPath}/${file.name}.thumb.webp`
             })
             .save();
         })
@@ -173,7 +173,7 @@ export default class Scanner {
         .resize(250, 250)
         .max()
         .quality(100)
-        .toFile(`${config.thumbs250Path}/${file.name}.jpg`),
+        .toFile(`${config.thumbs250Path}/${file.name}.webp`),
       exGetImgTags(file.path).then(metadata.process),
       (img, xmp) => {
         let createdAt;
@@ -200,7 +200,7 @@ export default class Scanner {
               aperture: xmp.fNumber,
               focal_length: xmp.focalLength,
               master: file.path,
-              thumb_250: `${config.thumbs250Path}/${file.name}.jpg`,
+              thumb_250: `${config.thumbs250Path}/${file.name}.webp`,
               thumb: file.path
             })
             .save();
