@@ -26,6 +26,7 @@ export default {
   acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff' ],
   watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
   exportFormats: [ 'jpg', 'png' ],
+  workExt: 'webp',
   dotAnsel,
   menusFolder: `${anselFolder}/menus`,
   keymapsFolder: `${anselFolder}/keymaps`,
