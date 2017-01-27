@@ -12,6 +12,7 @@ import metadata from './metadata';
 import walker from './lib/walker';
 
 import Tag from './models/tag';
+import Photo from './models/photo';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 
@@ -45,8 +46,27 @@ class Library {
   }
 
   emptyTrash() {
-    console.log('BEEP!');
-    shell.beep();
+    new Photo()
+      .where({ trashed: 1 })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then((photos) => {
+        console.log('photos', photos.toJSON());
+        return photos.toJSON();
+      })
+      .each((photo) => {
+        return Promise
+          .each(
+            [ 'master', 'thumb', 'thumb_250' ],
+            (key => shell.moveItemToTrash(photo[key]))
+          )
+          .then(() => {
+            return new Photo({ id: photo.id })
+              .destroy();
+          });
+      })
+      .then(() => {
+        console.log('done');
+      });
   }
 
   walk(file) {
