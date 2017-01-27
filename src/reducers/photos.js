@@ -29,6 +29,12 @@ export default function reducers(state, action) {
       })
     };
 
+  case 'ON_REMOVED_PHOTOS':
+    return {
+      ...state,
+      photos: state.photos.filter(photo => !action.ids.includes(photo.id))
+    };
+
   case 'UPDATED_PHOTO_SUCCESS':
     return {
       ...state,

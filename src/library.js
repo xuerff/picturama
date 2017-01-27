@@ -49,11 +49,8 @@ class Library {
     new Photo()
       .where({ trashed: 1 })
       .fetchAll({ withRelated: ['versions', 'tags'] })
-      .then((photos) => {
-        console.log('photos', photos.toJSON());
-        return photos.toJSON();
-      })
-      .each((photo) => {
+      .then(photos => photos.toJSON())
+      .map((photo) => {
         return Promise
           .each(
             [ 'master', 'thumb', 'thumb_250' ],
@@ -62,10 +59,14 @@ class Library {
           .then(() => {
             return new Photo({ id: photo.id })
               .destroy();
-          });
+          })
+          .then(() => photo);
       })
-      .then(() => {
-        console.log('done');
+      .then((photos) => {
+        this.mainWindow.webContents.send(
+          'photos-trashed',
+          photos.map(photo => photo.id)
+        );
       });
   }
 

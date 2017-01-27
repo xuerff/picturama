@@ -55,6 +55,7 @@ class Ansel extends React.Component {
     ipcRenderer.on('scanned-devices', this.state.actions.initDevices);
     ipcRenderer.on('add-device', this.state.actions.addDevice);
     ipcRenderer.on('remove-device', this.state.actions.removeDevice);
+    ipcRenderer.on('photos-trashed', this.state.actions.removePhotos);
 
     window.addEventListener('core:toggleSidebar', this.toggleSidebar);
   }

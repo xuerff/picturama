@@ -56,4 +56,8 @@ export const getTrashed = () => {
   };
 };
 
-
+export const removePhotos = (e, ids) => {
+  return (dispatch => {
+    dispatch({ type: 'ON_REMOVED_PHOTOS', ids });
+  });
+};
