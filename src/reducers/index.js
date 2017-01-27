@@ -16,6 +16,7 @@ const initialState = {
   current: -1,
   diff: false,
   settingsExists: false,
+  route: '',
   photos: [],
   tags: [],
   devices: [],

@@ -47,7 +47,11 @@ export const getTrashed = () => {
       .where({ trashed: 1 })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
-        dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+        dispatch({
+          type: 'GET_PHOTOS_SUCCESS',
+          photos: photos.toJSON(),
+          route: 'trash'
+        });
       });
   };
 };

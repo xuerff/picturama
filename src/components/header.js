@@ -7,6 +7,7 @@ class Header extends React.Component {
     className: React.PropTypes.string.isRequired,
     currentTag: React.PropTypes.number,
     currentDate: React.PropTypes.string,
+    route: React.PropTypes.string,
     showOnlyFlagged: React.PropTypes.bool.isRequired,
     actions: React.PropTypes.object.isRequired
   }
@@ -38,6 +39,11 @@ class Header extends React.Component {
         </button>
 
         <div className="pull-right">
+          {this.props.route == 'trash' ? (
+            <button className='button'>
+              <i className="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          ) : null}
           <button
             className={btnClass}
             onClick={this.toggleFlagged.bind(this)}>
@@ -52,7 +58,8 @@ class Header extends React.Component {
 const ReduxHeader = connect(state => ({
   currentTag: state.currentTag,
   currentDate: state.currentDate,
-  showOnlyFlagged: state.showOnlyFlagged
+  showOnlyFlagged: state.showOnlyFlagged,
+  route: state.route
 }))(Header);
 
 export default ReduxHeader;
