@@ -1,6 +1,9 @@
 import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
+import { remote, ipcRenderer } from 'electron';
+
+const dialog = remote.dialog;
 
 class Header extends React.Component {
   static propTypes = {
@@ -25,6 +28,17 @@ class Header extends React.Component {
     );
   }
 
+  deleteModal() {
+    dialog.showMessageBox({
+      type: 'question',
+      message: 'Are you sure you want to empty the trash?',
+      buttons: ['Move picture(s) to trash', 'Cancel']
+    }, (index) => {
+      if (index === 0)
+        ipcRenderer.send('empty-trash', true);
+    });
+  }
+
   render() {
     let btnClass = classNames({
       'button': true,
@@ -40,7 +54,9 @@ class Header extends React.Component {
 
         <div className="pull-right">
           {this.props.route == 'trash' ? (
-            <button className='button'>
+            <button
+              onClick={this.deleteModal.bind(this)}
+              className='button'>
               <i className="fa fa-trash" aria-hidden="true"></i>
             </button>
           ) : null}
