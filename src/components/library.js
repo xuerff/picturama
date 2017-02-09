@@ -8,6 +8,7 @@ import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
 import Export from './export';
+import ReadyToScan from './ready-to-scan';
 
 class Library extends React.Component {
   static propTypes = {
@@ -206,10 +207,6 @@ class Library extends React.Component {
     this.setState(state);
   }
 
-  startScanning() {
-    ipcRenderer.send('start-scanning');
-  }
-
   closeDialog() {
     this.bindEventListeners();
 
@@ -234,17 +231,7 @@ class Library extends React.Component {
       );
 
     if (!this.props.photos || this.props.photos.length === 0)
-      currentView = (
-        <div>
-          <p>
-            <span>No photos imported. press Ctrl+R or </span>
-            <button 
-              id="start-scanning"
-              onClick={this.startScanning.bind(this)}>click here</button>
-            <span> to start scanning</span>
-          </p>
-        </div>
-      );
+      currentView = <ReadyToScan />;
 
     else if (this.props.current == -1)
       currentView = this.props.photos.map((photo, index) => {
