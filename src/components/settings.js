@@ -4,6 +4,8 @@ import React from 'react';
 
 import config from '../config';
 
+import Logo from './logo';
+
 const dialog = remote.dialog;
 
 class Settings extends React.Component {
@@ -70,24 +72,24 @@ class Settings extends React.Component {
 
           <p>Please select the main photos folder to scan from, as well as a versions folder in which we'll put the processed pictures.</p>
 
-          <div>
+          <p>
             <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
               {this.state.directories.photos || 'Photos directory'}
             </button>
-          </div>
+          </p>
 
-          <div>
+          <p>
             <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
               {this.state.directories.versions || 'Versions directory'}
             </button>
+          </p>
 
-            <p>Version folder where you put all your externally processed photos</p>
-          </div>
+          <p>Clicking on the save button will generate a hidden config folder at the root of your home folder</p>
 
           <button className="save" onClick={this.save.bind(this)}>Save</button>
         </div>
 
-        <img src="../static/ansel.svg" className="logo" />
+        <Logo />
       </div>
     );
   }
