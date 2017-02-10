@@ -86,6 +86,8 @@ class Settings extends React.Component {
 
           <button className="save" onClick={this.save.bind(this)}>Save</button>
         </div>
+
+        <img src="../static/ansel.svg" className="logo" />
       </div>
     );
   }
