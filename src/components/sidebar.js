@@ -52,7 +52,7 @@ class Sidebar extends React.Component {
 
     return (
       <div id="sidebar" className={this.props.className}>
-        <h2><i className="fa fa-camera-retro"></i> Library</h2>
+        <h2><img src="../static/ansel.svg" /> Library</h2>
 
         <div className="sidebar-content">
           <button 
