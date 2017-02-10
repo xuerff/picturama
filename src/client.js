@@ -3,7 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './../dist/components/app';
+import App from './../src/components/app';
 import pkgs from './../package.json';
 
 if (process.env.ANSEL_DEV_MODE)

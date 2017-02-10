@@ -5,9 +5,9 @@ let migrationsFolder = `${process.resourcesPath}/app/migrations`;
 let anselFolder = `${process.resourcesPath}/app`;
 
 if (process.env.ANSEL_DEV_MODE) {
-  dotAnsel = `${process.env.INIT_CWD}/dot-ansel`;
-  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
-  anselFolder = `${process.env.INIT_CWD}`;
+  dotAnsel = `${process.env.PWD}/dot-ansel`;
+  migrationsFolder = `${process.env.PWD}/migrations`;
+  anselFolder = `${process.env.PWD}`;
 }
 
 if (process.env.ANSEL_TEST_MODE) {
@@ -17,7 +17,7 @@ if (process.env.ANSEL_TEST_MODE) {
     fs.mkdirSync(testsPath);
 
   dotAnsel = `${testsPath}/dot-ansel`;
-  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
+  migrationsFolder = `${process.env.PWD}/migrations`;
 }
 
 export default {
