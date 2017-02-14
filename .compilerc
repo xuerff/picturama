@@ -1,0 +1,12 @@
+{
+  "text/less": {
+    "relativeUrls": false
+  },
+  "application/javascript": {
+    "presets": [
+      "stage-1",
+      "react"
+    ],
+    "plugins": ["syntax-decorators", "transform-es2015-modules-commonjs"]
+  }
+}
