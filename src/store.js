@@ -1,30 +1,23 @@
 import thunk from 'redux-thunk';
-import createLogger from 'redux-logger';
 import { createStore, applyMiddleware, compose } from 'redux';
 
 import reducers from './reducers';
 
+let createLogger, enhancer, logger;
 
-const logger = createLogger();
-const enhancer = compose(
-  applyMiddleware(thunk, logger)
-);
+if (process.env.ANSEL_DEV_MODE) {
+  createLogger = require('redux-logger');
 
-//const initialState = {
-//  splashed: false,
-//  importing: false,
-//  currentDate: null,
-//  currentTag: null,
-//  showOnlyFlagged: false,
-//  current: -1,
-//  diff: false,
-//  settingsExists: false,
-//  photos: [],
-//  tags: [],
-//  devices: [],
-//  dates: { years: [] },
-//  progress: { processed: 0, total: 0 }
-//};
+  logger = createLogger();
+  enhancer = compose(
+    applyMiddleware(thunk, logger)
+  );
+
+} else {
+  enhancer = compose(
+    applyMiddleware(thunk)
+  );
+}
 
 const store = createStore(reducers, enhancer);
 
