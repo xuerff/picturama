@@ -1,6 +1,6 @@
 {
   "name": "ansel",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "",
   "main": "dist/browser.js",
   "engines": {
@@ -16,6 +16,7 @@
     "rebuild-sqlite3": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.4-linux-x64 && node-gyp rebuild --target=1.4.6 --arch=x64 --target_platform=linux --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/electron-v1.4-linux-x64",
     "test": "./node_modules/.bin/gulp tests",
     "build": "gulp increment-buildnum && ./scripts/build.sh",
+    "build-no-bump": "./scripts/build.sh",
     "start": "./node_modules/.bin/gulp"
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
