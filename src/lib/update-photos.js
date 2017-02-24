@@ -14,14 +14,23 @@ export default function updatePhotos(photos, updatedPhoto) {
       updatedPhoto.versionNumber = versionNumber + 1;
   }
 
-  photos.forEach((photo, index) => {
-    if (photo.id == updatedPhoto.id)
-      updatedPhotoPos = index;
-  });
+  photos
+    .forEach((photo, index) => {
+      if (photo.id == updatedPhoto.id)
+        updatedPhotoPos = index;
+    });
 
-  return [
-    ...photos.slice(0, updatedPhotoPos),
-    Object.assign({}, updatedPhotoPos, updatedPhoto),
-    ...photos.slice(updatedPhotoPos + 1)
-  ];
+  // If photo has been moved to trashed, we remove it from the array
+  if (updatedPhoto.trashed === 1)
+    return [
+      ...photos.slice(0, updatedPhotoPos),
+      ...photos.slice(updatedPhotoPos + 1)
+    ];
+
+  else
+    return [
+      ...photos.slice(0, updatedPhotoPos),
+      Object.assign({}, updatedPhotoPos, updatedPhoto),
+      ...photos.slice(updatedPhotoPos + 1)
+    ];
 }

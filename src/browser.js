@@ -13,13 +13,16 @@ import config from './config';
 import Watch from './watch';
 
 const initLibrary = (mainWindow) => {
+  const knex = require('knex')(config.knex);
   const Library = require('./library').default;
-  let library = new Library(mainWindow);
-  let watcher = new Watch(mainWindow);
 
-  new MainMenu(mainWindow, library);
-  //library.watch();
-  watcher.watch();
+  knex.migrate.latest().finally(() => {
+    let library = new Library(mainWindow);
+    let watcher = new Watch(mainWindow);
+
+    new MainMenu(mainWindow, library);
+    watcher.watch();
+  });
 };
 
 var mainWindow = null;

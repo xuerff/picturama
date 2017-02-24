@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import moment from 'moment';
 import notifier from 'node-notifier';
 import fs from 'fs';
@@ -12,6 +12,7 @@ import metadata from './metadata';
 import walker from './lib/walker';
 
 import Tag from './models/tag';
+import Photo from './models/photo';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 
@@ -21,6 +22,8 @@ class Library {
     this.mainWindow = mainWindow;
 
     this.scanForTags = this.scanForTags.bind(this);
+    this.scan = this.scan.bind(this);
+    this.emptyTrash = this.emptyTrash.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -38,9 +41,33 @@ class Library {
     if (!fs.existsSync(config.tmp))
       fs.mkdirSync(config.tmp);
 
-    ipcMain.on('start-scanning', () => {
-      this.scan();
-    });
+    ipcMain.on('start-scanning', this.scan);
+    ipcMain.on('empty-trash', this.emptyTrash);
+  }
+
+  emptyTrash() {
+    new Photo()
+      .where({ trashed: 1 })
+      .fetchAll({ withRelated: ['versions', 'tags'] })
+      .then(photos => photos.toJSON())
+      .map((photo) => {
+        return Promise
+          .each(
+            [ 'master', 'thumb', 'thumb_250' ],
+            (key => shell.moveItemToTrash(photo[key]))
+          )
+          .then(() => {
+            return new Photo({ id: photo.id })
+              .destroy();
+          })
+          .then(() => photo);
+      })
+      .then((photos) => {
+        this.mainWindow.webContents.send(
+          'photos-trashed',
+          photos.map(photo => photo.id)
+        );
+      });
   }
 
   walk(file) {
@@ -80,7 +107,6 @@ class Library {
 
     if (!this.path || !this.versionsPath)
       return false;
-
     new Scanner(this.path, this.versionsPath, this.mainWindow)
       .scanPictures()
       .then((pics) => {

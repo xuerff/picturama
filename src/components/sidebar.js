@@ -74,6 +74,13 @@ class Sidebar extends React.Component {
             <i className="fa fa-pencil-square-o"></i> Processed
           </button>
 
+          <button
+            onClick={this.props.actions.getTrashed}
+            className="button">
+            <i className="fa fa-trash-o"></i> Trash
+          </button>
+
+
           {menus}
         </div>
       </div>

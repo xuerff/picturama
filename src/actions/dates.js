@@ -3,7 +3,7 @@ import Photo from './../models/photo';
 export const setDateFilter = (date) => {
   return (dispatch) => {
     new Photo()
-      .where({ date: date })
+      .where({ date: date, trashed: false })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         dispatch({ 
