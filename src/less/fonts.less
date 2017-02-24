@@ -1,12 +1,14 @@
+@rootFolder: ~"./../..";
+
 /*FONT AWESOME*/
 @font-face {
   font-family: 'FontAwesome';
-  src: url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.eot?v=4.4.0');
-  src: url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'),
-    url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.woff2?v=4.4.0') format('woff2'),
-    url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.woff?v=4.4.0') format('woff'),
-    url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.ttf?v=4.4.0') format('truetype'),
-    url('./../../node_modules/font-awesome/fonts/fontawesome-webfont.svg?v=4.4.0#fontawesomeregular') format('svg');
+  src: url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.eot');
+  src: url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.eot') format('embedded-opentype'),
+    url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.woff2') format('woff2'),
+    url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.woff') format('woff'),
+    url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.ttf') format('truetype'),
+    url('@{rootFolder}/node_modules/font-awesome/fonts/fontawesome-webfont.svg') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -192,17 +194,17 @@
 
 /*}*/
 
-/*@font-face {*/
-/*    font-family: 'Roboto';*/
-/*    src: url('../static/fonts/EOT/Roboto-Regular-webfont.eot');*/
-/*    src: url('../static/fonts/EOT/Roboto-Regular-webfont.eot?#iefix') format('embedded-opentype'),*/
-/*         url('../static/fonts/WOFF/Roboto-Regular-webfont.woff') format('woff'),*/
-/*         url('../static/fonts/TTF/Roboto-Regular-webfont.ttf') format('truetype'),*/
-/*         url('../static/fonts/SVG/Roboto-Regular-webfont.svg#robotoregular') format('svg');*/
-/*    font-weight: 400;*/
-/*    font-style: normal;*/
+@font-face {
+    font-family: 'Roboto';
+    src: url('@{rootFolder}/static/fonts/EOT/Roboto-Regular-webfont.eot');
+    src: url('@{rootFolder}/static/fonts/EOT/Roboto-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('@{rootFolder}/static/fonts/WOFF/Roboto-Regular-webfont.woff') format('woff'),
+         url('@{rootFolder}/static/fonts/TTF/Roboto-Regular-webfont.ttf') format('truetype'),
+         url('@{rootFolder}/static/fonts/SVG/Roboto-Regular-webfont.svg#robotoregular') format('svg');
+    font-weight: 400;
+    font-style: normal;
 
-/*}*/
+}
 
 /*@font-face {*/
 /*    font-family: 'robotothin_italic';*/
@@ -218,26 +220,30 @@
 
 @font-face {
     font-family: 'Roboto';
-    src: url('./../../fonts/EOT/Roboto-Thin-webfont.eot');
-    src: url('./../../fonts/EOT/Roboto-Thin-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/WOFF/Roboto-Thin-webfont.woff') format('woff'),
-         url('./../static/fonts/TTF/Roboto-Thin-webfont.ttf') format('truetype'),
-         url('./../../fonts/SVG/Roboto-Thin-webfont.svg#robotothin') format('svg');
+    /*src: url('./../../static/fonts/EOT/Roboto-Thin-webfont.eot');*/
+    /*src: url('./../../static/fonts/EOT/Roboto-Thin-webfont.eot?#iefix') format('embedded-opentype'),*/
+    /*     url('./../../static/fonts/WOFF/Roboto-Thin-webfont.woff') format('woff'),*/
+    /*     url('./../../static/fonts/TTF/Roboto-Thin-webfont.ttf') format('truetype'),*/
+    /*     url('./../../static/fonts/SVG/Roboto-Thin-webfont.svg#robotothin') format('svg');*/
+    src: url('@{rootFolder}/static/fonts/EOT/Roboto-Thin-webfont.eot');
+    src: url('@{rootFolder}/static/fonts/EOT/Roboto-Thin-webfont.eot?#iefix') format('embedded-opentype'),
+         url('@{rootFolder}/static/fonts/WOFF/Roboto-Thin-webfont.woff') format('woff'),
+         url('@{rootFolder}/static/fonts/TTF/Roboto-Thin-webfont.ttf') format('truetype'),
+         url('@{rootFolder}/static/fonts/SVG/Roboto-Thin-webfont.svg#robotothin') format('svg');
     font-weight: 200;
     font-style: normal;
 
 }
 
 /*Roboto Mono*/
-/*@font-face {*/
-/*    font-family: 'Roboto Mono';*/
-/*    src: url('../static/fonts/EOT/roboto-mono_regular.eot');*/
-/*    src: url('../static/fonts/EOT/roboto-mono_regular.eot?#iefix') format('embedded-opentype'),*/
-/*         url('../static/fonts/WOFF/roboto-mono_regular.woff') format('woff'),*/
-/*         url('../static/fonts/TTF/roboto-mono_regular.ttf') format('truetype'),*/
-/*         url('../static/fonts/SVG/roboto-mono_regular.svg#robotothin') format('svg');*/
-/*    font-weight: 400;*/
-/*    font-style: normal;*/
-
-/*}*/
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('@{rootFolder}/static/fonts/EOT/roboto-mono_regular.eot');
+    src: url('@{rootFolder}/static/fonts/EOT/roboto-mono_regular.eot?#iefix') format('embedded-opentype'),
+         url('@{rootFolder}/static/fonts/WOFF/roboto-mono_regular.woff') format('woff'),
+         url('@{rootFolder}/static/fonts/TTF/roboto-mono_regular.ttf') format('truetype'),
+         url('@{rootFolder}/static/fonts/SVG/roboto-mono_regular.svg#robotothin') format('svg');
+    font-weight: 400;
+    font-style: normal;
+}
 

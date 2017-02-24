@@ -1,5 +1,6 @@
 {
   "text/less": {
+    "dumpLineNumbers": "comments",
     "relativeUrls": false
   },
   "application/javascript": {
