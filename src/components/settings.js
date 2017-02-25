@@ -4,6 +4,8 @@ import React from 'react';
 
 import config from '../config';
 
+import Logo from './logo';
+
 const dialog = remote.dialog;
 
 class Settings extends React.Component {
@@ -63,30 +65,31 @@ class Settings extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Settings</h1>
+      <div className="settings-container">
+        <div className="info">
+          <h1>Ansel</h1>
+          <h2>Digital image organizer powered by the web</h2>
 
-        <div>
-          <label htmlFor="photos-dir">Photos directory</label>
+          <p>Please select the main photos folder to scan from, as well as a versions folder in which we'll put the processed pictures.</p>
 
-          <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
-            Photos directory {this.state.directories.photos}
-          </button>
+          <p>
+            <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>
+              {this.state.directories.photos || 'Photos directory'}
+            </button>
+          </p>
 
-          <p>Photo folder to digest</p>
+          <p>
+            <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
+              {this.state.directories.versions || 'Versions directory'}
+            </button>
+          </p>
+
+          <p>Clicking on the save button will generate a hidden config folder at the root of your home folder</p>
+
+          <button className="save" onClick={this.save.bind(this)}>Save</button>
         </div>
 
-        <div>
-          <label htmlFor="versions-dir">Photos directory</label>
-
-          <button id="versions-dir" onClick={this.openVersionsDialog.bind(this)}>
-            Versions directory {this.state.directories.versions}
-          </button>
-
-          <p>Version folder where you put all your externally processed photos</p>
-        </div>
-
-        <button onClick={this.save.bind(this)}>Save</button>
+        <Logo />
       </div>
     );
   }

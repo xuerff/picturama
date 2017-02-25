@@ -4,6 +4,7 @@ import React from 'react';
 import Tags from './tags';
 import Dates from './dates';
 import Devices from './devices';
+import Logo from './logo';
 
 import config from './../config';
 
@@ -52,7 +53,7 @@ class Sidebar extends React.Component {
 
     return (
       <div id="sidebar" className={this.props.className}>
-        <h2><i className="fa fa-camera-retro"></i> Library</h2>
+        <h2><Logo /> Library</h2>
 
         <div className="sidebar-content">
           <button 

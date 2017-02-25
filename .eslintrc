@@ -1,5 +1,6 @@
 {
   "rules": {
+    "complexity": [1, 2],
     "no-console": 0,
     "prefer-arrow-callback": 1,
     "indent": [
