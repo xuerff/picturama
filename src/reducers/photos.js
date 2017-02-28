@@ -21,8 +21,8 @@ export default function reducers(state, action) {
 
           let lastVersion = photo.versions[photo.versions.length - 1];
 
-          photo.thumb = lastVersion.output;
-          photo.thumb_250 = lastVersion.thumbnail;
+          photo.thumb = lastVersion.output || photo.thumb;
+          photo.thumb_250 = lastVersion.thumbnail || photo.thumb_250;
         }
 
         return photo;
