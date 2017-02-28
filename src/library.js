@@ -13,6 +13,7 @@ import walker from './lib/walker';
 
 import Tag from './models/tag';
 import Photo from './models/photo';
+import Version from './models/version';
 
 const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 
@@ -24,6 +25,7 @@ class Library {
     this.scanForTags = this.scanForTags.bind(this);
     this.scan = this.scan.bind(this);
     this.emptyTrash = this.emptyTrash.bind(this);
+    this.fixMissingVersions = this.fixMissingVersions.bind(this);
 
     if (fs.existsSync(config.settings)) {
       let settings = require(config.settings);
@@ -43,6 +45,21 @@ class Library {
 
     ipcMain.on('start-scanning', this.scan);
     ipcMain.on('empty-trash', this.emptyTrash);
+  }
+
+  fixMissingVersions() {
+    Version
+      .query(qb => {
+        return qb
+          .innerJoin('photos', 'versions.photo_id', 'photos.id')
+          .where('output', null)
+          .orWhere('thumbnail', null);
+      })
+      //.fetchAll({ withRelated: ['photo'] })
+      .fetchAll()
+      .then(versions => {
+        console.log('empty versions', versions.toJSON());
+      });
   }
 
   emptyTrash() {

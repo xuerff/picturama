@@ -19,6 +19,7 @@ class MainMenu {
     this.toggleDevTools = this.toggleDevTools.bind(this);
     this.addTags = this.addTags.bind(this);
     this.export = this.export.bind(this);
+    this.fixMissingVersions = this.fixMissingVersions.bind(this);
 
     this.template = template.menu.map((menu) => {
       menu.submenu = menu.submenu.map((submenu) => {
@@ -50,7 +51,6 @@ class MainMenu {
   }
 
   scanForTags() {
-    console.log('scan for tags listener');
     this.library.scanForTags();
   }
 
@@ -76,6 +76,11 @@ class MainMenu {
 
   export() {
     this.mainWindow.webContents.send('exportClicked', true);
+  }
+
+  fixMissingVersions() {
+    console.log('fix');
+    this.library.fixMissingVersions();
   }
 
   render() {

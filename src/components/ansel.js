@@ -38,7 +38,6 @@ class Ansel extends React.Component {
       let splash = document.getElementById('splash');
       if (splash) splash.parentNode.removeChild(splash);
     }
-
   }
 
   componentDidMount() {

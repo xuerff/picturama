@@ -57,11 +57,18 @@
     },
     {
       "label": "Developer",
-      "submenu": [{
-        "label": "Toggle DevTools",
-        "accelerator": "Shift+Ctrl+I",
-        "click": "toggleDevTools"
-      }]
+      "submenu": [
+        {
+          "label": "Toggle DevTools",
+          "accelerator": "Shift+Ctrl+I",
+          "click": "toggleDevTools"
+        },
+        {
+          "label": "Fix missing versions",
+          "accelerator": "Shift+Ctrl+V",
+          "click": "fixMissingVersions"
+        }
+      ]
     },
     {
       "label": "Help",
