@@ -59,6 +59,18 @@ class Library {
       .fetchAll()
       .then(versions => {
         console.log('empty versions', versions.toJSON());
+        versions.toJSON().forEach(version => {
+          let versionName = version.master.match(/\w+-[\wéè]+-\d.\w{1,5}$/)[0];
+          let outputPath = `${this.versionsPath}/${versionName}`;
+
+          if (fs.existsSync(outputPath))
+            // TODO: regenerate thumbnail
+            new Version({ id: version.id })
+              .save('output', outputPath, { path: true });
+          else
+            new Version({ id: version.id })
+              .destroy();
+        });
       });
   }
 
