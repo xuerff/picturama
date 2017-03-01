@@ -66,10 +66,16 @@ class Library {
           if (fs.existsSync(outputPath))
             // TODO: regenerate thumbnail
             new Version({ id: version.id })
-              .save('output', outputPath, { path: true });
+              .save('output', outputPath, { path: true })
+              .then(() => {
+                console.log('output', outputPath, outputPath.match(config.watchedFormats));
+                Version.updateImage(outputPath.match(config.watchedFormats));
+              });
           else
             new Version({ id: version.id })
-              .destroy();
+              .destroy()
+              .then(() => console.log('destroyed!', version))
+              .catch(err => console.log('error while destroying', err));
         });
       });
   }
