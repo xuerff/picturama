@@ -3,7 +3,7 @@ import {ipcMain, Menu} from 'electron';
 import config from './config';
 import npmPackage from './../package.json';
 
-const template = require(`${config.menusFolder}/linux.json`);
+const template = require(config.menuPath);
 
 class MainMenu {
   constructor(mainWindow, library) {
