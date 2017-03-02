@@ -39,10 +39,15 @@ app.on('ready', () => {
   let cursorPos = screen.getCursorScreenPoint();
   let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize;
 
-  mainWindow = new BrowserWindow({ width: 1356, height: 768, webPreferences: {
-    experimentalFeatures: true,
-    blinkFeatures: 'CSSGridLayout'
-  }});
+  mainWindow = new BrowserWindow({
+    width: 1356,
+    height: 768,
+    title: 'Ansel',
+    webPreferences: {
+      experimentalFeatures: true,
+      blinkFeatures: 'CSSGridLayout'
+    }
+  });
 
   if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
     mainWindow.maximize();
