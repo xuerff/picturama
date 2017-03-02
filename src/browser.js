@@ -8,7 +8,7 @@ import {
 import fs from 'fs';
 
 import MainMenu from './main-menu';
-import Usb from './usb';
+// import Usb from './usb';
 import config from './config';
 import Watch from './watch';
 
@@ -60,20 +60,20 @@ app.on('ready', () => {
       });
   }
 
-  let usb = new Usb();
+  // let usb = new Usb();
 
-  usb.scan((err, drives) => {
-    mainWindow.webContents.send('scanned-devices', drives);
-  });
-
-  usb.watch((err, action, drive) => {
-    console.log('new drive', action, drive);
-
-    if (action == 'add')
-      mainWindow.webContents.send('add-device', drive);
-    else
-      mainWindow.webContents.send('remove-device', drive);
-  });
+  // usb.scan((err, drives) => {
+  //   mainWindow.webContents.send('scanned-devices', drives);
+  // });
+  //
+  // usb.watch((err, action, drive) => {
+  //   console.log('new drive', action, drive);
+  //
+  //   if (action == 'add')
+  //     mainWindow.webContents.send('add-device', drive);
+  //   else
+  //     mainWindow.webContents.send('remove-device', drive);
+  // });
 
   ipcMain.on('settings-created', () => initLibrary(mainWindow));
 
