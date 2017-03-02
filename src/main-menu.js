@@ -85,7 +85,7 @@ class MainMenu {
 
   render() {
     this.menu = Menu.buildFromTemplate(this.template);
-    this.mainWindow.setMenu(this.menu);
+    Menu.setApplicationMenu(this.menu);
   }
 }
 
