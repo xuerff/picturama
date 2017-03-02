@@ -1,22 +1,29 @@
 {
   "menu": [
     {
+      "label": "Ansel",
+      "submenu": [{
+        "label": "Version",
+        "enabled": false
+      }]
+    },
+    {
       "label": "File",
       "submenu": [
         {
           "label": "Export picture(s)",
-          "accelerator": "Ctrl+Shift+E",
+          "accelerator": "Cmd+Shift+E",
           "enabled": false,
           "click": "export"
         },
         {
           "label": "Scan",
-          "accelerator": "Ctrl+R",
+          "accelerator": "Cmd+R",
           "click": "scan"
         },
         {
           "label": "Close",
-          "accelerator": "Ctrl+Q",
+          "accelerator": "Cmd+Q",
           "click": "close"
         }
       ]
@@ -26,18 +33,13 @@
       "submenu": [
         {
           "label": "Reload",
-          "accelerator": "Shift+Ctrl+R",
+          "accelerator": "Shift+Cmd+R",
           "click": "reload"
         },
         {
           "label": "Enter Fullscreen",
           "accelerator": "F11",
           "click": "fullscreen"
-        },
-        {
-          "label": "Toggle DevTools",
-          "accelerator": "Shift+Ctrl+I",
-          "click": "toggleDevTools"
         }
       ]
     },
@@ -45,13 +47,13 @@
       "label": "Tags",
       "submenu": [{
         "label": "Add tags",
-        "accelerator": "Ctrl+T",
+        "accelerator": "Cmd+T",
         "enabled": false,
         "click": "addTags"
       },
       {
         "label": "Scan for tags",
-        "accelerator": "Shift+Ctrl+R",
+        "accelerator": "Shift+Cmd+R",
         "click": "scanForTags"
       }]
     },
@@ -60,22 +62,15 @@
       "submenu": [
         {
           "label": "Toggle DevTools",
-          "accelerator": "Shift+Ctrl+I",
+          "accelerator": "Shift+Cmd+I",
           "click": "toggleDevTools"
         },
         {
           "label": "Fix missing versions",
-          "accelerator": "Shift+Ctrl+V",
+          "accelerator": "Shift+Cmd+V",
           "click": "fixMissingVersions"
         }
       ]
-    },
-    {
-      "label": "Help",
-      "submenu": [{
-        "label": "Version",
-        "enabled": false
-      }]
     }
   ]
 }
