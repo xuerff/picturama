@@ -255,6 +255,7 @@ export default class PictureDetail extends React.Component {
     else if (this.state.modal == 'export')
       showModal = (
         <Export
+          actions={this.props.actions}
           photos={[this.props.photo]} 
           closeExportDialog={this.closeDialog} />
       );
