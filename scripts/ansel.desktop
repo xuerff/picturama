@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Ansel
-Exec=/opt/ansel-linux-x64/ansel
+Exec=/opt/ansel/ansel
 Terminal=false
 Categories=GNOME;GTK;Graphics;
 StartupNotify=true
-Icon=/opt/ansel-linux-x64/ansel.svg
+Icon=/opt/ansel/ansel.svg

@@ -1,5 +1,5 @@
 ANSEL_PATH=$PWD
-APPDIR=$ANSEL_PATH/build/ansel_0.4-1
+APPDIR=$ANSEL_PATH/build/ansel
 BUILD_PATH=$ANSEL_PATH/build
 APPIMAGETOOL=$ANSEL_PATH/build/appimagetool
 
@@ -15,6 +15,7 @@ mkdir $APPDIR/usr/share/applications
 
 cp $ANSEL_PATH/scripts/ansel.desktop $APPDIR/usr/share/applications
 cp $ANSEL_PATH/scripts/control $APPDIR/DEBIAN
+cp $ANSEL_PATH/ansel.svg $APPDIR/opt/ansel
 cp -r $BUILD_PATH/ansel-linux-x64/* $APPDIR/opt/ansel
 
 dpkg-deb --build $APPDIR

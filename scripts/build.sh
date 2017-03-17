@@ -58,6 +58,5 @@ find $PREPARED_PATH/node_modules/ -type f -name '.npmignore' -delete
 
 cd $ANSEL_PATH/build
 electron-packager $PREPARED_PATH ansel --platform=linux --arch=x64 --no-prune --out=$ANSEL_PATH/build
-tar cvzf ansel-linux-x64.tar.gz ansel-linux-x64
 
 rm -rf $PREPARED_PATH
