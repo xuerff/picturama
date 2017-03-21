@@ -23,9 +23,9 @@ if (process.env.ANSEL_TEST_MODE) {
 export default {
   characters: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZéè',
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
-  acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff' ],
-  watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM)/i,
-  exportFormats: [ 'jpg', 'png' ],
+  acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
+  watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
+  exportFormats: [ 'jpg', 'png', 'webp' ],
   workExt: 'webp',
   dotAnsel,
   menusFolder: `${anselFolder}/menus`,

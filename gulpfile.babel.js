@@ -5,7 +5,7 @@ import concat from 'gulp-concat';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
 import electronMocha from 'gulp-electron-mocha';
-import bumpBuildNumber from 'gulp-buildnum';
+import bump from 'gulp-bump';
 import childProcess from 'child_process';
 import electron from 'electron-prebuilt';
 import del from 'del';
@@ -136,7 +136,7 @@ gulp.task('package', [ 'prepare-src', 'prepare-modules' ], (cb) => {
 
 gulp.task('increment-buildnum', (cb) => {
   return gulp.src('./package.json')
-    .pipe(bumpBuildNumber({key: "buildnum"}))
+    .pipe(bump({ type: 'patch' }))
     .pipe(gulp.dest('./'));
 });
 

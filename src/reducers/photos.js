@@ -12,6 +12,7 @@ export default function reducers(state, action) {
       currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
       showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
+      route: action.route || '',
       photos: action.photos.map((photo) => {
         photo.versionNumber = 1;
 
@@ -20,12 +21,18 @@ export default function reducers(state, action) {
 
           let lastVersion = photo.versions[photo.versions.length - 1];
 
-          photo.thumb = lastVersion.output;
-          photo.thumb_250 = lastVersion.thumbnail;
+          photo.thumb = lastVersion.output || photo.thumb;
+          photo.thumb_250 = lastVersion.thumbnail || photo.thumb_250;
         }
 
         return photo;
       })
+    };
+
+  case 'ON_REMOVED_PHOTOS':
+    return {
+      ...state,
+      photos: state.photos.filter(photo => !action.ids.includes(photo.id))
     };
 
   case 'UPDATED_PHOTO_SUCCESS':

@@ -39,6 +39,7 @@ export default class PictureDetail extends React.Component {
     this.finishLoading = this.finishLoading.bind(this);
     this.cancelEvent = this.cancelEvent.bind(this);
     this.toggleDiff = this.toggleDiff.bind(this);
+    this.moveToTrash = this.moveToTrash.bind(this);
   }
 
   contextMenu(e) {
@@ -118,6 +119,10 @@ export default class PictureDetail extends React.Component {
       this.closeDialog();
   }
 
+  moveToTrash() {
+    this.props.actions.moveToTrash(this.props.photo);
+  }
+
   toggleDiff() {
     if (this.props.photo.versionNumber > 1)
       this.props.actions.toggleDiff();
@@ -136,6 +141,11 @@ export default class PictureDetail extends React.Component {
       click: this.showExportDialog.bind(this)
     }));
 
+    this.menu.append(new MenuItem({
+      label: 'Move to trash',
+      click: this.moveToTrash
+    }));
+
     this.menu.append(new MenuItem({ 
       type: 'separator'
     }));
@@ -151,6 +161,7 @@ export default class PictureDetail extends React.Component {
     window.addEventListener('core:cancel', this.cancelEvent);
     window.addEventListener('detail:diff', this.toggleDiff);
     window.addEventListener('detail:flag', this.props.toggleFlag);
+    window.addEventListener('detail:moveToTrash', this.moveToTrash);
 
     window.addEventListener(
       'detail:moveLeft',
@@ -182,6 +193,7 @@ export default class PictureDetail extends React.Component {
     window.removeEventListener('core:cancel', this.cancelEvent);
     window.removeEventListener('detail:diff', this.toggleDiff);
     window.removeEventListener('detail:flag', this.props.toggleFlag);
+    window.removeEventListener('detail:moveToTrash', this.moveToTrash);
 
     window.removeEventListener(
       'detail:moveLeft',
@@ -222,7 +234,6 @@ export default class PictureDetail extends React.Component {
     ipcRenderer.send('toggleExportMenu', false);
 
     ipcRenderer.removeAllListeners('addTagClicked');
-    //ipcRenderer.removeAllListeners('exportClicked');
   }
 
   render() {
@@ -244,6 +255,7 @@ export default class PictureDetail extends React.Component {
     else if (this.state.modal == 'export')
       showModal = (
         <Export
+          actions={this.props.actions}
           photos={[this.props.photo]} 
           closeExportDialog={this.closeDialog} />
       );
