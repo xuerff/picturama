@@ -2,10 +2,17 @@
   "menu": [
     {
       "label": "Ansel",
-      "submenu": [{
-        "label": "Version",
-        "enabled": false
-      }]
+      "submenu": [
+        {
+          "label": "Version",
+          "enabled": false
+        },
+        {
+          "label": "Quit",
+          "accelerator": "Cmd+Q",
+          "click": "close"
+        }
+      ]
     },
     {
       "label": "File",
@@ -20,11 +27,6 @@
           "label": "Scan",
           "accelerator": "Cmd+R",
           "click": "scan"
-        },
-        {
-          "label": "Close",
-          "accelerator": "Cmd+Q",
-          "click": "close"
         }
       ]
     },

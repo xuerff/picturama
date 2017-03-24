@@ -28,20 +28,20 @@ npm dedupe
 
 cp -r $ANSEL_PATH/node_modules/libraw $PREPARED_PATH/node_modules
 cp -r $ANSEL_PATH/node_modules/sharp $PREPARED_PATH/node_modules
-cp -r $ANSEL_PATH/node_modules/udev $PREPARED_PATH/node_modules
+# cp -r $ANSEL_PATH/node_modules/udev $PREPARED_PATH/node_modules
 cp -r $ANSEL_PATH/node_modules/exiv2 $PREPARED_PATH/node_modules
 cp -r $ANSEL_PATH/node_modules/sqlite3 $PREPARED_PATH/node_modules
 
 # Trimming fat
-# rm -r $PREPARED_PATH/node_modules/sharp/docs
-# rm -r $PREPARED_PATH/node_modules/sharp/src
-# rm -r $PREPARED_PATH/node_modules/exiv2/examples
-# rm -r $PREPARED_PATH/node_modules/exiv2/test
-# rm -r $PREPARED_PATH/node_modules/sqlite3/src
-# rm -r $PREPARED_PATH/node_modules/react/dist
-# rm -r $PREPARED_PATH/node_modules/bookshelf/test
-# rm -r $PREPARED_PATH/node_modules/bookshelf/tutorials
-#
+rm -r $PREPARED_PATH/node_modules/sharp/docs
+rm -r $PREPARED_PATH/node_modules/sharp/src
+rm -r $PREPARED_PATH/node_modules/exiv2/examples
+rm -r $PREPARED_PATH/node_modules/exiv2/test
+rm -r $PREPARED_PATH/node_modules/sqlite3/src
+rm -r $PREPARED_PATH/node_modules/react/dist
+rm -r $PREPARED_PATH/node_modules/bookshelf/test
+rm -r $PREPARED_PATH/node_modules/bookshelf/tutorials
+
 # find $PREPARED_PATH/node_modules/ -type f -name '*.md' -delete
 # find $PREPARED_PATH/node_modules/ -type f -name '*.txt' -delete
 # find $PREPARED_PATH/node_modules/ -type f -name '*.log' -delete
@@ -57,7 +57,9 @@ cp -r $ANSEL_PATH/node_modules/sqlite3 $PREPARED_PATH/node_modules
 # find $PREPARED_PATH/node_modules/ -type f -name '.npmignore' -delete
 
 cd $ANSEL_PATH/build
-electron-packager $PREPARED_PATH Ansel --platform=darwin --arch=x64 --no-prune --out=$ANSEL_PATH/build
+
+electron-packager $PREPARED_PATH Ansel --platform=darwin --arch=x64 --overwrite --no-prune --icon=$ANSEL_PATH/scripts/ansel.icns --out=$ANSEL_PATH/build
+hdiutil create -srcfolder $PREPARED_PATH/build/Ansel-darwin-x64 $PREPARED_PATH/build/ansel.dmg
 # tar cvzf ansel-darwin-x64.tar.gz ansel-darwin-x64
 #
 # rm -rf $PREPARED_PATH

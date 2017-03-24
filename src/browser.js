@@ -30,14 +30,18 @@ var mainWindow = null;
 if (!fs.existsSync(config.dotAnsel))
   fs.mkdirSync(config.dotAnsel);
 
+
+
 app.on('window-all-closed', () => {
-  if (process.platform != 'darwin')
-    app.quit();
+  // if (process.platform != 'darwin')
+  app.quit();
 });
 
 app.on('ready', () => {
   let cursorPos = screen.getCursorScreenPoint();
   let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize;
+
+  app.setName('Ansel');
 
   mainWindow = new BrowserWindow({
     width: 1356,
@@ -53,6 +57,7 @@ app.on('ready', () => {
     mainWindow.maximize();
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
+  mainWindow.setTitle('Ansel');
 
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
