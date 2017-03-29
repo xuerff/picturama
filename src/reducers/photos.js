@@ -13,7 +13,7 @@ export default function reducers(state, action) {
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
       showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
       route: action.route || '',
-      photos: action.photos.map((photo) => {
+      photos: action.photos.map(photo => {
         photo.versionNumber = 1;
 
         if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {

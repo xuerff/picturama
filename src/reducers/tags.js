@@ -1,17 +1,17 @@
 const processTags = (prevTags, nextTags) => {
-  let tags = nextTags.map((nextTag) => {
+  let tags = nextTags.map(nextTag => {
     let exists = false;
 
-    prevTags.forEach((prevTag) => {
-      if (nextTag.slug == prevTag.slug)
+    prevTags.forEach(prevTag => {
+      if (nextTag.slug === prevTag.slug)
         exists = true;
     });
 
-    return (!exists) ? nextTag : null;
+    return !exists ? nextTag : null;
   })
-  .filter((tag) => tag);
+  .filter(tag => tag);
 
-  return (tags.length > 0) ? prevTags.concat(tags) : [];
+  return tags.length > 0 ? prevTags.concat(tags) : [];
 };
 
 export default function reducers(state, action) {
