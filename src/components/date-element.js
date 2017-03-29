@@ -1,8 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-export default class DateElement extends React.Component {
+class DateElement extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
+    showOnlyFlagged: React.PropTypes.bool.isRequired,
     currentDate: React.PropTypes.string,
     date: React.PropTypes.string.isRequired
   }
@@ -14,7 +16,10 @@ export default class DateElement extends React.Component {
   }
 
   handleClick() {
-    this.props.actions.setDateFilter(this.props.date);
+    this.props.actions.setDateFilter(
+      this.props.date,
+      this.props.showOnlyFlagged
+    );
   }
 
   isActive(date) {
@@ -31,3 +36,10 @@ export default class DateElement extends React.Component {
     );
   }
 }
+
+const ReduxDateElement = connect(state => ({
+  showOnlyFlagged: state.showOnlyFlagged
+}))(DateElement);
+
+export default ReduxDateElement;
+export { DateElement };

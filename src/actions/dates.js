@@ -1,9 +1,9 @@
 import Photo from './../models/photo';
 
-export const setDateFilter = (date) => {
+export const setDateFilter = (date, showOnlyFlagged) => {
   return (dispatch) => {
     new Photo()
-      .where({ date: date, trashed: false })
+      .where({ date: date, trashed: false, flag: showOnlyFlagged })
       .fetchAll({ withRelated: ['versions', 'tags'] })
       .then((photos) => {
         dispatch({ 
