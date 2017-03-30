@@ -2,9 +2,10 @@ import { remote } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
 
-const {Menu, MenuItem} = remote;
+const { Menu, MenuItem } = remote;
 
-var rotation = {};
+let rotation = {};
+
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
@@ -43,13 +44,13 @@ class Picture extends React.Component {
   componentDidMount() {
     this.menu = new Menu();
 
-    this.menu.append(new MenuItem({ 
-      label: 'Flag picture(s)', 
+    this.menu.append(new MenuItem({
+      label: 'Flag picture(s)',
       click: this.props.setFlagging
     }));
 
-    this.menu.append(new MenuItem({ 
-      label: 'Export picture(s)', 
+    this.menu.append(new MenuItem({
+      label: 'Export picture(s)',
       click: this.props.setExport
     }));
   }
@@ -64,7 +65,7 @@ class Picture extends React.Component {
 
       if (rect.bottom > containerRect.bottom)
         container.scrollTop += rect.bottom - containerRect.bottom;
-      else if (rect.top < 0) 
+      else if (rect.top < 0)
         container.scrollTop += rect.top;
     }
 
@@ -92,7 +93,7 @@ class Picture extends React.Component {
     let anchorClass = classNames(
       'picture',
       'card',
-      { 'highlighted': this.props.highlighted }
+      { highlighted: this.props.highlighted }
     );
 
     let imgClass = classNames(
@@ -109,7 +110,7 @@ class Picture extends React.Component {
         <img
           onClick={this.handleClick.bind(this)}
           onContextMenu={this.contextMenu}
-          src={photo.thumb_250} 
+          src={photo.thumb_250}
           className={imgClass} />
       </a>
     );

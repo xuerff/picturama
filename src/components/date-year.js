@@ -26,29 +26,27 @@ export default class DateYear extends React.Component {
 
   toggleDropdown() {
     this.setState({
-      showDropdown: (!this.state.showDropdown)
+      showDropdown: !this.state.showDropdown
     });
   }
 
   getClasses() {
-    return (this.state.showDropdown) ? '' : 'hide';
+    return this.state.showDropdown ? '' : 'hide';
   }
 
   getBtnClasses() {
-    return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
+    return 'fa ' + (this.state.showDropdown ? 'fa-angle-down' : 'fa-angle-right');
   }
 
   render() {
-    let dateMonthsList = this.props.year.months.map((month) => {
-      return (
-        <DateMonth
-          actions={this.props.actions}
-          setDate={this.handleDate.bind(this)}
-          currentDate={this.props.currentDate}
-          key={this.props.year.id+month.id}
-          month={month} />
-      );
-    });
+    let dateMonthsList = this.props.year.months.map(month =>
+      <DateMonth
+        actions={this.props.actions}
+        setDate={this.handleDate.bind(this)}
+        currentDate={this.props.currentDate}
+        key={this.props.year.id + month.id}
+        month={month} />
+    );
 
     return (
       <li>

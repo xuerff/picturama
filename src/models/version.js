@@ -8,9 +8,9 @@ import config from './../config';
 
 import Photo from './photo';
 
-var copy = Promise.promisify(fs.copy);
+const copy = Promise.promisify(fs.copy);
 
-var Version = anselBookshelf.Model.extend({
+const Version = anselBookshelf.Model.extend({
   tableName: 'versions',
 
   photo: function() {
@@ -53,7 +53,7 @@ var Version = anselBookshelf.Model.extend({
   }
 }, {
   updateImage: data => {
-    let filename = [data[1], data[2], data[3]].join('-');
+    let filename = [ data[1], data[2], data[3] ].join('-');
     let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`;
 
     return sharp(data.input)

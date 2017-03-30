@@ -42,7 +42,7 @@ class Library extends React.Component {
 
     this.props.actions.setCurrent(current);
 
-    if (this.props.current != -1)
+    if (this.props.current !== -1)
       state.scrollTop = this.node.parentNode.scrollTop;
 
     this.setState(state);
@@ -50,7 +50,7 @@ class Library extends React.Component {
 
   handleFlagging() {
     let flagSet = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+      .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
 
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
@@ -65,13 +65,13 @@ class Library extends React.Component {
 
     state.modal = 'export';
     state.photosToExport = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+      .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
 
     this.setState(state);
   }
 
   pressedEnter() {
-    if (this.state.highlighted.length == 1)
+    if (this.state.highlighted.length === 1)
       this.handleCurrent(this.state.highlighted[0]);
   }
 
@@ -88,13 +88,13 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.current != -1 || this.state.modal != 'none')
+    if (this.props.current !== -1 || this.state.modal !== 'none')
       this.deactivateExportAccelerator();
 
     else if (state.highlighted.length > 0)
       this.activateExportAccelerator();
 
-    if (this.props.current == -1 && state.scrollTop > 0) {
+    if (this.props.current === -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
       this.setState(state);
@@ -138,20 +138,21 @@ class Library extends React.Component {
   isLast() {
     let photos = this.props.photos;
 
-    if (photos.length == photos.indexOf(this.props.current) + 1)
+    if (photos.length === photos.indexOf(this.props.current) + 1)
       return true;
-    else if (photos.indexOf(this.props.current) == 0)
+
+    if (photos.indexOf(this.props.current) === 0)
       return true;
-    else
-      return false;
+
+    return false;
   }
 
   moveHighlightLeft() {
     let state = this.state;
     let currentPos = this.state.highlighted[0];
 
-    if (currentPos-1 >= 0)
-      state.highlighted = [currentPos-1];
+    if (currentPos - 1 >= 0)
+      state.highlighted = [ currentPos - 1 ];
 
     this.setState(state);
   }
@@ -160,8 +161,8 @@ class Library extends React.Component {
     let state = this.state;
     let currentPos = this.state.highlighted[0];
 
-    if (currentPos+1 < this.props.photos.length)
-      state.highlighted = [currentPos+1];
+    if (currentPos + 1 < this.props.photos.length)
+      state.highlighted = [ currentPos + 1 ];
 
     this.setState(state);
   }
@@ -176,7 +177,7 @@ class Library extends React.Component {
     let jumpSize = gridWidth / elWidth;
 
     if (currentPos - jumpSize > 0)
-      state.highlighted = [currentPos - jumpSize];
+      state.highlighted = [ currentPos - jumpSize ];
 
     this.setState(state);
   }
@@ -191,7 +192,7 @@ class Library extends React.Component {
     let jumpSize = gridWidth / elWidth;
 
     if (currentPos + jumpSize < this.props.photos.length)
-      state.highlighted = [currentPos + jumpSize];
+      state.highlighted = [ currentPos + jumpSize ];
 
     this.setState(state);
   }
@@ -210,7 +211,8 @@ class Library extends React.Component {
   closeDialog() {
     this.bindEventListeners();
 
-    var state = this.state;
+    let state = this.state;
+
     state.modal = 'none';
     this.setState(state);
   }
@@ -220,46 +222,44 @@ class Library extends React.Component {
     let currentView;
     let showModal;
 
-    let libraryClass = classNames({ 'grid': this.props.current == -1 });
+    let libraryClass = classNames({
+      grid: this.props.current === -1
+    });
 
-    if (this.state.modal == 'export')
-      showModal = (
-        <Export
-          photos={this.state.photosToExport}
-          actions={this.props.actions}
-          closeExportDialog={this.closeDialog} />
-      );
+    if (this.state.modal === 'export') {
+      showModal = <Export
+        photos={this.state.photosToExport}
+        actions={this.props.actions}
+        closeExportDialog={this.closeDialog} />;
+    }
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <ReadyToScan />;
 
-    else if (this.props.current == -1)
-      currentView = this.props.photos.map((photo, index) => {
-        return (
-          <Picture
-            key={index}
-            index={index}
-            photo={photo}
-            setHighlight={this.handleHighlight.bind(this)}
-            highlighted={this.state.highlighted.indexOf(index) != -1}
-            setFlagging={this.handleFlagging.bind(this)}
-            setExport={this.handleExport.bind(this)}
-            setCurrent={this.handleCurrent.bind(this)} />
-        );
-      });
-
-    else if (this.props.diff)
+    else if (this.props.current === -1) {
+      currentView = this.props.photos.map((photo, index) =>
+        <Picture
+          key={index}
+          index={index}
+          photo={photo}
+          setHighlight={this.handleHighlight.bind(this)}
+          highlighted={this.state.highlighted.indexOf(index) !== -1}
+          setFlagging={this.handleFlagging.bind(this)}
+          setExport={this.handleExport.bind(this)}
+          setCurrent={this.handleCurrent.bind(this)} />
+      );
+    } else if (this.props.diff) {
       currentView = <PictureDiff
                       actions={this.props.actions}
                       photo={this.props.photos[this.props.current]} />;
-
-    else
+    } else {
       currentView = <PictureDetail
                       photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}
                       setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
+    }
 
     return (
       <div id="library" className={libraryClass} ref="library">

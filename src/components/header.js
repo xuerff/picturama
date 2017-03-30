@@ -20,8 +20,6 @@ class Header extends React.Component {
   }
 
   toggleFlagged() {
-    console.log(this.props.currentDate, this.props.currentTag, this.props.showOnlyFlagged);
-
     this.props.actions.toggleFlagged(
       this.props.currentDate,
       !this.props.showOnlyFlagged
@@ -32,8 +30,8 @@ class Header extends React.Component {
     dialog.showMessageBox({
       type: 'question',
       message: 'Are you sure you want to empty the trash?',
-      buttons: ['Move picture(s) to trash', 'Cancel']
-    }, (index) => {
+      buttons: [ 'Move picture(s) to trash', 'Cancel' ]
+    }, index => {
       if (index === 0)
         ipcRenderer.send('empty-trash', true);
     });
@@ -41,9 +39,9 @@ class Header extends React.Component {
 
   render() {
     let btnClass = classNames({
-      'button': true,
-      'flagged': true,
-      'active': this.props.showOnlyFlagged
+      button: true,
+      flagged: true,
+      active: this.props.showOnlyFlagged
     });
 
     return (
@@ -53,13 +51,13 @@ class Header extends React.Component {
         </button>
 
         <div className="pull-right">
-          {this.props.route == 'trash' ? (
+          {this.props.route === 'trash' ?
             <button
               onClick={this.deleteModal.bind(this)}
-              className='button'>
+              className="button">
               <i className="fa fa-trash" aria-hidden="true"></i>
             </button>
-          ) : null}
+          : null}
           <button
             className={btnClass}
             onClick={this.toggleFlagged.bind(this)}>

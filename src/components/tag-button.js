@@ -7,10 +7,6 @@ export default class TagButton extends React.Component {
     setTag: React.PropTypes.func.isRequired
   }
 
-  constructor(props) {
-    super(props);
-  }
-
   handleClick() {
     this.props.setTag(this.props.tag);
   }

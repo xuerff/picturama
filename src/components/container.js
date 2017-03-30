@@ -24,6 +24,7 @@ export default class Container extends React.Component {
 
   handleImport(store) {
     let state = this.state;
+
     state.isImporting = store.importing;
     this.setState(state);
   }
@@ -35,12 +36,11 @@ export default class Container extends React.Component {
   render() {
     let content = <Settings actions={this.props.actions} />;
 
-    if (this.props.settingsExists)
-      content = (
-        <Library 
-          actions={this.props.actions}
-          setScrollTop={this.handleScrollTop.bind(this)}/>
-      );
+    if (this.props.settingsExists) {
+      content = <Library
+        actions={this.props.actions}
+        setScrollTop={this.handleScrollTop.bind(this)}/>;
+    }
 
     if (this.props.importing)
       content = <Progress />;

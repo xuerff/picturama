@@ -23,7 +23,7 @@ class DateElement extends React.Component {
   }
 
   isActive(date) {
-    return (date == this.props.currentDate) ? 'active' : '';
+    return date === this.props.currentDate ? 'active' : '';
   }
 
   render() {

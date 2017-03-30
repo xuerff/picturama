@@ -26,29 +26,27 @@ export default class DateMonth extends React.Component {
 
   toggleDropdown() {
     this.setState({
-      showDropdown: (!this.state.showDropdown)
+      showDropdown: !this.state.showDropdown
     });
   }
 
   getClasses() {
-    return 'date-elements' + ((this.state.showDropdown) ? '' : ' hide');
+    return 'date-elements' + (this.state.showDropdown ? '' : ' hide');
   }
 
   getBtnClasses() {
-    return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
+    return 'fa ' + (this.state.showDropdown ? 'fa-angle-down' : 'fa-angle-right');
   }
 
   render() {
-    var dateElementsList = this.props.month.days.map((date) => {
-      return (
-        <DateElement
-          actions={this.props.actions}
-          setDate={this.handleDate.bind(this)}
-          currentDate={this.props.currentDate}
-          key={date.id}
-          date={date.id} />
-      );
-    });
+    const dateElementsList = this.props.month.days.map(date =>
+      <DateElement
+        actions={this.props.actions}
+        setDate={this.handleDate.bind(this)}
+        currentDate={this.props.currentDate}
+        key={date.id}
+        date={date.id} />
+    );
 
     return (
       <li>
