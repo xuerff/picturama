@@ -4,11 +4,11 @@ import config from './config';
 
 let keymaps;
 
-const eventListener = (event) => {
+const eventListener = event => {
   keymaps.handleKeyboardEvent(event);
 };
 
-const bind = (el) => {
+const bind = el => {
   keymaps = new KeymapManager();
   keymaps.defaultTarget = el;
   keymaps.loadKeymap(`${config.keymapsFolder}/linux.json`);
