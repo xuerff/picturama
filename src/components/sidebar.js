@@ -8,7 +8,7 @@ import Logo from './logo';
 
 import config from './../config';
 
-var settings;
+let settings;
 
 if (fs.existsSync(config.settings))
   settings = require(config.settings);
@@ -19,13 +19,9 @@ class Sidebar extends React.Component {
     actions: React.PropTypes.object.isRequired
   }
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-    var menus = [
-      <Dates 
+    let menus = [
+      <Dates
         key="0"
         actions={this.props.actions} />,
       <Tags key="1" actions={this.props.actions} />,
@@ -36,17 +32,16 @@ class Sidebar extends React.Component {
       menus = [];
 
       settings.menus.forEach((menu, key) => {
-        if (menu == 'dates')
+        if (menu === 'dates') {
           menus.push(
-            <Dates 
-              key={key} 
+            <Dates
+              key={key}
               actions={this.props.actions} />
           );
-
-        else if (menu == 'tags')
+        } else if (menu === 'tags')
           menus.push(<Tags key={key} actions={this.props.actions} />);
 
-        else if (menu == 'devices')
+        else if (menu === 'devices')
           menus.push(<Devices key={key} />);
       });
     }
@@ -56,7 +51,7 @@ class Sidebar extends React.Component {
         <h2><Logo /> Library</h2>
 
         <div className="sidebar-content">
-          <button 
+          <button
             onClick={this.props.actions.getPhotos}
             className="button">
             <i className="fa fa-book"></i> All content

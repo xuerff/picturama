@@ -5,12 +5,9 @@ class PictureInfo extends React.Component {
     photo: React.PropTypes.object.isRequired
   }
 
-  constructor(props) {
-    super(props);
-  }
-
   shutterSpeed(exposureTime) {
-    var zeros = -Math.floor( Math.log(exposureTime) / Math.log(10));
+    const zeros = -Math.floor(Math.log(exposureTime) / Math.log(10));
+
     return '1/' + Math.pow(10, zeros);
   }
 
@@ -18,13 +15,12 @@ class PictureInfo extends React.Component {
     if (!this.props.photo.hasOwnProperty('tags'))
       return '';
 
-    else if (this.props.photo.tags.length == 0)
+    if (this.props.photo.tags.length === 0)
       return 'none';
 
-    else
-      return this.props.photo.tags
-        .map((tag) => tag.title)
-        .join(', ');
+    return this.props.photo.tags
+      .map(tag => tag.title)
+      .join(', ');
   }
 
   render() {

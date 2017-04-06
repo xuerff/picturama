@@ -8,7 +8,7 @@ import Tag from './tag';
 
 shortid.characters(config.characters);
 
-var Photo = anselBookshelf.Model.extend({
+export default anselBookshelf.Model.extend({
   tableName: 'photos',
 
   versions: function() {
@@ -20,15 +20,14 @@ var Photo = anselBookshelf.Model.extend({
   },
 
   initialize: function() {
-    this.on('creating', (model) => {
+    this.on('creating', model => {
       model.set('id', shortid.generate());
     });
   }
 
 }, {
   getDates: function() {
-    return this.query().distinct('date').orderBy('date', 'desc');
+    return this.query().distinct('date')
+      .orderBy('date', 'desc');
   }
 });
-
-export default Photo;

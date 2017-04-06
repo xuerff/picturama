@@ -1,5 +1,5 @@
-import {spawn} from 'child_process';
-import {ipcRenderer, remote} from 'electron';
+import { spawn } from 'child_process';
+import { ipcRenderer, remote } from 'electron';
 
 import classNames from 'classnames';
 import React from 'react';
@@ -12,9 +12,14 @@ import AddTags from './add-tags';
 import Export from './export';
 import PictureInfo from './picture-info';
 
-const {Menu, MenuItem} = remote;
+const { Menu, MenuItem } = remote;
 
-var rotation = {};
+const rawtherapeeCmd = spawn('which', [ 'rawtherapee' ]);
+const darktableCmd = spawn('which', [ 'darktable' ]);
+const gimpCmd = spawn('which', [ 'gimp' ]);
+
+let rotation = {};
+
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
@@ -49,16 +54,16 @@ export default class PictureDetail extends React.Component {
 
   openWithRawtherapee() {
     createVersionAndOpenWith(
-      this.props.photo, 
-      'RAW', 
+      this.props.photo,
+      'RAW',
       'rawtherapee'
     );
   }
 
   openWithDarktable() {
     createVersionAndOpenWith(
-      this.props.photo, 
-      'RAW', 
+      this.props.photo,
+      'RAW',
       'darktable'
     );
   }
@@ -68,22 +73,22 @@ export default class PictureDetail extends React.Component {
   }
 
   addRawtherapeeMenu() {
-    this.menu.append(new MenuItem({ 
-      label: 'Open with Rawtherapee', 
+    this.menu.append(new MenuItem({
+      label: 'Open with Rawtherapee',
       click: this.openWithRawtherapee.bind(this)
     }));
   }
 
   addDarktableMenu() {
-    this.menu.append(new MenuItem({ 
-      label: 'Open with Darktable', 
+    this.menu.append(new MenuItem({
+      label: 'Open with Darktable',
       click: this.openWithDarktable.bind(this)
     }));
   }
 
   addGimpMenu() {
-    this.menu.append(new MenuItem({ 
-      label: 'Open with Gimp', 
+    this.menu.append(new MenuItem({
+      label: 'Open with Gimp',
       click: this.openWithGimp.bind(this)
     }));
   }
@@ -91,7 +96,8 @@ export default class PictureDetail extends React.Component {
   showTagDialog() {
     this.unbindEventListeners();
 
-    var state = this.state;
+    let state = this.state;
+
     state.modal = 'addTags';
     this.setState(state);
   }
@@ -99,7 +105,8 @@ export default class PictureDetail extends React.Component {
   closeDialog() {
     this.bindEventListeners();
 
-    var state = this.state;
+    let state = this.state;
+
     state.modal = 'none';
     this.setState(state);
   }
@@ -107,13 +114,14 @@ export default class PictureDetail extends React.Component {
   showExportDialog() {
     this.unbindEventListeners();
 
-    var state = this.state;
+    let state = this.state;
+
     state.modal = 'export';
     this.setState(state);
   }
 
   cancelEvent() {
-    if (this.state.modal == 'none') // escape
+    if (this.state.modal === 'none') // escape
       this.props.setCurrent(-1);
     else
       this.closeDialog();
@@ -131,13 +139,13 @@ export default class PictureDetail extends React.Component {
   componentDidMount() {
     this.menu = new Menu();
 
-    this.menu.append(new MenuItem({ 
-      label: 'Add tag', 
+    this.menu.append(new MenuItem({
+      label: 'Add tag',
       click: this.showTagDialog.bind(this)
     }));
 
-    this.menu.append(new MenuItem({ 
-      label: 'Export', 
+    this.menu.append(new MenuItem({
+      label: 'Export',
       click: this.showExportDialog.bind(this)
     }));
 
@@ -146,13 +154,9 @@ export default class PictureDetail extends React.Component {
       click: this.moveToTrash
     }));
 
-    this.menu.append(new MenuItem({ 
+    this.menu.append(new MenuItem({
       type: 'separator'
     }));
-
-    let rawtherapeeCmd = spawn('which', ['rawtherapee']);
-    let darktableCmd = spawn('which', ['darktable']);
-    let gimpCmd = spawn('which', ['gimp']);
 
     rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
     darktableCmd.stdout.on('data', this.addDarktableMenu.bind(this));
@@ -179,6 +183,7 @@ export default class PictureDetail extends React.Component {
 
   finishLoading() {
     let state = this.state;
+
     state.loaded = true;
     this.setState(state);
   }
@@ -211,6 +216,7 @@ export default class PictureDetail extends React.Component {
 
   bindEventListeners() {
     let state = this.state;
+
     state.binded = true;
     this.setState(state);
 
@@ -220,11 +226,11 @@ export default class PictureDetail extends React.Component {
     ipcRenderer.send('toggleExportMenu', true);
 
     ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
-    //ipcRenderer.on('exportClicked', this.showExportDialog.bind(this));
   }
 
   unbindEventListeners() {
     let state = this.state;
+
     state.binded = false;
     this.setState(state);
 
@@ -239,32 +245,28 @@ export default class PictureDetail extends React.Component {
   render() {
     let imgClass = classNames(
       'shadow--2dp',
-      rotation[this.props.photo.orientation] 
+      rotation[this.props.photo.orientation]
     );
 
-    var showModal;
+    let showModal;
 
-    if (this.state.modal == 'addTags')
-      showModal = (
-        <AddTags 
-          photo={this.props.photo} 
-          actions={this.props.actions}
-          closeTagDialog={this.closeDialog} />
-      );
-
-    else if (this.state.modal == 'export')
-      showModal = (
-        <Export
-          actions={this.props.actions}
-          photos={[this.props.photo]} 
-          closeExportDialog={this.closeDialog} />
-      );
+    if (this.state.modal === 'addTags') {
+      showModal = <AddTags
+        photo={this.props.photo}
+        actions={this.props.actions}
+        closeTagDialog={this.closeDialog} />;
+    } else if (this.state.modal === 'export') {
+      showModal = <Export
+        actions={this.props.actions}
+        photos={[ this.props.photo ]}
+        closeExportDialog={this.closeDialog} />;
+    }
 
     return (
       <div className="picture-detail" ref="detail">
         <div className="v-align">
           <img
-            src={this.props.photo.thumb} 
+            src={this.props.photo.thumb}
             onLoad={this.finishLoading}
             className={imgClass} />
         </div>

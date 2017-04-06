@@ -17,16 +17,17 @@ export default class Watch {
   }
 
   onVersionAdd(path) {
-    if (path.match(allowed))
-      Version.updateImage(path.match(allowed)).then((version) => {
+    if (path.match(allowed)) {
+      Version.updateImage(path.match(allowed)).then(version => {
         if (version)
           this.mainWindow.webContents.send('new-version', version);
       });
+    }
   }
 
   watch() {
     let watcher = chokidar.watch(
-      this.versionsPath, 
+      this.versionsPath,
       { awaitWriteFinish: true, ignoreInitial: true }
     );
 

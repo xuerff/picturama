@@ -27,7 +27,7 @@ const initialState = {
 const runReducers = (state, action, reducers) => {
   let reducersList = Object.keys(reducers);
 
-  reducersList.forEach((key) => {
+  reducersList.forEach(key => {
     state = reducers[key](state, action);
   });
 
