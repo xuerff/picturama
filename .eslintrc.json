@@ -1,7 +1,6 @@
 {
   "rules": {
     "complexity": [1, 2],
-    "no-console": 0,
     "prefer-arrow-callback": 1,
     "indent": [2, 2],
     "quotes": [2,"single"],
@@ -15,7 +14,7 @@
     "no-unused-vars": [1, {"vars": "all", "args": "none"}],
 
     "no-cond-assign": 2,
-    "no-console": [2, {"allow": ["warn", "error", "info"]}],
+    "no-console": [1, {"allow": ["warn", "error", "info"]}],
     "no-constant-condition": 2,
     "no-debugger": 2,
     "no-dupe-args": 2,
