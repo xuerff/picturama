@@ -10,6 +10,7 @@ export * from './dates';
 export * from './import';
 export * from './photos';
 export * from './flags';
+export * from './grid';
 
 export const getProcessed = () => dispatch => {
   Photo.forge()

@@ -1,6 +1,7 @@
 import { remote } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
+import { connect } from 'react-redux';
 
 const { Menu, MenuItem } = remote;
 
@@ -11,11 +12,11 @@ rotation[0] = 'minus-ninety';
 
 class Picture extends React.Component {
   static propTypes = {
+    actions: React.PropTypes.object.isRequired,
     setCurrent: React.PropTypes.func.isRequired,
-    setHighlight: React.PropTypes.func.isRequired,
     setFlagging: React.PropTypes.func.isRequired,
     setExport: React.PropTypes.func.isRequired,
-    highlighted: React.PropTypes.bool.isRequired,
+    highlighted: React.PropTypes.array.isRequired,
     photo: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired
   }
@@ -34,7 +35,7 @@ class Picture extends React.Component {
     e.preventDefault();
 
     if (!this.props.highlighted)
-      this.props.setHighlight(this.props.index, e.ctrlKey);
+      this.props.actions.setHighlight(this.props.index, e.ctrlKey);
 
     state.showContextMenu = true;
 
@@ -84,7 +85,8 @@ class Picture extends React.Component {
 
   handleClick(e) {
     e.preventDefault();
-    this.props.setHighlight(this.props.index, e.ctrlKey);
+
+    this.props.actions.setHighlight(this.props.index, e.ctrlKey);
   }
 
   render() {
@@ -93,7 +95,7 @@ class Picture extends React.Component {
     let anchorClass = classNames(
       'picture',
       'card',
-      { highlighted: this.props.highlighted }
+      { highlighted: this.props.highlighted.indexOf(this.props.index) !== -1 }
     );
 
     let imgClass = classNames(
@@ -117,4 +119,8 @@ class Picture extends React.Component {
   }
 }
 
-export default Picture;
+const ReduxPicture = connect(state => ({
+  highlighted: state.highlighted
+}))(Picture);
+
+export default ReduxPicture;

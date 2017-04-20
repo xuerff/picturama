@@ -1,9 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import Picture from './picture';
 
-export default class Grid extends React.Component {
+class Grid extends React.Component {
   static propTypes = {
+    highlighted: React.PropTypes.array.isRequired,
     setCurrent: React.PropTypes.func.isRequired,
     actions: React.PropTypes.object.isRequired,
     photos: React.PropTypes.array.isRequired
@@ -14,21 +16,7 @@ export default class Grid extends React.Component {
 
     this.moveHighlightUp = this.moveHighlightUp.bind(this);
     this.moveHighlightDown = this.moveHighlightDown.bind(this);
-    this.moveHighlightLeft = this.moveHighlightLeft.bind(this);
     this.moveHighlightRight = this.moveHighlightRight.bind(this);
-
-    this.state = { highlighted: [] };
-  }
-
-  handleHighlight(index, ctrlKey) {
-    let state = this.state;
-
-    if (!ctrlKey)
-      state.highlighted = [];
-
-    state.highlighted.push(index);
-
-    this.setState(state);
   }
 
   handleFlagging() {
@@ -45,16 +33,6 @@ export default class Grid extends React.Component {
     state.modal = 'export';
     state.photosToExport = this.props.photos
       .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
-
-    this.setState(state);
-  }
-
-  moveHighlightLeft() {
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-
-    if (currentPos - 1 >= 0)
-      state.highlighted = [ currentPos - 1 ];
 
     this.setState(state);
   }
@@ -100,7 +78,7 @@ export default class Grid extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('library:left', this.moveHighlightLeft);
+    window.addEventListener('library:left', this.props.actions.moveHighlightLeft);
     window.addEventListener('library:right', this.moveHighlightRight);
     window.addEventListener('library:up', this.moveHighlightUp);
     window.addEventListener('library:down', this.moveHighlightDown);
@@ -121,8 +99,7 @@ export default class Grid extends React.Component {
             key={index}
             index={index}
             photo={photo}
-            setHighlight={this.handleHighlight.bind(this)}
-            highlighted={this.state.highlighted.indexOf(index) !== -1}
+            actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
             setExport={this.handleExport.bind(this)}
             setCurrent={this.props.setCurrent.bind(this)} />
@@ -132,3 +109,9 @@ export default class Grid extends React.Component {
     );
   }
 }
+
+const ReduxGrid = connect(state => ({
+  highlighted: state.highlighted
+}))(Grid);
+
+export default ReduxGrid;
