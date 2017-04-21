@@ -1,14 +1,32 @@
-export const moveHighlightLeft = () => dispatch => {
+export const moveHighlightLeft = event => dispatch => {
   dispatch({
     type: 'MOVE_HIGHLIGHT_SUCCESS',
-    direction: 'left'
+    direction: 'left',
+    event
   });
 };
 
-export const moveHighlightRight = () => dispatch => {
+export const moveHighlightRight = event => dispatch => {
   dispatch({
     type: 'MOVE_HIGHLIGHT_SUCCESS',
-    direction: 'right'
+    direction: 'right',
+    event
+  });
+};
+
+export const moveHighlightUp = event => dispatch => {
+  dispatch({
+    type: 'MOVE_HIGHLIGHT_SUCCESS',
+    direction: 'up',
+    event
+  });
+};
+
+export const moveHighlightDown = event => dispatch => {
+  dispatch({
+    type: 'MOVE_HIGHLIGHT_SUCCESS',
+    direction: 'down',
+    event
   });
 };
 

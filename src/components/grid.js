@@ -12,14 +12,6 @@ class Grid extends React.Component {
     photos: React.PropTypes.array.isRequired
   }
 
-  constructor(props) {
-    super(props);
-
-    this.moveHighlightUp = this.moveHighlightUp.bind(this);
-    this.moveHighlightDown = this.moveHighlightDown.bind(this);
-    //this.moveHighlightRight = this.moveHighlightRight.bind(this);
-  }
-
   handleFlagging() {
     let flagSet = this.props.photos
       .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
@@ -38,51 +30,11 @@ class Grid extends React.Component {
     this.setState(state);
   }
 
-  //moveHighlightRight() {
-  //  let state = this.state;
-  //  let currentPos = this.state.highlighted[0];
-
-  //  if (currentPos + 1 < this.props.photos.length)
-  //    state.highlighted = [ currentPos + 1 ];
-
-  //  this.setState(state);
-  //}
-
-  moveHighlightUp(e) {
-    e.preventDefault();
-
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-    let gridWidth = this.refs.grid.getBoundingClientRect().width;
-    let elWidth = this.refs.grid.children[0].getBoundingClientRect().width;
-    let jumpSize = gridWidth / elWidth;
-
-    if (currentPos - jumpSize > 0)
-      state.highlighted = [ currentPos - jumpSize ];
-
-    this.setState(state);
-  }
-
-  moveHighlightDown(e) {
-    e.preventDefault();
-
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-    let gridWidth = this.refs.grid.getBoundingClientRect().width;
-    let elWidth = this.refs.grid.children[0].getBoundingClientRect().width;
-    let jumpSize = gridWidth / elWidth;
-
-    if (currentPos + jumpSize < this.props.photos.length)
-      state.highlighted = [ currentPos + jumpSize ];
-
-    this.setState(state);
-  }
-
   componentDidMount() {
     window.addEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.addEventListener('grid:right', this.props.actions.moveHighlightRight);
-    window.addEventListener('grid:up', this.moveHighlightUp);
-    window.addEventListener('grid:down', this.moveHighlightDown);
+    window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
+    window.addEventListener('grid:down', this.props.actions.moveHighlightDown);
 
     keymapManager.bind(this.refs.grid);
   }
@@ -90,8 +42,8 @@ class Grid extends React.Component {
   componentWillUnmount() {
     window.removeEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.removeEventListener('grid:right', this.props.actions.moveHighlightRight);
-    window.removeEventListener('grid:up', this.moveHighlightUp);
-    window.removeEventListener('grid:down', this.moveHighlightDown);
+    window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);
+    window.removeEventListener('grid:down', this.props.actions.moveHighlightDown);
 
     keymapManager.unbind();
   }
