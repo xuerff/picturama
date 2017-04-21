@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import keymapManager from './../keymap-manager';
 import Picture from './picture';
 
 class Grid extends React.Component {
@@ -16,7 +17,7 @@ class Grid extends React.Component {
 
     this.moveHighlightUp = this.moveHighlightUp.bind(this);
     this.moveHighlightDown = this.moveHighlightDown.bind(this);
-    this.moveHighlightRight = this.moveHighlightRight.bind(this);
+    //this.moveHighlightRight = this.moveHighlightRight.bind(this);
   }
 
   handleFlagging() {
@@ -37,15 +38,15 @@ class Grid extends React.Component {
     this.setState(state);
   }
 
-  moveHighlightRight() {
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
+  //moveHighlightRight() {
+  //  let state = this.state;
+  //  let currentPos = this.state.highlighted[0];
 
-    if (currentPos + 1 < this.props.photos.length)
-      state.highlighted = [ currentPos + 1 ];
+  //  if (currentPos + 1 < this.props.photos.length)
+  //    state.highlighted = [ currentPos + 1 ];
 
-    this.setState(state);
-  }
+  //  this.setState(state);
+  //}
 
   moveHighlightUp(e) {
     e.preventDefault();
@@ -78,17 +79,21 @@ class Grid extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('library:left', this.props.actions.moveHighlightLeft);
-    window.addEventListener('library:right', this.moveHighlightRight);
-    window.addEventListener('library:up', this.moveHighlightUp);
-    window.addEventListener('library:down', this.moveHighlightDown);
+    window.addEventListener('grid:left', this.props.actions.moveHighlightLeft);
+    window.addEventListener('grid:right', this.props.actions.moveHighlightRight);
+    window.addEventListener('grid:up', this.moveHighlightUp);
+    window.addEventListener('grid:down', this.moveHighlightDown);
+
+    keymapManager.bind(this.refs.grid);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('library:left', this.moveHighlightLeft);
-    window.removeEventListener('library:right', this.moveHighlightRight);
-    window.removeEventListener('library:up', this.moveHighlightUp);
-    window.removeEventListener('library:down', this.moveHighlightDown);
+    window.removeEventListener('grid:left', this.props.actions.moveHighlightLeft);
+    window.removeEventListener('grid:right', this.props.actions.moveHighlightRight);
+    window.removeEventListener('grid:up', this.moveHighlightUp);
+    window.removeEventListener('grid:down', this.moveHighlightDown);
+
+    keymapManager.unbind();
   }
 
   render() {

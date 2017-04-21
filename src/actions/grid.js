@@ -1,19 +1,20 @@
-export const moveHightlightLeft = highlighted => dispatch => {
-  let currentPos = highlighted[0];
-  let newHighlighted = [];
-
-  if (currentPos + 1 < this.props.photos.length)
-    newHighlighted = [ currentPos + 1 ];
-
+export const moveHighlightLeft = () => dispatch => {
   dispatch({
     type: 'MOVE_HIGHLIGHT_SUCCESS',
-    highlighted: newHighlighted
+    direction: 'left'
+  });
+};
+
+export const moveHighlightRight = () => dispatch => {
+  dispatch({
+    type: 'MOVE_HIGHLIGHT_SUCCESS',
+    direction: 'right'
   });
 };
 
 export const setHighlight = (index, ctrlKey) => dispatch => {
   dispatch({
-    type: ctrlKey ? 'ADD_HIGHLIGHT_SUCCESS' : 'MOVE_HIGHLIGHT_SUCCESS',
+    type: ctrlKey ? 'ADD_HIGHLIGHT_SUCCESS' : 'SET_HIGHLIGHT_SUCCESS',
     index
   });
 };
