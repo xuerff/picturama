@@ -59,9 +59,9 @@ class Picture extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.highlighted) {
+    if (this.props.highlighted.indexOf(this.props.index) !== -1) {
       let rect = this.refs.picture.getBoundingClientRect();
-      let container = this.refs.picture.parentNode.parentNode;
+      let container = this.refs.picture.parentNode.parentNode.parentNode;
       let containerRect = container.getBoundingClientRect();
 
       if (rect.bottom > containerRect.bottom)
