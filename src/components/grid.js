@@ -6,7 +6,10 @@ import Picture from './picture';
 
 class Grid extends React.Component {
   static propTypes = {
+    setExport: React.PropTypes.func.isRequired,
+    setScrollTop: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.array.isRequired,
+    current: React.PropTypes.number,
     actions: React.PropTypes.object.isRequired,
     photos: React.PropTypes.array.isRequired
   }
@@ -22,17 +25,6 @@ class Grid extends React.Component {
       .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
 
     this.props.actions.flagSet(this.props.photos, flagSet, true);
-  }
-
-  handleExport() {
-    this.unbindEventListeners();
-    let state = this.state;
-
-    state.modal = 'export';
-    state.photosToExport = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
-
-    this.setState(state);
   }
 
   pressedEnter() {
@@ -70,7 +62,7 @@ class Grid extends React.Component {
             photo={photo}
             actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
-            setExport={this.handleExport.bind(this)} />
+            setExport={this.props.setExport} />
           )
         }
       </div>
@@ -79,6 +71,7 @@ class Grid extends React.Component {
 }
 
 const ReduxGrid = connect(state => ({
+  current: state.current,
   highlighted: state.highlighted
 }))(Grid);
 

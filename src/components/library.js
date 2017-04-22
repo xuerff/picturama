@@ -1,7 +1,7 @@
-import { ipcRenderer } from 'electron';
 import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { ipcRenderer } from 'electron';
 
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
@@ -11,6 +11,7 @@ import Grid from './grid';
 
 class Library extends React.Component {
   static propTypes = {
+    highlighted: React.PropTypes.array.isRequired,
     setScrollTop: React.PropTypes.func.isRequired,
     actions: React.PropTypes.object.isRequired,
     current: React.PropTypes.number,
@@ -24,14 +25,26 @@ class Library extends React.Component {
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
+    this.handleExport = this.handleExport.bind(this);
     this.activateExportAccelerator = this.activateExportAccelerator.bind(this);
     this.deactivateExportAccelerator = this.deactivateExportAccelerator.bind(this);
 
-    this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
+    this.state = { scrollTop: 0, modal: 'none' };
   }
 
   handleFlag() {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
+  }
+
+  handleExport() {
+    this.unbindEventListeners();
+    let state = this.state;
+
+    state.modal = 'export';
+    state.photosToExport = this.props.photos
+      .filter((photo, i) => this.props.highlighted.indexOf(i) !== -1);
+
+    this.setState(state);
   }
 
   activateExportAccelerator() {
@@ -50,7 +63,7 @@ class Library extends React.Component {
     if (this.props.current !== -1 || this.state.modal !== 'none')
       this.deactivateExportAccelerator();
 
-    else if (state.highlighted.length > 0)
+    else if (this.props.highlighted.length > 0)
       this.activateExportAccelerator();
 
     if (this.props.current === -1 && state.scrollTop > 0) {
@@ -61,7 +74,7 @@ class Library extends React.Component {
   }
 
   bindEventListeners() {
-    if (this.state.highlighted.length > 0)
+    if (this.props.highlighted.length > 0)
       this.activateExportAccelerator();
   }
 
@@ -120,6 +133,8 @@ class Library extends React.Component {
     else if (this.props.current === -1) {
       currentView = <Grid
                       actions={this.props.actions}
+                      setScrollTop={this.props.setScrollTop}
+                      setExport={this.handleExport}
                       photos={this.props.photos}/>;
     } else if (this.props.diff) {
       currentView = <PictureDiff
@@ -145,7 +160,8 @@ class Library extends React.Component {
 const ReduxLibrary = connect(state => ({
   photos: state.photos,
   current: state.current,
-  diff: state.diff
+  diff: state.diff,
+  highlighted: state.highlighted
 }))(Library);
 
 export default ReduxLibrary;
