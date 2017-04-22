@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
 import PictureDetail from './picture-detail';
@@ -116,10 +115,6 @@ class Library extends React.Component {
     let currentView;
     let showModal;
 
-    let libraryClass = classNames({
-      grid: this.props.current === -1
-    });
-
     if (this.state.modal === 'export') {
       showModal = <Export
         photos={this.state.photosToExport}
@@ -149,7 +144,7 @@ class Library extends React.Component {
     }
 
     return (
-      <div id="library" className={libraryClass} ref="library">
+      <div id="library" ref="library">
         {currentView}
         {showModal}
       </div>

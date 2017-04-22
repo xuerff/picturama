@@ -1,11 +1,14 @@
 import React from 'react';
+import classNames from 'classnames';
+import { connect } from 'react-redux';
 
 import Library from './library';
 import Settings from './settings';
 import Progress from './progress';
 
-export default class Container extends React.Component {
+class Container extends React.Component {
   static propTypes = {
+    current: React.PropTypes.number,
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
     settingsExists: React.PropTypes.bool.isRequired,
@@ -36,6 +39,10 @@ export default class Container extends React.Component {
   render() {
     let content = <Settings actions={this.props.actions} />;
 
+    let containerClass = classNames(this.props.className, {
+      'bottom-bar-present': this.props.current === -1
+    });
+
     if (this.props.settingsExists) {
       content = <Library
         actions={this.props.actions}
@@ -46,9 +53,14 @@ export default class Container extends React.Component {
       content = <Progress />;
 
     return (
-      <div id="container" ref="container" className={this.props.className}>
+      <div id="container" ref="container" className={containerClass}>
         {content}
+        {this.props.current === -1 ? <div className="bottom-bar" /> : ''}
       </div>
     );
   }
 }
+
+export default connect(state => ({
+  current: state.current
+}))(Container);
