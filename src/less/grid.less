@@ -14,15 +14,33 @@
 }
 
 #container.bottom-bar-present {
-  height: ~"calc(100% - 88px)";
+  height: ~"calc(100% - 96px)";
 
   div.bottom-bar {
     position: fixed;
     bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    background: pink;
+    right: 0;
+    width: ~"calc(100% - 300px)";
+    height: 48px;
+    background: @blue-grey-800;
+    color: @blue-grey-100;
+
+    div.content {
+      position: relative;
+      line-height: 48px;
+      margin: 0 25px;
+
+      span.selection {
+        background: @blue-grey-900;
+        border-radius: 5px;
+        padding: 4px 10px;
+      }
+
+      span.total {
+        position: absolute;
+        left: 48%;
+      }
+    }
   }
 }
 

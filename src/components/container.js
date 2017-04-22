@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Library from './library';
 import Settings from './settings';
 import Progress from './progress';
+import BottomBar from './bottom-bar';
 
 class Container extends React.Component {
   static propTypes = {
@@ -55,7 +56,7 @@ class Container extends React.Component {
     return (
       <div id="container" ref="container" className={containerClass}>
         {content}
-        {this.props.current === -1 ? <div className="bottom-bar" /> : ''}
+        {this.props.current === -1 ? <BottomBar /> : ''}
       </div>
     );
   }
