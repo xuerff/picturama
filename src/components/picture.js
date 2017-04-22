@@ -13,7 +13,6 @@ rotation[0] = 'minus-ninety';
 class Picture extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    setCurrent: React.PropTypes.func.isRequired,
     setFlagging: React.PropTypes.func.isRequired,
     setExport: React.PropTypes.func.isRequired,
     highlighted: React.PropTypes.array.isRequired,
@@ -80,7 +79,7 @@ class Picture extends React.Component {
   }
 
   handleDblClick() {
-    this.props.setCurrent(this.props.index);
+    this.props.actions.setCurrent(this.props.index);
   }
 
   handleClick(e) {

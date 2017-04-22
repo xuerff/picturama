@@ -38,10 +38,7 @@ export default function reducers(state, action) {
   case 'ADD_HIGHLIGHT_SUCCESS':
     return {
       ...state,
-      highlighted: [
-        ...state.hightlighted,
-        action.index
-      ]
+      highlighted: state.highlighted.concat(action.index)
     };
 
   default:
