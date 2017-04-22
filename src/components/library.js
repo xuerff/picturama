@@ -3,7 +3,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
-import keymapManager from './../keymap-manager';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
 import Export from './export';
@@ -22,7 +21,6 @@ class Library extends React.Component {
   constructor(props) {
     super(props);
 
-    this.pressedEnter = this.pressedEnter.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
@@ -32,24 +30,8 @@ class Library extends React.Component {
     this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
   }
 
-  handleCurrent(current) {
-    let state = this.state;
-
-    this.props.actions.setCurrent(current);
-
-    if (this.props.current !== -1)
-      state.scrollTop = this.node.parentNode.scrollTop;
-
-    this.setState(state);
-  }
-
   handleFlag() {
     this.props.actions.toggleFlag(this.props.photos[this.props.current]);
-  }
-
-  pressedEnter() {
-    if (this.state.highlighted.length === 1)
-      this.handleCurrent(this.state.highlighted[0]);
   }
 
   activateExportAccelerator() {
@@ -79,29 +61,21 @@ class Library extends React.Component {
   }
 
   bindEventListeners() {
-    window.addEventListener('library:enter', this.pressedEnter);
-
     if (this.state.highlighted.length > 0)
       this.activateExportAccelerator();
   }
 
   unbindEventListeners() {
-    window.removeEventListener('library:enter', this.pressedEnter);
-
     this.deactivateExportAccelerator();
   }
 
   componentDidMount() {
     this.props.actions.getPhotos();
     this.bindEventListeners();
-
-    keymapManager.bind(this.refs.library);
   }
 
   componentWillUnmount() {
     this.unbindEventListeners();
-
-    keymapManager.unbind();
   }
 
   isLast() {
@@ -146,7 +120,6 @@ class Library extends React.Component {
     else if (this.props.current === -1) {
       currentView = <Grid
                       actions={this.props.actions}
-                      setCurrent={this.handleCurrent.bind(this)}
                       photos={this.props.photos}/>;
     } else if (this.props.diff) {
       currentView = <PictureDiff
@@ -157,7 +130,6 @@ class Library extends React.Component {
                       photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}
-                      setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
     }
 

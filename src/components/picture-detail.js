@@ -26,7 +26,6 @@ rotation[0] = 'minus-ninety';
 export default class PictureDetail extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    setCurrent: React.PropTypes.func.isRequired,
     isLast: React.PropTypes.func.isRequired,
     toggleFlag: React.PropTypes.func.isRequired,
     photo: React.PropTypes.object.isRequired
@@ -122,7 +121,7 @@ export default class PictureDetail extends React.Component {
 
   cancelEvent() {
     if (this.state.modal === 'none') // escape
-      this.props.setCurrent(-1);
+      this.props.actions.setCurrent(-1);
     else
       this.closeDialog();
   }
