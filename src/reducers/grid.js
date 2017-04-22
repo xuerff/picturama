@@ -13,7 +13,7 @@ const moveHighlight = (state, direction, event) => {
   else if (direction === 'up' && currentPos - jumpSize > 0)
     currentPos -= jumpSize;
 
-  else if (currentPos + jumpSize < state.photos.length)
+  else if (direction === 'down' && currentPos + jumpSize < state.photos.length)
     currentPos += jumpSize;
 
   return currentPos;
