@@ -36,3 +36,7 @@ export const setHighlight = (index, ctrlKey) => dispatch => {
     index
   });
 };
+
+export const clearHighlight = () => dispatch => {
+  dispatch({ type: 'CLEAR_HIGHLIGHT_SUCCESS' });
+};

@@ -41,6 +41,12 @@ export default function reducers(state, action) {
       highlighted: state.highlighted.concat(action.index)
     };
 
+  case 'CLEAR_HIGHLIGHT_SUCCESS':
+    return {
+      ...state,
+      highlighted: []
+    };
+
   default:
     return state;
   }

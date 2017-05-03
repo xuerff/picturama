@@ -56,7 +56,9 @@ class Container extends React.Component {
     return (
       <div id="container" ref="container" className={containerClass}>
         {content}
-        {this.props.current === -1 ? <BottomBar /> : ''}
+        {this.props.current === -1 ?
+            <BottomBar actions={this.props.actions} />
+        : ''}
       </div>
     );
   }
