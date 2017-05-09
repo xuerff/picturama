@@ -19,8 +19,6 @@ class PictureDiff extends React.Component {
     super(props);
 
     this.updateState = this.updateState.bind(this);
-    this.bindEventListeners = this.bindEventListeners.bind(this);
-    this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.onImgLoad = this.onImgLoad.bind(this);
 
     this.state = {
