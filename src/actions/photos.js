@@ -2,16 +2,25 @@ import Photo from './../models/photo';
 
 export const getPhotos = () => dispatch => {
   Photo
-    .query(qb => {
-      qb
-        .limit(100)
-        .offset(0)
-        .where({ trashed: false })
-        .orderBy('created_at', 'desc');
-    })
-    .fetchAll({ withRelated: [ 'versions', 'tags' ] })
-    .then(photos => {
-      dispatch({ type: 'GET_PHOTOS_SUCCESS', photos: photos.toJSON() });
+    .where({ trashed: false })
+    .count()
+    .then(count => {
+      Photo
+        .query(qb => {
+          qb
+            .limit(100)
+            .offset(0)
+            .where({ trashed: false })
+            .orderBy('created_at', 'desc');
+        })
+        .fetchAll({ withRelated: [ 'versions', 'tags' ] })
+        .then(photos => {
+          dispatch({
+            type: 'GET_PHOTOS_SUCCESS',
+            photos: photos.toJSON(),
+            count: count
+          });
+        });
     });
 };
 

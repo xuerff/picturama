@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 class BottomBar extends React.Component {
   static propTypes = {
     actions: React.PropTypes.object.isRequired,
-    highlighted: React.PropTypes.array.isRequired
+    highlighted: React.PropTypes.array.isRequired,
+    photosCount: React.PropTypes.number.isRequired
   }
 
   render() {
@@ -21,7 +22,9 @@ class BottomBar extends React.Component {
                 </button>
             : ''}
           </span>
-          <span className="total">120 items</span>
+          <span className="total">
+            {this.props.photosCount} item{this.props.photosCount > 1 ? 's' : ''}
+          </span>
         </div>
       </div>
     );
@@ -29,5 +32,6 @@ class BottomBar extends React.Component {
 }
 
 export default connect(state => ({
-  highlighted: state.highlighted
+  highlighted: state.highlighted,
+  photosCount: state.photosCount
 }))(BottomBar);

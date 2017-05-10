@@ -131,6 +131,7 @@ export default class PictureDetail extends React.Component {
   }
 
   toggleDiff() {
+    console.log('toggle diff');
     if (this.props.photo.versionNumber > 1)
       this.props.actions.toggleDiff();
   }

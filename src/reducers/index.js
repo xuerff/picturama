@@ -18,6 +18,7 @@ const initialState = {
   diff: false,
   settingsExists: false,
   route: '',
+  photosCount: 0,
   photos: [],
   tags: [],
   devices: [],
