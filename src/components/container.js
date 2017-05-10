@@ -41,7 +41,7 @@ class Container extends React.Component {
     let content = <Settings actions={this.props.actions} />;
 
     let containerClass = classNames(this.props.className, {
-      'bottom-bar-present': this.props.current === -1
+      'bottom-bar-present': this.props.current === -1 && this.props.settingsExists
     });
 
     if (this.props.settingsExists) {
@@ -56,7 +56,7 @@ class Container extends React.Component {
     return (
       <div id="container" ref="container" className={containerClass}>
         {content}
-        {this.props.current === -1 ?
+        {this.props.current === -1 && this.props.settingsExists ?
             <BottomBar actions={this.props.actions} />
         : ''}
       </div>
