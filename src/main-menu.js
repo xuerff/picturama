@@ -1,4 +1,4 @@
-import {ipcMain, Menu} from 'electron';
+import { ipcMain, Menu } from 'electron';
 
 import config from './config';
 import npmPackage from './../package.json';
@@ -19,13 +19,14 @@ class MainMenu {
     this.toggleDevTools = this.toggleDevTools.bind(this);
     this.addTags = this.addTags.bind(this);
     this.export = this.export.bind(this);
+    this.fixMissingVersions = this.fixMissingVersions.bind(this);
 
-    this.template = template.menu.map((menu) => {
-      menu.submenu = menu.submenu.map((submenu) => {
+    this.template = template.menu.map(menu => {
+      menu.submenu = menu.submenu.map(submenu => {
         if (this.hasOwnProperty(submenu.click))
           submenu.click = this[submenu.click];
 
-        if (submenu.label.toLowerCase() == 'version')
+        if (submenu.label.toLowerCase() === 'version')
           submenu.label = `Version ${npmPackage.version}`;
 
         return submenu;
@@ -50,7 +51,6 @@ class MainMenu {
   }
 
   scanForTags() {
-    console.log('scan for tags listener');
     this.library.scanForTags();
   }
 
@@ -63,7 +63,7 @@ class MainMenu {
   }
 
   fullscreen() {
-    this.mainWindow.setFullScreen((!this.mainWindow.isFullScreen()));
+    this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
   }
 
   toggleDevTools() {
@@ -76,6 +76,10 @@ class MainMenu {
 
   export() {
     this.mainWindow.webContents.send('exportClicked', true);
+  }
+
+  fixMissingVersions() {
+    this.library.fixMissingVersions();
   }
 
   render() {

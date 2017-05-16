@@ -1,11 +1,15 @@
 import React from 'react';
+import classNames from 'classnames';
+import { connect } from 'react-redux';
 
 import Library from './library';
 import Settings from './settings';
 import Progress from './progress';
+import BottomBar from './bottom-bar';
 
-export default class Container extends React.Component {
+class Container extends React.Component {
   static propTypes = {
+    current: React.PropTypes.number,
     className: React.PropTypes.string.isRequired,
     actions: React.PropTypes.object.isRequired,
     settingsExists: React.PropTypes.bool.isRequired,
@@ -24,6 +28,7 @@ export default class Container extends React.Component {
 
   handleImport(store) {
     let state = this.state;
+
     state.isImporting = store.importing;
     this.setState(state);
   }
@@ -35,20 +40,30 @@ export default class Container extends React.Component {
   render() {
     let content = <Settings actions={this.props.actions} />;
 
-    if (this.props.settingsExists)
-      content = (
-        <Library 
-          actions={this.props.actions}
-          setScrollTop={this.handleScrollTop.bind(this)}/>
-      );
+    let containerClass = classNames(this.props.className, {
+      'bottom-bar-present': this.props.current === -1 && this.props.settingsExists
+    });
+
+    if (this.props.settingsExists) {
+      content = <Library
+        actions={this.props.actions}
+        setScrollTop={this.handleScrollTop.bind(this)}/>;
+    }
 
     if (this.props.importing)
       content = <Progress />;
 
     return (
-      <div id="container" ref="container" className={this.props.className}>
+      <div id="container" ref="container" className={containerClass}>
         {content}
+        {this.props.current === -1 && this.props.settingsExists ?
+            <BottomBar actions={this.props.actions} />
+        : ''}
       </div>
     );
   }
 }
+
+export default connect(state => ({
+  current: state.current
+}))(Container);

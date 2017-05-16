@@ -6,7 +6,7 @@ PREPARED_PATH=$ANSEL_PATH/build/prepared
 # Destroy previous work directories
 rm -rf $ANSEL_PATH/build $ANSEL_PATH/dist
 
-npm install
+yarn install
 
 mkdir $ANSEL_PATH/build
 mkdir $PREPARED_PATH
@@ -23,8 +23,6 @@ cp $ANSEL_PATH/static $PREPARED_PATH -r
 cp $ANSEL_PATH/node_modules $PREPARED_PATH -r
 
 cd $PREPARED_PATH
-#npm prune --production --ignore-scripts
-#npm dedupe
 
 cp $ANSEL_PATH/node_modules/libraw $PREPARED_PATH/node_modules -r
 cp $ANSEL_PATH/node_modules/sharp $PREPARED_PATH/node_modules -r
@@ -60,6 +58,5 @@ find $PREPARED_PATH/node_modules/ -type f -name '.npmignore' -delete
 
 cd $ANSEL_PATH/build
 electron-packager $PREPARED_PATH ansel --platform=linux --arch=x64 --no-prune --out=$ANSEL_PATH/build
-tar cvzf ansel-linux-x64.tar.gz ansel-linux-x64
 
 rm -rf $PREPARED_PATH

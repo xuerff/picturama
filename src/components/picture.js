@@ -1,19 +1,21 @@
 import { remote } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
+import { connect } from 'react-redux';
 
-const {Menu, MenuItem} = remote;
+const { Menu, MenuItem } = remote;
 
-var rotation = {};
+let rotation = {};
+
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
 class Picture extends React.Component {
   static propTypes = {
-    setCurrent: React.PropTypes.func.isRequired,
-    setHighlight: React.PropTypes.func.isRequired,
+    actions: React.PropTypes.object.isRequired,
     setFlagging: React.PropTypes.func.isRequired,
-    highlighted: React.PropTypes.bool.isRequired,
+    setExport: React.PropTypes.func.isRequired,
+    highlighted: React.PropTypes.array.isRequired,
     photo: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired
   }
@@ -32,7 +34,7 @@ class Picture extends React.Component {
     e.preventDefault();
 
     if (!this.props.highlighted)
-      this.props.setHighlight(this.props.index, e.ctrlKey);
+      this.props.actions.setHighlight(this.props.index, e.ctrlKey);
 
     state.showContextMenu = true;
 
@@ -42,33 +44,28 @@ class Picture extends React.Component {
   componentDidMount() {
     this.menu = new Menu();
 
-    this.menu.append(new MenuItem({ 
-      label: 'Flag picture(s)', 
+    this.menu.append(new MenuItem({
+      label: 'Flag picture(s)',
       click: this.props.setFlagging
     }));
 
-    this.menu.append(new MenuItem({ 
-      label: 'Export picture(s)', 
-      //click: this.handleExport.bind(this)
-      click: () => console.log('export, bitch!')
+    this.menu.append(new MenuItem({
+      label: 'Export picture(s)',
+      click: this.props.setExport
     }));
   }
 
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.highlighted) {
+    if (this.props.highlighted.indexOf(this.props.index) !== -1) {
       let rect = this.refs.picture.getBoundingClientRect();
-      let container = this.refs.picture.parentNode.parentNode;
+      let container = this.refs.picture.parentNode.parentNode.parentNode;
       let containerRect = container.getBoundingClientRect();
-      console.log('rect',  rect, containerRect);
 
-      if (rect.bottom > containerRect.bottom) {
-        console.log('should scroll yo!', container.scrollTop);
+      if (rect.bottom > containerRect.bottom)
         container.scrollTop += rect.bottom - containerRect.bottom;
-        console.log('should still scroll yo!', container.scrollTop);
-      }
-      else if (rect.top < 0) 
+      else if (rect.top < 0)
         container.scrollTop += rect.top;
     }
 
@@ -82,12 +79,13 @@ class Picture extends React.Component {
   }
 
   handleDblClick() {
-    this.props.setCurrent(this.props.index);
+    this.props.actions.setCurrent(this.props.index);
   }
 
   handleClick(e) {
     e.preventDefault();
-    this.props.setHighlight(this.props.index, e.ctrlKey);
+
+    this.props.actions.setHighlight(this.props.index, e.ctrlKey);
   }
 
   render() {
@@ -96,7 +94,7 @@ class Picture extends React.Component {
     let anchorClass = classNames(
       'picture',
       'card',
-      { 'highlighted': this.props.highlighted }
+      { highlighted: this.props.highlighted.indexOf(this.props.index) !== -1 }
     );
 
     let imgClass = classNames(
@@ -113,11 +111,15 @@ class Picture extends React.Component {
         <img
           onClick={this.handleClick.bind(this)}
           onContextMenu={this.contextMenu}
-          src={photo.thumb_250} 
+          src={photo.thumb_250}
           className={imgClass} />
       </a>
     );
   }
 }
 
-export default Picture;
+const ReduxPicture = connect(state => ({
+  highlighted: state.highlighted
+}))(Picture);
+
+export default ReduxPicture;

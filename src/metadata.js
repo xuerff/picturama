@@ -1,14 +1,16 @@
 import matches from './lib/matches';
 
-var accessByMatch = (obj, key) => {
+const accessByMatch = (obj, key) => {
   let id = matches(Object.keys(obj), key);
+
   return obj[Object.keys(obj)[id]];
 };
 
-var process = (exData) => {
+// TODO: Why is eval used here?
+const processData = exData => {
   let xmp = {
     exposureTime: eval(accessByMatch(exData, 'ExposureTime')),
-    iso: parseInt(accessByMatch(exData, 'ISOSpeedRating')),
+    iso: parseInt(accessByMatch(exData, 'ISOSpeedRating'), 10),
     aperture: eval(accessByMatch(exData, 'FNumber')),
     tags: []
   };
@@ -27,11 +29,11 @@ var process = (exData) => {
     xmp.createdAt = exData['Exif.Image.DateTime'];
 
   if (exData.hasOwnProperty('Exif.Image.Orientation'))
-    xmp.orientation = parseInt(exData['Exif.Image.Orientation']);
+    xmp.orientation = parseInt(exData['Exif.Image.Orientation'], 10);
   else
     xmp.orientation = 1;
 
   return xmp;
 };
 
-export default { process };
+export default { processData };

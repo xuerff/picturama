@@ -22,24 +22,24 @@ class Dates extends React.Component {
 
   handleDate(date) {
     let state = this.state;
+
     state.currentDate = date;
     this.setState(state);
   }
 
   render() {
-    var dateYearsList = [];
+    let dateYearsList = [];
 
-    if (this.props.dates.years)
-      dateYearsList = this.props.dates.years.map((year) => {
-        return (
-          <DateYear
-            actions={this.props.actions}
-            year={year}
-            key={year.id}
-            currentDate={this.props.currentDate}
-            setDate={this.handleDate.bind(this)} />
-        );
-      });
+    if (this.props.dates.years) {
+      dateYearsList = this.props.dates.years.map(year =>
+        <DateYear
+          actions={this.props.actions}
+          year={year}
+          key={year.id}
+          currentDate={this.props.currentDate}
+          setDate={this.handleDate.bind(this)} />
+      );
+    }
 
     return (
       <div className="dates">

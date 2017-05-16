@@ -3,16 +3,17 @@
     "tab": "core:toggleSidebar",
     "escape": "core:cancel"
   },
-  "#library": {
-    "up": "library:up",
-    "down": "library:down",
-    "left": "library:left",
-    "right": "library:right",
-    "enter": "library:enter"
+  ".grid": {
+    "up": "grid:up",
+    "down": "grid:down",
+    "left": "grid:left",
+    "right": "grid:right",
+    "enter": "grid:enter"
   },
   ".picture-detail": {
     "y": "detail:diff",
     "p": "detail:flag",
+    "delete": "detail:moveToTrash",
     "left": "detail:moveLeft",
     "right": "detail:moveRight"
   },

@@ -23,6 +23,7 @@ class Tags extends React.Component {
 
   appendTags(data) {
     let state = this.state;
+
     state.tags = data.tags;
     this.setState(state);
   }
@@ -34,17 +35,16 @@ class Tags extends React.Component {
       <div className="tags">
         <h3><i className="fa fa-tags"></i> Tags</h3>
         <ul>
-          {this.props.tags.map(tag =>
-            <TagButton 
+          {this.props.tags.length > 0 ? this.props.tags.map(tag =>
+            <TagButton
               setTag={() => this.props.actions.setTagFilter(tag)}
-              className={classNames({ 'active': tag.id == currentTag })}
+              className={classNames({ active: tag.id === currentTag })}
               key={tag.id}
               tag={tag} />
-          )}
+          ) : ''}
         </ul>
       </div>
     );
-
   }
 }
 

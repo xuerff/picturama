@@ -1,11 +1,11 @@
-//import KeymapManager from 'atom-keymap';
 import React from 'react';
 import Loader from 'react-loader';
 
 import keymapManager from './../keymap-manager';
 import Photo from './../models/photo';
 
-var rotation = {};
+let rotation = {};
+
 rotation[1] = '';
 rotation[8] = 'minus-ninety';
 
@@ -19,12 +19,10 @@ class PictureDiff extends React.Component {
     super(props);
 
     this.updateState = this.updateState.bind(this);
-    this.bindEventListeners = this.bindEventListeners.bind(this);
-    this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.onImgLoad = this.onImgLoad.bind(this);
 
-    this.state = { 
-      photo: { thumb: null }, 
+    this.state = {
+      photo: { thumb: null },
       loaded: false,
       loadingCount: 0
     };
@@ -32,7 +30,7 @@ class PictureDiff extends React.Component {
 
   componentDidMount() {
     new Photo({ id: this.props.photo.id })
-      .fetch({ withRelated: ['versions'] })
+      .fetch({ withRelated: [ 'versions' ] })
       .then(this.updateState);
 
     window.addEventListener('core:cancel', this.props.actions.toggleDiff);
@@ -43,12 +41,14 @@ class PictureDiff extends React.Component {
 
   updateState(photo) {
     let state = this.state;
+
     state.photo = photo.toJSON();
     this.setState(state);
   }
 
   onImgLoad() {
     let state = this.state;
+
     state.loadingCount++;
 
     if (state.loadingCount >= 2)
@@ -63,27 +63,10 @@ class PictureDiff extends React.Component {
     keymapManager.unbind();
   }
 
-  bindEventListeners() {
-    //document.addEventListener('keyup', this.keyboardListener);
-  }
-
-  unbindEventListeners() {
-    //document.removeEventListener('keyup', this.keyboardListener);
-  }
-
-  //keyboardListener(e) {
-  //  e.preventDefault();
-
-  //  if ([27, 89].indexOf(e.keyCode) != -1) {
-  //    this.unbindEventListeners();
-  //    this.props.actions.toggleDiff();
-  //  }
-  //}
-
   render() {
-    var last = { thumb: null };
+    let last = { thumb: null };
 
-    var className = [
+    let className = [
       'shadow--2dp',
       rotation[this.props.photo.orientation]
     ].join(' ');
@@ -96,7 +79,7 @@ class PictureDiff extends React.Component {
         <div className="before v-align">
           <h3>Before</h3>
           <img
-            src={this.state.photo.thumb} 
+            src={this.state.photo.thumb}
             onLoad={this.onImgLoad}
             className={className} />
         </div>
@@ -104,7 +87,7 @@ class PictureDiff extends React.Component {
         <div className="after v-align">
           <h3>After</h3>
           <img
-            src={last.output} 
+            src={last.output}
             onLoad={this.onImgLoad}
             className={className} />
         </div>

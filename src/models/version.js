@@ -8,9 +8,9 @@ import config from './../config';
 
 import Photo from './photo';
 
-var copy = Promise.promisify(fs.copy);
+const copy = Promise.promisify(fs.copy);
 
-var Version = anselBookshelf.Model.extend({
+const Version = anselBookshelf.Model.extend({
   tableName: 'versions',
 
   photo: function() {
@@ -18,10 +18,9 @@ var Version = anselBookshelf.Model.extend({
   },
 
   initialize: function() {
-    this.on('creating', function(model) {
-      console.log('ON CREATING', model.get('photo_id'));
-
-      return new Photo({ id: model.get('photo_id') }).fetch().then(function(photo) {
+    this.on('creating', model => new Photo({ id: model.get('photo_id') })
+      .fetch()
+      .then(photo => {
         photo = photo.toJSON();
 
         let fileName = [
@@ -30,60 +29,53 @@ var Version = anselBookshelf.Model.extend({
           model.get('version')
         ].join('-');
 
-        if (model.get('type') == 'RAW') {
+        if (model.get('type') === 'RAW') {
           let fileNamePath = `${config.tmp}/${fileName}.${photo.extension}`;
+
           model.set('master', fileNamePath);
 
           return copy(photo.master, fileNamePath);
-
-        } else {
-          let fileNamePath = `${config.tmp}/${fileName}`;
-          model.set('master', `${fileNamePath}.tiff`);
-
-          return libraw.extract(photo.master, fileNamePath)
-            .then((output) => {
-              console.log('extracted tiff', output);
-              model.set('master', output);
-              return output;
-            });
         }
+
+        let fileNamePath = `${config.tmp}/${fileName}`;
+
+        model.set('master', `${fileNamePath}.tiff`);
+
+        return libraw.extract(photo.master, fileNamePath)
+          .then(output => {
+            model.set('master', output);
+            return output;
+          });
       })
-      .catch(function(err) {
-        console.log('ERR', err);
-      });
-    });
+      .catch(err => {
+        console.error('ERR', err);
+      }));
   }
 }, {
-  updateImage: (data) => {
-    let filename = [data[1], data[2], data[3]].join('-');
-    console.log('fileName', filename);
+  updateImage: data => {
+    let filename = [ data[1], data[2], data[3] ].join('-');
     let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`;
-
-    console.log('before sharp', thumbPathName);
 
     return sharp(data.input)
       .resize(250, 250)
       .max()
       .quality(100)
       .toFile(thumbPathName)
-      .then(() => {
-        console.log('after sharp');
-        return Version.where({ photo_id: data[2], version: data[3] })
-          .fetch();
-      })
-      .then((version) => {
-        console.log('update img', { photo_id: data[2], version: data[3] }, version);
-
-        if (version)
+      .then(() => Version.where({ photo_id: data[2], version: data[3] })
+          .fetch()
+      )
+      .then(version => {
+        if (version) {
           return version.save(
-            { output: data.input, thumbnail: thumbPathName }, 
+            { output: data.input, thumbnail: thumbPathName },
             { method: 'update' }
           );
-        else
-          throw 'not-found';
+        }
+
+        throw 'not-found';
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(err => {
+        console.error(err);
         return null;
       });
   }

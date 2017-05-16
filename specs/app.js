@@ -1,6 +1,4 @@
-'use strict';
-
-const Application = require('spectron').Application
+const Application = require('spectron').Application;
 const fs = require('fs');
 const rimraf = require('rimraf');
 
@@ -15,7 +13,7 @@ if (!fs.existsSync(`${testsPath}/dot-ansel`))
 if (!fs.existsSync(`${testsPath}/versions`))
   fs.mkdirSync(`${testsPath}/versions`);
 
-var knex = require('knex')({
+const knex = require('knex')({
   client: 'sqlite3',
   useNullAsDefault: true,
   connection: {
@@ -47,7 +45,7 @@ class App {
 
     this.app = new Application({
       path: `${__dirname}/../node_modules/.bin/electron`,
-      args: [`${__dirname}/../.`],
+      args: [ `${__dirname}/../.` ],
       env: { ANSEL_TEST_MODE: 1 }
     });
 

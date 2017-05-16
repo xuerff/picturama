@@ -1,4 +1,4 @@
-#container #library.grid {
+#container #library div.grid {
   display: grid;
   grid-template-rows: auto;
   grid-template-columns: repeat(4, 247px);
@@ -8,18 +8,54 @@
   margin: auto;
 }
 
-#container.no-sidebar #library.grid {
+#container.no-sidebar #library div.grid {
   grid-template-columns: repeat(5, 247px);
   width: 1235px;
 }
 
+#container.bottom-bar-present {
+  height: ~"calc(100% - 96px)";
+
+  div.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: ~"calc(100% - 300px)";
+    height: 48px;
+    background: @blue-grey-800;
+    color: @blue-grey-100;
+
+    div.content {
+      position: relative;
+      line-height: 48px;
+      margin: 0 25px;
+
+      span.selection {
+        background: @blue-grey-900;
+        border-radius: 5px;
+        padding: 4px 10px;
+
+        button.deselect-all:before {
+          content: "|";
+          padding-right: 6px;
+        }
+      }
+
+      span.total {
+        position: absolute;
+        left: 48%;
+      }
+    }
+  }
+}
+
 @media (max-width: 2717px) and (min-width: 2471px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(10, 247px);
     width: 2470px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(9, 247px);
     width: 2223px;
   }
@@ -27,36 +63,36 @@
 
 
 @media (max-width: 2470px) and (min-width: 2224px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(9, 247px);
     width: 2223px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(8, 247px);
     width: 1976px;
   }
 }
 
 @media (max-width: 2223px) and (min-width: 1977px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(8, 247px);
     width: 1976px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(7, 247px);
     width: 1729px;
   }
 }
 
 @media (max-width: 1976px) and (min-width: 1730px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(7, 247px);
     width: 1729px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(6, 247px);
     width: 1482px;
   }
@@ -64,69 +100,69 @@
 
 
 @media (max-width: 1729px) and (min-width: 1483px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(6, 247px);
     width: 1482px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(5, 247px);
     width: 1235px;
   }
 }
 
 @media (max-width: 1482px) and (min-width: 1275px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(5, 247px);
     width: 1235px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(4, 247px);
     width: 988px;
   }
 }
 
 @media (max-width: 1275px) and (min-width: 1056px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(4, 247px);
     width: 988px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(3, 247px);
     width: 741px;
   }
 }
 
 @media (max-width: 1055px) and (min-width: 811px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(3, 247px);
     width: 741px;
   }
 
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(2, 247px);
     width: 494px;
   }
 }
 
 @media (max-width: 810px) and (min-width: 516px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(2, 247px);
     width: 494px;
   }
 }
 
 @media (max-width: 810px) {
-  #container #library.grid {
+  #container #library div.grid {
     grid-template-columns: repeat(1, 247px);
     width: 247px;
   }
 }
 
 @media (max-width: 515px) {
-  #container.no-sidebar #library.grid {
+  #container.no-sidebar #library div.grid {
     grid-template-columns: repeat(1, 247px);
     width: 247px;
   }

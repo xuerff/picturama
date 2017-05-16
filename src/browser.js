@@ -12,23 +12,26 @@ import Usb from './usb';
 import config from './config';
 import Watch from './watch';
 
-const initLibrary = (mainWindow) => {
+const initLibrary = mainWindow => {
+  const knex = require('knex')(config.knex);
   const Library = require('./library').default;
-  let library = new Library(mainWindow);
-  let watcher = new Watch(mainWindow);
 
-  new MainMenu(mainWindow, library);
-  //library.watch();
-  watcher.watch();
+  knex.migrate.latest().finally(() => {
+    let library = new Library(mainWindow);
+    let watcher = new Watch(mainWindow);
+
+    new MainMenu(mainWindow, library);
+    watcher.watch();
+  });
 };
 
-var mainWindow = null;
+let mainWindow = null;
 
 if (!fs.existsSync(config.dotAnsel))
   fs.mkdirSync(config.dotAnsel);
 
 app.on('window-all-closed', () => {
-  if (process.platform != 'darwin')
+  if (process.platform !== 'darwin')
     app.quit();
 });
 
@@ -39,7 +42,7 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({ width: 1356, height: 768, webPreferences: {
     experimentalFeatures: true,
     blinkFeatures: 'CSSGridLayout'
-  }});
+  } });
 
   if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
     mainWindow.maximize();
@@ -49,12 +52,13 @@ app.on('ready', () => {
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
   else {
-    var knex = require('knex')(config.knex);
+    const knex = require('knex')(config.knex);
 
-    if (!fs.existsSync(config.dbFile))
-      knex.migrate.latest().finally(() => {
-        return knex.destroy(); //works
-      });
+    if (!fs.existsSync(config.dbFile)) {
+      knex.migrate.latest().finally(() =>
+        knex.destroy() // works
+      );
+    }
   }
 
   let usb = new Usb();
@@ -64,9 +68,7 @@ app.on('ready', () => {
   });
 
   usb.watch((err, action, drive) => {
-    console.log('new drive', action, drive);
-
-    if (action == 'add')
+    if (action === 'add')
       mainWindow.webContents.send('add-device', drive);
     else
       mainWindow.webContents.send('remove-device', drive);
