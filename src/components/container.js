@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import Library from './library';
 import Settings from './settings';
@@ -9,11 +10,11 @@ import BottomBar from './bottom-bar';
 
 class Container extends React.Component {
   static propTypes = {
-    current: React.PropTypes.number,
-    className: React.PropTypes.string.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    settingsExists: React.PropTypes.bool.isRequired,
-    importing: React.PropTypes.bool.isRequired
+    current: PropTypes.number,
+    className: PropTypes.string.isRequired,
+    actions: PropTypes.object.isRequired,
+    settingsExists: PropTypes.bool.isRequired,
+    importing: PropTypes.bool.isRequired
   }
 
   constructor(props) {

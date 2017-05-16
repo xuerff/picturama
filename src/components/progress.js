@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class Progress extends React.Component {
   static propTypes = {
-    progress: React.PropTypes.object.isRequired
+    progress: PropTypes.object.isRequired
   }
 
   constructor(props) {

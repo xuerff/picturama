@@ -2,6 +2,7 @@ import { remote } from 'electron';
 import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 const { Menu, MenuItem } = remote;
 
@@ -12,12 +13,12 @@ rotation[0] = 'minus-ninety';
 
 class Picture extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    setFlagging: React.PropTypes.func.isRequired,
-    setExport: React.PropTypes.func.isRequired,
-    highlighted: React.PropTypes.array.isRequired,
-    photo: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired
+    actions: PropTypes.object.isRequired,
+    setFlagging: PropTypes.func.isRequired,
+    setExport: PropTypes.func.isRequired,
+    highlighted: PropTypes.array.isRequired,
+    photo: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired
   }
 
   constructor(props) {

@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class PictureInfo extends React.Component {
   static propTypes = {
-    photo: React.PropTypes.object.isRequired
+    photo: PropTypes.object.isRequired
   }
 
   shutterSpeed(exposureTime) {

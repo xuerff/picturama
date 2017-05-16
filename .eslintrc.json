@@ -141,6 +141,7 @@
     "template-curly-spacing": 2,
     "yield-star-spacing": 2,
 
+    "react/no-string-refs": 1,
     "react/no-did-update-set-state": 0
   },
   "env": {

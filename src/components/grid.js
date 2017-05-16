@@ -1,17 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import keymapManager from './../keymap-manager';
 import Picture from './picture';
 
 class Grid extends React.Component {
   static propTypes = {
-    setExport: React.PropTypes.func.isRequired,
-    setScrollTop: React.PropTypes.func.isRequired,
-    highlighted: React.PropTypes.array.isRequired,
-    current: React.PropTypes.number,
-    actions: React.PropTypes.object.isRequired,
-    photos: React.PropTypes.array.isRequired
+    setExport: PropTypes.func.isRequired,
+    setScrollTop: PropTypes.func.isRequired,
+    highlighted: PropTypes.array.isRequired,
+    current: PropTypes.number,
+    actions: PropTypes.object.isRequired,
+    photos: PropTypes.array.isRequired
   }
 
   constructor(props) {

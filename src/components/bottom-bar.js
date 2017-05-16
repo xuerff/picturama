@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class BottomBar extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    highlighted: React.PropTypes.array.isRequired,
-    photosCount: React.PropTypes.number.isRequired
+    actions: PropTypes.object.isRequired,
+    highlighted: PropTypes.array.isRequired,
+    photosCount: PropTypes.number.isRequired
   }
 
   render() {

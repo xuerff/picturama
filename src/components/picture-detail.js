@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { ipcRenderer, remote } from 'electron';
-
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
@@ -25,10 +25,10 @@ rotation[0] = 'minus-ninety';
 
 export default class PictureDetail extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    isLast: React.PropTypes.func.isRequired,
-    toggleFlag: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
+    isLast: PropTypes.func.isRequired,
+    toggleFlag: PropTypes.func.isRequired,
+    photo: PropTypes.object.isRequired
   }
 
   constructor(props) {

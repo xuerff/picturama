@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class DateElement extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    showOnlyFlagged: React.PropTypes.bool.isRequired,
-    currentDate: React.PropTypes.string,
-    date: React.PropTypes.string.isRequired
+    actions: PropTypes.object.isRequired,
+    showOnlyFlagged: PropTypes.bool.isRequired,
+    currentDate: PropTypes.string,
+    date: PropTypes.string.isRequired
   }
 
   constructor(props) {

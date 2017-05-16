@@ -1,13 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import DateElement from './date-element';
 
 export default class DateMonth extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    setDate: React.PropTypes.func.isRequired,
-    month: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string
+    actions: PropTypes.object.isRequired,
+    setDate: PropTypes.func.isRequired,
+    month: PropTypes.object.isRequired,
+    currentDate: PropTypes.string
   }
 
   constructor(props) {

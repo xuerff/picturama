@@ -1,5 +1,6 @@
 import fs from 'fs';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Tags from './tags';
 import Dates from './dates';
@@ -15,8 +16,8 @@ if (fs.existsSync(config.settings))
 
 class Sidebar extends React.Component {
   static propTypes = {
-    className: React.PropTypes.string.isRequired,
-    actions: React.PropTypes.object.isRequired
+    className: PropTypes.string.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   render() {

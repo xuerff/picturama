@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import DateYear from './date-year';
 
 class Dates extends React.Component {
   static propTypes = {
-    dates: React.PropTypes.object.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string
+    dates: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
+    currentDate: PropTypes.string
   }
 
   constructor(props) {

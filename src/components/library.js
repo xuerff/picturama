@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
+import PropTypes from 'prop-types';
 
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
@@ -10,12 +11,12 @@ import Grid from './grid';
 
 class Library extends React.Component {
   static propTypes = {
-    highlighted: React.PropTypes.array.isRequired,
-    setScrollTop: React.PropTypes.func.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    current: React.PropTypes.number,
-    diff: React.PropTypes.bool.isRequired,
-    photos: React.PropTypes.array.isRequired
+    highlighted: PropTypes.array.isRequired,
+    setScrollTop: PropTypes.func.isRequired,
+    actions: PropTypes.object.isRequired,
+    current: PropTypes.number,
+    diff: PropTypes.bool.isRequired,
+    photos: PropTypes.array.isRequired
   }
 
   constructor(props) {
