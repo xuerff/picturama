@@ -1,4 +1,3 @@
-import { spawn } from 'child_process';
 import { ipcRenderer, remote } from 'electron';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -7,6 +6,7 @@ import Loader from 'react-loader';
 
 import keymapManager from './../keymap-manager';
 import createVersionAndOpenWith from './../create-version';
+import AvailableEditors from './../available-editors';
 
 import AddTags from './add-tags';
 import Export from './export';
@@ -14,9 +14,7 @@ import PictureInfo from './picture-info';
 
 const { Menu, MenuItem } = remote;
 
-const rawtherapeeCmd = spawn('which', [ 'rawtherapee' ]);
-const darktableCmd = spawn('which', [ 'darktable' ]);
-const gimpCmd = spawn('which', [ 'gimp' ]);
+const availableEditors = new AvailableEditors();
 
 let rotation = {};
 
@@ -44,6 +42,7 @@ export default class PictureDetail extends React.Component {
     this.cancelEvent = this.cancelEvent.bind(this);
     this.toggleDiff = this.toggleDiff.bind(this);
     this.moveToTrash = this.moveToTrash.bind(this);
+    this.addEditorMenu = this.addEditorMenu.bind(this);
   }
 
   contextMenu(e) {
@@ -51,44 +50,16 @@ export default class PictureDetail extends React.Component {
     this.menu.popup(remote.getCurrentWindow());
   }
 
-  openWithRawtherapee() {
-    createVersionAndOpenWith(
-      this.props.photo,
-      'RAW',
-      'rawtherapee'
-    );
-  }
-
-  openWithDarktable() {
-    createVersionAndOpenWith(
-      this.props.photo,
-      'RAW',
-      'darktable'
-    );
-  }
-
-  openWithGimp() {
-    createVersionAndOpenWith(this.props.photo, 'JPG', 'gimp');
-  }
-
-  addRawtherapeeMenu() {
+  addEditorMenu(editor) {
     this.menu.append(new MenuItem({
-      label: 'Open with Rawtherapee',
-      click: this.openWithRawtherapee.bind(this)
-    }));
-  }
-
-  addDarktableMenu() {
-    this.menu.append(new MenuItem({
-      label: 'Open with Darktable',
-      click: this.openWithDarktable.bind(this)
-    }));
-  }
-
-  addGimpMenu() {
-    this.menu.append(new MenuItem({
-      label: 'Open with Gimp',
-      click: this.openWithGimp.bind(this)
+      label: `Open with ${editor.name}`,
+      click: () => {
+        createVersionAndOpenWith(
+          this.props.photo,
+          editor.format,
+          editor.cmd
+        );
+      }
     }));
   }
 
@@ -131,7 +102,6 @@ export default class PictureDetail extends React.Component {
   }
 
   toggleDiff() {
-    console.log('toggle diff');
     if (this.props.photo.versionNumber > 1)
       this.props.actions.toggleDiff();
   }
@@ -158,9 +128,7 @@ export default class PictureDetail extends React.Component {
       type: 'separator'
     }));
 
-    rawtherapeeCmd.stdout.on('data', this.addRawtherapeeMenu.bind(this));
-    darktableCmd.stdout.on('data', this.addDarktableMenu.bind(this));
-    gimpCmd.stdout.on('data', this.addGimpMenu.bind(this));
+    availableEditors.editors.forEach(this.addEditorMenu);
 
     window.addEventListener('core:cancel', this.cancelEvent);
     window.addEventListener('detail:diff', this.toggleDiff);
