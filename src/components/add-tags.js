@@ -1,15 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TagsInput from 'react-tagsinput';
 
 const btnClass = 'button button--raised button--colored';
 
 export default class AddTags extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    closeTagDialog: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired,
-    tags: React.PropTypes.array.isRequired,
-    id: React.PropTypes.string.isRequired
+    actions: PropTypes.object.isRequired,
+    closeTagDialog: PropTypes.func.isRequired,
+    photo: PropTypes.object.isRequired,
+    tags: PropTypes.array.isRequired,
+    id: PropTypes.string.isRequired
   }
 
   constructor(props) {

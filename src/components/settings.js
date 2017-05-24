@@ -1,6 +1,7 @@
 import { remote, ipcRenderer } from 'electron';
 import fs from 'fs';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import config from '../config';
 
@@ -10,7 +11,7 @@ const dialog = remote.dialog;
 
 class Settings extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -70,7 +71,7 @@ class Settings extends React.Component {
           <h2>Digital image organizer powered by the web</h2>
 
           <p>Please select the main photos folder to scan from, as well as
-            a versions folder in which we'll put the processed pictures.</p>
+            a versions folder in which we&#39;ll put the processed pictures.</p>
 
           <p>
             <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>

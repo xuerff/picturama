@@ -11,8 +11,10 @@ export default function reducers(state, action) {
       splashed: true,
       currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
+      photosCount: action.count || action.photos.length,
       showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
       route: action.route || '',
+      highlighted: [],
       photos: action.photos.map(photo => {
         photo.versionNumber = 1;
 

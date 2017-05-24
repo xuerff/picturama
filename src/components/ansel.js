@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 
 import * as action from './../actions';
 
@@ -12,10 +13,10 @@ import Container from './container';
 
 class Ansel extends React.Component {
   static propTypes = {
-    dispatch: React.PropTypes.func.isRequired,
-    settingsExists: React.PropTypes.bool.isRequired,
-    importing: React.PropTypes.bool.isRequired,
-    splashed: React.PropTypes.bool.isRequired
+    dispatch: PropTypes.func.isRequired,
+    settingsExists: PropTypes.bool.isRequired,
+    importing: PropTypes.bool.isRequired,
+    splashed: PropTypes.bool.isRequired
   }
 
   constructor(props) {

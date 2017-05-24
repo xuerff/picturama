@@ -5,6 +5,7 @@ import notifier from 'node-notifier';
 import libraw from 'libraw';
 import sharp from 'sharp';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import config from './../config';
 import Progress from './progress';
@@ -13,9 +14,9 @@ const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   static propTypes = {
-    closeExportDialog: React.PropTypes.func.isRequired,
-    photos: React.PropTypes.array.isRequired,
-    actions: React.PropTypes.object.isRequired
+    closeExportDialog: PropTypes.func.isRequired,
+    photos: PropTypes.array.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {

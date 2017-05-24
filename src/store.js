@@ -1,23 +1,16 @@
 import thunk from 'redux-thunk';
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 
 import reducers from './reducers';
 
-let createLogger, enhancer, logger;
+let enhancer, logger;
 
 if (process.env.ANSEL_DEV_MODE) {
-  createLogger = require('redux-logger');
+  logger = require('redux-logger').default;
 
-  logger = createLogger();
-  enhancer = compose(
-    applyMiddleware(thunk, logger)
-  );
-
-} else {
-  enhancer = compose(
-    applyMiddleware(thunk)
-  );
-}
+  enhancer = applyMiddleware(thunk, logger);
+} else
+  enhancer = applyMiddleware(thunk);
 
 const store = createStore(reducers, enhancer);
 

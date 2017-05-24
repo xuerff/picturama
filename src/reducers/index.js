@@ -6,6 +6,7 @@ import importation from './importation';
 import photos from './photos';
 import settings from './settings';
 import tags from './tags';
+import grid from './grid';
 
 const initialState = {
   splashed: false,
@@ -17,11 +18,13 @@ const initialState = {
   diff: false,
   settingsExists: false,
   route: '',
+  photosCount: 0,
   photos: [],
   tags: [],
   devices: [],
   dates: { years: [] },
-  progress: { processed: 0, total: 0 }
+  progress: { processed: 0, total: 0 },
+  highlighted: []
 };
 
 const runReducers = (state, action, reducers) => {
@@ -43,6 +46,7 @@ export default function reducers(state = initialState, action) {
     importation,
     photos,
     settings,
-    tags
+    tags,
+    grid
   });
 }

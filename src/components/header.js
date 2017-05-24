@@ -2,17 +2,18 @@ import classNames from 'classnames';
 import React from 'react';
 import { connect } from 'react-redux';
 import { remote, ipcRenderer } from 'electron';
+import PropTypes from 'prop-types';
 
 const dialog = remote.dialog;
 
 class Header extends React.Component {
   static propTypes = {
-    className: React.PropTypes.string.isRequired,
-    currentTag: React.PropTypes.number,
-    currentDate: React.PropTypes.string,
-    route: React.PropTypes.string,
-    showOnlyFlagged: React.PropTypes.bool.isRequired,
-    actions: React.PropTypes.object.isRequired
+    className: PropTypes.string.isRequired,
+    currentTag: PropTypes.number,
+    currentDate: PropTypes.string,
+    route: PropTypes.string,
+    showOnlyFlagged: PropTypes.bool.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   showSidebar() {

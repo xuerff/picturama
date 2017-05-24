@@ -47,5 +47,26 @@ export default {
       tableName: 'knex_migrations',
       directory: migrationsFolder
     }
-  }
+  },
+
+  editors: [
+    {
+      name: 'Gimp',
+      cmd: 'gimp',
+      format: 'JPG',
+      platforms: [ 'darwin', 'linux' ]
+    },
+    {
+      name: 'Rawtherapee',
+      cmd: 'rawtherapee',
+      format: 'RAW',
+      platforms: [ 'darwin', 'linux' ]
+    },
+    {
+      name: 'Darktable',
+      cmd: 'darktable',
+      format: 'RAW',
+      platforms: [ 'darwin', 'linux' ]
+    }
+  ]
 };

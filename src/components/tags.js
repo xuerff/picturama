@@ -1,14 +1,15 @@
 import classNames from 'classnames';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import TagButton from './tag-button';
 
 class Tags extends React.Component {
   static propTypes = {
-    tags: React.PropTypes.array.isRequired,
-    currentTag: React.PropTypes.number,
-    actions: React.PropTypes.object.isRequired
+    tags: PropTypes.array.isRequired,
+    currentTag: PropTypes.number,
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {

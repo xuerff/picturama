@@ -1,5 +1,6 @@
 import React from 'react';
 import Loader from 'react-loader';
+import PropTypes from 'prop-types';
 
 import keymapManager from './../keymap-manager';
 import Photo from './../models/photo';
@@ -11,16 +12,14 @@ rotation[8] = 'minus-ninety';
 
 class PictureDiff extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    photo: React.PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
+    photo: PropTypes.object.isRequired
   }
 
   constructor(props) {
     super(props);
 
     this.updateState = this.updateState.bind(this);
-    this.bindEventListeners = this.bindEventListeners.bind(this);
-    this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.onImgLoad = this.onImgLoad.bind(this);
 
     this.state = {
