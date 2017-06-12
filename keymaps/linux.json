@@ -8,7 +8,8 @@
     "down": "grid:down",
     "left": "grid:left",
     "right": "grid:right",
-    "enter": "grid:enter"
+    "enter": "grid:enter",
+    "ctrl-a": "grid:selectAll"
   },
   ".picture-detail": {
     "y": "detail:diff",

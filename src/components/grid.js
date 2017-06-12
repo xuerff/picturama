@@ -39,6 +39,7 @@ class Grid extends React.Component {
     window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
     window.addEventListener('grid:down', this.props.actions.moveHighlightDown);
     window.addEventListener('grid:enter', this.pressedEnter);
+    window.addEventListener('grid:selectAll', this.props.actions.highlightAll);
 
     keymapManager.bind(this.refs.grid);
   }
@@ -49,6 +50,7 @@ class Grid extends React.Component {
     window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);
     window.removeEventListener('grid:down', this.props.actions.moveHighlightDown);
     window.removeEventListener('grid:enter', this.pressedEnter);
+    window.removeEventListener('grid:selectAll', this.props.actions.highlightAll);
 
     keymapManager.unbind();
   }

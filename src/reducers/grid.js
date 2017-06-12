@@ -47,6 +47,12 @@ export default function reducers(state, action) {
       highlighted: []
     };
 
+  case 'SET_HIGHLIGHT_ALL':
+    return {
+      ...state,
+      highlighted: state.photos.map((photo, i) => i)
+    };
+
   default:
     return state;
   }

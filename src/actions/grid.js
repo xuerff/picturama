@@ -40,3 +40,9 @@ export const setHighlight = (index, ctrlKey) => dispatch => {
 export const clearHighlight = () => dispatch => {
   dispatch({ type: 'CLEAR_HIGHLIGHT_SUCCESS' });
 };
+
+export const highlightAll = event => dispatch => {
+  dispatch({
+    type: 'SET_HIGHLIGHT_ALL',
+  });
+};
