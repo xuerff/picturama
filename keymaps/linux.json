@@ -2,6 +2,7 @@
   "body": {
     "tab": "core:toggleSidebar",
     "escape": "core:cancel",
+    "ctrl-shift-r": "core:scan-for-tags",
     "ctrl-q": "core:quit",
     "ctrl-r": "core:scan"
   },

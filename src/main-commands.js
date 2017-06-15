@@ -5,15 +5,15 @@ export default class MainCommands {
     this.mainWindow = mainWindow;
     this.library = library;
 
-    ipcMain.on('core:quit', this.quit.bind(this));
-    ipcMain.on('core:scan', this.scan.bind(this));
-  }
+    const selectors = {
+      'core:scan': () => this.library.scan(),
+      'core:scan-for-tags': () => this.library.scanForTags(),
+      'core:quit': () => this.mainWindow.close()
+    };
 
-  scan() {
-    this.library.scan();
-  }
-
-  quit() {
-    this.mainWindow.close();
+    ipcMain.on('command', (e, command) => {
+      if (selectors.hasOwnProperty(command))
+        selectors[command]();
+    });
   }
 }

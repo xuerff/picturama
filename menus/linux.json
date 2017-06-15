@@ -50,8 +50,7 @@
       },
       {
         "label": "Scan for tags",
-        "accelerator": "Shift+Ctrl+R",
-        "click": "scanForTags"
+        "command": "core:scan-for-tags"
       }]
     },
     {
