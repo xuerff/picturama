@@ -16,8 +16,7 @@
         },
         {
           "label": "Close",
-          "accelerator": "Ctrl+Q",
-          "click": "close"
+          "command": "core:quit"
         }
       ]
     },

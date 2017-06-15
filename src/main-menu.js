@@ -25,6 +25,8 @@ class MainMenu {
       menu.submenu = menu.submenu.map(submenu => {
         if (this.hasOwnProperty(submenu.click))
           submenu.click = this[submenu.click];
+        else if (submenu.hasOwnProperty('command'))
+          submenu.click = this.bindCommand.bind(this, submenu.command);
 
         if (submenu.label.toLowerCase() === 'version')
           submenu.label = `Version ${npmPackage.version}`;
@@ -44,6 +46,11 @@ class MainMenu {
     });
 
     this.render();
+  }
+
+  bindCommand(command) {
+    console.log(command);
+    this.mainWindow.webContents.send('dispatch-command', command);
   }
 
   scan() {

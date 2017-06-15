@@ -28,15 +28,28 @@ class Ansel extends React.Component {
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
+    this.quit = this.quit.bind(this);
   }
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
   }
 
+  quit() {
+    console.log('Quit app');
+  }
+
+  dispatchCommand(e, command) {
+    const event = document.createEvent("HTMLEvents");
+
+    event.initEvent(command, true, true);
+    window.dispatchEvent(event);
+  }
+
   componentDidUpdate() {
     if (this.props.splashed === true) {
       let splash = document.getElementById('splash');
+
       if (splash) splash.parentNode.removeChild(splash);
     }
   }
@@ -56,22 +69,26 @@ class Ansel extends React.Component {
     ipcRenderer.on('add-device', this.state.actions.addDevice);
     ipcRenderer.on('remove-device', this.state.actions.removeDevice);
     ipcRenderer.on('photos-trashed', this.state.actions.removePhotos);
+    ipcRenderer.on('dispatch-command', this.dispatchCommand);
 
     window.addEventListener('core:toggleSidebar', this.toggleSidebar);
+    window.addEventListener('core:quit', this.quit);
   }
 
   componentWillUnmount() {
     window.removeEventListener('core:toggleSidebar', this.toggleSidebar);
+    window.removeEventListener('core:quit', this.quit);
   }
 
   toggleSidebar() {
     let state = this.state;
+
     state.showSidebar = !state.showSidebar;
     this.setState(state);
   }
 
   render() {
-    let noSidebarClass = classNames({ 
+    let noSidebarClass = classNames({
       'no-sidebar': !this.state.showSidebar || !this.props.settingsExists
     });
 
