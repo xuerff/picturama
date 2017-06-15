@@ -4,7 +4,11 @@ const selectors = {
   core: {
     'core:quit': () => ipcRenderer.send('command', 'core:quit'),
     'core:scan': () => ipcRenderer.send('command', 'core:scan'),
-    'core:scan-for-tags': () => ipcRenderer.send('command', 'core:scan-for-tags')
+    'core:scan-for-tags': () => ipcRenderer.send('command', 'core:scan-for-tags'),
+    'core:toggleSidebar': 'toggleSidebar'
+  },
+  grid: {
+    'grid:selectAll': 'highlightAll'
   }
 };
 
@@ -12,30 +16,36 @@ export default class RenderedCommands {
   constructor(selector) {
     this.selector = selector || 'core';
 
-    this.quit = this.quit.bind(this);
-    this.scan = this.scan.bind(this);
+    this.getSelectorFunction = this.getSelectorFunction.bind(this);
+  }
+
+  getSelectorFunction(command, bindings) {
+    let value = selectors[this.selector][command];
+
+    if (typeof value === 'string' && bindings.hasOwnProperty(value))
+      value = bindings[value];
+
+    return value;
   }
 
   mount(bindings) {
     ipcRenderer.on('dispatch-command', this.dispatchCommand.bind(this));
 
-    Object.keys(selectors[this.selector]).forEach(command => {
-      window.addEventListener(command, selectors[this.selector][command]);
-    });
-
-    if (bindings.hasOwnProperty('toggleSidebar'))
-      window.addEventListener('core:toggleSidebar', bindings.toggleSidebar);
+    if (selectors.hasOwnProperty(this.selector)) {
+      Object.keys(selectors[this.selector]).forEach(command => {
+        window.addEventListener(command, this.getSelectorFunction(command, bindings));
+      });
+    }
   }
 
   unmount(bindings) {
     ipcRenderer.removeAllListeners('dispatch-command');
 
-    Object.keys(selectors[this.selector]).forEach(command => {
-      window.removeEventListener(command, selectors[this.selector][command]);
-    });
-
-    if (bindings.hasOwnProperty('toggleSidebar'))
-      window.removeEventListener('core:toggleSidebar', bindings.toggleSidebar);
+    if (selectors.hasOwnProperty(this.selector)) {
+      Object.keys(selectors[this.selector]).forEach(command => {
+        window.removeEventListener(command, this.getSelectorFunction(command, bindings));
+      });
+    }
   }
 
   dispatchCommand(e, command) {
@@ -43,13 +53,5 @@ export default class RenderedCommands {
 
     event.initEvent(command, true, true);
     window.dispatchEvent(event);
-  }
-
-  quit() {
-    ipcRenderer.send('core:quit');
-  }
-
-  scan() {
-    ipcRenderer.send('core:scan');
   }
 }

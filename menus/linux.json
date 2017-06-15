@@ -24,11 +24,6 @@
       "label": "View",
       "submenu": [
         {
-          "label": "Reload",
-          "accelerator": "Shift+Ctrl+R",
-          "click": "reload"
-        },
-        {
           "label": "Enter Fullscreen",
           "accelerator": "F11",
           "click": "fullscreen"
@@ -37,6 +32,16 @@
           "label": "Toggle DevTools",
           "accelerator": "Shift+Ctrl+I",
           "click": "toggleDevTools"
+        }
+      ]
+    },
+    {
+      "label": "Selection",
+      "submenu": [
+        {
+          "label": "Select All",
+          "accelerator": "Ctrl+A",
+          "command": "grid:selectAll"
         }
       ]
     },

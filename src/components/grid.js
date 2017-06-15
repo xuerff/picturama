@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import RenderedCommands from './../rendered-commands';
 import keymapManager from './../keymap-manager';
 import Picture from './picture';
 
@@ -19,6 +20,7 @@ class Grid extends React.Component {
     super(props);
 
     this.pressedEnter = this.pressedEnter.bind(this);
+    this.state = { renderedCommands: new RenderedCommands('grid') };
   }
 
   handleFlagging() {
@@ -39,7 +41,8 @@ class Grid extends React.Component {
     window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
     window.addEventListener('grid:down', this.props.actions.moveHighlightDown);
     window.addEventListener('grid:enter', this.pressedEnter);
-    window.addEventListener('grid:selectAll', this.props.actions.highlightAll);
+
+    this.state.renderedCommands.mount(this.props.actions);
 
     keymapManager.bind(this.refs.grid);
   }
@@ -50,7 +53,8 @@ class Grid extends React.Component {
     window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);
     window.removeEventListener('grid:down', this.props.actions.moveHighlightDown);
     window.removeEventListener('grid:enter', this.pressedEnter);
-    window.removeEventListener('grid:selectAll', this.props.actions.highlightAll);
+
+    this.state.renderedCommands.unmount(this.props.actions);
 
     keymapManager.unbind();
   }
