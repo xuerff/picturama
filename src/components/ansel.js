@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as action from './../actions';
+import RenderedCommands from './../rendered-commands';
 
 import Header from './header';
 import Sidebar from './sidebar';
@@ -24,32 +25,15 @@ class Ansel extends React.Component {
 
     this.state = {
       showSidebar: true,
-      actions: bindActionCreators(action, this.props.dispatch)
+      actions: bindActionCreators(action, this.props.dispatch),
+      renderedCommands: new RenderedCommands()
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
-    this.quit = this.quit.bind(this);
   }
 
   handleDateFilter(date) {
     this.setState({ dateFilter: date });
-  }
-
-  quit() {
-    console.log('Quit app');
-    ipcRenderer.send('core:quit');
-  }
-
-  scan() {
-    console.log('scan');
-    ipcRenderer.send('core:scan');
-  }
-
-  dispatchCommand(e, command) {
-    const event = document.createEvent("HTMLEvents");
-
-    event.initEvent(command, true, true);
-    window.dispatchEvent(event);
   }
 
   componentDidUpdate() {
@@ -75,17 +59,12 @@ class Ansel extends React.Component {
     ipcRenderer.on('add-device', this.state.actions.addDevice);
     ipcRenderer.on('remove-device', this.state.actions.removeDevice);
     ipcRenderer.on('photos-trashed', this.state.actions.removePhotos);
-    ipcRenderer.on('dispatch-command', this.dispatchCommand);
 
-    window.addEventListener('core:toggleSidebar', this.toggleSidebar);
-    window.addEventListener('core:quit', this.quit);
-    window.addEventListener('core:scan', this.scan);
+    this.state.renderedCommands.mount({ toggleSidebar: this.toggleSidebar });
   }
 
   componentWillUnmount() {
-    window.removeEventListener('core:toggleSidebar', this.toggleSidebar);
-    window.removeEventListener('core:quit', this.quit);
-    window.removeEventListener('core:scan', this.scan);
+    this.state.renderedCommands.unmount({ toggleSidebar: this.toggleSidebar });
   }
 
   toggleSidebar() {
