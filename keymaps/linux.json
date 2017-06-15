@@ -1,7 +1,9 @@
 {
   "body": {
     "tab": "core:toggleSidebar",
-    "escape": "core:cancel"
+    "escape": "core:cancel",
+    "ctrl-q": "core:quit",
+    "ctrl-r": "core:scan"
   },
   ".grid": {
     "up": "grid:up",

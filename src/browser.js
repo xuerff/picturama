@@ -11,6 +11,7 @@ import MainMenu from './main-menu';
 import Usb from './usb';
 import config from './config';
 import Watch from './watch';
+import MainCommands from './main-commands';
 
 const initLibrary = mainWindow => {
   const knex = require('knex')(config.knex);
@@ -21,6 +22,8 @@ const initLibrary = mainWindow => {
     let watcher = new Watch(mainWindow);
 
     new MainMenu(mainWindow, library);
+    new MainCommands(mainWindow, library);
+
     watcher.watch();
   });
 };

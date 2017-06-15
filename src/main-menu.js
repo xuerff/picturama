@@ -11,9 +11,7 @@ class MainMenu {
     this.library = library;
 
     this.render = this.render.bind(this);
-    this.scan = this.scan.bind(this);
     this.scanForTags = this.scanForTags.bind(this);
-    this.close = this.close.bind(this);
     this.reload = this.reload.bind(this);
     this.fullscreen = this.fullscreen.bind(this);
     this.toggleDevTools = this.toggleDevTools.bind(this);
@@ -49,20 +47,11 @@ class MainMenu {
   }
 
   bindCommand(command) {
-    console.log(command);
     this.mainWindow.webContents.send('dispatch-command', command);
-  }
-
-  scan() {
-    this.library.scan();
   }
 
   scanForTags() {
     this.library.scanForTags();
-  }
-
-  close() {
-    this.mainWindow.close();
   }
 
   reload() {

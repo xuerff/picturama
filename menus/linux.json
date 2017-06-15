@@ -12,7 +12,7 @@
         {
           "label": "Scan",
           "accelerator": "Ctrl+R",
-          "click": "scan"
+          "command": "core:scan"
         },
         {
           "label": "Close",

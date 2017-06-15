@@ -37,6 +37,12 @@ class Ansel extends React.Component {
 
   quit() {
     console.log('Quit app');
+    ipcRenderer.send('core:quit');
+  }
+
+  scan() {
+    console.log('scan');
+    ipcRenderer.send('core:scan');
   }
 
   dispatchCommand(e, command) {
@@ -73,11 +79,13 @@ class Ansel extends React.Component {
 
     window.addEventListener('core:toggleSidebar', this.toggleSidebar);
     window.addEventListener('core:quit', this.quit);
+    window.addEventListener('core:scan', this.scan);
   }
 
   componentWillUnmount() {
     window.removeEventListener('core:toggleSidebar', this.toggleSidebar);
     window.removeEventListener('core:quit', this.quit);
+    window.removeEventListener('core:scan', this.scan);
   }
 
   toggleSidebar() {
