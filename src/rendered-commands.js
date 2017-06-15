@@ -8,7 +8,12 @@ const selectors = {
     'core:toggleSidebar': 'toggleSidebar'
   },
   grid: {
-    'grid:selectAll': 'highlightAll'
+    'grid:selectAll': 'highlightAll',
+    'grid:left': 'moveHighlightLeft',
+    'grid:right': 'moveHighlightRight',
+    'grid:up': 'moveHighlightUp',
+    'grid:down': 'moveHighlightDown',
+    'grid:enter': 'pressedEnter'
   }
 };
 

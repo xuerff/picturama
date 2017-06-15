@@ -36,25 +36,17 @@ class Grid extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('grid:left', this.props.actions.moveHighlightLeft);
-    window.addEventListener('grid:right', this.props.actions.moveHighlightRight);
-    window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
-    window.addEventListener('grid:down', this.props.actions.moveHighlightDown);
-    window.addEventListener('grid:enter', this.pressedEnter);
-
-    this.state.renderedCommands.mount(this.props.actions);
+    this.state.renderedCommands.mount(Object.assign({}, this.props.actions, {
+      pressedEnter: this.pressedEnter
+    }));
 
     keymapManager.bind(this.refs.grid);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('grid:left', this.props.actions.moveHighlightLeft);
-    window.removeEventListener('grid:right', this.props.actions.moveHighlightRight);
-    window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);
-    window.removeEventListener('grid:down', this.props.actions.moveHighlightDown);
-    window.removeEventListener('grid:enter', this.pressedEnter);
-
-    this.state.renderedCommands.unmount(this.props.actions);
+    this.state.renderedCommands.unmount(Object.assign({}, this.props.actions, {
+      pressedEnter: this.pressedEnter
+    }));
 
     keymapManager.unbind();
   }
