@@ -11,7 +11,6 @@ class MainMenu {
     this.library = library;
 
     this.render = this.render.bind(this);
-    //this.scanForTags = this.scanForTags.bind(this);
     this.reload = this.reload.bind(this);
     this.fullscreen = this.fullscreen.bind(this);
     this.toggleDevTools = this.toggleDevTools.bind(this);

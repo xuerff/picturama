@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import React from 'react';
 import Loader from 'react-loader';
 
+import RenderedCommands from './../rendered-commands';
 import keymapManager from './../keymap-manager';
 import createVersionAndOpenWith from './../create-version';
 import AvailableEditors from './../available-editors';
@@ -32,7 +33,12 @@ export default class PictureDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { binded: false, modal: 'none', loaded: false };
+    this.state = {
+      binded: false,
+      modal: 'none',
+      loaded: false,
+      renderedCommands: new RenderedCommands('detail')
+    };
 
     this.contextMenu = this.contextMenu.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
@@ -130,20 +136,14 @@ export default class PictureDetail extends React.Component {
 
     availableEditors.editors.forEach(this.addEditorMenu);
 
-    window.addEventListener('core:cancel', this.cancelEvent);
-    window.addEventListener('detail:diff', this.toggleDiff);
-    window.addEventListener('detail:flag', this.props.toggleFlag);
-    window.addEventListener('detail:moveToTrash', this.moveToTrash);
-
-    window.addEventListener(
-      'detail:moveLeft',
-      this.props.actions.setCurrentLeft
-    );
-
-    window.addEventListener(
-      'detail:moveRight',
-      this.props.actions.setCurrentRight
-    );
+    this.state.renderedCommands.mount({
+      cancelEvent: this.cancelEvent,
+      toggleDiff: this.toggleDiff,
+      toggleFlag: this.props.toggleFlag,
+      moveToTrash: this.moveToTrash,
+      setCurrentLeft: this.props.actions.setCurrentLeft,
+      setCurrentRight: this.props.actions.setCurrentRight,
+    });
 
     keymapManager.bind(this.refs.detail);
     this.bindEventListeners();
@@ -163,20 +163,14 @@ export default class PictureDetail extends React.Component {
   componentWillUnmount() {
     this.unbindEventListeners();
 
-    window.removeEventListener('core:cancel', this.cancelEvent);
-    window.removeEventListener('detail:diff', this.toggleDiff);
-    window.removeEventListener('detail:flag', this.props.toggleFlag);
-    window.removeEventListener('detail:moveToTrash', this.moveToTrash);
-
-    window.removeEventListener(
-      'detail:moveLeft',
-      this.props.actions.setCurrentLeft
-    );
-
-    window.removeEventListener(
-      'detail:moveRight',
-      this.props.actions.setCurrentRight
-    );
+    this.state.renderedCommands.unmount({
+      cancelEvent: this.cancelEvent,
+      toggleDiff: this.toggleDiff,
+      toggleFlag: this.props.toggleFlag,
+      moveToTrash: this.moveToTrash,
+      setCurrentLeft: this.props.actions.setCurrentLeft,
+      setCurrentRight: this.props.actions.setCurrentRight,
+    });
 
     keymapManager.unbind();
     delete this.menu;

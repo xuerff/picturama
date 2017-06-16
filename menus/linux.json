@@ -49,9 +49,8 @@
       "label": "Tags",
       "submenu": [{
         "label": "Add tags",
-        "accelerator": "Ctrl+T",
         "enabled": false,
-        "click": "addTags"
+        "command": "grid:addTags"
       },
       {
         "label": "Scan for tags",

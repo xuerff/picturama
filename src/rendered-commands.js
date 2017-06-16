@@ -14,6 +14,14 @@ const selectors = {
     'grid:up': 'moveHighlightUp',
     'grid:down': 'moveHighlightDown',
     'grid:enter': 'pressedEnter'
+  },
+  detail: {
+    'detail:cancel': 'cancelEvent',
+    'detail:diff': 'toggleDiff',
+    'detail:flag': 'toggleFlag',
+    'detail:moveToTrash': 'moveToTrash',
+    'detail:moveLeft': 'setCurrentLeft',
+    'detail:moveRight': 'setCurrentRight'
   }
 };
 

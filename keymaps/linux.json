@@ -19,7 +19,9 @@
     "p": "detail:flag",
     "delete": "detail:moveToTrash",
     "left": "detail:moveLeft",
-    "right": "detail:moveRight"
+    "right": "detail:moveRight",
+    "ctrl-t": "detail:addTags",
+    "escape": "detail:cancel"
   },
   ".picture-diff": {
     "y": "diff:cancel"
