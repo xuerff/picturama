@@ -29,7 +29,7 @@ const Version = anselBookshelf.Model.extend({
           model.get('version')
         ].join('-');
 
-        if (model.get('type') === 'RAW') {
+        if (model.get('type') !== 'RAW') {
           let fileNamePath = `${config.tmp}/${fileName}.${photo.extension}`;
 
           model.set('master', fileNamePath);
