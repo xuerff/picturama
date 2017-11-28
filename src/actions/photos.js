@@ -36,7 +36,7 @@ export const moveToTrash = photo => dispatch => {
   new Photo({ id: photo.id })
     .save('trashed', true, { patch: true })
     .then(() => new Photo({ id: photo.id })
-        .fetch({ withRelated: [ 'versions', 'tags' ] })
+      .fetch({ withRelated: [ 'versions', 'tags' ] })
     )
     .then(photoModel => {
       dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() });

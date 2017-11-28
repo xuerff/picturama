@@ -64,7 +64,7 @@ class Grid extends React.Component {
             actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
             setExport={this.props.setExport} />
-          )
+        )
         }
       </div>
     );

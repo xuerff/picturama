@@ -58,7 +58,7 @@ class Header extends React.Component {
               className="button">
               <i className="fa fa-trash" aria-hidden="true"></i>
             </button>
-          : null}
+            : null}
           <button
             className={btnClass}
             onClick={this.toggleFlagged.bind(this)}>

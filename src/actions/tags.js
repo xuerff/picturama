@@ -36,9 +36,9 @@ export const createTagsAndAssociateToPhoto = (tags, photoId) => dispatch => {
         return new Tag({ title: tagName }).save();
       })
       .then(tag => tag
-          .photos()
-          .attach(photo)
-          .then(() => tag.toJSON())
+        .photos()
+        .attach(photo)
+        .then(() => tag.toJSON())
       )
     ))
     .then(tags => {

@@ -128,20 +128,20 @@ class Library extends React.Component {
 
     else if (this.props.current === -1) {
       currentView = <Grid
-                      actions={this.props.actions}
-                      setScrollTop={this.props.setScrollTop}
-                      setExport={this.handleExport}
-                      photos={this.props.photos}/>;
+        actions={this.props.actions}
+        setScrollTop={this.props.setScrollTop}
+        setExport={this.handleExport}
+        photos={this.props.photos}/>;
     } else if (this.props.diff) {
       currentView = <PictureDiff
-                      actions={this.props.actions}
-                      photo={this.props.photos[this.props.current]} />;
+        actions={this.props.actions}
+        photo={this.props.photos[this.props.current]} />;
     } else {
       currentView = <PictureDetail
-                      photo={this.props.photos[this.props.current]}
-                      actions={this.props.actions}
-                      toggleFlag={this.handleFlag.bind(this)}
-                      isLast={this.isLast.bind(this)} />;
+        photo={this.props.photos[this.props.current]}
+        actions={this.props.actions}
+        toggleFlag={this.handleFlag.bind(this)}
+        isLast={this.isLast.bind(this)} />;
     }
 
     return (

@@ -15,8 +15,8 @@ let walker = (dirName, blacklist) => {
     return fsStat(path)
       .then(stat => stat.isDirectory() ? walker(path, blacklist) : path);
   })
-  .filter(a => a)
-  .reduce((a, b) => a.concat(b), []);
+    .filter(a => a)
+    .reduce((a, b) => a.concat(b), []);
 };
 
 export default walker;

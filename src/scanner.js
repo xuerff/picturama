@@ -21,12 +21,12 @@ const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
 
 const extract = new RegExp(
-  '([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$',
+  '([^/]+).(' + config.acceptedRawFormats.join('|') + ')$',
   'i'
 );
 
 const extractImg = new RegExp(
-  '([^\/]+)\.(' + config.acceptedImgFormats.join('|') + ')$',
+  '([^/]+).(' + config.acceptedImgFormats.join('|') + ')$',
   'i'
 );
 
@@ -55,12 +55,12 @@ export default class Scanner {
     let rawFiles = filePaths.map(filePath =>
       filePath.match(allowed) ? filePath : null
     )
-    .filter(filePath => filePath);
+      .filter(filePath => filePath);
 
     let imgFiles = filePaths.map(filePath =>
       filePath.match(allowedImg) ? filePath : null
     )
-    .filter(filePath => filePath);
+      .filter(filePath => filePath);
 
     let preparedFiles = rawFiles.map(rawFile => {
       let filename = rawFile.match(extract)[1];
@@ -153,7 +153,7 @@ export default class Scanner {
               thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
               thumb: `${config.thumbsPath}/${file.name}.thumb.${config.workExt}`
             })
-            .save();
+              .save();
           })
           .then(photo => this.populateTags(photo, xmp.tags));
       })
@@ -199,16 +199,16 @@ export default class Scanner {
               thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
               thumb: file.path
             })
-            .save()
+              .save()
           )
           .then(photo => this.populateTags(photo, xmp.tags));
       }
     )
-    .then(this.onImportedStep.bind(this))
-    .catch(err => {
-      console.error('err', err);
-      return false;
-    });
+      .then(this.onImportedStep.bind(this))
+      .catch(err => {
+        console.error('err', err);
+        return false;
+      });
   }
 
   populateTags(photo, tags) {
@@ -221,7 +221,7 @@ export default class Scanner {
           )
           .then(tag => tag.photos().attach(photo))
       )
-      .then(() => photo);
+        .then(() => photo);
     }
 
     return photo;

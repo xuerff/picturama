@@ -9,7 +9,7 @@ const processTags = (prevTags, nextTags) => {
 
     return !exists ? nextTag : null;
   })
-  .filter(tag => tag);
+    .filter(tag => tag);
 
   return tags.length > 0 ? prevTags.concat(tags) : [];
 };

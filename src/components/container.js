@@ -58,8 +58,8 @@ class Container extends React.Component {
       <div id="container" ref="container" className={containerClass}>
         {content}
         {this.props.current === -1 && this.props.settingsExists ?
-            <BottomBar actions={this.props.actions} />
-        : ''}
+          <BottomBar actions={this.props.actions} />
+          : ''}
       </div>
     );
   }

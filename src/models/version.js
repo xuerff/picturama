@@ -62,7 +62,7 @@ const Version = anselBookshelf.Model.extend({
       .quality(100)
       .toFile(thumbPathName)
       .then(() => Version.where({ photo_id: data[2], version: data[3] })
-          .fetch()
+        .fetch()
       )
       .then(version => {
         if (version) {

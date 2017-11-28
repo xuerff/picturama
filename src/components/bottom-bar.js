@@ -16,12 +16,12 @@ class BottomBar extends React.Component {
           <span className="selection">
             <span>{this.props.highlighted.length} selected</span>
             {this.props.highlighted.length > 0 ?
-                <button
-                  className="deselect-all"
-                  onClick={this.props.actions.clearHighlight}>
-                  Deselect all
-                </button>
-            : ''}
+              <button
+                className="deselect-all"
+                onClick={this.props.actions.clearHighlight}>
+                Deselect all
+              </button>
+              : ''}
           </span>
           <span className="total">
             {this.props.photosCount} item{this.props.photosCount > 1 ? 's' : ''}

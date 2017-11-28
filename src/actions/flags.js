@@ -46,16 +46,16 @@ export const flagSet = (photos, flaggedPhotos, flag) => dispatch => {
     new Photo({ id: photo.id })
       .save('flag', flag, { patch: true })
   )
-  .then(() => photos)
-  .map(photo => new Photo({ id: photo.id })
+    .then(() => photos)
+    .map(photo => new Photo({ id: photo.id })
       .where({ trashed: 0 })
       .fetch({ withRelated: [ 'versions', 'tags' ] })
       .then(photo => photo.toJSON())
-  )
-  .then(photos => {
-    dispatch({
-      type: 'GET_PHOTOS_SUCCESS',
-      photos: photos
+    )
+    .then(photos => {
+      dispatch({
+        type: 'GET_PHOTOS_SUCCESS',
+        photos: photos
+      });
     });
-  });
 };

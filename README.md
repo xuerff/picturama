@@ -41,6 +41,16 @@ npm install
 gulp
 ```
 
+### Run
+
+**Important: Due to an issue regarding sharp & electron, you must set LD_PRELOAD value before npm start**
+
+replace `/code/ansel/` with the path to your local installation.
+
+```
+LD_PRELOAD="$HOME/code/ansel/node_modules/sharp/vendor/lib/libz.so" npm start
+```
+
 ## Supported cameras
 
 - [x] Fuji X100
