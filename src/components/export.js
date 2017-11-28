@@ -61,7 +61,7 @@ class Export extends React.Component {
     return sharp(source)
       .rotate()
       .withMetadata()
-      .quality(this.state.quality)
+      //.webp({ quality: this.state.quality })
       .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`);
   }
 

@@ -59,7 +59,7 @@ const Version = anselBookshelf.Model.extend({
     return sharp(data.input)
       .resize(250, 250)
       .max()
-      .quality(100)
+      .webp({ quality: 100 })
       .toFile(thumbPathName)
       .then(() => Version.where({ photo_id: data[2], version: data[3] })
         .fetch()

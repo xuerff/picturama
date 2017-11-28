@@ -97,6 +97,7 @@ export default class Scanner {
   }
 
   walk(file) {
+    console.log('file', file);
     if (file.isRaw)
       return this.importRaw(file);
 
@@ -126,7 +127,7 @@ export default class Scanner {
         sharp(`${config.thumbsPath}/${file.name}.thumb.${config.workExt}`)
           .resize(250, 250)
           .max()
-          .quality(100)
+          .webp({ quality: 100 })
           .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`)
       )
       .then(() => exGetImgTags(file.path).then(metadata.processData))
@@ -168,7 +169,7 @@ export default class Scanner {
       sharp(file.path)
         .resize(250, 250)
         .max()
-        .quality(100)
+        .webp({ quality: 100 })
         .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`),
       exGetImgTags(file.path).then(metadata.processData),
       (img, xmp) => {
