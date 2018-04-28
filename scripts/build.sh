@@ -28,15 +28,15 @@ npm dedupe
 
 cp -r $ANSEL_PATH/node_modules/libraw $PREPARED_PATH/node_modules
 cp -r $ANSEL_PATH/node_modules/sharp $PREPARED_PATH/node_modules
-# cp -r $ANSEL_PATH/node_modules/udev $PREPARED_PATH/node_modules
-cp -r $ANSEL_PATH/node_modules/exiv2 $PREPARED_PATH/node_modules
+#cp -r $ANSEL_PATH/node_modules/udev $PREPARED_PATH/node_modules
+#cp -r $ANSEL_PATH/node_modules/exiv2 $PREPARED_PATH/node_modules
 cp -r $ANSEL_PATH/node_modules/sqlite3 $PREPARED_PATH/node_modules
 
 # Trimming fat
 rm -r $PREPARED_PATH/node_modules/sharp/docs
 rm -r $PREPARED_PATH/node_modules/sharp/src
-rm -r $PREPARED_PATH/node_modules/exiv2/examples
-rm -r $PREPARED_PATH/node_modules/exiv2/test
+#rm -r $PREPARED_PATH/node_modules/exiv2/examples
+#rm -r $PREPARED_PATH/node_modules/exiv2/test
 rm -r $PREPARED_PATH/node_modules/sqlite3/src
 rm -r $PREPARED_PATH/node_modules/react/dist
 rm -r $PREPARED_PATH/node_modules/bookshelf/test

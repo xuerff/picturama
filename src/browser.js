@@ -31,7 +31,6 @@ if (!fs.existsSync(config.dotAnsel))
   fs.mkdirSync(config.dotAnsel);
 
 
-
 app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin')
   app.quit();

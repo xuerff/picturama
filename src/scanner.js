@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import libraw from 'libraw';
 import fs from 'fs';
-import exiv2 from 'exiv2';
+//import exiv2 from 'exiv2';
 import moment from 'moment';
 import Promise from 'bluebird';
 
@@ -15,7 +15,8 @@ import Photo from './models/photo';
 import Tag from './models/tag';
 
 const readFile = Promise.promisify(fs.readFile);
-const exGetImgTags = Promise.promisify(exiv2.getImageTags);
+//const exGetImgTags = Promise.promisify(exiv2.getImageTags);
+const exGetImgTags = filePath => Promise.resolve({})
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');

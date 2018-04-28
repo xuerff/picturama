@@ -60,7 +60,6 @@ gulp
 - [Bookshelf.js](http://bookshelfjs.org/) / [Knex.js](http://knexjs.org/)
 - [Bluebird.js](http://bluebirdjs.com/)
 - [Chokidar](https://github.com/paulmillr/chokidar)
-- [Exiv2](http://www.exiv2.org) - [node bindings](https://github.com/dberesford/exiv2node)
 - [Libraw](http://www.libraw.org/) - [node bindings](https://github.com/m0g/node-libraw)
 - [Moment.js](http://momentjs.com/)
 - [Font Awesome](http://fontawesome.io/)

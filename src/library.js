@@ -3,7 +3,7 @@ import moment from 'moment';
 import notifier from 'node-notifier';
 import fs from 'fs';
 import Promise from 'bluebird';
-import exiv2 from 'exiv2';
+//import exiv2 from 'exiv2';
 
 import Scanner from './scanner';
 import config from './config';
@@ -15,7 +15,8 @@ import Tag from './models/tag';
 import Photo from './models/photo';
 import Version from './models/version';
 
-const exGetImgTags = Promise.promisify(exiv2.getImageTags);
+//const exGetImgTags = Promise.promisify(exiv2.getImageTags);
+const exGetImgTags = filePath => Promise.resolve({})
 
 class Library {
 
