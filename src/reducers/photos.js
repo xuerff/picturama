@@ -11,9 +11,11 @@ export default function reducers(state, action) {
       splashed: true,
       currentDate: action.hasOwnProperty('date') ? action.date : state.currentDate,
       currentTag: action.hasOwnProperty('tagId') ? action.tagId : state.currentTag,
+      photosCount: action.count || action.photos.length,
       showOnlyFlagged: action.hasOwnProperty('showOnlyFlagged') ? action.showOnlyFlagged : state.showOnlyFlagged,
       route: action.route || '',
-      photos: action.photos.map((photo) => {
+      highlighted: [],
+      photos: action.photos.map(photo => {
         photo.versionNumber = 1;
 
         if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {

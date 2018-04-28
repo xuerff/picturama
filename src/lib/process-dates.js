@@ -1,18 +1,18 @@
 export default function processDates(data) {
   let dates = { years: [] };
 
-  data.forEach((date) => {
+  data.forEach(date => {
     let [ year, month ] = date.date.split('-');
 
     // Year
-    if (dates.years.length === 0) {
+    if (dates.years.length === 0)
       dates.years.push({ id: year, months: [] });
 
-    } else {
+    else {
       let foundYear = false;
 
-      dates.years.forEach((dateYear) => {
-        if (dateYear.id == year)
+      dates.years.forEach(dateYear => {
+        if (dateYear.id === year)
           foundYear = true;
       });
 
@@ -21,16 +21,16 @@ export default function processDates(data) {
     }
 
     // Month
-    dates.years = dates.years.map((dateYear) => {
-      if (dateYear.id == year) {
-        if (dateYear.months.length === 0) {
+    dates.years = dates.years.map(dateYear => {
+      if (dateYear.id === year) {
+        if (dateYear.months.length === 0)
           dateYear.months.push({ id: month, days: [] });
 
-        } else {
+        else {
           let foundMonth = false;
 
-          dateYear.months.forEach((dateMonth) => {
-            if (dateMonth.id == month)
+          dateYear.months.forEach(dateMonth => {
+            if (dateMonth.id === month)
               foundMonth = true;
           });
 
@@ -43,14 +43,15 @@ export default function processDates(data) {
     });
 
     // Day
-    dates.years = dates.years.map((dateYear) => {
-      if (dateYear.id == year)
-        dateYear.months.map((dateMonth) => {
-          if (dateMonth.id == month)
+    dates.years = dates.years.map(dateYear => {
+      if (dateYear.id === year) {
+        dateYear.months.map(dateMonth => {
+          if (dateMonth.id === month)
             dateMonth.days.push({ id: date.date });
 
           return dateMonth;
         });
+      }
 
       return dateYear;
     });

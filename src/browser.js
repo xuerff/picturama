@@ -12,7 +12,7 @@ import MainMenu from './main-menu';
 import config from './config';
 import Watch from './watch';
 
-const initLibrary = (mainWindow) => {
+const initLibrary = mainWindow => {
   const knex = require('knex')(config.knex);
   const Library = require('./library').default;
 
@@ -25,7 +25,7 @@ const initLibrary = (mainWindow) => {
   });
 };
 
-var mainWindow = null;
+let mainWindow = null;
 
 if (!fs.existsSync(config.dotAnsel))
   fs.mkdirSync(config.dotAnsel);
@@ -33,7 +33,7 @@ if (!fs.existsSync(config.dotAnsel))
 
 
 app.on('window-all-closed', () => {
-  // if (process.platform != 'darwin')
+  // if (process.platform !== 'darwin')
   app.quit();
 });
 
@@ -62,28 +62,27 @@ app.on('ready', () => {
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
   else {
-    var knex = require('knex')(config.knex);
+    const knex = require('knex')(config.knex);
 
-    if (!fs.existsSync(config.dbFile))
-      knex.migrate.latest().finally(() => {
-        return knex.destroy(); //works
-      });
+    if (!fs.existsSync(config.dbFile)) {
+      knex.migrate.latest().finally(() =>
+        knex.destroy() // works
+      );
+    }
   }
 
-  // let usb = new Usb();
-
-  // usb.scan((err, drives) => {
-  //   mainWindow.webContents.send('scanned-devices', drives);
-  // });
+  //let usb = new Usb();
   //
-  // usb.watch((err, action, drive) => {
-  //   console.log('new drive', action, drive);
+  //usb.scan((err, drives) => {
+  //  mainWindow.webContents.send('scanned-devices', drives);
+  //});
   //
-  //   if (action == 'add')
-  //     mainWindow.webContents.send('add-device', drive);
-  //   else
-  //     mainWindow.webContents.send('remove-device', drive);
-  // });
+  //usb.watch((err, action, drive) => {
+  //  if (action === 'add')
+  //    mainWindow.webContents.send('add-device', drive);
+  //  else
+  //    mainWindow.webContents.send('remove-device', drive);
+  //});
 
   ipcMain.on('settings-created', () => initLibrary(mainWindow));
 

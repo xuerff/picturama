@@ -1,14 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class TagButton extends React.Component {
   static propTypes = {
-    tag: React.PropTypes.object.isRequired,
-    className: React.PropTypes.string.isRequired,
-    setTag: React.PropTypes.func.isRequired
-  }
-
-  constructor(props) {
-    super(props);
+    tag: PropTypes.object.isRequired,
+    className: PropTypes.string.isRequired,
+    setTag: PropTypes.func.isRequired
   }
 
   handleClick() {

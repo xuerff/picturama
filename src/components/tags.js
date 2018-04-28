@@ -1,14 +1,15 @@
 import classNames from 'classnames';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import TagButton from './tag-button';
 
 class Tags extends React.Component {
   static propTypes = {
-    tags: React.PropTypes.array.isRequired,
-    currentTag: React.PropTypes.number,
-    actions: React.PropTypes.object.isRequired
+    tags: PropTypes.array.isRequired,
+    currentTag: PropTypes.number,
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -23,6 +24,7 @@ class Tags extends React.Component {
 
   appendTags(data) {
     let state = this.state;
+
     state.tags = data.tags;
     this.setState(state);
   }
@@ -34,17 +36,16 @@ class Tags extends React.Component {
       <div className="tags">
         <h3><i className="fa fa-tags"></i> Tags</h3>
         <ul>
-          {(this.props.tags.length > 0) ? this.props.tags.map(tag =>
-            <TagButton 
+          {this.props.tags.length > 0 ? this.props.tags.map(tag =>
+            <TagButton
               setTag={() => this.props.actions.setTagFilter(tag)}
-              className={classNames({ 'active': tag.id == currentTag })}
+              className={classNames({ active: tag.id === currentTag })}
               key={tag.id}
               tag={tag} />
           ) : ''}
         </ul>
       </div>
     );
-
   }
 }
 

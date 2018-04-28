@@ -2,7 +2,7 @@ const rmDevice = (devices, rmDevice) => {
   let pos = -1;
 
   devices.forEach((device, index) => {
-    if (device.id == rmDevice.id)
+    if (device.id === rmDevice.id)
       pos = index;
   });
 

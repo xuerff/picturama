@@ -4,7 +4,7 @@ import anselBookshelf from './ansel-bookshelf';
 
 import Photo from './photo';
 
-var Tag = anselBookshelf.Model.extend({
+export default anselBookshelf.Model.extend({
   tableName: 'tags',
 
   photos: function() {
@@ -12,12 +12,11 @@ var Tag = anselBookshelf.Model.extend({
   },
 
   initialize: function() {
-    this.on('creating', (model) => {
+    this.on('creating', model => {
       let sluggedTitle = slug(model.get('title'));
+
       model.set('slug', sluggedTitle);
     });
   }
 
 });
-
-export default Tag;

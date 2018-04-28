@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import DateYear from './date-year';
 
 class Dates extends React.Component {
   static propTypes = {
-    dates: React.PropTypes.object.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string
+    dates: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
+    currentDate: PropTypes.string
   }
 
   constructor(props) {
@@ -22,24 +23,24 @@ class Dates extends React.Component {
 
   handleDate(date) {
     let state = this.state;
+
     state.currentDate = date;
     this.setState(state);
   }
 
   render() {
-    var dateYearsList = [];
+    let dateYearsList = [];
 
-    if (this.props.dates.years)
-      dateYearsList = this.props.dates.years.map((year) => {
-        return (
-          <DateYear
-            actions={this.props.actions}
-            year={year}
-            key={year.id}
-            currentDate={this.props.currentDate}
-            setDate={this.handleDate.bind(this)} />
-        );
-      });
+    if (this.props.dates.years) {
+      dateYearsList = this.props.dates.years.map(year =>
+        <DateYear
+          actions={this.props.actions}
+          year={year}
+          key={year.id}
+          currentDate={this.props.currentDate}
+          setDate={this.handleDate.bind(this)} />
+      );
+    }
 
     return (
       <div className="dates">

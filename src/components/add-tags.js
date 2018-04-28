@@ -1,13 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TagsInput from 'react-tagsinput';
+
+const btnClass = 'button button--raised button--colored';
 
 export default class AddTags extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    closeTagDialog: React.PropTypes.func.isRequired,
-    photo: React.PropTypes.object.isRequired,
-    tags: React.PropTypes.array.isRequired,
-    id: React.PropTypes.string.isRequired
+    actions: PropTypes.object.isRequired,
+    closeTagDialog: PropTypes.func.isRequired,
+    photo: PropTypes.object.isRequired,
+    tags: PropTypes.array.isRequired,
+    id: PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -16,7 +19,7 @@ export default class AddTags extends React.Component {
     let tags = [];
 
     if (this.props.photo.tags.length > 0)
-      tags = this.props.photo.tags.map((tag) => tag.title);
+      tags = this.props.photo.tags.map(tag => tag.title);
 
     this.state = { tags: tags };
 
@@ -36,21 +39,20 @@ export default class AddTags extends React.Component {
 
   handleChange(tags) {
     let state = this.state;
+
     state.tags = tags;
     this.setState(state);
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    let tags = this.state.tags.map((tag) => tag.trim());
+    let tags = this.state.tags.map(tag => tag.trim());
 
     this.props.actions.createTagsAndAssociateToPhoto(tags, this.props.photo.id);
     this.props.closeTagDialog();
   }
 
   render() {
-    var btnClass = 'button button--raised button--colored';
-
     return (
       <div className="outer-modal" id="add-tags">
         <div className="modal shadow--2dp">

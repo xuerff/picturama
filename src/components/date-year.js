@@ -1,13 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import DateMonth from './date-month';
 
 export default class DateYear extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired,
-    setDate: React.PropTypes.func.isRequired,
-    year: React.PropTypes.object.isRequired,
-    currentDate: React.PropTypes.string
+    actions: PropTypes.object.isRequired,
+    setDate: PropTypes.func.isRequired,
+    year: PropTypes.object.isRequired,
+    currentDate: PropTypes.string
   }
 
   constructor(props) {
@@ -26,29 +27,27 @@ export default class DateYear extends React.Component {
 
   toggleDropdown() {
     this.setState({
-      showDropdown: (!this.state.showDropdown)
+      showDropdown: !this.state.showDropdown
     });
   }
 
   getClasses() {
-    return (this.state.showDropdown) ? '' : 'hide';
+    return this.state.showDropdown ? '' : 'hide';
   }
 
   getBtnClasses() {
-    return 'fa ' + ((this.state.showDropdown) ? 'fa-angle-down' : 'fa-angle-right');
+    return 'fa ' + (this.state.showDropdown ? 'fa-angle-down' : 'fa-angle-right');
   }
 
   render() {
-    let dateMonthsList = this.props.year.months.map((month) => {
-      return (
-        <DateMonth
-          actions={this.props.actions}
-          setDate={this.handleDate.bind(this)}
-          currentDate={this.props.currentDate}
-          key={this.props.year.id+month.id}
-          month={month} />
-      );
-    });
+    let dateMonthsList = this.props.year.months.map(month =>
+      <DateMonth
+        actions={this.props.actions}
+        setDate={this.handleDate.bind(this)}
+        currentDate={this.props.currentDate}
+        key={this.props.year.id + month.id}
+        month={month} />
+    );
 
     return (
       <li>

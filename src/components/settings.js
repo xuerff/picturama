@@ -1,6 +1,7 @@
-import {remote, ipcRenderer} from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import fs from 'fs';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import config from '../config';
 
@@ -10,7 +11,7 @@ const dialog = remote.dialog;
 
 class Settings extends React.Component {
   static propTypes = {
-    actions: React.PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -20,7 +21,6 @@ class Settings extends React.Component {
   }
 
   onPhotosFolderSelection(filenames) {
-    console.log('filenames', filenames);
     let state = this.state;
 
     state.directories.photos = filenames[0];
@@ -30,13 +30,12 @@ class Settings extends React.Component {
 
   openPhotosDialog() {
     dialog.showOpenDialog(
-      { properties: [ 'openDirectory' ]},
+      { properties: [ 'openDirectory' ] },
       this.onPhotosFolderSelection.bind(this)
     );
   }
 
   onVersionsFolderSelection(filenames) {
-    console.log('filenames', filenames);
     let state = this.state;
 
     state.directories.versions = filenames[0];
@@ -46,13 +45,14 @@ class Settings extends React.Component {
 
   openVersionsDialog() {
     dialog.showOpenDialog(
-      { properties: [ 'openDirectory' ]},
+      { properties: [ 'openDirectory' ] },
       this.onVersionsFolderSelection.bind(this)
     );
   }
 
   save() {
     let settings = JSON.stringify(this.state, null, 2);
+
     fs.writeFile(config.settings, settings, this.onSavedFile.bind(this));
   }
 
@@ -70,7 +70,8 @@ class Settings extends React.Component {
           <h1>Ansel</h1>
           <h2>Digital image organizer powered by the web</h2>
 
-          <p>Please select the main photos folder to scan from, as well as a versions folder in which we'll put the processed pictures.</p>
+          <p>Please select the main photos folder to scan from, as well as
+            a versions folder in which we&#39;ll put the processed pictures.</p>
 
           <p>
             <button id="photos-dir" onClick={this.openPhotosDialog.bind(this)}>

@@ -1,10 +1,11 @@
-import {remote} from 'electron';
+import { remote } from 'electron';
 import fs from 'fs';
 import Promise from 'bluebird';
 import notifier from 'node-notifier';
 import libraw from 'libraw';
 import sharp from 'sharp';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import config from './../config';
 import Progress from './progress';
@@ -13,9 +14,9 @@ const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   static propTypes = {
-    closeExportDialog: React.PropTypes.func.isRequired,
-    photos: React.PropTypes.array.isRequired,
-    actions: React.PropTypes.object.isRequired
+    closeExportDialog: PropTypes.func.isRequired,
+    photos: PropTypes.array.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -42,6 +43,7 @@ class Export extends React.Component {
 
   onFolderSelection(filenames) {
     let state = this.state;
+
     state.folder = filenames[0];
     this.setState(state);
   }
@@ -50,7 +52,7 @@ class Export extends React.Component {
     e.preventDefault();
 
     remote.dialog.showOpenDialog(
-      { properties: [ 'openDirectory' ]},
+      { properties: [ 'openDirectory' ] },
       this.onFolderSelection.bind(this)
     );
   }
@@ -65,8 +67,8 @@ class Export extends React.Component {
 
   afterExport() {
     notifier.notify({
-      'title': 'Ansel',
-      'message': `Finish exporting ${this.props.photos.length} photo(s)`
+      title: 'Ansel',
+      message: `Finish exporting ${this.props.photos.length} photo(s)`
     });
 
     this.props.closeExportDialog();
@@ -78,30 +80,29 @@ class Export extends React.Component {
     if (!this.state.folder)
       return false;
 
-    else {
-      this.props.actions.importProgress(null, {
-        processed: i+1,
-        total: this.props.photos.length,
-        photosDir: this.state.folder
-      });
+    this.props.actions.importProgress(null, {
+      processed: i + 1,
+      total: this.props.photos.length,
+      photosDir: this.state.folder
+    });
 
-      if (photo.versions.length > 0)
-        return this.processImg(photo, photo.thumb);
+    if (photo.versions.length > 0)
+      return this.processImg(photo, photo.thumb);
 
-      else if (config.acceptedRawFormats.indexOf(extension) != -1)
-        return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
-          .then((imgPath) => readFile(imgPath))
-          .then(img => this.processImg(photo, img));
-
-      else
-        return this.processImg(photo, photo.thumb);
+    if (config.acceptedRawFormats.indexOf(extension) !== -1) {
+      return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
+        .then(imgPath => readFile(imgPath))
+        .then(img => this.processImg(photo, img));
     }
+
+    return this.processImg(photo, photo.thumb);
   }
 
   handleSubmit(e) {
     e.preventDefault();
 
     let state = this.state;
+
     state.showProgress = true;
     this.setState(state);
 
@@ -111,20 +112,21 @@ class Export extends React.Component {
 
   updateQuality() {
     let state = this.state;
+
     state.quality = this.refs.quality.value;
     this.setState(state);
   }
 
   updateFormat() {
     let state = this.state;
+
     state.format = this.refs.format.value;
     this.setState(state);
   }
 
   render() {
-    let formats = config.exportFormats.map((exportFormat, i) => {
-      return <option key={i} value={exportFormat}>{exportFormat}</option>;
-    });
+    let formats = config.exportFormats
+      .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>);
 
     return (
       <div className="outer-modal">
@@ -133,9 +135,9 @@ class Export extends React.Component {
             <div>
               <label htmlFor="format">Format:</label>
 
-              <select 
-                id="format" 
-                ref="format" 
+              <select
+                id="format"
+                ref="format"
                 value={this.state.format}
                 onChange={this.updateFormat.bind(this)}>{formats}</select>
             </div>
@@ -144,11 +146,11 @@ class Export extends React.Component {
               <label htmlFor="quality">Quality</label>
 
               <input
-                type="range" 
-                id="quality" 
+                type="range"
+                id="quality"
                 ref="quality"
-                min="10" 
-                max="100" 
+                min="10"
+                max="100"
                 value={this.state.quality}
                 onChange={this.updateQuality.bind(this)}
                 step="1" />
@@ -167,7 +169,7 @@ class Export extends React.Component {
             <button>Save</button>
           </form>
 
-          {this.state.showProgress ? (<Progress />) : null}
+          {this.state.showProgress ? <Progress /> : null}
         </div>
       </div>
     );

@@ -1,58 +1,35 @@
-import { ipcRenderer } from 'electron';
 import React from 'react';
 import { connect } from 'react-redux';
-import classNames from 'classnames';
+import { ipcRenderer } from 'electron';
+import PropTypes from 'prop-types';
 
-import keymapManager from './../keymap-manager';
-import Picture from './picture';
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';
 import Export from './export';
 import ReadyToScan from './ready-to-scan';
+import Grid from './grid';
 
 class Library extends React.Component {
   static propTypes = {
-    setScrollTop: React.PropTypes.func.isRequired,
-    actions: React.PropTypes.object.isRequired,
-    current: React.PropTypes.number,
-    diff: React.PropTypes.bool.isRequired,
-    photos: React.PropTypes.array.isRequired
+    highlighted: PropTypes.array.isRequired,
+    setScrollTop: PropTypes.func.isRequired,
+    actions: PropTypes.object.isRequired,
+    current: PropTypes.number,
+    diff: PropTypes.bool.isRequired,
+    photos: PropTypes.array.isRequired
   }
 
   constructor(props) {
     super(props);
 
-    this.moveHighlightRight = this.moveHighlightRight.bind(this);
-    this.moveHighlightLeft = this.moveHighlightLeft.bind(this);
-    this.moveHighlightUp = this.moveHighlightUp.bind(this);
-    this.moveHighlightDown = this.moveHighlightDown.bind(this);
-    this.pressedEnter = this.pressedEnter.bind(this);
-    this.handleExport = this.handleExport.bind(this);
     this.bindEventListeners = this.bindEventListeners.bind(this);
     this.unbindEventListeners = this.unbindEventListeners.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
+    this.handleExport = this.handleExport.bind(this);
     this.activateExportAccelerator = this.activateExportAccelerator.bind(this);
     this.deactivateExportAccelerator = this.deactivateExportAccelerator.bind(this);
 
-    this.state = { highlighted: [], scrollTop: 0, modal: 'none' };
-  }
-
-  handleCurrent(current) {
-    let state = this.state;
-
-    this.props.actions.setCurrent(current);
-
-    if (this.props.current != -1)
-      state.scrollTop = this.node.parentNode.scrollTop;
-
-    this.setState(state);
-  }
-
-  handleFlagging() {
-    let flagSet = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
-
-    this.props.actions.flagSet(this.props.photos, flagSet, true);
+    this.state = { scrollTop: 0, modal: 'none' };
   }
 
   handleFlag() {
@@ -65,14 +42,9 @@ class Library extends React.Component {
 
     state.modal = 'export';
     state.photosToExport = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) != -1);
+      .filter((photo, i) => this.props.highlighted.indexOf(i) !== -1);
 
     this.setState(state);
-  }
-
-  pressedEnter() {
-    if (this.state.highlighted.length == 1)
-      this.handleCurrent(this.state.highlighted[0]);
   }
 
   activateExportAccelerator() {
@@ -88,13 +60,13 @@ class Library extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.current != -1 || this.state.modal != 'none')
+    if (this.props.current !== -1 || this.state.modal !== 'none')
       this.deactivateExportAccelerator();
 
-    else if (state.highlighted.length > 0)
+    else if (this.props.highlighted.length > 0)
       this.activateExportAccelerator();
 
-    if (this.props.current == -1 && state.scrollTop > 0) {
+    if (this.props.current === -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
       state.scrollTop = 0;
       this.setState(state);
@@ -102,167 +74,78 @@ class Library extends React.Component {
   }
 
   bindEventListeners() {
-    window.addEventListener('library:left', this.moveHighlightLeft);
-    window.addEventListener('library:right', this.moveHighlightRight);
-    window.addEventListener('library:up', this.moveHighlightUp);
-    window.addEventListener('library:down', this.moveHighlightDown);
-    window.addEventListener('library:enter', this.pressedEnter);
-
-    if (this.state.highlighted.length > 0)
+    if (this.props.highlighted.length > 0)
       this.activateExportAccelerator();
   }
 
   unbindEventListeners() {
-    window.removeEventListener('library:left', this.moveHighlightLeft);
-    window.removeEventListener('library:right', this.moveHighlightRight);
-    window.removeEventListener('library:up', this.moveHighlightUp);
-    window.removeEventListener('library:down', this.moveHighlightDown);
-    window.removeEventListener('library:enter', this.pressedEnter);
-
     this.deactivateExportAccelerator();
   }
 
   componentDidMount() {
     this.props.actions.getPhotos();
     this.bindEventListeners();
-
-    keymapManager.bind(this.refs.library);
   }
 
   componentWillUnmount() {
     this.unbindEventListeners();
-
-    keymapManager.unbind();
   }
 
   isLast() {
     let photos = this.props.photos;
 
-    if (photos.length == photos.indexOf(this.props.current) + 1)
+    if (photos.length === photos.indexOf(this.props.current) + 1)
       return true;
-    else if (photos.indexOf(this.props.current) == 0)
+
+    if (photos.indexOf(this.props.current) === 0)
       return true;
-    else
-      return false;
-  }
 
-  moveHighlightLeft() {
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-
-    if (currentPos-1 >= 0)
-      state.highlighted = [currentPos-1];
-
-    this.setState(state);
-  }
-
-  moveHighlightRight() {
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-
-    if (currentPos+1 < this.props.photos.length)
-      state.highlighted = [currentPos+1];
-
-    this.setState(state);
-  }
-
-  moveHighlightUp(e) {
-    e.preventDefault();
-
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-    let gridWidth = this.refs.library.getBoundingClientRect().width;
-    let elWidth = this.refs.library.children[0].getBoundingClientRect().width;
-    let jumpSize = gridWidth / elWidth;
-
-    if (currentPos - jumpSize > 0)
-      state.highlighted = [currentPos - jumpSize];
-
-    this.setState(state);
-  }
-
-  moveHighlightDown(e) {
-    e.preventDefault();
-
-    let state = this.state;
-    let currentPos = this.state.highlighted[0];
-    let gridWidth = this.refs.library.getBoundingClientRect().width;
-    let elWidth = this.refs.library.children[0].getBoundingClientRect().width;
-    let jumpSize = gridWidth / elWidth;
-
-    if (currentPos + jumpSize < this.props.photos.length)
-      state.highlighted = [currentPos + jumpSize];
-
-    this.setState(state);
-  }
-
-  handleHighlight(index, ctrlKey) {
-    let state = this.state;
-
-    if (!ctrlKey)
-      state.highlighted = [];
-
-    state.highlighted.push(index);
-
-    this.setState(state);
+    return false;
   }
 
   closeDialog() {
     this.bindEventListeners();
 
-    var state = this.state;
+    let state = this.state;
+
     state.modal = 'none';
     this.setState(state);
   }
-
 
   render() {
     let currentView;
     let showModal;
 
-    let libraryClass = classNames({ 'grid': this.props.current == -1 });
-
-    if (this.state.modal == 'export')
-      showModal = (
-        <Export
-          photos={this.state.photosToExport}
-          actions={this.props.actions}
-          closeExportDialog={this.closeDialog} />
-      );
+    if (this.state.modal === 'export') {
+      showModal = <Export
+        photos={this.state.photosToExport}
+        actions={this.props.actions}
+        closeExportDialog={this.closeDialog} />;
+    }
 
     if (!this.props.photos || this.props.photos.length === 0)
       currentView = <ReadyToScan />;
 
-    else if (this.props.current == -1)
-      currentView = this.props.photos.map((photo, index) => {
-        return (
-          <Picture
-            key={index}
-            index={index}
-            photo={photo}
-            setHighlight={this.handleHighlight.bind(this)}
-            highlighted={this.state.highlighted.indexOf(index) != -1}
-            setFlagging={this.handleFlagging.bind(this)}
-            setExport={this.handleExport.bind(this)}
-            setCurrent={this.handleCurrent.bind(this)} />
-        );
-      });
-
-    else if (this.props.diff)
+    else if (this.props.current === -1) {
+      currentView = <Grid
+                      actions={this.props.actions}
+                      setScrollTop={this.props.setScrollTop}
+                      setExport={this.handleExport}
+                      photos={this.props.photos}/>;
+    } else if (this.props.diff) {
       currentView = <PictureDiff
                       actions={this.props.actions}
                       photo={this.props.photos[this.props.current]} />;
-
-    else
+    } else {
       currentView = <PictureDetail
                       photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}
-                      setCurrent={this.handleCurrent.bind(this)}
                       isLast={this.isLast.bind(this)} />;
+    }
 
     return (
-      <div id="library" className={libraryClass} ref="library">
+      <div id="library" ref="library">
         {currentView}
         {showModal}
       </div>
@@ -273,7 +156,8 @@ class Library extends React.Component {
 const ReduxLibrary = connect(state => ({
   photos: state.photos,
   current: state.current,
-  diff: state.diff
+  diff: state.diff,
+  highlighted: state.highlighted
 }))(Library);
 
 export default ReduxLibrary;

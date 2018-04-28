@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class Progress extends React.Component {
   static propTypes = {
-    progress: React.PropTypes.object.isRequired
+    progress: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -12,13 +13,14 @@ class Progress extends React.Component {
     this.getProgress = this.getProgress.bind(this);
 
     this.state = {
-      progress: { processed: 0, total: 0 }, 
+      progress: { processed: 0, total: 0 },
       timer: new Date().getTime()
     };
   }
 
   getProgress() {
     let progress = this.props.progress;
+
     return progress.processed / (progress.total / 100) || 0;
   }
 
@@ -28,8 +30,8 @@ class Progress extends React.Component {
         <h2>scanning: {this.props.progress.photosDir}</h2>
 
         <div className="progress-bar">
-          <div 
-            className="progress-value" 
+          <div
+            className="progress-value"
             style={{ width: this.getProgress() + '%' }}></div>
         </div>
 

@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class Devices extends React.Component {
   static propTypes = {
-    devices: React.PropTypes.array.isRequired
+    devices: PropTypes.array.isRequired
   }
 
   constructor(props) {
@@ -14,6 +15,7 @@ class Devices extends React.Component {
 
   appendDevices(data) {
     let state = this.state;
+
     state.devices = data.devices;
     this.setState(state);
   }
