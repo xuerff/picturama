@@ -1,12 +1,11 @@
 import sharp from 'sharp';
 import libraw from 'libraw';
 import fs from 'fs';
-//import exiv2 from 'exiv2';
 import moment from 'moment';
 import Promise from 'bluebird';
 
 import config from './config';
-import metadata from './metadata';
+import { readMetadataOfImage } from './metadata';
 
 import walker from './lib/walker';
 import matches from './lib/matches';
@@ -15,8 +14,6 @@ import Photo from './models/photo';
 import Tag from './models/tag';
 
 const readFile = Promise.promisify(fs.readFile);
-//const exGetImgTags = Promise.promisify(exiv2.getImageTags);
-const exGetImgTags = filePath => Promise.resolve({})
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
@@ -130,11 +127,9 @@ export default class Scanner {
           .quality(100)
           .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`)
       )
-      .then(() => exGetImgTags(file.path).then(metadata.processData))
-      .then(xmp => {
-        let createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
-
-        return new Photo({ title: file.name })
+      .then(() => readMetadataOfImage(file.path))
+      .then(metaData =>
+        new Photo({ title: file.name })
           .fetch()
           .then(photo => {
             if (photo)
@@ -143,21 +138,21 @@ export default class Scanner {
             return Photo.forge({
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
-              orientation: xmp.orientation,
-              date: createdAt.format('YYYY-MM-DD'),
-              created_at: createdAt.toDate(),
-              exposure_time: xmp.exposureTime,
-              iso: xmp.iso,
-              aperture: xmp.fNumber,
-              focal_length: xmp.focalLength,
+              orientation: metaData.orientation,
+              date: moment(metaData.createdAt).format('YYYY-MM-DD'),
+              created_at: metaData.createdAt,
+              exposure_time: metaData.exposureTime,
+              iso: metaData.iso,
+              aperture: metaData.aperture,
+              focal_length: metaData.focalLength,
               master: `${file.path}`,
               thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
               thumb: `${config.thumbsPath}/${file.name}.thumb.${config.workExt}`
             })
             .save();
           })
-          .then(photo => this.populateTags(photo, xmp.tags));
-      })
+          .then(photo => this.populateTags(photo, metaData.tags))
+      )
       .then(this.onImportedStep.bind(this))
       .catch(err => {
         console.error('ERR knex', file, err);
@@ -171,39 +166,28 @@ export default class Scanner {
         .max()
         .quality(100)
         .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`),
-      exGetImgTags(file.path).then(metadata.processData),
-      (img, xmp) => {
-        let createdAt;
-
-        if (xmp.hasOwnProperty('createdAt'))
-          createdAt = moment(xmp.createdAt, 'YYYY:MM:DD HH:mm:ss');
-        else {
-          let fileDate = fs.statSync(file.path);
-
-          createdAt = moment(fileDate.birthtime);
-        }
-
-        return new Photo({ title: file.name })
+      readMetadataOfImage(file.path),
+      (img, metaData) =>
+        new Photo({ title: file.name })
           .fetch()
           .then(photo =>
             photo ? null : Photo.forge({
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
-              orientation: xmp.orientation,
-              date: createdAt.format('YYYY-MM-DD'),
-              created_at: createdAt.toDate(),
-              exposure_time: xmp.exposureTime,
-              iso: xmp.iso,
-              aperture: xmp.fNumber,
-              focal_length: xmp.focalLength,
+              orientation: metaData.orientation,
+              date: moment(metaData.createdAt).format('YYYY-MM-DD'),
+              created_at: metaData.createdAt,
+              exposure_time: metaData.exposureTime,
+              iso: metaData.iso,
+              aperture: metaData.aperture,
+              focal_length: metaData.focalLength,
               master: file.path,
               thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
               thumb: file.path
             })
             .save()
           )
-          .then(photo => this.populateTags(photo, xmp.tags));
-      }
+          .then(photo => this.populateTags(photo, metaData.tags))
     )
     .then(this.onImportedStep.bind(this))
     .catch(err => {

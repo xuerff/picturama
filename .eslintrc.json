@@ -124,6 +124,7 @@
     "space-unary-ops": 1,
     "spaced-comment": 1,
 
+    "arrow-body-style": [2, "as-needed"],
     "arrow-parens": [2, "as-needed"],
     "arrow-spacing": 2,
     "constructor-super": 2,
