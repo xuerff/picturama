@@ -162,6 +162,7 @@ export default class Scanner {
   importImg(file) {
     return Promise.join(
       sharp(file.path)
+        .rotate()
         .resize(250, 250)
         .max()
         .quality(100)
