@@ -1,7 +1,7 @@
-import React from 'react';
-import classNames from 'classnames';
+import * as React from 'react'
+import * as classNames from 'classnames'
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
 import Library from './library';
 import Settings from './settings';

@@ -66,7 +66,7 @@ npm start
 
 ### Testing, building & transpiling
 
-- [Babel.js](http://babeljs.io/)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Spectron](http://electron.atom.io/spectron/)
 - [Gulp](http://gulpjs.com/)
 - [Mocha](http://mochajs.org/)

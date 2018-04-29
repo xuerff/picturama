@@ -1,6 +1,6 @@
-import React from 'react';
-import Loader from 'react-loader';
-import PropTypes from 'prop-types';
+import * as React from 'react'
+import * as Loader from 'react-loader'
+import * as PropTypes from 'prop-types'
 
 import keymapManager from './../keymap-manager';
 import Photo from './../models/photo';

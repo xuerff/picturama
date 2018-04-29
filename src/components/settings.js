@@ -1,7 +1,7 @@
 import { remote, ipcRenderer } from 'electron';
-import fs from 'fs';
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as fs from 'fs'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import config from '../config';
 

@@ -5,7 +5,7 @@ import {
   BrowserWindow
 } from 'electron';
 
-import fs from 'fs';
+import * as fs from 'fs'
 
 import MainMenu from './main-menu';
 // import Usb from './usb';

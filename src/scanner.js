@@ -1,8 +1,8 @@
 import sharp from 'sharp';
 import libraw from 'libraw';
-import fs from 'fs';
+import * as fs from 'fs'
 import moment from 'moment';
-import Promise from 'bluebird';
+import * as Promise from 'bluebird'
 
 import config from './config';
 import { readMetadataOfImage } from './metadata';

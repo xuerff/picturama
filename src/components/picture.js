@@ -1,8 +1,8 @@
 import { remote } from 'electron';
-import classNames from 'classnames';
-import React from 'react';
+import * as classNames from 'classnames'
+import * as React from 'react'
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
 const { Menu, MenuItem } = remote;
 

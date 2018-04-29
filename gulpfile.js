@@ -1,29 +1,49 @@
-import gulp from "gulp";
-import babel from "gulp-babel";
-import less from 'gulp-less';
-import concat from 'gulp-concat';
-import eslint from 'gulp-eslint';
-import mocha from 'gulp-mocha';
-import electronMocha from 'gulp-electron-mocha';
-import bump from 'gulp-bump';
-import childProcess from 'child_process';
-import electron from 'electron';
-import del from 'del';
-import env from 'gulp-env';
-import packager from 'electron-packager';
+var gulp = require('gulp')
+var less = require('gulp-less')
+var concat = require('gulp-concat')
+var eslint = require('gulp-eslint')
+var mocha = require('gulp-mocha')
+var electronMocha = require('gulp-electron-mocha')
+var bump = require('gulp-bump')
+var sourcemaps = require('gulp-sourcemaps')
+var typescript = require('gulp-typescript')
+var childProcess = require('child_process')
+var electron = require('electron')
+var del = require('del')
+var env = require('gulp-env')
+var packager = require('electron-packager')
 
-import config from './src/config';
-import npmPkgs from './package.json';
+var npmPkgs = require('./package.json')
 
-gulp.task("babel", ['lint'], () => {
-  return gulp.src("src/**/*.js")
-    .pipe(babel())
+
+var typescriptSettings = {
+  target: 'es5',
+  jsx: 'react',
+  module: 'commonjs',
+  moduleResolution: 'node',
+  sourceMap: true,
+  allowJs: true,
+  emitDecoratorMetadata: true,
+  experimentalDecorators: true,
+  removeComments: true,
+  noImplicitAny: false,
+  suppressImplicitAnyIndexErrors: true
+}
+
+
+gulp.task("transpile", ['lint'], () => {
+  return gulp.src([ 'src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx' ])
+    .pipe(sourcemaps.init())
+    .pipe(typescript(typescriptSettings))
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest("dist"));
 });
 
-gulp.task("babel-tests", () => {
-  return gulp.src("tests/**/*.js")
-    .pipe(babel())
+gulp.task("transpile-tests", () => {
+  return gulp.src([ 'tests/**/*.js', 'tests/**/*.ts', 'src/**/*.tsx' ])
+    .pipe(sourcemaps.init())
+    .pipe(typescript(typescriptSettings))
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest("tests-dist"));
 });
 
@@ -48,7 +68,7 @@ gulp.task('lint-tests', () => {
 });
 
 
-gulp.task('run', [ 'babel', 'styles' ],
+gulp.task('run', [ 'transpile', 'styles' ],
   () => {
     childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
   });
@@ -84,7 +104,7 @@ gulp.task('set-env-test', () => {
   })
 });
 
-gulp.task('test', ['babel-tests'], () => {
+gulp.task('test', ['transpile-tests'], () => {
   return gulp.src('tests-dist/**/*.spec.js', { read: false })
     .pipe(electronMocha({ 
       electronPath: electron, 
@@ -92,7 +112,7 @@ gulp.task('test', ['babel-tests'], () => {
     }));
 });
 
-gulp.task('prepare-src', [ 'babel', 'styles', 'clear-build' ], 
+gulp.task('prepare-src', [ 'transpile', 'styles', 'clear-build' ], 
   () => {
     return gulp
       .src([
@@ -144,12 +164,12 @@ gulp.task('mocha', () => {
     .pipe(mocha({reporter: 'list'}))
 });
 
-gulp.task('default', [ 'set-env', 'lint', 'babel', 'styles', 'run' ]);
+gulp.task('default', [ 'set-env', 'lint', 'transpile', 'styles', 'run' ]);
 
 gulp.task('build', [ 
   'lint', 
   'clear-build', 
-  'babel', 
+  'transpile', 
   'styles', 
   'increment-buildnum',
   'prepare-src', 
@@ -160,9 +180,9 @@ gulp.task('build', [
 gulp.task('clear', [
   'set-env',
   'clear-db',
-  'babel',
+  'transpile',
   'styles',
   'run'
 ]);
 
-gulp.task('tests', ['set-env-test', 'lint', 'babel', 'styles', 'mocha']);
+gulp.task('tests', ['set-env-test', 'lint', 'transpile', 'styles', 'mocha']);

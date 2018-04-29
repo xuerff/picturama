@@ -1,11 +1,11 @@
 import { remote } from 'electron';
-import fs from 'fs';
-import Promise from 'bluebird';
+import * as fs from 'fs'
+import * as Promise from 'bluebird'
 import notifier from 'node-notifier';
 import libraw from 'libraw';
 import sharp from 'sharp';
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import config from './../config';
 import Progress from './progress';

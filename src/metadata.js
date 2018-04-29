@@ -1,6 +1,6 @@
-import fs from 'fs'
+import * as fs from 'fs'
 
-import Promise from 'bluebird'
+import * as Promise from 'bluebird'
 import ExifParser from 'exif-parser'
 
 const readFile = Promise.promisify(fs.readFile)

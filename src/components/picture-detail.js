@@ -1,8 +1,8 @@
 import { ipcRenderer, remote } from 'electron';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import React from 'react';
-import Loader from 'react-loader';
+import * as PropTypes from 'prop-types'
+import * as classNames from 'classnames'
+import * as React from 'react'
+import * as Loader from 'react-loader'
 
 import keymapManager from './../keymap-manager';
 import createVersionAndOpenWith from './../create-version';

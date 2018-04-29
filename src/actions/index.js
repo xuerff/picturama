@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs'
 
 import config from './../config';
 import Photo from './../models/photo';

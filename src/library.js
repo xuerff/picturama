@@ -1,8 +1,8 @@
 import { ipcMain, shell } from 'electron';
 import moment from 'moment';
 import notifier from 'node-notifier';
-import fs from 'fs';
-import Promise from 'bluebird';
+import * as fs from 'fs'
+import * as Promise from 'bluebird'
 
 import Scanner from './scanner';
 import config from './config';

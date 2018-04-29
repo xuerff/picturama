@@ -1,7 +1,7 @@
-import React from 'react';
+import * as React from 'react'
 import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
 import PictureDetail from './picture-detail';
 import PictureDiff from './picture-diff';

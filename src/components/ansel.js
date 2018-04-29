@@ -1,11 +1,11 @@
 import { ipcRenderer } from 'electron';
-import classNames from 'classnames';
-import React from 'react';
+import * as classNames from 'classnames'
+import * as React from 'react'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
-import * as action from './../actions';
+import * as action from './../actions'
 
 import Header from './header';
 import Sidebar from './sidebar';

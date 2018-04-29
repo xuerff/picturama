@@ -1,8 +1,8 @@
-import classNames from 'classnames';
-import React from 'react';
+import * as classNames from 'classnames'
+import * as React from 'react'
 import { connect } from 'react-redux';
 import { remote, ipcRenderer } from 'electron';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
 const dialog = remote.dialog;
 

@@ -1,4 +1,4 @@
-import Promise from 'bluebird';
+import * as Promise from 'bluebird'
 
 import Photo from './../models/photo';
 
