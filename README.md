@@ -38,7 +38,7 @@ sudo apt-get install zlib1g-dev libudev-dev
 ```bash
 sudo npm install -g gulp
 npm install
-gulp
+npm start
 ```
 
 ## Supported cameras
