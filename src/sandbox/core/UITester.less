@@ -1,0 +1,34 @@
+
+@sideBarWidth: 230px;
+@padding: 10px;
+
+html, body, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.UITester {
+    position: relative;
+    height: 100%;
+}
+
+.UITester-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: @sideBarWidth;
+    overflow-y: auto;
+
+    padding: @padding;
+}
+
+.UITester-arena {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: @sideBarWidth;
+    right: 0;
+    padding: @padding;
+}

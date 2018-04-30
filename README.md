@@ -33,14 +33,6 @@ In order to be able to run, ansel requires the following libraries:
 sudo apt-get install zlib1g-dev libudev-dev
 ```
 
-### Build from sources
-
-```bash
-sudo npm install -g gulp
-npm install
-npm start
-```
-
 ## Supported cameras
 
 - [x] Fuji X100
@@ -48,6 +40,10 @@ npm start
 - [x] Fuji X100T
 - [x] Canon 5D Mark I
 - [ ] Canon EOS 700D
+
+## Develop
+
+See [DEVELOP.md](DEVELOP.md) for details about how to develop Ansel.
 
 ## Technologies & libraries
 

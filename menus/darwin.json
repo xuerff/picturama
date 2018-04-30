@@ -55,7 +55,7 @@
       },
       {
         "label": "Scan for tags",
-        "accelerator": "Shift+Cmd+R",
+        "accelerator": "Shift+Cmd+T",
         "click": "scanForTags"
       }]
     },
@@ -64,8 +64,13 @@
       "submenu": [
         {
           "label": "Toggle DevTools",
-          "accelerator": "Shift+Cmd+I",
+          "accelerator": "Cmd+Alt+I",
           "click": "toggleDevTools"
+        },
+        {
+          "label": "Toggle Sandbox",
+          "accelerator": "Cmd+Alt+S",
+          "click": "toggleSandbox"
         },
         {
           "label": "Fix missing versions",

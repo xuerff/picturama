@@ -40,7 +40,7 @@ gulp.task("transpile", ['lint'], () => {
 });
 
 gulp.task("transpile-tests", () => {
-  return gulp.src([ 'tests/**/*.js', 'tests/**/*.ts', 'src/**/*.tsx' ])
+  return gulp.src([ 'tests/**/*.js', 'tests/**/*.ts', 'tests/**/*.tsx' ])
     .pipe(sourcemaps.init())
     .pipe(typescript(typescriptSettings))
     .pipe(sourcemaps.write())
@@ -51,6 +51,12 @@ gulp.task('styles', ['lint'], () => {
   return gulp.src('src/less/index.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
+});
+
+gulp.task('styles-sandbox', () => {
+  return gulp.src('src/sandbox/entry.less')
+    .pipe(less())
+    .pipe(gulp.dest('dist/sandbox'));
 });
 
 gulp.task('lint', () => {
@@ -164,13 +170,14 @@ gulp.task('mocha', () => {
     .pipe(mocha({reporter: 'list'}))
 });
 
-gulp.task('default', [ 'set-env', 'lint', 'transpile', 'styles', 'run' ]);
+gulp.task('default', [ 'set-env', 'lint', 'transpile', 'styles', 'styles-sandbox', 'run' ]);
 
 gulp.task('build', [ 
   'lint', 
   'clear-build', 
   'transpile', 
   'styles', 
+  'styles-sandbox',
   'increment-buildnum',
   'prepare-src', 
   'prepare-modules', 
