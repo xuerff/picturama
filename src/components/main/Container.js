@@ -39,20 +39,22 @@ class Container extends React.Component {
   }
 
   render() {
-    let content = <Settings actions={this.props.actions} />;
-
     let containerClass = classNames(this.props.className, {
       'bottom-bar-present': this.props.current === -1 && this.props.settingsExists
     });
 
-    if (this.props.settingsExists) {
-      content = <Library
-        actions={this.props.actions}
-        setScrollTop={this.handleScrollTop.bind(this)}/>;
+    let content
+    if (this.props.importing) {
+      content = <Progress />
+    } else if (!this.props.settingsExists) {
+      content = <Settings actions={this.props.actions} />
+    } else {
+      content =
+        <Library
+          actions={this.props.actions}
+          setScrollTop={this.handleScrollTop.bind(this)}
+        />
     }
-
-    if (this.props.importing)
-      content = <Progress />;
 
     return (
       <div id="container" ref="container" className={containerClass}>
