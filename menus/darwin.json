@@ -18,6 +18,7 @@
       "label": "File",
       "submenu": [
         {
+          "id": "export",
           "label": "Export picture(s)",
           "accelerator": "Cmd+Shift+E",
           "enabled": false,
@@ -48,6 +49,7 @@
     {
       "label": "Tags",
       "submenu": [{
+        "id": "addTags",
         "label": "Add tags",
         "accelerator": "Cmd+T",
         "enabled": false,

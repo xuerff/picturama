@@ -37,14 +37,26 @@ class MainMenu {
     });
 
     ipcMain.on('toggleAddTagMenu', (e, state) => {
-      this.menu.items[2].submenu.items[0].enabled = state;
+      this.getMenuItemById('addTags').enabled = state
     });
 
     ipcMain.on('toggleExportMenu', (e, state) => {
-      this.menu.items[0].submenu.items[0].enabled = state;
+      this.getMenuItemById('export').enabled = state
     });
 
     this.render();
+  }
+
+  getMenuItemById(id) {
+    // According to API docs an electron menu should have a `getMenuItemById` method, but it's not there
+    // -> We do it by hand
+    for (let item of this.menu.items) {
+      for (let subItem of item.submenu.items) {
+        if (subItem.id === id) {
+          return subItem
+        }
+      }
+    }
   }
 
   scan() {
