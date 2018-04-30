@@ -11,7 +11,7 @@ import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/Photo'
-import Tag from './models/tag';
+import Tag from './models/Tag'
 
 const readFile = Promise.promisify(fs.readFile);
 

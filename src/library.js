@@ -10,7 +10,7 @@ import { readMetadataOfImage } from './metadata';
 
 import walker from './lib/walker';
 
-import Tag from './models/tag';
+import Tag from './models/Tag'
 import Photo from './models/Photo'
 import Version from './models/version';
 
