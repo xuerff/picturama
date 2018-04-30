@@ -3,10 +3,10 @@ import * as classNames from 'classnames'
 import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types'
 
-import Library from './library';
-import Settings from './settings';
-import Progress from './progress';
-import BottomBar from './bottom-bar';
+import BottomBar from './BottomBar'
+import Library from './Library'
+import Settings from '../settings'
+import Progress from '../progress'
 
 class Container extends React.Component {
   static propTypes = {

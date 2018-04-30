@@ -3,11 +3,9 @@ import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import * as PropTypes from 'prop-types'
 
-import PictureDetail from './detail/PictureDetail'
-import PictureDiff from './picture-diff';
-import Export from './export';
-import ReadyToScan from './ready-to-scan';
-import Grid from './grid';
+import Export from '../export'
+import ReadyToScan from '../ready-to-scan'
+import Grid from '../grid'
 
 class Library extends React.Component {
   static propTypes = {
@@ -15,7 +13,6 @@ class Library extends React.Component {
     setScrollTop: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
     current: PropTypes.number,
-    diff: PropTypes.bool.isRequired,
     photos: PropTypes.array.isRequired
   }
 
@@ -30,10 +27,6 @@ class Library extends React.Component {
     this.deactivateExportAccelerator = this.deactivateExportAccelerator.bind(this);
 
     this.state = { scrollTop: 0, modal: 'none' };
-  }
-
-  handleFlag() {
-    this.props.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
   handleExport() {
@@ -91,18 +84,6 @@ class Library extends React.Component {
     this.unbindEventListeners();
   }
 
-  isLast() {
-    let photos = this.props.photos;
-
-    if (photos.length === photos.indexOf(this.props.current) + 1)
-      return true;
-
-    if (photos.indexOf(this.props.current) === 0)
-      return true;
-
-    return false;
-  }
-
   closeDialog() {
     this.bindEventListeners();
 
@@ -123,26 +104,16 @@ class Library extends React.Component {
         closeExportDialog={this.closeDialog} />;
     }
 
-    if (!this.props.photos || this.props.photos.length === 0)
+    if (!this.props.photos || this.props.photos.length === 0) {
       currentView = <ReadyToScan />;
-
-    else if (this.props.current === -1) {
-      currentView = <Grid
-                      actions={this.props.actions}
-                      setScrollTop={this.props.setScrollTop}
-                      setExport={this.handleExport}
-                      photos={this.props.photos}/>;
-    } else if (this.props.diff) {
-      currentView = <PictureDiff
-                      actions={this.props.actions}
-                      photo={this.props.photos[this.props.current]} />;
     } else {
-      currentView = <PictureDetail
-                      className="Library-body"
-                      photo={this.props.photos[this.props.current]}
-                      actions={this.props.actions}
-                      toggleFlag={this.handleFlag.bind(this)}
-                      isLast={this.isLast.bind(this)} />;
+      currentView =
+        <Grid
+          actions={this.props.actions}
+          setScrollTop={this.props.setScrollTop}
+          setExport={this.handleExport}
+          photos={this.props.photos}
+        />
     }
 
     return (
@@ -157,7 +128,6 @@ class Library extends React.Component {
 const ReduxLibrary = connect(state => ({
   photos: state.photos,
   current: state.current,
-  diff: state.diff,
   highlighted: state.highlighted
 }))(Library);
 
