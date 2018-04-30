@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import * as PropTypes from 'prop-types'
 
-import PictureDetail from './picture-detail';
+import PictureDetail from './detail/PictureDetail'
 import PictureDiff from './picture-diff';
 import Export from './export';
 import ReadyToScan from './ready-to-scan';

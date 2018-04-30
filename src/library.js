@@ -11,7 +11,7 @@ import { readMetadataOfImage } from './metadata';
 import walker from './lib/walker';
 
 import Tag from './models/tag';
-import Photo from './models/photo';
+import Photo from './models/Photo'
 import Version from './models/version';
 
 class Library {

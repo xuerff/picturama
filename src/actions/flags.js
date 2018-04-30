@@ -1,6 +1,6 @@
 import * as Promise from 'bluebird'
 
-import Photo from './../models/photo';
+import Photo from '../models/Photo'
 
 export const toggleFlagged = (date, showOnlyFlagged) => {
   let where = { flag: showOnlyFlagged, trashed: 0 };

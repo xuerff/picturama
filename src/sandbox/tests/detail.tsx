@@ -2,15 +2,16 @@ import * as React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import PictureDetail from '../../components/picture-detail'
+import PictureDetail from '../../components/detail/PictureDetail'
+import { PhotoType } from '../../models/Photo'
 
 
-const testPhoto = {
+const testPhoto: PhotoType = {
     id: 'B1m80éAMpf',
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
     thumb: '../specs/photos/IMG_9700.JPG',
-    //thumb_250: '../dot-ansel/thumbs-250/IMG_9700.webp',
+    thumb_250: '../specs/photos/IMG_9700.JPG', // '../dot-ansel/thumbs-250/IMG_9700.webp',
     extension: 'JPG',
     flag: 0,
     created_at: 1474222345000,

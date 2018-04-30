@@ -10,7 +10,7 @@ import { readMetadataOfImage } from './metadata';
 import walker from './lib/walker';
 import matches from './lib/matches';
 
-import Photo from './models/photo';
+import Photo from './models/Photo'
 import Tag from './models/tag';
 
 const readFile = Promise.promisify(fs.readFile);

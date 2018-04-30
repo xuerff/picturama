@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 import config from './../config';
-import Photo from './../models/photo';
+import Photo from '../models/Photo'
 
 export * from './devices';
 export * from './current';
