@@ -138,6 +138,7 @@ class Library extends React.Component {
                       photo={this.props.photos[this.props.current]} />;
     } else {
       currentView = <PictureDetail
+                      className="Library-body"
                       photo={this.props.photos[this.props.current]}
                       actions={this.props.actions}
                       toggleFlag={this.handleFlag.bind(this)}

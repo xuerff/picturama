@@ -2,14 +2,14 @@ import React from 'react';
 import { shallow, render } from 'enzyme';
 import { expect } from 'chai';
 
-import PictureInfo from './../../dist/components/picture-info';
+import PictureInfo from '../../dist/components/detail/PictureInfo'
 
 describe('<PictureInfo />', () => {
-  it('renders an `.picture-info`', () => {
+  it('renders an `.PictureInfo`', () => {
     let photo = { iso: 400, aperture: 2.8 };
     const wrapper = shallow(<PictureInfo photo={photo} />);
 
-    expect(wrapper.find('.picture-info')).to.have.length(1);
+    expect(wrapper.find('.PictureInfo')).to.have.length(1);
   });
 
   it('should display the tags', () => {

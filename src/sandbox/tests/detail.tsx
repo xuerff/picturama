@@ -31,21 +31,18 @@ const testPhoto: PhotoType = {
 
 addSection('Detail')
     .add('Details', context => (
-        <div id="container">
-            <div id="library">
-                <PictureDetail
-                    photo={testPhoto}
-                    actions={{
-                        setCurrent:  action('setCurrent'),
-                        setCurrentLeft: action('setCurrentLeft'),
-                        setCurrentRight: action('setCurrentRight'),
-                        moveToTrash: action('moveToTrash'),
-                        toggleDiff:  action('toggleDiff'),
-                        toggleFlag:  action('toggleFlag (action)'),
-                    }}
-                    toggleFlag={action('toggleFlag (direct)')}
-                    isLast={() => false}
-                />
-            </div>
-        </div>
+        <PictureDetail
+            style={{ width: '100%', height: '100%' }}
+            photo={testPhoto}
+            actions={{
+                setCurrent:  action('setCurrent'),
+                setCurrentLeft: action('setCurrentLeft'),
+                setCurrentRight: action('setCurrentRight'),
+                moveToTrash: action('moveToTrash'),
+                toggleDiff:  action('toggleDiff'),
+                toggleFlag:  action('toggleFlag (action)'),
+            }}
+            toggleFlag={action('toggleFlag (direct)')}
+            isLast={() => false}
+        />
     ))

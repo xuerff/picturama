@@ -22,6 +22,8 @@ rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
 interface Props {
+    style?: any
+    className?: any
     actions: any
     toggleFlag: () => void
     isLast: () => boolean
@@ -200,35 +202,38 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     render() {
+        const props = this.props
+
         let imgClass = classNames(
-            'shadow--2dp',
-            rotation[this.props.photo.orientation]
+            'PictureDetail-image shadow--2dp',
+            rotation[props.photo.orientation]
         );
 
         let showModal;
 
         if (this.state.modal === 'addTags') {
             showModal = <AddTags
-                photo={this.props.photo}
-                actions={this.props.actions}
+                photo={props.photo}
+                actions={props.actions}
                 closeTagDialog={this.closeDialog} />;
         } else if (this.state.modal === 'export') {
             showModal = <Export
-                actions={this.props.actions}
-                photos={[ this.props.photo ]}
+                actions={props.actions}
+                photos={[ props.photo ]}
                 closeExportDialog={this.closeDialog} />;
         }
 
         return (
-            <div className="picture-detail" ref="detail">
-                <div className="v-align">
+            <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
+                <div className="PictureDetail-body">
                     <img
-                        src={this.props.photo.thumb}
+                        className={imgClass}
+                        src={props.photo.thumb}
                         onLoad={this.finishLoading}
-                        className={imgClass} />
+                    />
                 </div>
 
-                <PictureInfo photo={this.props.photo} />
+                <PictureInfo className="PictureDetail-infoBar" photo={props.photo} />
                 <Loader loaded={this.state.loaded} />
 
                 {showModal}

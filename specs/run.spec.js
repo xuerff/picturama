@@ -39,7 +39,7 @@ describe('application launch', function () {
 
   it('should show a particular photo', function() {
     return this.app.client.doubleClick('a.picture')
-      .then(() => this.app.client.waitForExist('.picture-detail img'));
+      .then(() => this.app.client.waitForExist('.PictureDetail img'));
   });
 
   it('should go back to the library view', function() {

@@ -1,8 +1,10 @@
+import * as classNames from 'classnames'
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 class PictureInfo extends React.Component {
   static propTypes = {
+    className: PropTypes.any,
     photo: PropTypes.object.isRequired
   }
 
@@ -25,20 +27,22 @@ class PictureInfo extends React.Component {
   }
 
   render() {
+    const props = this.props
+    const photo = props.photo
     return (
-      <div className="picture-info card shadow--2dp">
+      <div className={classNames(props.className, "PictureInfo picture-info shadow--2dp")}>
         <ul>
-          <li className="title">{this.props.photo.title}</li>
-          <li>ISO: {this.props.photo.iso}</li>
-          <li>f/{this.props.photo.aperture}</li>
-          <li>@ {this.shutterSpeed(this.props.photo.exposure_time)}</li>
-          <li>v#: {this.props.photo.versionNumber}</li>
-          <li>Orientation: {this.props.photo.orientation}</li>
-          <li>Flag: {this.props.photo.flag}</li>
+          <li className="title">{photo.title}</li>
+          <li>ISO: {photo.iso}</li>
+          <li>f/{photo.aperture}</li>
+          <li>@ {this.shutterSpeed(photo.exposure_time)}</li>
+          <li>v#: {photo.versionNumber}</li>
+          <li>Orientation: {photo.orientation}</li>
+          <li>Flag: {photo.flag}</li>
           <li className="tags">Tags: {this.displayTags()}</li>
         </ul>
       </div>
-    );
+    )
   }
 }
 
