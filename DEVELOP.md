@@ -6,7 +6,6 @@ Build from sources
 ------------------
 
 ```bash
-sudo npm install -g gulp
 npm install
 npm start
 ```
