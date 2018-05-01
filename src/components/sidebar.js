@@ -1,11 +1,12 @@
-import fs from 'fs';
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as fs from 'fs'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import Tags from './tags';
 import Dates from './dates';
 import Devices from './devices';
 import Logo from './logo';
+import Toolbar from './widget/Toolbar'
 
 import config from './../config';
 
@@ -14,6 +15,10 @@ let settings;
 if (fs.existsSync(config.settings))
   settings = require(config.settings);
 
+const defaultMenuSettings = [ 'dates', 'tags' ]
+  // Don't showing 'devices', since USB detection is deactivated in `browser.js`
+
+
 class Sidebar extends React.Component {
   static propTypes = {
     className: PropTypes.string.isRequired,
@@ -21,35 +26,26 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    let menus = [
-      <Dates
-        key="0"
-        actions={this.props.actions} />,
-      <Tags key="1" actions={this.props.actions} />,
-      <Devices key="2" />
-    ];
+    const menuSettings = settings.menus || defaultMenuSettings
 
-    if (settings && settings.hasOwnProperty('menus')) {
-      menus = [];
+    let menus = []
+    menuSettings.forEach((menu, key) => {
+      if (menu === 'dates') {
+        menus.push(
+          <Dates
+            key={key}
+            actions={this.props.actions} />
+        );
+      } else if (menu === 'tags')
+        menus.push(<Tags key={key} actions={this.props.actions} />);
 
-      settings.menus.forEach((menu, key) => {
-        if (menu === 'dates') {
-          menus.push(
-            <Dates
-              key={key}
-              actions={this.props.actions} />
-          );
-        } else if (menu === 'tags')
-          menus.push(<Tags key={key} actions={this.props.actions} />);
-
-        else if (menu === 'devices')
-          menus.push(<Devices key={key} />);
-      });
-    }
+      else if (menu === 'devices')
+        menus.push(<Devices key={key} />);
+    });
 
     return (
       <div id="sidebar" className={this.props.className}>
-        <h2><Logo /> Library</h2>
+        <Toolbar className="Sidebar-topBar"><Logo /> Library</Toolbar>
 
         <div className="sidebar-content">
           <button

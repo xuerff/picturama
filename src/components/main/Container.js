@@ -1,12 +1,12 @@
-import React from 'react';
-import classNames from 'classnames';
+import * as React from 'react'
+import * as classNames from 'classnames'
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
-import Library from './library';
-import Settings from './settings';
-import Progress from './progress';
-import BottomBar from './bottom-bar';
+import BottomBar from './BottomBar'
+import Library from './Library'
+import Settings from '../settings'
+import Progress from '../progress'
 
 class Container extends React.Component {
   static propTypes = {
@@ -39,20 +39,22 @@ class Container extends React.Component {
   }
 
   render() {
-    let content = <Settings actions={this.props.actions} />;
-
     let containerClass = classNames(this.props.className, {
       'bottom-bar-present': this.props.current === -1 && this.props.settingsExists
     });
 
-    if (this.props.settingsExists) {
-      content = <Library
-        actions={this.props.actions}
-        setScrollTop={this.handleScrollTop.bind(this)}/>;
+    let content
+    if (this.props.importing) {
+      content = <Progress />
+    } else if (!this.props.settingsExists) {
+      content = <Settings actions={this.props.actions} />
+    } else {
+      content =
+        <Library
+          actions={this.props.actions}
+          setScrollTop={this.handleScrollTop.bind(this)}
+        />
     }
-
-    if (this.props.importing)
-      content = <Progress />;
 
     return (
       <div id="container" ref="container" className={containerClass}>

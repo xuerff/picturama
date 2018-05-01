@@ -1,8 +1,10 @@
-import classNames from 'classnames';
-import React from 'react';
+import * as classNames from 'classnames'
+import * as React from 'react'
 import { connect } from 'react-redux';
 import { remote, ipcRenderer } from 'electron';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
+
+import Toolbar from '../widget/Toolbar'
 
 const dialog = remote.dialog;
 
@@ -46,7 +48,7 @@ class Header extends React.Component {
     });
 
     return (
-      <header className={this.props.className} id="top-bar">
+      <Toolbar className={this.props.className} id="top-bar">
         <button onClick={this.showSidebar.bind(this)} id="hamburger">
           <i className="fa fa-bars" aria-hidden="true"></i>
         </button>
@@ -65,7 +67,7 @@ class Header extends React.Component {
             <i className="fa fa-flag" aria-hidden="true"></i>
           </button>
         </div>
-      </header>
+      </Toolbar>
     );
   }
 }

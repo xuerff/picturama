@@ -1,21 +1,18 @@
 import { ipcMain, shell } from 'electron';
 import moment from 'moment';
 import notifier from 'node-notifier';
-import fs from 'fs';
-import Promise from 'bluebird';
-import exiv2 from 'exiv2';
+import * as fs from 'fs'
+import * as Promise from 'bluebird'
 
 import Scanner from './scanner';
 import config from './config';
-import metadata from './metadata';
+import { readMetadataOfImage } from './metadata';
 
 import walker from './lib/walker';
 
-import Tag from './models/tag';
-import Photo from './models/photo';
+import Tag from './models/Tag'
+import Photo from './models/Photo'
 import Version from './models/version';
-
-const exGetImgTags = Promise.promisify(exiv2.getImageTags);
 
 class Library {
 
@@ -108,11 +105,10 @@ class Library {
   }
 
   walkForTags(file) {
-    return exGetImgTags(file.path)
-      .then(metadata.processData)
-      .then(data => {
-        if (data.tags.length > 0)
-          return data.tags;
+    return readMetadataOfImage(file.path)
+      .then(metaData => {
+        if (metaData.tags.length > 0)
+          return metaData.tags;
 
         throw 'no-tag';
       })

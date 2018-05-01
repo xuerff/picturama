@@ -10,14 +10,14 @@
     "right": "grid:right",
     "enter": "grid:enter"
   },
-  ".picture-detail": {
+  ".PictureDetail": {
     "y": "detail:diff",
     "p": "detail:flag",
     "delete": "detail:moveToTrash",
     "left": "detail:moveLeft",
     "right": "detail:moveRight"
   },
-  ".picture-diff": {
+  ".PictureDiff": {
     "y": "diff:cancel"
   }
 }

@@ -1,20 +1,25 @@
 import { ipcRenderer } from 'electron';
-import classNames from 'classnames';
-import React from 'react';
+import * as classNames from 'classnames'
+import * as React from 'react'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types'
 
-import * as action from './../actions';
+import * as action from '../../actions'
 
-import Header from './header';
-import Sidebar from './sidebar';
-import Container from './container';
+import PictureDetail from '../detail/PictureDetail'
+import PictureDiff from '../picture-diff'
+import Header from './Header'
+import Container from './Container'
+import Sidebar from '../sidebar'
 
 class Ansel extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     settingsExists: PropTypes.bool.isRequired,
+    current: PropTypes.number,
+    photos: PropTypes.array.isRequired,
+    diff: PropTypes.bool.isRequired,
     importing: PropTypes.bool.isRequired,
     splashed: PropTypes.bool.isRequired
   }
@@ -28,6 +33,9 @@ class Ansel extends React.Component {
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
+    this.handleFlag = this.handleFlag.bind(this)
+    this.isLast = this.isLast.bind(this)
+    this.handleDateFilter = this.handleDateFilter.bind(this)
   }
 
   handleDateFilter(date) {
@@ -70,34 +78,78 @@ class Ansel extends React.Component {
     this.setState(state);
   }
 
+  handleFlag() {
+    this.state.actions.toggleFlag(this.props.photos[this.props.current]);
+  }
+
+  isLast() {
+    let photos = this.props.photos;
+
+    if (photos.length === photos.indexOf(this.props.current) + 1)
+      return true;
+
+    if (photos.indexOf(this.props.current) === 0)
+      return true;
+
+    return false;
+  }
+
   render() {
+    const props = this.props
+    const state = this.state
+
     let noSidebarClass = classNames({ 
-      'no-sidebar': !this.state.showSidebar || !this.props.settingsExists
+      'no-sidebar': !state.showSidebar || !props.settingsExists
     });
 
+    let detailView
+    if (props.settingsExists && !props.importing && props.current !== -1) {
+      if (props.diff) {
+        detailView =
+          <PictureDiff
+            className="Ansel-detail"
+            actions={state.actions}
+            photo={props.photos[props.current]}
+          />
+      } else {
+        detailView =
+          <PictureDetail
+            className="Ansel-detail"
+            photo={props.photos[props.current]}
+            actions={state.actions}
+            toggleFlag={this.handleFlag}
+            isLast={this.isLast}
+          />
+      }
+    }
+
     return (
-      <div id="ansel">
+      <div id="ansel" className="Ansel">
         <Sidebar
-          actions={this.state.actions}
+          actions={state.actions}
           className={noSidebarClass}
-          setDateFilter={this.handleDateFilter.bind(this)} />
+          setDateFilter={this.handleDateFilter} />
 
         <Header
-          actions={this.state.actions}
+          actions={state.actions}
           className={noSidebarClass} />
 
         <Container
-          settingsExists={this.props.settingsExists}
-          actions={this.state.actions}
-          importing={this.props.importing}
+          settingsExists={props.settingsExists}
+          actions={state.actions}
+          importing={props.importing}
           className={noSidebarClass} />
 
+        {detailView}
       </div>
     );
   }
 }
 
 const ReduxAnsel = connect(state => ({
+  photos: state.photos,
+  current: state.current,
+  diff: state.diff,
   importing: state.importing,
   splashed: state.splashed,
   settingsExists: state.settingsExists

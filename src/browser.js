@@ -5,10 +5,10 @@ import {
   BrowserWindow
 } from 'electron';
 
-import fs from 'fs';
+import * as fs from 'fs'
 
 import MainMenu from './main-menu';
-import Usb from './usb';
+// import Usb from './usb';
 import config from './config';
 import Watch from './watch';
 
@@ -30,24 +30,33 @@ let mainWindow = null;
 if (!fs.existsSync(config.dotAnsel))
   fs.mkdirSync(config.dotAnsel);
 
+
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin')
-    app.quit();
+  // if (process.platform !== 'darwin')
+  app.quit();
 });
 
 app.on('ready', () => {
   let cursorPos = screen.getCursorScreenPoint();
   let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize;
 
-  mainWindow = new BrowserWindow({ width: 1356, height: 768, webPreferences: {
-    experimentalFeatures: true,
-    blinkFeatures: 'CSSGridLayout'
-  } });
+  app.setName('Ansel');
+
+  mainWindow = new BrowserWindow({
+    width: 1356,
+    height: 768,
+    title: 'Ansel',
+    webPreferences: {
+      experimentalFeatures: true,
+      blinkFeatures: 'CSSGridLayout'
+    }
+  });
 
   if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
     mainWindow.maximize();
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
+  mainWindow.setTitle('Ansel');
 
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
@@ -61,18 +70,18 @@ app.on('ready', () => {
     }
   }
 
-  let usb = new Usb();
-
-  usb.scan((err, drives) => {
-    mainWindow.webContents.send('scanned-devices', drives);
-  });
-
-  usb.watch((err, action, drive) => {
-    if (action === 'add')
-      mainWindow.webContents.send('add-device', drive);
-    else
-      mainWindow.webContents.send('remove-device', drive);
-  });
+  //let usb = new Usb();
+  //
+  //usb.scan((err, drives) => {
+  //  mainWindow.webContents.send('scanned-devices', drives);
+  //});
+  //
+  //usb.watch((err, action, drive) => {
+  //  if (action === 'add')
+  //    mainWindow.webContents.send('add-device', drive);
+  //  else
+  //    mainWindow.webContents.send('remove-device', drive);
+  //});
 
   ipcMain.on('settings-created', () => initLibrary(mainWindow));
 

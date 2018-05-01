@@ -33,14 +33,6 @@ In order to be able to run, ansel requires the following libraries:
 sudo apt-get install zlib1g-dev libudev-dev
 ```
 
-### Build from sources
-
-```bash
-sudo npm install -g gulp
-npm install
-gulp
-```
-
 ## Supported cameras
 
 - [x] Fuji X100
@@ -48,6 +40,10 @@ gulp
 - [x] Fuji X100T
 - [x] Canon 5D Mark I
 - [ ] Canon EOS 700D
+
+## Develop
+
+See [DEVELOP.md](DEVELOP.md) for details about how to develop Ansel.
 
 ## Technologies & libraries
 
@@ -60,14 +56,13 @@ gulp
 - [Bookshelf.js](http://bookshelfjs.org/) / [Knex.js](http://knexjs.org/)
 - [Bluebird.js](http://bluebirdjs.com/)
 - [Chokidar](https://github.com/paulmillr/chokidar)
-- [Exiv2](http://www.exiv2.org) - [node bindings](https://github.com/dberesford/exiv2node)
 - [Libraw](http://www.libraw.org/) - [node bindings](https://github.com/m0g/node-libraw)
 - [Moment.js](http://momentjs.com/)
 - [Font Awesome](http://fontawesome.io/)
 
 ### Testing, building & transpiling
 
-- [Babel.js](http://babeljs.io/)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Spectron](http://electron.atom.io/spectron/)
 - [Gulp](http://gulpjs.com/)
 - [Mocha](http://mochajs.org/)
