@@ -11,6 +11,8 @@ import AddTags from '../add-tags';
 import Export from '../export';
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
+import ButtonGroup from '../widget/ButtonGroup'
+import Icon from '../widget/Icon'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType } from '../../models/Photo'
 
@@ -28,8 +30,9 @@ interface Props {
     className?: any
     actions: any
     toggleFlag: () => void
-    isLast: () => boolean
     photo: PhotoType
+    isFirst: boolean
+    isLast: boolean
 }
 
 interface State {
@@ -229,9 +232,17 @@ export default class PictureDetail extends React.Component<Props, State> {
             <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
                 <Toolbar className="PictureDetail-topBar">
                     <Button onClick={this.cancelEvent}>
-                        <i className="fa fa-chevron-left" aria-hidden="true"/>
-                        Back to library
+                        <Icon name="chevron-left"/>
+                        <span>Back to library</span>
                     </Button>
+                    <ButtonGroup>
+                        <Button enabled={!props.isFirst} onClick={props.actions.setCurrentLeft} tip="Previous image [left]">
+                            <Icon name="arrow-left"/>
+                        </Button>
+                        <Button enabled={!props.isLast} onClick={props.actions.setCurrentRight} tip="Next image [right]">
+                            <Icon name="arrow-right"/>
+                        </Button>
+                    </ButtonGroup>
                 </Toolbar>
 
                 <div className="PictureDetail-body">

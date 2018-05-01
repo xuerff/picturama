@@ -43,6 +43,7 @@ addSection('Detail')
                 toggleFlag:  action('toggleFlag (action)'),
             }}
             toggleFlag={action('toggleFlag (direct)')}
-            isLast={() => false}
+            isFirst={true}
+            isLast={false}
         />
     ))

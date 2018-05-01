@@ -34,7 +34,6 @@ class Ansel extends React.Component {
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.handleFlag = this.handleFlag.bind(this)
-    this.isLast = this.isLast.bind(this)
     this.handleDateFilter = this.handleDateFilter.bind(this)
   }
 
@@ -82,18 +81,6 @@ class Ansel extends React.Component {
     this.state.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
-  isLast() {
-    let photos = this.props.photos;
-
-    if (photos.length === photos.indexOf(this.props.current) + 1)
-      return true;
-
-    if (photos.indexOf(this.props.current) === 0)
-      return true;
-
-    return false;
-  }
-
   render() {
     const props = this.props
     const state = this.state
@@ -116,9 +103,10 @@ class Ansel extends React.Component {
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
+            isFirst={props.current === 0}
+            isLast={props.current === props.photos.length - 1}
             actions={state.actions}
             toggleFlag={this.handleFlag}
-            isLast={this.isLast}
           />
       }
     }

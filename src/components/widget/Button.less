@@ -12,7 +12,11 @@
     }
 
     &[disabled] {
-        background-color: @background;
+        &,
+        &:hover,
+        &:active {
+            background-color: @background;
+        }
     }
 }
 
@@ -30,6 +34,10 @@
     font-weight: 400;
     text-align: center;
     border-radius: 4px;
+
+    &:not(:last-child) {
+        margin-right: 8px;
+    }
 
     &:hover {
         text-decoration: none;
@@ -51,8 +59,10 @@
         .button-variant(#eee, @deep-orange-800)
     }
 
-    i.fa {
-        margin-right: 10px;
+    .Icon {
+        &:not(:last-child) {
+            margin-right: 10px;
+        }
     }
 
 }

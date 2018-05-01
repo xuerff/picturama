@@ -2,27 +2,49 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 
 interface Props {
-    id?: string
     className?: any
     style?: any
-    type?: 'default' | 'primary'
-    onClick?: (evt) => void
     children?: any
+    type?: 'default' | 'primary'
+    enabled?: boolean
+    onClick?: (evt) => void
+    tip?: string
 }
 
 class Button extends React.Component<Props, undefined> {
     static defaultProps: Partial<Props> = {
-        type: 'default'
+        type: 'default',
+        enabled: true
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.onClick = this.onClick.bind(this)
+    }
+
+    onClick(evt) {
+        const props = this.props
+        if (props.enabled) {
+            props.onClick(evt)
+        }
     }
 
     render() {
         const props = this.props
+        let dynamicAttributes: any = {}
+        if (!props.enabled) {
+            dynamicAttributes.disabled = 'disabled'
+        }
+
         return (
             <div
-                id={props.id}
                 className={classNames(props.className, `Button hasType-${props.type}`)}
                 style={props.style}
-                onClick={props.onClick}
+                onClick={this.onClick}
+                aria-label={props.tip}
+                title={props.tip}
+                {...dynamicAttributes}
             >
                 {props.children}
             </div>
