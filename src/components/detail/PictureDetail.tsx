@@ -10,6 +10,8 @@ import AvailableEditors from '../../available-editors'
 import AddTags from '../add-tags';
 import Export from '../export';
 import PictureInfo from './PictureInfo'
+import Button from '../widget/Button'
+import Toolbar from '../widget/Toolbar'
 import { PhotoType } from '../../models/Photo'
 
 const { Menu, MenuItem } = remote;
@@ -225,6 +227,13 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         return (
             <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
+                <Toolbar className="PictureDetail-topBar">
+                    <Button onClick={this.cancelEvent}>
+                        <i className="fa fa-chevron-left" aria-hidden="true"/>
+                        Back to library
+                    </Button>
+                </Toolbar>
+
                 <div className="PictureDetail-body">
                     <img
                         className={imgClass}
