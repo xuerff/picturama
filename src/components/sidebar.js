@@ -6,6 +6,7 @@ import Tags from './tags';
 import Dates from './dates';
 import Devices from './devices';
 import Logo from './logo';
+import Toolbar from './widget/Toolbar'
 
 import config from './../config';
 
@@ -44,7 +45,7 @@ class Sidebar extends React.Component {
 
     return (
       <div id="sidebar" className={this.props.className}>
-        <h2><Logo /> Library</h2>
+        <Toolbar className="Sidebar-topBar"><Logo /> Library</Toolbar>
 
         <div className="sidebar-content">
           <button

@@ -2,6 +2,8 @@ import * as React from 'react'
 import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types'
 
+import Toolbar from '../widget/Toolbar'
+
 class BottomBar extends React.Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -11,7 +13,7 @@ class BottomBar extends React.Component {
 
   render() {
     return (
-      <div className="bottom-bar">
+      <Toolbar className="bottom-bar">
         <div className="content">
           <span className="selection">
             <span>{this.props.highlighted.length} selected</span>
@@ -27,7 +29,7 @@ class BottomBar extends React.Component {
             {this.props.photosCount} item{this.props.photosCount > 1 ? 's' : ''}
           </span>
         </div>
-      </div>
+      </Toolbar>
     );
   }
 }
