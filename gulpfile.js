@@ -31,7 +31,7 @@ var typescriptSettings = {
 }
 
 
-gulp.task("transpile", ['lint'], () => {
+gulp.task("transpile", () => {
   return gulp.src([ 'src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx' ])
     .pipe(sourcemaps.init())
     .pipe(typescript(typescriptSettings))
@@ -47,7 +47,7 @@ gulp.task("transpile-tests", () => {
     .pipe(gulp.dest("tests-dist"));
 });
 
-gulp.task('styles', ['lint'], () => {
+gulp.task('styles', () => {
   return gulp.src('src/less/index.less')
     .pipe(less())
     .pipe(gulp.dest('dist'));
