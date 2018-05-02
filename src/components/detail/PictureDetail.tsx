@@ -82,17 +82,17 @@ export default class PictureDetail extends React.Component<Props, State> {
 
     showTagDialog() {
         this.unbindEventListeners();
-        this.setState({ ...this.state, modal: 'addTags' });
+        this.setState({ modal: 'addTags' });
     }
 
     closeDialog() {
         this.bindEventListeners();
-        this.setState({ ...this.state, modal: 'none' });
+        this.setState({ modal: 'none' });
     }
 
     showExportDialog() {
         this.unbindEventListeners();
-        this.setState({ ...this.state, modal: 'export' });
+        this.setState({ modal: 'export' });
     }
 
     cancelEvent() {
@@ -155,7 +155,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     finishLoading() {
-        this.setState({ ...this.state, loaded: true });
+        this.setState({ loaded: true });
     }
 
     componentWillReceiveProps() {
@@ -185,7 +185,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     bindEventListeners() {
-        this.setState({ ...this.state, bound: true });
+        this.setState({ bound: true });
 
         document.addEventListener('contextmenu', this.contextMenu);
 
@@ -196,7 +196,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     unbindEventListeners() {
-        this.setState({ ...this.state, bound: false });
+        this.setState({ bound: false });
 
         document.removeEventListener('contextmenu', this.contextMenu);
 
