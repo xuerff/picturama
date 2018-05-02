@@ -2,6 +2,7 @@ import { ipcRenderer, remote, Menu as MenuType } from 'electron';
 import * as classNames from 'classnames'
 import * as React from 'react'
 import * as Loader from 'react-loader'
+import { findDOMNode } from 'react-dom'
 
 import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
@@ -9,6 +10,7 @@ import AvailableEditors from '../../available-editors'
 
 import AddTags from '../add-tags';
 import Export from '../export';
+import ImageCanvas from './ImageCanvas'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
@@ -38,7 +40,9 @@ interface Props {
 interface State {
     bound: boolean,
     modal: 'addTags' | 'none' | 'export',
-    loaded: boolean
+    loaded: boolean,
+    canvasWidth?: number
+    canvasHeight?: number
 }
 
 export default class PictureDetail extends React.Component<Props, State> {
@@ -60,6 +64,7 @@ export default class PictureDetail extends React.Component<Props, State> {
         this.toggleDiff = this.toggleDiff.bind(this);
         this.moveToTrash = this.moveToTrash.bind(this);
         this.addEditorMenu = this.addEditorMenu.bind(this);
+        this.updateCanvasSize = this.updateCanvasSize.bind(this)
     }
 
     contextMenu(e) {
@@ -154,12 +159,12 @@ export default class PictureDetail extends React.Component<Props, State> {
         this.bindEventListeners();
     }
 
-    finishLoading() {
-        this.setState({ loaded: true });
-    }
-
     componentWillReceiveProps() {
         this.bindEventListeners();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        this.updateCanvasSize()
     }
 
     componentWillUnmount() {
@@ -187,6 +192,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     bindEventListeners() {
         this.setState({ bound: true });
 
+        window.addEventListener('resize', this.updateCanvasSize);
         document.addEventListener('contextmenu', this.contextMenu);
 
         ipcRenderer.send('toggleAddTagMenu', true);
@@ -198,6 +204,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     unbindEventListeners() {
         this.setState({ bound: false });
 
+        window.removeEventListener('resize', this.updateCanvasSize);
         document.removeEventListener('contextmenu', this.contextMenu);
 
         ipcRenderer.send('toggleAddTagMenu', false);
@@ -206,8 +213,25 @@ export default class PictureDetail extends React.Component<Props, State> {
         ipcRenderer.removeAllListeners('addTagClicked');
     }
 
+    finishLoading() {
+        this.setState({ loaded: true });
+    }
+
+    updateCanvasSize() {
+        const state = this.state
+
+        const bodyElem = findDOMNode(this.refs.body)
+        const canvasWidth  = Math.round(bodyElem.clientWidth  * 0.9)
+        const canvasHeight = Math.round(bodyElem.clientHeight * 0.9)
+
+        if (state.canvasWidth !== canvasWidth || state.canvasHeight !== canvasHeight) {
+            this.setState({ canvasWidth, canvasHeight })
+        }
+    }
+
     render() {
         const props = this.props
+        const state = this.state
 
         let imgClass = classNames(
             'PictureDetail-image shadow--2dp',
@@ -245,10 +269,13 @@ export default class PictureDetail extends React.Component<Props, State> {
                     </ButtonGroup>
                 </Toolbar>
 
-                <div className="PictureDetail-body">
-                    <img
-                        className={imgClass}
+                <div className="PictureDetail-body" ref="body">
+                    <ImageCanvas
+                        className="PictureDetail-image"
+                        width={state.canvasWidth}
+                        height={state.canvasHeight}
                         src={props.photo.thumb}
+                        orientation={props.photo.orientation}
                         onLoad={this.finishLoading}
                     />
                 </div>
