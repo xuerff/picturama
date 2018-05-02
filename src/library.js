@@ -1,6 +1,6 @@
 import { ipcMain, shell } from 'electron';
-import moment from 'moment';
-import notifier from 'node-notifier';
+import * as moment from 'moment'
+import * as notifier from 'node-notifier'
 import * as fs from 'fs'
 import * as Promise from 'bluebird'
 

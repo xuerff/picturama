@@ -1,9 +1,9 @@
 import { remote } from 'electron';
 import * as fs from 'fs'
 import * as Promise from 'bluebird'
-import notifier from 'node-notifier';
-import libraw from 'libraw';
-import sharp from 'sharp';
+import * as notifier from 'node-notifier'
+import * as libraw from 'libraw'
+import * as sharp from 'sharp'
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 

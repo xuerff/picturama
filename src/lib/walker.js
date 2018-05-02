@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import Path from 'path';
+import * as Path from 'path'
 import * as Promise from 'bluebird'
 
 const fsReadDir = Promise.promisify(fs.readdir);

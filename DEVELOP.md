@@ -10,6 +10,13 @@ npm install
 npm start
 ```
 
+If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try again:
+
+```bash
+rm -rf ~/.node-gyp
+```
+
+
 
 UI sandbox
 ----------
@@ -25,7 +32,7 @@ UI sandbox
 
 4. Rebuild (in extra console):
     ```bash
-    ./node_modules/.bin/gulp transpile styles styles-sandbox
+    ./node_modules/.bin/gulp transpile styles
     ```
 
 5. Reload UI sandbox: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)

@@ -1,7 +1,7 @@
-import sharp from 'sharp';
-import libraw from 'libraw';
+import * as sharp from 'sharp'
+import * as libraw from 'libraw'
 import * as fs from 'fs'
-import moment from 'moment';
+import * as moment from 'moment'
 import * as Promise from 'bluebird'
 
 import config from './config';

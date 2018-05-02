@@ -26,7 +26,7 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const menuSettings = settings.menus || defaultMenuSettings
+    const menuSettings = (settings && settings.menus) || defaultMenuSettings
 
     let menus = []
     menuSettings.forEach((menu, key) => {
