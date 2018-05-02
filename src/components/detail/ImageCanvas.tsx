@@ -96,7 +96,7 @@ class ImageCanvas extends React.Component<Props, State> {
         return (
             <div
                 className={classNames(props.className, 'ImageCanvas')}
-                style={props.style}
+                style={{ ...props.style, width: props.width, height: props.height }}
             >
                 <img
                     ref="texture"
