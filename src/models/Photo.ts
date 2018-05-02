@@ -3,8 +3,9 @@ import * as shortid from 'shortid'
 
 import config from './../config';
 
-import Version from './version';
+import { ExifOrientation } from './DataTypes'
 import Tag, { TagType } from './Tag'
+import Version from './version'
 
 shortid.characters(config.characters);
 
@@ -19,7 +20,7 @@ export interface PhotoType {
     flag: number,               // Example: 0
     created_at: number,         // Example: 0
     updated_at: number | null,  // Example: null
-    orientation: number,        // Example: 1
+    orientation: ExifOrientation, // Example: 1 (= ExifOrientation.Up)
     exposure_time: number,      // Example: 0.0166
     iso: number,                // Example: 0
     focal_length: number,       // Example: 5

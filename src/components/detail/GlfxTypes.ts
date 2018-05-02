@@ -74,7 +74,13 @@ export interface GlfxCanvas {
     // TODO: timeshift
     // TODO: reaction
     // TODO: relief
-    // TODO: transform
+
+    /**
+     * @param x the x translation (from 0 = left to 1 = right)
+     * @param y the y translation (from 0 = bottom to 1 = top)
+     */
+    transform(x: number, y: number, scale: number, angle: number)
+
     // TODO: polygon
     // TODO: matte
     // TODO: waveform

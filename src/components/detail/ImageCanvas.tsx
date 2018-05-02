@@ -3,6 +3,7 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 
 import { Glfx, GlfxCanvas, GlfxCanvasElement, GlfxTexture } from './GlfxTypes'
+import { ExifOrientation } from '../../models/DataTypes'
 
 
 // `node_modules/glfx-js/glfx.js` is not in a module syntax and defines the global var `fx`
@@ -16,8 +17,8 @@ interface Props {
     width: number
     height: number
     src: string
-    /** The EXIF orientation. See: https://www.impulseadventure.com/photo/exif-orientation.html */
-    orientation: number
+    orientation: ExifOrientation
+    onLoad: () => void
 }
 
 interface State {
@@ -40,13 +41,18 @@ class ImageCanvas extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this.destroyCanvas()
-        this.destroyTexture()
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.src !== nextProps.src) {
+        const props = this.props
+        if (props.src !== nextProps.src || props.width !== nextProps.width || props.height !== nextProps.height || props.orientation !== nextProps.orientation) {
             this.destroyCanvas()
-            this.destroyTexture()
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!this.canvas) {
+            this.updateCanvas()
         }
     }
 
@@ -55,9 +61,6 @@ class ImageCanvas extends React.Component<Props, State> {
             this.canvas.parentNode.removeChild(this.canvas)
             this.canvas = null
         }
-    }
-
-    destroyTexture() {
         if (this.texture) {
             this.texture.destroy()
             this.texture = null
@@ -65,21 +68,34 @@ class ImageCanvas extends React.Component<Props, State> {
     }
 
     onTextureImageLoaded() {
-        const props = this.props
+        this.updateCanvas()
+        this.props.onLoad()
+    }
 
-        const imgElem: HTMLImageElement = findDOMNode(this.refs.texture)
-        const imgWidth  = imgElem.width
-        const imgHeight = imgElem.height
-        const imgRatio = imgWidth / imgHeight
-        const viewRatio = props.width / props.height
-        const canvasScale = Math.min(1, (imgHeight > viewRatio) ? (props.width / imgWidth) : (props.height / imgHeight))
-        const canvasWidth = Math.round(imgWidth * canvasScale)
-        const canvasHeight = Math.round(imgHeight * canvasScale)
+    updateCanvas() {
+        const props = this.props
+        const orientation = props.orientation
 
         this.destroyCanvas()
 
+        const imgElem: HTMLImageElement = findDOMNode(this.refs.texture)
+        if (!imgElem || !imgElem.complete) {
+            return
+        }
+
+        const imgWidth  = imgElem.width
+        const imgHeight = imgElem.height
+        const switchSides = orientation === ExifOrientation.Left || orientation === ExifOrientation.Right
+        const rotatedWidth  = switchSides ? imgHeight : imgWidth
+        const rotatedHeight = switchSides ? imgWidth : imgHeight
+        const canvasScale = Math.min(1, props.width / rotatedWidth, props.height / rotatedHeight)
+        const canvasWidth = Math.round(imgWidth * canvasScale)
+        const canvasHeight = Math.round(imgHeight * canvasScale)
+
+        console.log('## data', JSON.stringify({ orientation, imgWidth, imgHeight, switchSides, rotatedWidth, rotatedHeight, canvasScale, canvasWidth, canvasHeight }))
+
         this.canvas = fx.canvas({ antialias: true })
-        this.canvas.className = 'ImageCanvas-canvas'
+        this.canvas.className = this.getCanvasCssClass()
         const canvas: GlfxCanvas = this.canvas
         canvas.initialize(canvasWidth, canvasHeight)
 
@@ -89,6 +105,16 @@ class ImageCanvas extends React.Component<Props, State> {
             .update()
 
         imgElem.parentNode.insertBefore(this.canvas, imgElem)
+    }
+
+    getCanvasCssClass() {
+        const orientation = this.props.orientation
+        switch (this.props.orientation) {
+            case ExifOrientation.Left:   return 'ImageCanvas-canvas isTurnedLeft'
+            case ExifOrientation.Right:  return 'ImageCanvas-canvas isTurnedRight'
+            case ExifOrientation.Bottom: return 'ImageCanvas-canvas isTurnedBottom'
+            default:                     return 'ImageCanvas-canvas'
+        }
     }
 
     render() {
