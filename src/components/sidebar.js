@@ -16,7 +16,7 @@ if (fs.existsSync(config.settings))
   settings = require(config.settings);
 
 const defaultMenuSettings = [ 'dates', 'tags' ]
-  // Don't showing 'devices', since USB detection is deactivated in `browser.js`
+// Don't show 'devices', since USB detection is deactivated in `browser.js`
 
 
 class Sidebar extends React.Component {
@@ -26,7 +26,7 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const menuSettings = (settings && settings.menus) || defaultMenuSettings
+    const menuSettings = settings && settings.menus ? settings.menus : defaultMenuSettings;
 
     let menus = []
     menuSettings.forEach((menu, key) => {
