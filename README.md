@@ -21,24 +21,14 @@
 - [x] Export to external editor
 - [ ] Export
 
+Searching for USB support on Linux? Check out the [Branch linux-usb](https://github.com/til-schneider/ansel/tree/linux-usb).
+
 ## Install
 
-### Prerequistes
-
-As of today, only **Ubuntu 14.04 & 16.04 LTS** 64-bits are supported.
-
-In order to be able to run, ansel requires the following libraries:
-
 ```bash
-sudo apt-get install zlib1g-dev libudev-dev
-```
-
-### Build from sources
-
-```bash
-sudo npm install -g gulp
+cd path/to/ansel
 npm install
-gulp
+npm start
 ```
 
 ## Supported cameras
@@ -48,6 +38,10 @@ gulp
 - [x] Fuji X100T
 - [x] Canon 5D Mark I
 - [ ] Canon EOS 700D
+
+## Develop
+
+See [DEVELOP.md](DEVELOP.md) for details about how to develop Ansel.
 
 ## Technologies & libraries
 
@@ -60,14 +54,13 @@ gulp
 - [Bookshelf.js](http://bookshelfjs.org/) / [Knex.js](http://knexjs.org/)
 - [Bluebird.js](http://bluebirdjs.com/)
 - [Chokidar](https://github.com/paulmillr/chokidar)
-- [Exiv2](http://www.exiv2.org) - [node bindings](https://github.com/dberesford/exiv2node)
 - [Libraw](http://www.libraw.org/) - [node bindings](https://github.com/m0g/node-libraw)
 - [Moment.js](http://momentjs.com/)
 - [Font Awesome](http://fontawesome.io/)
 
 ### Testing, building & transpiling
 
-- [Babel.js](http://babeljs.io/)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Spectron](http://electron.atom.io/spectron/)
 - [Gulp](http://gulpjs.com/)
 - [Mocha](http://mochajs.org/)

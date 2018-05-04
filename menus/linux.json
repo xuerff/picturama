@@ -4,6 +4,7 @@
       "label": "File",
       "submenu": [
         {
+          "id": "export",
           "label": "Export picture(s)",
           "accelerator": "Ctrl+Shift+E",
           "enabled": false,
@@ -44,6 +45,7 @@
     {
       "label": "Tags",
       "submenu": [{
+        "id": "addTags",
         "label": "Add tags",
         "accelerator": "Ctrl+T",
         "enabled": false,
@@ -51,7 +53,7 @@
       },
       {
         "label": "Scan for tags",
-        "accelerator": "Shift+Ctrl+R",
+        "accelerator": "Shift+Ctrl+T",
         "click": "scanForTags"
       }]
     },
@@ -62,6 +64,11 @@
           "label": "Toggle DevTools",
           "accelerator": "Shift+Ctrl+I",
           "click": "toggleDevTools"
+        },
+        {
+          "label": "Toggle Sandbox",
+          "accelerator": "Shift+Ctrl+S",
+          "click": "toggleSandbox"
         },
         {
           "label": "Fix missing versions",

@@ -1,7 +1,12 @@
 @import "./../../node_modules/font-awesome/less/font-awesome";
 @import "./variables.less";
 @import "./fonts.less";
-@import "./splash.less";
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
 
 html, body, #app, #ansel, #sidebar, #container {
   height: 100%;
@@ -135,9 +140,6 @@ button {
   float: right;
 }
 
-@import "./sidebar.less";
-@import "./header.less";
-
 div.outer-modal {
   position: fixed;
   top: 0;
@@ -176,15 +178,21 @@ div.outer-modal {
 
     /* create a full-height inline block pseudo=element */
     div.picture-diff div.before:before, 
-    div.picture-diff div.after:before, 
-    div.picture-detail:before { 
+    div.picture-diff div.after:before { 
       content: ' ';
       display: inline-block;
       vertical-align: middle;  /* vertical alignment of the inline element */
       height: 100%;
     }
 
-    div.picture-diff, div.picture-detail {
+    .Library-body {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    div.picture-diff {
       width: 100%;
       height: ~"calc(100% - 26px)";
       margin: 0 auto;
@@ -213,28 +221,7 @@ div.outer-modal {
         position: absolute;
         bottom: -26px;
         left: 0;
-        /*background: rgba(30, 30, 30, 0.7);*/
-        background: rgba(38, 50, 56, 0.7);
-        min-height: 24px;
         width: 100%;
-
-        ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-
-          li {
-            float: left;
-            margin-right: 10px;
-          }
-
-          li.title {
-            font-weight: 200;
-            font-size: 26px;
-            line-height: 26px;
-            background: @deep-orange-500;
-          }
-        }
       }
     }
 
@@ -356,4 +343,4 @@ div.outer-modal {
   }
 }
 
-@import './grid.less';
+@import './components.less';

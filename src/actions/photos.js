@@ -1,4 +1,4 @@
-import Photo from './../models/photo';
+import Photo from '../models/Photo'
 
 export const getPhotos = () => dispatch => {
   Photo

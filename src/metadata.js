@@ -1,39 +1,54 @@
-import matches from './lib/matches';
+import * as fs from 'fs'
 
-const accessByMatch = (obj, key) => {
-  let id = matches(Object.keys(obj), key);
+import * as Promise from 'bluebird'
+import * as ExifParser from 'exif-parser'
 
-  return obj[Object.keys(obj)[id]];
-};
+const readFile = Promise.promisify(fs.readFile)
+const fileStat = Promise.promisify(fs.stat)
 
-// TODO: Why is eval used here?
-const processData = exData => {
-  let xmp = {
-    exposureTime: eval(accessByMatch(exData, 'ExposureTime')),
-    iso: parseInt(accessByMatch(exData, 'ISOSpeedRating'), 10),
-    aperture: eval(accessByMatch(exData, 'FNumber')),
-    tags: []
+
+export function readMetadataOfImage(imagePath) {
+  return readExifOfImage(imagePath)
+    .then(extractMetaDataFromExif)
+    .catch(error => {
+      if (error.message !== 'Invalid JPEG section offset') {
+        console.log(`Reading EXIF data from ${imagePath} failed`, error)
+      }
+      return fileStat(imagePath)
+        .then(stat => ({
+          createdAt: stat.birthtime,
+          orientation: 1,
+          tags: []
+        }))
+    })
+}
+
+
+function readExifOfImage(imagePath) {
+  return readFile(imagePath)
+    .then(buffer => {
+      const parser = ExifParser.create(buffer)
+      return parser.parse()
+    })
+}
+
+
+function extractMetaDataFromExif(exifData) {
+  const exifTags = exifData.tags
+  let metaData = {
+    exposureTime: exifTags.ExposureTime,
+    iso:          exifTags.ISO,
+    aperture:     exifTags.FNumber,
+    focalLength:  exifTags.FocalLength,
+    createdAt:    new Date((exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate) * 1000),
+    orientation:  exifTags.Orientation || 1,
+      // Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html
+    tags:         []
   };
 
-  if (exData.hasOwnProperty('Exif.Photo.FocalLength'))
-    xmp.focalLength = eval(exData['Exif.Photo.FocalLength']);
-  else
-    xmp.focalLength = eval(accessByMatch(exData, 'FocalLength'));
+  // TODO: Translate from `exiv2` result into `exif-parser` result
+  //if (exData.hasOwnProperty('Xmp.dc.subject'))
+  //  metaData.tags = exData['Xmp.dc.subject'].split(', ');
 
-  if (exData.hasOwnProperty('Xmp.dc.subject'))
-    xmp.tags = exData['Xmp.dc.subject'].split(', ');
-
-  if (exData.hasOwnProperty('Exif.Photo.DateTimeOriginal'))
-    xmp.createdAt = exData['Exif.Photo.DateTimeOriginal'];
-  else if (exData.hasOwnProperty('Exif.Image.DateTime'))
-    xmp.createdAt = exData['Exif.Image.DateTime'];
-
-  if (exData.hasOwnProperty('Exif.Image.Orientation'))
-    xmp.orientation = parseInt(exData['Exif.Image.Orientation'], 10);
-  else
-    xmp.orientation = 1;
-
-  return xmp;
+  return metaData;
 };
-
-export default { processData };

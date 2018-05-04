@@ -1,4 +1,4 @@
-import chokidar from 'chokidar';
+import * as chokidar from 'chokidar'
 
 import Version from './models/version';
 import config from './config';

@@ -1,0 +1,85 @@
+{
+  "menu": [
+    {
+      "label": "Ansel",
+      "submenu": [
+        {
+          "label": "Version",
+          "enabled": false
+        },
+        {
+          "label": "Quit",
+          "accelerator": "Cmd+Q",
+          "click": "close"
+        }
+      ]
+    },
+    {
+      "label": "File",
+      "submenu": [
+        {
+          "id": "export",
+          "label": "Export picture(s)",
+          "accelerator": "Cmd+Shift+E",
+          "enabled": false,
+          "click": "export"
+        },
+        {
+          "label": "Scan",
+          "accelerator": "Cmd+R",
+          "click": "scan"
+        }
+      ]
+    },
+    {
+      "label": "View",
+      "submenu": [
+        {
+          "label": "Reload",
+          "accelerator": "Shift+Cmd+R",
+          "click": "reload"
+        },
+        {
+          "label": "Enter Fullscreen",
+          "accelerator": "F11",
+          "click": "fullscreen"
+        }
+      ]
+    },
+    {
+      "label": "Tags",
+      "submenu": [{
+        "id": "addTags",
+        "label": "Add tags",
+        "accelerator": "Cmd+T",
+        "enabled": false,
+        "click": "addTags"
+      },
+      {
+        "label": "Scan for tags",
+        "accelerator": "Shift+Cmd+T",
+        "click": "scanForTags"
+      }]
+    },
+    {
+      "label": "Developer",
+      "submenu": [
+        {
+          "label": "Toggle DevTools",
+          "accelerator": "Cmd+Alt+I",
+          "click": "toggleDevTools"
+        },
+        {
+          "label": "Toggle Sandbox",
+          "accelerator": "Cmd+Alt+S",
+          "click": "toggleSandbox"
+        },
+        {
+          "label": "Fix missing versions",
+          "accelerator": "Shift+Cmd+V",
+          "click": "fixMissingVersions"
+        }
+      ]
+    }
+  ]
+}

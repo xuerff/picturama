@@ -1,5 +1,5 @@
-import Photo from './../models/photo';
-import Tag from './../models/tag';
+import Photo from '../models/Photo'
+import Tag from './../models/Tag'
 
 export const setTagFilter = tag => dispatch => {
   new Tag({ id: tag.id })

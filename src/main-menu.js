@@ -1,9 +1,9 @@
-import { ipcMain, Menu } from 'electron';
+import { ipcMain, Menu, BrowserWindow } from 'electron'
 
 import config from './config';
-import npmPackage from './../package.json';
+import * as npmPackage from './../package.json'
 
-const template = require(`${config.menusFolder}/linux.json`);
+const template = require(config.menuPath);
 
 class MainMenu {
   constructor(mainWindow, library) {
@@ -17,6 +17,7 @@ class MainMenu {
     this.reload = this.reload.bind(this);
     this.fullscreen = this.fullscreen.bind(this);
     this.toggleDevTools = this.toggleDevTools.bind(this);
+    this.toggleSandbox = this.toggleSandbox.bind(this);
     this.addTags = this.addTags.bind(this);
     this.export = this.export.bind(this);
     this.fixMissingVersions = this.fixMissingVersions.bind(this);
@@ -36,14 +37,26 @@ class MainMenu {
     });
 
     ipcMain.on('toggleAddTagMenu', (e, state) => {
-      this.menu.items[2].submenu.items[0].enabled = state;
+      this.getMenuItemById('addTags').enabled = state
     });
 
     ipcMain.on('toggleExportMenu', (e, state) => {
-      this.menu.items[0].submenu.items[0].enabled = state;
+      this.getMenuItemById('export').enabled = state
     });
 
     this.render();
+  }
+
+  getMenuItemById(id) {
+    // According to API docs an electron menu should have a `getMenuItemById` method, but it's not there
+    // -> We do it by hand
+    for (let item of this.menu.items) {
+      for (let subItem of item.submenu.items) {
+        if (subItem.id === id) {
+          return subItem
+        }
+      }
+    }
   }
 
   scan() {
@@ -59,7 +72,10 @@ class MainMenu {
   }
 
   reload() {
-    this.mainWindow.restart();
+    this.mainWindow.reload()
+    if (this.sandboxWindow) {
+      this.sandboxWindow.reload()
+    }
   }
 
   fullscreen() {
@@ -68,6 +84,24 @@ class MainMenu {
 
   toggleDevTools() {
     this.mainWindow.toggleDevTools();
+  }
+
+  toggleSandbox() {
+    if (this.sandboxWindow) {
+      this.sandboxWindow.close()
+      this.sandboxWindow = null
+    } else {
+      this.sandboxWindow = new BrowserWindow({
+        title: 'UI Sandbox',
+        webPreferences: {
+          experimentalFeatures: true,
+          blinkFeatures: 'CSSGridLayout'
+        }
+      })
+      this.sandboxWindow.maximize()
+      this.sandboxWindow.loadURL('file://' + __dirname + '/../static/sandbox.html')
+      this.sandboxWindow.toggleDevTools()
+    }
   }
 
   addTags() {
@@ -84,7 +118,7 @@ class MainMenu {
 
   render() {
     this.menu = Menu.buildFromTemplate(this.template);
-    this.mainWindow.setMenu(this.menu);
+    Menu.setApplicationMenu(this.menu);
   }
 }
 

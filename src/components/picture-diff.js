@@ -1,9 +1,10 @@
-import React from 'react';
-import Loader from 'react-loader';
-import PropTypes from 'prop-types';
+import * as classNames from 'classnames'
+import * as React from 'react'
+import * as Loader from 'react-loader'
+import * as PropTypes from 'prop-types'
 
 import keymapManager from './../keymap-manager';
-import Photo from './../models/photo';
+import Photo from '../models/Photo'
 
 let rotation = {};
 
@@ -12,6 +13,7 @@ rotation[8] = 'minus-ninety';
 
 class PictureDiff extends React.Component {
   static propTypes = {
+    className: PropTypes.any,
     actions: PropTypes.object.isRequired,
     photo: PropTypes.object.isRequired
   }
@@ -76,7 +78,7 @@ class PictureDiff extends React.Component {
       last = this.state.photo.versions[this.state.photo.versions.length - 1];
 
     return (
-      <div className="picture-diff" ref="diff">
+      <div className={classNames(this.props.className, "picture-diff")} ref="diff">
         <div className="before v-align">
           <h3>Before</h3>
           <img

@@ -1,4 +1,4 @@
-import KeymapManager from 'atom-keymap';
+import * as KeymapManager from 'atom-keymap'
 
 import config from './config';
 

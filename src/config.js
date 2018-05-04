@@ -1,4 +1,5 @@
-import fs from 'fs';
+import * as fs from 'fs'
+import * as os from 'os'
 
 let dotAnsel = `${process.env.HOME}/.ansel`;
 let migrationsFolder = `${process.resourcesPath}/app/migrations`;
@@ -20,7 +21,11 @@ if (process.env.ANSEL_TEST_MODE) {
   migrationsFolder = `${process.env.INIT_CWD}/migrations`;
 }
 
+const menusFolder = `${anselFolder}/menus`;
+const platform = os.platform();
+
 export default {
+  platform,
   characters: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZéè',
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
   acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
@@ -28,8 +33,9 @@ export default {
   exportFormats: [ 'jpg', 'png', 'webp' ],
   workExt: 'webp',
   dotAnsel,
-  menusFolder: `${anselFolder}/menus`,
+  menusFolder,
   keymapsFolder: `${anselFolder}/keymaps`,
+  menuPath: `${menusFolder}/${platform}.json`,
   dbFile: `${dotAnsel}/db.sqlite3`,
   settings: `${dotAnsel}/settings.json`,
   thumbsPath: `${dotAnsel}/thumbs`,
