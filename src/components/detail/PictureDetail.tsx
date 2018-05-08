@@ -10,7 +10,7 @@ import AvailableEditors from '../../available-editors'
 
 import AddTags from '../add-tags';
 import Export from '../export';
-import ImageCanvas from './ImageCanvas'
+import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
@@ -270,7 +270,7 @@ export default class PictureDetail extends React.Component<Props, State> {
                 </Toolbar>
 
                 <div className="PictureDetail-body" ref="body">
-                    <ImageCanvas
+                    <PhotoPane
                         className="PictureDetail-image"
                         width={state.canvasWidth}
                         height={state.canvasHeight}

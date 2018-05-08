@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import ImageCanvas from '../../components/detail/ImageCanvas'
+import PhotoPane from '../../components/detail/PhotoPane'
 import { ExifOrientation } from '../../models/DataTypes'
 
 const defaultProps = {
@@ -12,30 +12,30 @@ const defaultProps = {
     onLoad: action('onLoad')
 }
 
-addSection('ImageCanvas')
+addSection('PhotoPane')
     .add('normal', context => (
-        <ImageCanvas
+        <PhotoPane
             {...defaultProps}
             src="../specs/photos/IMG_9700.JPG"
             orientation={ExifOrientation.Up}
         />
     ))
     .add('rotate left', context => (
-        <ImageCanvas
+        <PhotoPane
             {...defaultProps}
             src="../specs/photos/IMG_9700.JPG"
             orientation={ExifOrientation.Left}
         />
     ))
     .add('rotate right', context => (
-        <ImageCanvas
+        <PhotoPane
             {...defaultProps}
             src="../specs/photos/IMG_9700.JPG"
             orientation={ExifOrientation.Right}
         />
     ))
     .add('rotate bottom', context => (
-        <ImageCanvas
+        <PhotoPane
             {...defaultProps}
             src="../specs/photos/IMG_9700.JPG"
             orientation={ExifOrientation.Bottom}

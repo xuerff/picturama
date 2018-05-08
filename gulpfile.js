@@ -17,7 +17,7 @@ var npmPkgs = require('./package.json')
 
 
 var typescriptSettings = {
-  target: 'es5',
+  target: 'es6',
   jsx: 'react',
   module: 'commonjs',
   moduleResolution: 'node',
