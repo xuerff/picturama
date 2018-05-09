@@ -4,8 +4,8 @@ import { findDOMNode } from 'react-dom'
 import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation } from '../../models/DataTypes'
-import WebGLCanvas, { Texture } from '../../renderer/WebGLCanvas'
-import CancelablePromise from '../../util/CancelablePromise'
+import PhotoCanvas from '../../renderer/PhotoCanvas'
+import CancelablePromise, { isCancelError } from '../../util/CancelablePromise'
 
 
 interface Props {
@@ -23,8 +23,7 @@ interface State {
 
 export default class PhotoPane extends React.Component<Props, State> {
 
-    private canvas: WebGLCanvas | null = null
-    private baseTexturePromise: CancelablePromise<void> | null = null
+    private canvas: PhotoCanvas | null = null
 
 
     constructor(props) {
@@ -32,7 +31,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.canvas = new WebGLCanvas()
+        this.canvas = new PhotoCanvas()
         const canvasElem = this.canvas.getElement()
         canvasElem.className = 'PhotoPane-canvas'
         findDOMNode(this.refs.main).appendChild(canvasElem)
@@ -53,59 +52,23 @@ export default class PhotoPane extends React.Component<Props, State> {
         const props = this.props
         if (props.src !== prevProps.src) {
             this.canvas.getElement().style.display = 'none'
-
-            if (this.baseTexturePromise !== null) {
-                this.baseTexturePromise.cancel()
-            }
-    
-            this.baseTexturePromise = this.canvas.createTextureFromSrc(props.src)
-                .then(texture => {
-                    this.canvas.setBaseTexture(texture)
-                    this.baseTexturePromise = null
-                    this.updateCanvasSize()
+            this.canvas.loadFromSrc(props.src)
+                .then(() => {
                     this.canvas.getElement().style.display = null
                     this.props.onLoad()
                 })
-                .catch(error => console.error(`Loading ${props.src} failed`, error))
+                .catch(error => {
+                    if (!isCancelError(error)) {
+                        console.error(`Loading ${props.src} failed`, error)
+                    }
+                })
         }
         if (props.width !== prevProps.width || props.height !== prevProps.height || props.orientation !== prevProps.orientation) {
-            this.updateCanvasSize()
+            this.canvas
+                .setMaxSize(props.width, props.height)
+                .setExifOrientation(props.orientation)
+                .update()
         }
-    }
-
-    updateCanvasSize() {
-        const props = this.props
-
-        const texture = this.canvas.getBaseTexture()
-        if (texture == null) {
-            return
-        }
-
-        const textureWidth  = texture.width
-        const textureHeight = texture.height
-        const switchSides = props.orientation === ExifOrientation.Left || props.orientation === ExifOrientation.Right
-        const rotatedWidth  = switchSides ? textureHeight : textureWidth
-        const rotatedHeight = switchSides ? textureWidth : textureHeight
-        const canvasScale = Math.min(1, props.width / rotatedWidth, props.height / rotatedHeight)
-        const canvasWidth = Math.round(rotatedWidth * canvasScale)
-        const canvasHeight = Math.round(rotatedHeight * canvasScale)
-
-        let rotationSteps = 0
-        switch (props.orientation) {
-            case ExifOrientation.Right:  rotationSteps = 1; break
-            case ExifOrientation.Bottom: rotationSteps = 2; break
-            case ExifOrientation.Left:   rotationSteps = 3; break
-        }
-
-        // Important for matrix: Build it backwards (last operation first)
-        const matrix = mat4.create()
-        mat4.scale(matrix, matrix, [ canvasScale, canvasScale, 1 ])
-        mat4.rotateZ(matrix, matrix, rotationSteps * Math.PI / 2)
-
-        this.canvas
-            .setBaseTransformationMatrix(matrix)
-            .setSize(canvasWidth, canvasHeight)
-            .update()
     }
 
     render() {
