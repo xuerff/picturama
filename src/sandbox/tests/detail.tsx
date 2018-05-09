@@ -41,6 +41,7 @@ addSection('Detail')
                 moveToTrash: action('moveToTrash'),
                 toggleDiff:  action('toggleDiff'),
                 toggleFlag:  action('toggleFlag (action)'),
+                editRotate:  action('editRotate')
             }}
             toggleFlag={action('toggleFlag (direct)')}
             isFirst={true}

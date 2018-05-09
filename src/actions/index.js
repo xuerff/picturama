@@ -11,6 +11,7 @@ export * from './import';
 export * from './photos';
 export * from './flags';
 export * from './grid';
+export * from './edit'
 
 export const getProcessed = () => dispatch => {
   Photo.forge()

@@ -14,7 +14,9 @@ import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
-import Icon from '../widget/Icon'
+import FaIcon from '../widget/icon/FaIcon'
+import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
+import RotateRightIcon from '../widget/icon/RotateRightIcon'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType } from '../../models/Photo'
 
@@ -65,6 +67,8 @@ export default class PictureDetail extends React.Component<Props, State> {
         this.moveToTrash = this.moveToTrash.bind(this);
         this.addEditorMenu = this.addEditorMenu.bind(this);
         this.updateCanvasSize = this.updateCanvasSize.bind(this)
+        this.rotateLeft = this.rotateLeft.bind(this)
+        this.rotateRight = this.rotateRight.bind(this)
     }
 
     contextMenu(e) {
@@ -114,6 +118,14 @@ export default class PictureDetail extends React.Component<Props, State> {
     toggleDiff() {
         if (this.props.photo.versionNumber > 1)
             this.props.actions.toggleDiff();
+    }
+
+    rotateLeft() {
+        this.props.actions.editRotate(-1)
+    }
+
+    rotateRight() {
+        this.props.actions.editRotate(1)
     }
 
     componentDidMount() {
@@ -256,17 +268,27 @@ export default class PictureDetail extends React.Component<Props, State> {
             <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
                 <Toolbar className="PictureDetail-topBar">
                     <Button onClick={this.cancelEvent}>
-                        <Icon name="chevron-left"/>
+                        <FaIcon name="chevron-left"/>
                         <span>Back to library</span>
                     </Button>
                     <ButtonGroup>
                         <Button enabled={!props.isFirst} onClick={props.actions.setCurrentLeft} tip="Previous image [left]">
-                            <Icon name="arrow-left"/>
+                            <FaIcon name="arrow-left"/>
                         </Button>
                         <Button enabled={!props.isLast} onClick={props.actions.setCurrentRight} tip="Next image [right]">
-                            <Icon name="arrow-right"/>
+                            <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
+                    <span className="PictureDetail-topBarRight">
+                        <ButtonGroup>
+                            <Button onClick={this.rotateLeft} tip="Rotate image left">
+                                <RotateLeftIcon/>
+                            </Button>
+                            <Button onClick={this.rotateRight} tip="Rotate image right">
+                                <RotateRightIcon/>
+                            </Button>
+                        </ButtonGroup>
+                    </span>
                 </Toolbar>
 
                 <div className="PictureDetail-body" ref="body">
