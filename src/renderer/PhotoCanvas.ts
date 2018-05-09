@@ -20,7 +20,7 @@ export default class PhotoCanvas {
 
     private baseTexturePromise: CancelablePromise<void> | null = null
     private baseTexture: Texture | null = null
-    private squarePositionBuffer: GraphicBuffer
+    private unitSquareBuffer: GraphicBuffer
     private transformationShader: TransformationShader
 
 
@@ -28,15 +28,14 @@ export default class PhotoCanvas {
         this.webGlCanvas = new WebGLCanvas()
         const gl = this.webGlCanvas.gl
 
-        // Create a vertex buffer for a square (a square from 0,0 to 1,1)
+        // Create a buffer for a unit square (a square from 0,0 to 1,1)
         const squarePositions = new Float32Array([
-            // X, Y, Z, U, V
-            0.0, 0.0, 0.0, 0.0, 0.0,
-            1.0, 0.0, 0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 0.0, 1.0, 1.0
+            0.0, 0.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            1.0, 1.0,
         ])
-        this.squarePositionBuffer = this.webGlCanvas.createBufferFromData(squarePositions, 5)
+        this.unitSquareBuffer = this.webGlCanvas.createBufferFromData(squarePositions, 2)
 
         this.transformationShader = new TransformationShader(gl)
     }
@@ -135,8 +134,8 @@ export default class PhotoCanvas {
 
         this.transformationShader
             .use()
-            .setVertexBuffer(this.squarePositionBuffer, 3, 0)
-            .setTextureCoordBuffer(this.squarePositionBuffer, 2, 3)
+            .setVertexBuffer(this.unitSquareBuffer)
+            .setTextureCoordBuffer(this.unitSquareBuffer)
             .setTexture(baseTexture)
             .setUniforms({ uTransformationMatrix: matrix })
             .draw()
