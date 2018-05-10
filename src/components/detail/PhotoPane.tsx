@@ -4,6 +4,7 @@ import { findDOMNode } from 'react-dom'
 import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation } from '../../models/DataTypes'
+import { PhotoEffect } from '../../models/Photo'
 import PhotoCanvas from '../../renderer/PhotoCanvas'
 import CancelablePromise, { isCancelError } from '../../util/CancelablePromise'
 
@@ -15,6 +16,7 @@ interface Props {
     height: number
     src: string
     orientation: ExifOrientation
+    effects?: PhotoEffect[]
     onLoad: () => void
 }
 
@@ -50,11 +52,12 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     updateCanvas(prevProps: Partial<Props>) {
         const props = this.props
+        const canvas = this.canvas
         if (props.src !== prevProps.src) {
-            this.canvas.getElement().style.display = 'none'
-            this.canvas.loadFromSrc(props.src)
+            canvas.getElement().style.display = 'none'
+            canvas.loadFromSrc(props.src)
                 .then(() => {
-                    this.canvas.getElement().style.display = null
+                    canvas.getElement().style.display = null
                     this.props.onLoad()
                 })
                 .catch(error => {
@@ -63,11 +66,16 @@ export default class PhotoPane extends React.Component<Props, State> {
                     }
                 })
         }
-        if (props.width !== prevProps.width || props.height !== prevProps.height || props.orientation !== prevProps.orientation) {
-            this.canvas
+        if (props.width !== prevProps.width || props.height !== prevProps.height || props.orientation !== prevProps.orientation
+            || props.effects !== prevProps.effects)
+        {
+            canvas
                 .setMaxSize(props.width, props.height)
                 .setExifOrientation(props.orientation)
+                .setEffects(props.effects)
                 .update()
+
+            canvas.getElement().style.display = canvas.isValid() ? null : 'none'
         }
     }
 

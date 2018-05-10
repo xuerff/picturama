@@ -3,6 +3,7 @@ import { mat4 } from 'gl-matrix'
 import WebGLCanvas, { GraphicBuffer, Texture } from './WebGLCanvas'
 import { TransformationShader } from './Shaders'
 import { ExifOrientation } from '../models/DataTypes'
+import { PhotoEffect } from '../models/Photo'
 import CancelablePromise from '../util/CancelablePromise'
 
 /**
@@ -17,6 +18,9 @@ export default class PhotoCanvas {
 
     private src: string
     private exifOrientation: ExifOrientation
+    private effects: PhotoEffect[] | null
+
+    private valid: boolean = false
 
     private baseTexturePromise: CancelablePromise<void> | null = null
     private baseTexture: Texture | null = null
@@ -44,6 +48,10 @@ export default class PhotoCanvas {
         return this.webGlCanvas.getElement()
     }
 
+    isValid(): boolean {
+        return this.valid
+    }
+
     setMaxSize(width: number, height: number): this {
         this.maxWidth = width
         this.maxHeight = height
@@ -53,6 +61,11 @@ export default class PhotoCanvas {
 
     setExifOrientation(exifOrientation: ExifOrientation): this {
         this.exifOrientation = exifOrientation
+        return this
+    }
+
+    setEffects(effects: PhotoEffect[] | null): this {
+        this.effects = effects
         return this
     }
 
@@ -84,7 +97,13 @@ export default class PhotoCanvas {
 
     update(): this {
         const baseTexture = this.baseTexture
-        if (!baseTexture) {
+        const effects = this.effects
+        if (!baseTexture || !effects) {
+            const gl = this.webGlCanvas.gl
+            gl.clearColor(0.0, 0.0, 0.0, 1.0)
+            gl.clear(gl.COLOR_BUFFER_BIT)
+
+            this.valid = false
             return this
         }
 
@@ -92,32 +111,37 @@ export default class PhotoCanvas {
 
         // ===== Calculate =====
 
+        let rotationTurns = 0
+        switch (exifOrientation) {
+            case ExifOrientation.Right:  rotationTurns = 1; break
+            case ExifOrientation.Bottom: rotationTurns = 2; break
+            case ExifOrientation.Left:   rotationTurns = 3; break
+        }
+        for (const effect of effects) {
+            if (effect.type === 'rotate') {
+                rotationTurns = (rotationTurns + effect.turns) % 4
+            }
+        }
+
         const textureWidth  = baseTexture.width
         const textureHeight = baseTexture.height
-        const switchSides = exifOrientation === ExifOrientation.Left || exifOrientation === ExifOrientation.Right
+        const switchSides = rotationTurns % 2 === 1
         const rotatedWidth  = switchSides ? textureHeight : textureWidth
         const rotatedHeight = switchSides ? textureWidth : textureHeight
         const canvasScale = Math.min(1, this.maxWidth / rotatedWidth, this.maxHeight / rotatedHeight)
         const canvasWidth = Math.round(rotatedWidth * canvasScale)
         const canvasHeight = Math.round(rotatedHeight * canvasScale)
 
-        let rotationSteps = 0
-        switch (exifOrientation) {
-            case ExifOrientation.Right:  rotationSteps = 1; break
-            case ExifOrientation.Bottom: rotationSteps = 2; break
-            case ExifOrientation.Left:   rotationSteps = 3; break
-        }
-
-        // Important for matrix: Build it backwards (last operation first)
+        // Important for matrix: Build it backwards (first operation last)
         const matrix = mat4.create()
         // Scale from from canvas coordinates (-canvasSize/2 .. canvasSize/2) to clipspace coordinates (-1 .. 1)
         mat4.scale(matrix, matrix, [ 1 / (canvasWidth / 2), -1 / (canvasHeight / 2), 1 ])
         // Scale texture to canvas size
         mat4.scale(matrix, matrix, [ canvasScale, canvasScale, 1 ])
-        // Apply EXIF orientation
-        mat4.rotateZ(matrix, matrix, rotationSteps * Math.PI / 2)
+        // Apply 90° rotation
+        mat4.rotateZ(matrix, matrix, rotationTurns * Math.PI / 2)
         // Scale to texture coordinates (-textureSize/2 .. textureSize/2)
-        mat4.scale(matrix, matrix, [ this.baseTexture.width, this.baseTexture.height, 1 ])
+        mat4.scale(matrix, matrix, [ baseTexture.width, baseTexture.height, 1 ])
         // Move texture to the center
         mat4.translate(matrix, matrix, [ -0.5, -0.5, 0 ])
 
@@ -129,8 +153,8 @@ export default class PhotoCanvas {
 
         // Clear the canvas before we start drawing on it.
         // TODO: Make clear color configurable
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        gl.clear(gl.COLOR_BUFFER_BIT)
 
         this.transformationShader
             .use()
@@ -140,6 +164,7 @@ export default class PhotoCanvas {
             .setUniforms({ uTransformationMatrix: matrix })
             .draw()
 
+        this.valid = true
         return this
     }
 

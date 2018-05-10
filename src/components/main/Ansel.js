@@ -18,6 +18,7 @@ class Ansel extends React.Component {
     dispatch: PropTypes.func.isRequired,
     settingsExists: PropTypes.bool.isRequired,
     current: PropTypes.number,
+    detail: PropTypes.object,
     photos: PropTypes.array.isRequired,
     diff: PropTypes.bool.isRequired,
     importing: PropTypes.bool.isRequired,
@@ -103,6 +104,7 @@ class Ansel extends React.Component {
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
+            effects={props.detail && props.detail.effects}
             isFirst={props.current === 0}
             isLast={props.current === props.photos.length - 1}
             actions={state.actions}
@@ -137,6 +139,7 @@ class Ansel extends React.Component {
 const ReduxAnsel = connect(state => ({
   photos: state.photos,
   current: state.current,
+  detail: state.detail,
   diff: state.diff,
   importing: state.importing,
   splashed: state.splashed,

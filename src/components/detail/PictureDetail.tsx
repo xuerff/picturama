@@ -18,7 +18,7 @@ import FaIcon from '../widget/icon/FaIcon'
 import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
 import RotateRightIcon from '../widget/icon/RotateRightIcon'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType } from '../../models/Photo'
+import { PhotoType, PhotoEffect } from '../../models/Photo'
 
 const { Menu, MenuItem } = remote;
 
@@ -35,6 +35,7 @@ interface Props {
     actions: any
     toggleFlag: () => void
     photo: PhotoType
+    effects?: PhotoEffect[]
     isFirst: boolean
     isLast: boolean
 }
@@ -298,6 +299,7 @@ export default class PictureDetail extends React.Component<Props, State> {
                         height={state.canvasHeight}
                         src={props.photo.thumb}
                         orientation={props.photo.orientation}
+                        effects={props.effects}
                         onLoad={this.finishLoading}
                     />
                 </div>
