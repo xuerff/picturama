@@ -7,6 +7,7 @@ import photos from './photos';
 import settings from './settings';
 import tags from './tags';
 import grid from './grid';
+import detail from './detail';
 
 const initialState = {
   splashed: false,
@@ -15,6 +16,7 @@ const initialState = {
   currentTag: null,
   showOnlyFlagged: false,
   current: -1,
+  detail: null,
   diff: false,
   settingsExists: false,
   route: '',
@@ -47,6 +49,7 @@ export default function reducers(state = initialState, action) {
     photos,
     settings,
     tags,
-    grid
+    grid,
+    detail
   });
 }
