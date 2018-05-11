@@ -38,6 +38,10 @@ interface PhotoConstructor {
 
 export type PhotoEffect = { type: 'rotate', turns: number }
 
+export interface PhotoWork {
+    effects: PhotoEffect[]
+}
+
 
 export default anselBookshelf.Model.extend({
     tableName: 'photos',

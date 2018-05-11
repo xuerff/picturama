@@ -32,12 +32,13 @@ rotation[0] = 'minus-ninety';
 interface Props {
     style?: any
     className?: any
-    actions: any
-    toggleFlag: () => void
     photo: PhotoType
     effects?: PhotoEffect[]
     isFirst: boolean
     isLast: boolean
+    actions: any
+    toggleFlag: () => void
+    storeEffects: (effects: PhotoEffect[]) => void
 }
 
 interface State {
@@ -122,11 +123,39 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     rotateLeft() {
-        this.props.actions.editRotate(-1)
+        this.rotate(-1)
     }
 
     rotateRight() {
-        this.props.actions.editRotate(1)
+        this.rotate(1)
+    }
+
+    rotate(turns: number) {
+        const prevEffects = this.props.effects
+        if (!prevEffects) {
+            return
+        }
+
+        const nextEffects = []
+        let hadRotateEffect = false
+        for (const prevEffect of prevEffects) {
+            if (prevEffect.type === 'rotate') {
+                const nextTurns = (prevEffect.turns + turns + 4) % 4
+                if (nextTurns !== 0) {
+                    nextEffects.push({ type: 'rotate', turns: (prevEffect.turns + turns + 4) % 4 })
+                }
+                hadRotateEffect = true
+            } else {
+                nextEffects.push(prevEffect)
+            }
+        }
+
+        if (!hadRotateEffect) {
+            // Make the rotate effect the first effect
+            nextEffects.splice(0, 0, { type: 'rotate', turns: (turns + 4) % 4 })
+        }
+
+        this.props.storeEffects(nextEffects)
     }
 
     componentDidMount() {

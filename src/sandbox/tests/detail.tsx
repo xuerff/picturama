@@ -34,17 +34,17 @@ addSection('Detail')
         <PictureDetail
             style={{ width: '100%', height: '100%' }}
             photo={testPhoto}
+            isFirst={true}
+            isLast={false}
             actions={{
                 setCurrent:  action('setCurrent'),
                 setCurrentLeft: action('setCurrentLeft'),
                 setCurrentRight: action('setCurrentRight'),
                 moveToTrash: action('moveToTrash'),
                 toggleDiff:  action('toggleDiff'),
-                toggleFlag:  action('toggleFlag (action)'),
-                editRotate:  action('editRotate')
+                toggleFlag:  action('toggleFlag (action)')
             }}
             toggleFlag={action('toggleFlag (direct)')}
-            isFirst={true}
-            isLast={false}
+            storeEffects={action('storeEffects')}
         />
     ))

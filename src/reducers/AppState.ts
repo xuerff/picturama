@@ -1,5 +1,4 @@
-import { PhotoType } from '../models/Photo'
-import { DetailState } from './detail'
+import { PhotoType, PhotoWork } from '../models/Photo'
 
 export default interface AppState {
     splashed: boolean
@@ -8,7 +7,7 @@ export default interface AppState {
     currentTag: null  // TODO
     showOnlyFlagged: boolean
     current: number
-    detail: DetailState
+    currentPhotoWork: PhotoWork | null
     diff: boolean
     settingsExists: boolean
     route: ''

@@ -11,16 +11,17 @@ import PictureDiff from '../picture-diff'
 import Header from './Header'
 import Container from './Container'
 import Sidebar from '../sidebar'
-import { DetailState } from '../../reducers/detail'
+import { storePhotoWork } from '../../IpcClient'
 import AppState from '../../reducers/AppState'
-import { PhotoType } from '../../models/Photo'
+import { PhotoType, PhotoEffect, PhotoWork } from '../../models/Photo'
+import { bindMany } from '../../util/LangUtil'
 
 
 interface Props {
   dispatch: Dispatch<any>,
   settingsExists: boolean,
   current?: number,
-  detail?: DetailState,
+  currentPhotoWork?: PhotoWork,
   photos: PhotoType[],
   diff: boolean,
   importing: boolean,
@@ -43,9 +44,7 @@ class Ansel extends React.Component<Props, State> {
       actions: bindActionCreators(action, this.props.dispatch)
     };
 
-    this.toggleSidebar = this.toggleSidebar.bind(this);
-    this.handleFlag = this.handleFlag.bind(this)
-    this.handleDateFilter = this.handleDateFilter.bind(this)
+    bindMany(this, 'toggleSidebar', 'handleFlag', 'handleDateFilter', 'storeCurrentEffects')
   }
 
   handleDateFilter(date) {
@@ -90,6 +89,15 @@ class Ansel extends React.Component<Props, State> {
     this.state.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
+  storeCurrentEffects(effects: PhotoEffect[]) {
+    const props = this.props
+    const photo = props.photos[props.current]
+
+    this.state.actions.editEffectsChange(photo.id, effects)
+
+    storePhotoWork(photo.master, { effects })
+  }
+
   render() {
     const props = this.props
     const state = this.state
@@ -112,11 +120,12 @@ class Ansel extends React.Component<Props, State> {
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
-            effects={props.detail && props.detail.effects}
+            effects={props.currentPhotoWork && props.currentPhotoWork.effects}
             isFirst={props.current === 0}
             isLast={props.current === props.photos.length - 1}
             actions={state.actions}
             toggleFlag={this.handleFlag}
+            storeEffects={this.storeCurrentEffects}
           />
       }
     }
@@ -150,7 +159,7 @@ class Ansel extends React.Component<Props, State> {
 const ReduxAnsel = connect((state: AppState) => ({
   photos: state.photos,
   current: state.current,
-  detail: state.detail,
+  currentPhotoWork: state.currentPhotoWork,
   diff: state.diff,
   importing: state.importing,
   splashed: state.splashed,
