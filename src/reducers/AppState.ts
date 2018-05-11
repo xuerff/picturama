@@ -6,6 +6,7 @@ export default interface AppState {
     currentDate: null  // TODO
     currentTag: null  // TODO
     showOnlyFlagged: boolean
+    /** The index of the currenlty selected photo. Is `-1` if no photo is selected.  */
     current: number
     currentPhotoWork: PhotoWork | null
     diff: boolean

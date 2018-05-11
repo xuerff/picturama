@@ -13,7 +13,7 @@ type Executor<ValueType> = (
  */
 export default class CancelablePromise<ValueType> {
 
-    _wrappedPromise: Promise<ValueType>
+    private _wrappedPromise: Promise<ValueType>
 
 
     /**

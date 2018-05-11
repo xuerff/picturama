@@ -29,22 +29,34 @@ const testPhoto: PhotoType = {
 }
 
 
+const defaultProps = {
+    style: { width: '100%', height: '100%' },
+    photo: testPhoto,
+    isFirst: true,
+    isLast: false,
+    actions: {
+        setCurrent:  action('setCurrent'),
+        moveToTrash: action('moveToTrash'),
+        toggleDiff:  action('toggleDiff'),
+        toggleFlag:  action('toggleFlag (action)')
+    },
+    setCurrentLeft: action('setCurrentLeft'),
+    setCurrentRight: action('setCurrentRight'),
+    toggleFlag: action('toggleFlag (direct)'),
+    storeEffects: action('storeEffects')
+}
+
+
 addSection('Detail')
-    .add('Details', context => (
+    .add('loading', context => (
         <PictureDetail
-            style={{ width: '100%', height: '100%' }}
-            photo={testPhoto}
-            isFirst={true}
-            isLast={false}
-            actions={{
-                setCurrent:  action('setCurrent'),
-                setCurrentLeft: action('setCurrentLeft'),
-                setCurrentRight: action('setCurrentRight'),
-                moveToTrash: action('moveToTrash'),
-                toggleDiff:  action('toggleDiff'),
-                toggleFlag:  action('toggleFlag (action)')
-            }}
-            toggleFlag={action('toggleFlag (direct)')}
-            storeEffects={action('storeEffects')}
+            {...defaultProps}
+            effects={null}
+        />
+    ))
+    .add('done', context => (
+        <PictureDetail
+            {...defaultProps}
+            effects={[]}
         />
     ))

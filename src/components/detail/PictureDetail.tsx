@@ -19,6 +19,7 @@ import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
 import RotateRightIcon from '../widget/icon/RotateRightIcon'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType, PhotoEffect } from '../../models/Photo'
+import { bindMany } from '../../util/LangUtil'
 
 const { Menu, MenuItem } = remote;
 
@@ -37,6 +38,8 @@ interface Props {
     isFirst: boolean
     isLast: boolean
     actions: any
+    setCurrentLeft: () => void 
+    setCurrentRight: () => void 
     toggleFlag: () => void
     storeEffects: (effects: PhotoEffect[]) => void
 }
@@ -59,18 +62,8 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         this.state = { bound: false, modal: 'none', loaded: false };
 
-        this.contextMenu = this.contextMenu.bind(this);
-        this.bindEventListeners = this.bindEventListeners.bind(this);
-        this.unbindEventListeners = this.unbindEventListeners.bind(this);
-        this.closeDialog = this.closeDialog.bind(this);
-        this.finishLoading = this.finishLoading.bind(this);
-        this.cancelEvent = this.cancelEvent.bind(this);
-        this.toggleDiff = this.toggleDiff.bind(this);
-        this.moveToTrash = this.moveToTrash.bind(this);
-        this.addEditorMenu = this.addEditorMenu.bind(this);
-        this.updateCanvasSize = this.updateCanvasSize.bind(this)
-        this.rotateLeft = this.rotateLeft.bind(this)
-        this.rotateRight = this.rotateRight.bind(this)
+        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'finishLoading',
+            'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight')
     }
 
     contextMenu(e) {
@@ -189,12 +182,12 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         window.addEventListener(
             'detail:moveLeft',
-            this.props.actions.setCurrentLeft
+            this.props.setCurrentLeft
         );
 
         window.addEventListener(
             'detail:moveRight',
-            this.props.actions.setCurrentRight
+            this.props.setCurrentRight
         );
 
         keymapManager.bind(this.refs.detail);
@@ -219,12 +212,12 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         window.removeEventListener(
             'detail:moveLeft',
-            this.props.actions.setCurrentLeft
+            this.props.setCurrentLeft
         );
 
         window.removeEventListener(
             'detail:moveRight',
-            this.props.actions.setCurrentRight
+            this.props.setCurrentRight
         );
 
         keymapManager.unbind();
@@ -302,10 +295,10 @@ export default class PictureDetail extends React.Component<Props, State> {
                         <span>Back to library</span>
                     </Button>
                     <ButtonGroup>
-                        <Button enabled={!props.isFirst} onClick={props.actions.setCurrentLeft} tip="Previous image [left]">
+                        <Button enabled={!props.isFirst} onClick={props.setCurrentLeft} tip="Previous image [left]">
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button enabled={!props.isLast} onClick={props.actions.setCurrentRight} tip="Next image [right]">
+                        <Button enabled={!props.isLast} onClick={props.setCurrentRight} tip="Next image [right]">
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>

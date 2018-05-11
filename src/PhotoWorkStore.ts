@@ -30,6 +30,16 @@ interface DirectoryWork {
 }
 
 
+export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
+    const directoryPath = dirname(photoPath)
+    const photoBasename = basename(photoPath)
+
+    const directoryWork = await fetchDirectoryWork(directoryPath)
+    let photoWork = directoryWork.photos[photoBasename]
+    return photoWork || { effects: [] }
+}
+
+
 export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
     const directoryPath = dirname(photoPath)
     let directoryWork = await fetchDirectoryWork(directoryPath)

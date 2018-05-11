@@ -10,11 +10,14 @@ export default function currentPhotoWork(state: AppState, action): AppState {
                 currentPhotoWork: null
             }
         case 'SET_CURRENT_SUCCESS':
-        case 'SET_CURRENT_LEFT_SUCCESS':
-        case 'SET_CURRENT_RIGHT_SUCCESS':
             return {
                 ...state,
-                currentPhotoWork: { effects: [] }
+                currentPhotoWork: null
+            }
+        case 'FETCH_PHOTO_WORK_SUCCESS':
+            return {
+                ...state,
+                currentPhotoWork: action.photoWork
             }
         case 'EDIT_EFFECTS_CHANGE': {
             const currentPhoto = state.photos[state.current]

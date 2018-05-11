@@ -4,7 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux'
 
-import * as action from '../../actions'
+import * as actions from '../../actions'
 
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../picture-diff'
@@ -41,10 +41,10 @@ class Ansel extends React.Component<Props, State> {
 
     this.state = {
       showSidebar: true,
-      actions: bindActionCreators(action, this.props.dispatch)
+      actions: bindActionCreators(actions, props.dispatch)
     };
 
-    bindMany(this, 'toggleSidebar', 'handleFlag', 'handleDateFilter', 'storeCurrentEffects')
+    bindMany(this, 'toggleSidebar', 'handleFlag', 'handleDateFilter', 'setCurrentLeft', 'setCurrentRight', 'storeCurrentEffects')
   }
 
   handleDateFilter(date) {
@@ -89,6 +89,20 @@ class Ansel extends React.Component<Props, State> {
     this.state.actions.toggleFlag(this.props.photos[this.props.current]);
   }
 
+  setCurrentLeft() {
+    const props = this.props
+    if (props.current > 0) {
+      this.state.actions.setCurrent(props.current - 1)
+    }
+  }
+
+  setCurrentRight() {
+    const props = this.props
+    if (props.photos.length > props.current + 1) {
+      this.state.actions.setCurrent(props.current + 1)
+    }
+  }
+
   storeCurrentEffects(effects: PhotoEffect[]) {
     const props = this.props
     const photo = props.photos[props.current]
@@ -96,6 +110,7 @@ class Ansel extends React.Component<Props, State> {
     this.state.actions.editEffectsChange(photo.id, effects)
 
     storePhotoWork(photo.master, { effects })
+      .catch(error => console.log('Storing photo failed: ' + photo.master, error))  // TODO: Show error message in UI
   }
 
   render() {
@@ -124,6 +139,8 @@ class Ansel extends React.Component<Props, State> {
             isFirst={props.current === 0}
             isLast={props.current === props.photos.length - 1}
             actions={state.actions}
+            setCurrentLeft={this.setCurrentLeft}
+            setCurrentRight={this.setCurrentRight}
             toggleFlag={this.handleFlag}
             storeEffects={this.storeCurrentEffects}
           />

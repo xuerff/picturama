@@ -1,5 +1,10 @@
-import { storePhotoWork } from './PhotoWorkStore'
+import { fetchPhotoWork, storePhotoWork } from './PhotoWorkStore'
 import { PhotoWork } from './models/Photo'
+
+
+export function fetchPhotoWorkWithCallback(photoPath: string, callback: (error: any, result: PhotoWork) => void) {
+    promiseToCallback(fetchPhotoWork(photoPath), callback)
+}
 
 
 export function storePhotoWorkWithCallback(photoPath: string, photoWork: PhotoWork, callback: (error: any) => void) {
