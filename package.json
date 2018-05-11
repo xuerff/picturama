@@ -12,6 +12,7 @@
   "scripts": {
     "postinstall": "./node_modules/.bin/electron-rebuild",
     "test": "./node_modules/.bin/gulp tests",
+    "watch": "./node_modules/.bin/gulp watch",
     "prebuild": "gulp increment-buildnum",
     "build": "./scripts/build.sh",
     "postbuild": "./scripts/build-deb.sh",

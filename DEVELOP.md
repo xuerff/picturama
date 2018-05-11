@@ -28,7 +28,7 @@ UI sandbox
 
 2. Run watch build (in extra console):
     ```bash
-    ./node_modules/.bin/gulp watch
+    npm run watch
     ```
 
 3. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)
