@@ -2,8 +2,7 @@ import { ipcRenderer } from 'electron';
 import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as PropTypes from 'prop-types'
+import { bindActionCreators, Dispatch } from 'redux'
 
 import * as action from '../../actions'
 
@@ -12,18 +11,29 @@ import PictureDiff from '../picture-diff'
 import Header from './Header'
 import Container from './Container'
 import Sidebar from '../sidebar'
+import { DetailState } from '../../reducers/detail'
+import AppState from '../../reducers/AppState'
+import { PhotoType } from '../../models/Photo'
 
-class Ansel extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    settingsExists: PropTypes.bool.isRequired,
-    current: PropTypes.number,
-    detail: PropTypes.object,
-    photos: PropTypes.array.isRequired,
-    diff: PropTypes.bool.isRequired,
-    importing: PropTypes.bool.isRequired,
-    splashed: PropTypes.bool.isRequired
-  }
+
+interface Props {
+  dispatch: Dispatch<any>,
+  settingsExists: boolean,
+  current?: number,
+  detail?: DetailState,
+  photos: PhotoType[],
+  diff: boolean,
+  importing: boolean,
+  splashed: boolean
+}
+
+interface State {
+  showSidebar: boolean
+  dateFilter?: any  // TODO
+  actions: any
+}
+
+class Ansel extends React.Component<Props, State> {
 
   constructor(props) {
     super(props);
@@ -73,9 +83,7 @@ class Ansel extends React.Component {
   }
 
   toggleSidebar() {
-    let state = this.state;
-    state.showSidebar = !state.showSidebar;
-    this.setState(state);
+    this.setState({ showSidebar: !this.state.showSidebar })
   }
 
   handleFlag() {
@@ -113,6 +121,9 @@ class Ansel extends React.Component {
       }
     }
 
+    const HeaderUntyped = Header as any
+    const ContainerUntyped = Container as any
+
     return (
       <div id="ansel" className="Ansel">
         <Sidebar
@@ -120,11 +131,11 @@ class Ansel extends React.Component {
           className={noSidebarClass}
           setDateFilter={this.handleDateFilter} />
 
-        <Header
+        <HeaderUntyped
           actions={state.actions}
           className={noSidebarClass} />
 
-        <Container
+        <ContainerUntyped
           settingsExists={props.settingsExists}
           actions={state.actions}
           importing={props.importing}
@@ -136,7 +147,7 @@ class Ansel extends React.Component {
   }
 }
 
-const ReduxAnsel = connect(state => ({
+const ReduxAnsel = connect((state: AppState) => ({
   photos: state.photos,
   current: state.current,
   detail: state.detail,

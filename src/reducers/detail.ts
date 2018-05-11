@@ -1,7 +1,7 @@
 import { PhotoEffect } from '../models/Photo'
 
 
-export type DetailType = { effects: PhotoEffect[] } | null
+export type DetailState = { effects: PhotoEffect[] } | null
 
 
 export default function detail(state, action) {
