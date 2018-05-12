@@ -11,7 +11,6 @@ import PictureDiff from '../picture-diff'
 import Header from './Header'
 import Container from './Container'
 import Sidebar from '../sidebar'
-import { storePhotoWork } from '../../IpcClient'
 import AppState from '../../reducers/AppState'
 import { PhotoType, PhotoEffect, PhotoWork } from '../../models/Photo'
 import { bindMany } from '../../util/LangUtil'
@@ -106,11 +105,7 @@ class Ansel extends React.Component<Props, State> {
   storeCurrentEffects(effects: PhotoEffect[]) {
     const props = this.props
     const photo = props.photos[props.current]
-
-    this.state.actions.editEffectsChange(photo.id, effects)
-
-    storePhotoWork(photo.master, { effects })
-      .catch(error => console.log('Storing photo failed: ' + photo.master, error))  // TODO: Show error message in UI
+    this.state.actions.storeEffects(photo, effects)
   }
 
   render() {

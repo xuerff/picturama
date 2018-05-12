@@ -81,3 +81,12 @@ async function storeDirectoryWork(directoryPath: string, directoryWork: Director
     const json = JSON.stringify(directoryWork, null, 2)
     await writeFile(directoryWorkFile, json)
 }
+
+
+export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
+    // thumbnailData is a data URL. Example: 'data:image/webp;base64,UklG...'
+    const dataPrefix = 'base64,'
+    const base64Data = thumbnailData.substr(thumbnailData.indexOf(dataPrefix) + dataPrefix.length)
+    const dataBuffer = new Buffer(base64Data, 'base64')
+    await writeFile(thumbnailPath, dataBuffer)
+}

@@ -6,6 +6,7 @@ import { findDOMNode } from 'react-dom'
 
 import AppState from '../../reducers/AppState'
 import { PhotoType } from '../../models/photo'
+import { bindMany } from '../../util/LangUtil'
 
 const { Menu, MenuItem } = remote;
 
@@ -29,6 +30,7 @@ interface Props extends ConnectedProps {
 
 interface State {
     showContextMenu: boolean
+    thumbnailVersion: number
 }
 
 class Picture extends React.Component<Props, State> {
@@ -38,9 +40,9 @@ class Picture extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    this.state = { showContextMenu: false };
+    this.state = { showContextMenu: false, thumbnailVersion: Date.now() }
 
-    this.contextMenu = this.contextMenu.bind(this);
+    bindMany(this, 'contextMenu', 'onThumnailChange')
   }
 
   contextMenu(e) {
@@ -64,6 +66,8 @@ class Picture extends React.Component<Props, State> {
       label: 'Export picture(s)',
       click: this.props.setExport
     }));
+
+    window.addEventListener('edit:thumnailChange', this.onThumnailChange)
   }
 
   componentDidUpdate() {
@@ -87,6 +91,17 @@ class Picture extends React.Component<Props, State> {
       setTimeout(() => this.menu.popup(remote.getCurrentWindow()), 10);
 
       this.setState({ showContextMenu: false })
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('edit:thumnailChange', this.onThumnailChange)
+  }
+
+  onThumnailChange(evt: CustomEvent) {
+    const photoId = evt.detail.photoId
+    if (photoId === this.props.photo.id) {
+      this.setState({ thumbnailVersion: Date.now() })
     }
   }
 
@@ -123,7 +138,7 @@ class Picture extends React.Component<Props, State> {
         <img
           onClick={this.handleClick.bind(this)}
           onContextMenu={this.contextMenu}
-          src={photo.thumb_250}
+          src={photo.thumb_250 + '?v=' + this.state.thumbnailVersion}
           className={imgClass} />
       </a>
     );
