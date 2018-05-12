@@ -2,7 +2,10 @@ import { remote } from 'electron';
 import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types'
+import { findDOMNode } from 'react-dom'
+
+import AppState from '../../reducers/AppState'
+import { PhotoType } from '../../models/photo'
 
 const { Menu, MenuItem } = remote;
 
@@ -11,15 +14,26 @@ let rotation = {};
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
-class Picture extends React.Component {
-  static propTypes = {
-    actions: PropTypes.object.isRequired,
-    setFlagging: PropTypes.func.isRequired,
-    setExport: PropTypes.func.isRequired,
-    highlighted: PropTypes.array.isRequired,
-    photo: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired
-  }
+
+interface ConnectedProps {
+    actions: any
+    setFlagging: () => void
+    setExport: () => void
+    photo: PhotoType
+    photoIndex: number
+}
+
+interface Props extends ConnectedProps {
+     highlighted: number[]
+}
+
+interface State {
+    showContextMenu: boolean
+}
+
+class Picture extends React.Component<Props, State> {
+
+  private menu: Electron.Menu | null = null
 
   constructor(props) {
     super(props);
@@ -30,16 +44,12 @@ class Picture extends React.Component {
   }
 
   contextMenu(e) {
-    let state = this.state;
-
     e.preventDefault();
 
     if (!this.props.highlighted)
-      this.props.actions.setHighlight(this.props.index, e.ctrlKey);
+      this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey);
 
-    state.showContextMenu = true;
-
-    this.setState(state);
+    this.setState({ showContextMenu: true })
   }
 
   componentDidMount() {
@@ -59,34 +69,35 @@ class Picture extends React.Component {
   componentDidUpdate() {
     let state = this.state;
 
-    if (this.props.highlighted.indexOf(this.props.index) !== -1) {
-      let rect = this.refs.picture.getBoundingClientRect();
-      let container = this.refs.picture.parentNode.parentNode.parentNode;
-      let containerRect = container.getBoundingClientRect();
+    if (this.props.highlighted.indexOf(this.props.photoIndex) !== -1) {
+      const pictureElem = findDOMNode(this.refs.picture)
+      let rect = pictureElem.getBoundingClientRect()
+      let containerElem = pictureElem.parentNode.parentNode.parentNode as Element
+      let containerRect = containerElem.getBoundingClientRect()
 
-      if (rect.bottom > containerRect.bottom)
-        container.scrollTop += rect.bottom - containerRect.bottom;
-      else if (rect.top < 0)
-        container.scrollTop += rect.top;
+      if (rect.bottom > containerRect.bottom) {
+        containerElem.scrollTop += rect.bottom - containerRect.bottom
+      } else if (rect.top < 0) {
+        containerElem.scrollTop += rect.top
+      }
     }
 
     if (this.state.showContextMenu && this.props.highlighted) {
       // If no timeout the menu will appears before the highlight
       setTimeout(() => this.menu.popup(remote.getCurrentWindow()), 10);
-      state.showContextMenu = false;
 
-      this.setState(state);
+      this.setState({ showContextMenu: false })
     }
   }
 
   handleDblClick() {
-    this.props.actions.setCurrent(this.props.index);
+    this.props.actions.setCurrent(this.props.photoIndex);
   }
 
   handleClick(e) {
     e.preventDefault();
 
-    this.props.actions.setHighlight(this.props.index, e.ctrlKey);
+    this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey);
   }
 
   render() {
@@ -95,7 +106,7 @@ class Picture extends React.Component {
     let anchorClass = classNames(
       'picture',
       'card',
-      { highlighted: this.props.highlighted.indexOf(this.props.index) !== -1 }
+      { highlighted: this.props.highlighted.indexOf(this.props.photoIndex) !== -1 }
     );
 
     let imgClass = classNames(
@@ -119,8 +130,9 @@ class Picture extends React.Component {
   }
 }
 
-const ReduxPicture = connect(state => ({
-  highlighted: state.highlighted
-}))(Picture);
+const ReduxPicture = connect<Props, {}, ConnectedProps, AppState>((state, props) => ({
+     ...props,
+    highlighted: state.highlighted
+}))(Picture)
 
 export default ReduxPicture;

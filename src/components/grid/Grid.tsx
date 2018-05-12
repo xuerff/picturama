@@ -1,19 +1,22 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types'
 
-import keymapManager from './../keymap-manager';
-import Picture from './picture';
+import keymapManager from '../../keymap-manager'
+import { PhotoType } from '../../models/photo'
+import AppState from '../../reducers/AppState'
+import Picture from './Picture'
 
-class Grid extends React.Component {
-  static propTypes = {
-    setExport: PropTypes.func.isRequired,
-    setScrollTop: PropTypes.func.isRequired,
-    highlighted: PropTypes.array.isRequired,
-    current: PropTypes.number,
-    actions: PropTypes.object.isRequired,
-    photos: PropTypes.array.isRequired
-  }
+
+interface Props {
+    setExport: () => void
+    setScrollTop: () => void
+    highlighted: number[]
+    current: number
+    actions: any
+    photos: PhotoType[]
+}
+
+class Grid extends React.Component<Props, undefined> {
 
   constructor(props) {
     super(props);
@@ -23,7 +26,7 @@ class Grid extends React.Component {
 
   handleFlagging() {
     let flagSet = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
+      .filter((photo, i) => this.props.highlighted.indexOf(i) !== -1);
 
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
@@ -59,7 +62,7 @@ class Grid extends React.Component {
         {this.props.photos.map((photo, index) =>
           <Picture
             key={index}
-            index={index}
+            photoIndex={index}
             photo={photo}
             actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
@@ -71,7 +74,7 @@ class Grid extends React.Component {
   }
 }
 
-const ReduxGrid = connect(state => ({
+const ReduxGrid = connect((state: AppState) => ({
   current: state.current,
   highlighted: state.highlighted
 }))(Grid);

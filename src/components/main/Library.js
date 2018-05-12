@@ -5,7 +5,7 @@ import * as PropTypes from 'prop-types'
 
 import Export from '../export'
 import ReadyToScan from '../ready-to-scan'
-import Grid from '../grid'
+import Grid from '../grid/Grid'
 
 class Library extends React.Component {
   static propTypes = {
