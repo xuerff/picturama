@@ -3,7 +3,7 @@ export default function reducers(state, action) {
   case 'SET_CURRENT_SUCCESS':
     return {
       ...state,
-      diff: false,
+      modal: null,  // Hide diff
       current: action.current <= state.photos.length && action.current >= 0 ? action.current : -1
     };
 

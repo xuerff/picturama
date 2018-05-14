@@ -10,7 +10,6 @@ import Picture from './Picture'
 interface ConnectProps {
     isActive: boolean
     actions: any
-    setExport: () => void
 }
 
 interface Props extends ConnectProps {
@@ -88,9 +87,8 @@ class Grid extends React.Component<Props, undefined> {
             photo={photo}
             actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
-            setExport={this.props.setExport} />
-          )
-        }
+          />
+        )}
       </div>
     );
   }

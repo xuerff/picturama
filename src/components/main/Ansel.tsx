@@ -6,31 +6,34 @@ import { bindActionCreators, Dispatch } from 'redux'
 
 import * as actions from '../../actions'
 
+import Export from '../export'
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../picture-diff'
 import Header from './Header'
 import Container from './Container'
 import Sidebar from '../sidebar'
-import AppState from '../../reducers/AppState'
+import AppState, { ModalType } from '../../reducers/AppState'
 import { PhotoType, PhotoEffect, PhotoWork } from '../../models/Photo'
 import { bindMany } from '../../util/LangUtil'
 
 
 interface Props {
-  dispatch: Dispatch<any>,
-  settingsExists: boolean,
-  current?: number,
-  currentPhotoWork?: PhotoWork,
-  photos: PhotoType[],
-  diff: boolean,
-  importing: boolean,
-  splashed: boolean
+    dispatch: Dispatch<any>
+    settingsExists: boolean
+    current?: number
+    highlighted: number[]
+    currentPhotoWork?: PhotoWork
+    photos: PhotoType[]
+    modal: ModalType
+    importing: boolean
+    splashed: boolean
+    isExportEnabled: boolean
 }
 
 interface State {
-  showSidebar: boolean
-  dateFilter?: any  // TODO
-  actions: any
+    showSidebar: boolean
+    dateFilter?: void  // TODO
+    actions: any
 }
 
 class Ansel extends React.Component<Props, State> {
@@ -50,10 +53,19 @@ class Ansel extends React.Component<Props, State> {
     this.setState({ dateFilter: date });
   }
 
-  componentDidUpdate() {
-    if (this.props.splashed === true) {
+  componentDidUpdate(prevProps, prevState) {
+    const props = this.props
+    if (props.splashed === true) {
       let splash = document.getElementById('splash');
       if (splash) splash.parentNode.removeChild(splash);
+    }
+    if (props.isExportEnabled !== prevProps.isExportEnabled) {
+      ipcRenderer.send('toggleExportMenu', props.isExportEnabled)
+      if (props.isExportEnabled) {
+        ipcRenderer.on('exportClicked', this.state.actions.openExport)
+      } else {
+        ipcRenderer.removeAllListeners('exportClicked')
+      }
     }
   }
 
@@ -116,17 +128,23 @@ class Ansel extends React.Component<Props, State> {
       'no-sidebar': !state.showSidebar || !props.settingsExists
     });
 
-    let detailView
-    if (props.settingsExists && !props.importing && props.current !== -1) {
-      if (props.diff) {
-        detailView =
+    let modalView
+    if (props.modal === 'export') {
+      modalView =
+        <Export
+          photos={props.photos.filter((photo, i) => props.highlighted.indexOf(i) !== -1)}
+          actions={state.actions}
+        />
+    } else if (props.settingsExists && !props.importing && props.current !== -1) {
+      if (props.modal === 'diff') {
+        modalView =
           <PictureDiff
             className="Ansel-detail"
             actions={state.actions}
             photo={props.photos[props.current]}
           />
       } else {
-        detailView =
+        modalView =
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
@@ -154,13 +172,13 @@ class Ansel extends React.Component<Props, State> {
           className={noSidebarClass} />
 
         <Container
-          isActive={!detailView}
+          isActive={!modalView}
           settingsExists={props.settingsExists}
           actions={state.actions}
           importing={props.importing}
           className={noSidebarClass} />
 
-        {detailView}
+        {modalView}
       </div>
     );
   }
@@ -169,8 +187,10 @@ class Ansel extends React.Component<Props, State> {
 const ReduxAnsel = connect((state: AppState) => ({
   photos: state.photos,
   current: state.current,
+  highlighted: state.highlighted,
+  isExportEnabled: state.settingsExists && !state.importing && state.current === -1 && state.modal === null && state.highlighted.length > 0,
   currentPhotoWork: state.currentPhotoWork,
-  diff: state.diff,
+  modal: state.modal,
   importing: state.importing,
   splashed: state.splashed,
   settingsExists: state.settingsExists

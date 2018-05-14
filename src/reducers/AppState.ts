@@ -1,5 +1,6 @@
 import { PhotoType, PhotoWork } from '../models/Photo'
 
+export type ModalType = 'diff' | 'export' | null
 export type Route = '' | 'trash'
 
 export default interface AppState {
@@ -12,7 +13,7 @@ export default interface AppState {
     /** The index of the currenlty selected photo. Is `-1` if no photo is selected.  */
     current: number
     currentPhotoWork: PhotoWork | null
-    diff: boolean
+    modal: ModalType
     settingsExists: boolean
     route: Route
     photosCount: number

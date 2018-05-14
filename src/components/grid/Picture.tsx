@@ -19,7 +19,6 @@ rotation[0] = 'minus-ninety';
 interface ConnectProps {
     actions: any
     setFlagging: () => void
-    setExport: () => void
     photo: PhotoType
     photoIndex: number
 }
@@ -64,7 +63,7 @@ class Picture extends React.Component<Props, State> {
 
     this.menu.append(new MenuItem({
       label: 'Export picture(s)',
-      click: this.props.setExport
+      click: this.props.actions.openExport
     }));
 
     window.addEventListener('edit:thumnailChange', this.onThumnailChange)
