@@ -1,3 +1,4 @@
+import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types'
@@ -6,31 +7,30 @@ import Toolbar from '../widget/Toolbar'
 import AppState from '../../reducers/AppState'
 
 
-interface ConnectProps {
+interface Props {
+    className?: any
+    highlighted: number[]
+    photosCount: number
     actions: any
 }
 
-interface Props extends ConnectProps {
-    highlighted: number[]
-    photosCount: number
-}
-
-class BottomBar extends React.Component<Props, undefined> {
+export default class LibraryBottomBar extends React.Component<Props, undefined> {
     render() {
+        const props = this.props
         return (
-            <Toolbar className="bottom-bar">
-                <div className="content">
-                    <span className="selection">
+            <Toolbar className={classNames(props.className, 'LibraryBottomBar')}>
+                <div className="LibraryBottomBar-content">
+                    <span className="LibraryBottomBar-selection">
                         <span>{this.props.highlighted.length} selected</span>
                         {this.props.highlighted.length > 0 &&
                             <button
-                                className="deselect-all"
+                                className="LibraryBottomBar-deselectAll"
                                 onClick={this.props.actions.clearHighlight}>
                                 Deselect all
                             </button>
                         }
                     </span>
-                    <span className="total">
+                    <span className="LibraryBottomBar-total">
                         {this.props.photosCount} item{this.props.photosCount > 1 ? 's' : ''}
                     </span>
                 </div>
@@ -38,9 +38,3 @@ class BottomBar extends React.Component<Props, undefined> {
         )
     }
 }
-
-export default connect<Props, {}, ConnectProps, AppState>((state, props) => ({
-    ...props,
-    highlighted: state.highlighted,
-    photosCount: state.photosCount
-}))(BottomBar);

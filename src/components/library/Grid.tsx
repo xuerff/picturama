@@ -79,7 +79,7 @@ class Grid extends React.Component<Props, undefined> {
 
   render() {
     return (
-      <div className="grid" ref="grid">
+      <div className="Grid" ref="grid">
         {this.props.photos.map((photo, index) =>
           <Picture
             key={index}

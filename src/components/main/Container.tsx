@@ -4,15 +4,14 @@ import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types'
 
-import BottomBar from './BottomBar'
-import Library from './Library'
+import Library from '../library/Library'
 import Settings from '../settings'
 import Progress from '../progress'
 import AppState from '../../reducers/AppState'
 
 
 interface ConnectProps {
-  className: any
+  className?: any
   isActive: boolean
   settingsExists: boolean
   importing: boolean
@@ -51,10 +50,6 @@ class Container extends React.Component<Props, State> {
   render() {
     const props = this.props
 
-    let containerClass = classNames(props.className, {
-      'bottom-bar-present': props.current === -1 && props.settingsExists
-    });
-
     let content
     if (props.importing) {
       content = <Progress />
@@ -63,6 +58,7 @@ class Container extends React.Component<Props, State> {
     } else {
       content =
         <Library
+          className="Container-body"
           isActive={props.isActive}
           actions={props.actions}
           setScrollTop={this.handleScrollTop.bind(this)}
@@ -70,11 +66,8 @@ class Container extends React.Component<Props, State> {
     }
 
     return (
-      <div id="container" ref="container" className={containerClass}>
+      <div ref="container" className={classNames(props.className, 'Container')}>
         {content}
-        {props.current === -1 && props.settingsExists ?
-            <BottomBar actions={props.actions} />
-        : ''}
       </div>
     );
   }

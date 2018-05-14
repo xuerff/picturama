@@ -1,0 +1,21 @@
+.LibraryTopBar {
+    button {
+        font-size: 2em;
+        padding: 1px 12px;
+    }
+}
+
+.LibraryTopBar-showSidebar {
+    opacity: 1;
+    height: auto;
+    transition: opacity @transition-time ease-in;
+
+    .Ansel.hasSidebar & { 
+        opacity: 0;
+        height: 0;
+    }
+}
+
+.LibraryTopBar-toggleFlagged {
+    color: @red;
+}

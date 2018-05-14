@@ -9,7 +9,6 @@ import * as actions from '../../actions'
 import Export from '../export'
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../picture-diff'
-import Header from './Header'
 import Container from './Container'
 import Sidebar from '../sidebar'
 import AppState, { ModalType } from '../../reducers/AppState'
@@ -124,10 +123,6 @@ class Ansel extends React.Component<Props, State> {
     const props = this.props
     const state = this.state
 
-    let noSidebarClass = classNames({ 
-      'no-sidebar': !state.showSidebar || !props.settingsExists
-    });
-
     let modalView
     if (props.modal === 'export') {
       modalView =
@@ -161,22 +156,19 @@ class Ansel extends React.Component<Props, State> {
     }
 
     return (
-      <div id="ansel" className="Ansel">
+      <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExists && state.showSidebar })}>
         <Sidebar
+          className="Ansel-sidebar"
           actions={state.actions}
-          className={noSidebarClass}
           setDateFilter={this.handleDateFilter} />
 
-        <Header
-          actions={state.actions}
-          className={noSidebarClass} />
-
         <Container
+          className="Ansel-container"
           isActive={!modalView}
           settingsExists={props.settingsExists}
           actions={state.actions}
           importing={props.importing}
-          className={noSidebarClass} />
+        />
 
         {modalView}
       </div>

@@ -10,11 +10,6 @@ import { bindMany } from '../../util/LangUtil'
 
 const { Menu, MenuItem } = remote;
 
-let rotation = {};
-
-rotation[1] = '';
-rotation[0] = 'minus-ninety';
-
 
 interface ConnectProps {
     actions: any
@@ -116,29 +111,17 @@ class Picture extends React.Component<Props, State> {
 
   render() {
     let photo = this.props.photo;
-
-    let anchorClass = classNames(
-      'picture',
-      'card',
-      { highlighted: this.props.highlighted.indexOf(this.props.photoIndex) !== -1 }
-    );
-
-    let imgClass = classNames(
-      rotation[photo.orientation],
-      'shadow--2dp'
-    );
-
     return (
       <a
         ref="picture"
-        className={anchorClass}
+        className={classNames('Picture', { isHighlighted: this.props.highlighted.indexOf(this.props.photoIndex) !== -1 })}
         onDoubleClick={this.handleDblClick}>
         <span className="v-align"></span>
         <img
           onClick={this.handleClick}
           onContextMenu={this.contextMenu}
           src={photo.thumb_250 + '?v=' + this.state.thumbnailVersion}
-          className={imgClass} />
+          className="shadow--2dp" />
       </a>
     );
   }
