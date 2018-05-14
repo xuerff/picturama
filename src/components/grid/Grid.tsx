@@ -8,13 +8,14 @@ import Picture from './Picture'
 
 
 interface ConnectProps {
+    isActive: boolean
     actions: any
     setExport: () => void
 }
 
 interface Props extends ConnectProps {
-    highlighted: number[]
     current: number
+    highlighted: number[]
     photos: PhotoType[]
 }
 
@@ -39,6 +40,25 @@ class Grid extends React.Component<Props, undefined> {
   }
 
   componentDidMount() {
+    this.addListeners()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const props = this.props
+    if (props.isActive !== prevProps.isActive) {
+      if (props.isActive) {
+        this.addListeners()
+      } else {
+        this.removeListeners()
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.removeListeners()
+  }
+
+  addListeners() {
     window.addEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.addEventListener('grid:right', this.props.actions.moveHighlightRight);
     window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
@@ -48,7 +68,7 @@ class Grid extends React.Component<Props, undefined> {
     keymapManager.bind(this.refs.grid);
   }
 
-  componentWillUnmount() {
+  removeListeners() {
     window.removeEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.removeEventListener('grid:right', this.props.actions.moveHighlightRight);
     window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);

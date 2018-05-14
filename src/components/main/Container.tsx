@@ -13,6 +13,7 @@ import AppState from '../../reducers/AppState'
 
 interface ConnectProps {
   className: any
+  isActive: boolean
   settingsExists: boolean
   importing: boolean
   actions: any
@@ -48,19 +49,22 @@ class Container extends React.Component<Props, State> {
   }
 
   render() {
-    let containerClass = classNames(this.props.className, {
-      'bottom-bar-present': this.props.current === -1 && this.props.settingsExists
+    const props = this.props
+
+    let containerClass = classNames(props.className, {
+      'bottom-bar-present': props.current === -1 && props.settingsExists
     });
 
     let content
-    if (this.props.importing) {
+    if (props.importing) {
       content = <Progress />
-    } else if (!this.props.settingsExists) {
-      content = <Settings actions={this.props.actions} />
+    } else if (!props.settingsExists) {
+      content = <Settings actions={props.actions} />
     } else {
       content =
         <Library
-          actions={this.props.actions}
+          isActive={props.isActive}
+          actions={props.actions}
           setScrollTop={this.handleScrollTop.bind(this)}
         />
     }
@@ -68,8 +72,8 @@ class Container extends React.Component<Props, State> {
     return (
       <div id="container" ref="container" className={containerClass}>
         {content}
-        {this.props.current === -1 && this.props.settingsExists ?
-            <BottomBar actions={this.props.actions} />
+        {props.current === -1 && props.settingsExists ?
+            <BottomBar actions={props.actions} />
         : ''}
       </div>
     );

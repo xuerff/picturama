@@ -11,6 +11,7 @@ import AppState from '../../reducers/AppState'
 
 
 interface ConnectProps {
+  isActive: boolean
   actions: any
   setScrollTop: (scrollTop: number) => void
 }
@@ -109,22 +110,25 @@ class Library extends React.Component<Props, State> {
   }
 
   render() {
+    const props = this.props
+
     let currentView;
     let showModal;
 
     if (this.state.modal === 'export') {
       showModal = <Export
         photos={this.state.photosToExport}
-        actions={this.props.actions}
+        actions={props.actions}
         closeExportDialog={this.closeDialog} />;
     }
 
-    if (!this.props.photos || this.props.photos.length === 0) {
+    if (!props.photos || props.photos.length === 0) {
       currentView = <ReadyToScan />;
     } else {
       currentView =
         <Grid
-          actions={this.props.actions}
+          isActive={props.isActive && !showModal}
+          actions={props.actions}
           setExport={this.handleExport}
         />
     }

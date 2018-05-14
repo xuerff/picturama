@@ -154,6 +154,7 @@ class Ansel extends React.Component<Props, State> {
           className={noSidebarClass} />
 
         <Container
+          isActive={!detailView}
           settingsExists={props.settingsExists}
           actions={state.actions}
           importing={props.importing}
