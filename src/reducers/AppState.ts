@@ -1,22 +1,25 @@
 import { PhotoType, PhotoWork } from '../models/Photo'
 
+export type Route = '' | 'trash'
+
 export default interface AppState {
     splashed: boolean
     importing: boolean
-    currentDate: null  // TODO
-    currentTag: null  // TODO
+    /** The date filter, e.g. '2018-05-14' */
+    currentDate: string | null
+    currentTag: void  // TODO
     showOnlyFlagged: boolean
     /** The index of the currenlty selected photo. Is `-1` if no photo is selected.  */
     current: number
     currentPhotoWork: PhotoWork | null
     diff: boolean
     settingsExists: boolean
-    route: ''
+    route: Route
     photosCount: number
     photos: PhotoType[]
-    tags: any[]  // TODO
-    devices: any[]  // TODO
-    dates: { years: any[] } // TODO
+    tags: void[]  // TODO
+    devices: void[]  // TODO
+    dates: { years: void[] } // TODO
     progress: { processed: number, total: number }
-    highlighted: any[]  // TODO
+    highlighted: number[]
 }

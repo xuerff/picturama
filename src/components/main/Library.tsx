@@ -6,8 +6,28 @@ import * as PropTypes from 'prop-types'
 import Export from '../export'
 import ReadyToScan from '../ready-to-scan'
 import Grid from '../grid/Grid'
+import { PhotoType } from '../../models/photo'
+import AppState from '../../reducers/AppState'
 
-class Library extends React.Component {
+
+interface ConnectProps {
+  actions: any
+  setScrollTop: (scrollTop: number) => void
+}
+
+interface Props extends ConnectProps {
+  photos: PhotoType[],
+  current: number,
+  highlighted: number[]
+}
+
+interface State {
+  scrollTop: number
+  modal: 'none' | 'export'
+  photosToExport?: PhotoType[]
+}
+
+class Library extends React.Component<Props, State> {
   static propTypes = {
     highlighted: PropTypes.array.isRequired,
     setScrollTop: PropTypes.func.isRequired,
@@ -31,13 +51,13 @@ class Library extends React.Component {
 
   handleExport() {
     this.unbindEventListeners();
-    let state = this.state;
+    let props = this.props
 
-    state.modal = 'export';
-    state.photosToExport = this.props.photos
-      .filter((photo, i) => this.props.highlighted.indexOf(i) !== -1);
-
-    this.setState(state);
+    this.setState({
+      modal: 'export',
+      photosToExport: props.photos
+        .filter((photo, i) => props.highlighted.indexOf(i) !== -1)
+    })
   }
 
   activateExportAccelerator() {
@@ -61,8 +81,7 @@ class Library extends React.Component {
 
     if (this.props.current === -1 && state.scrollTop > 0) {
       this.props.setScrollTop(state.scrollTop);
-      state.scrollTop = 0;
-      this.setState(state);
+      this.setState({ scrollTop: 0 });
     }
   }
 
@@ -86,11 +105,7 @@ class Library extends React.Component {
 
   closeDialog() {
     this.bindEventListeners();
-
-    let state = this.state;
-
-    state.modal = 'none';
-    this.setState(state);
+    this.setState({ modal: 'none' })
   }
 
   render() {
@@ -110,9 +125,7 @@ class Library extends React.Component {
       currentView =
         <Grid
           actions={this.props.actions}
-          setScrollTop={this.props.setScrollTop}
           setExport={this.handleExport}
-          photos={this.props.photos}
         />
     }
 
@@ -125,7 +138,8 @@ class Library extends React.Component {
   }
 }
 
-const ReduxLibrary = connect(state => ({
+const ReduxLibrary = connect<Props, {}, ConnectProps, AppState>((state, props) => ({
+  ...props,
   photos: state.photos,
   current: state.current,
   highlighted: state.highlighted

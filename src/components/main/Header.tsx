@@ -5,18 +5,23 @@ import { remote, ipcRenderer } from 'electron';
 import * as PropTypes from 'prop-types'
 
 import Toolbar from '../widget/Toolbar'
+import AppState, { Route } from '../../reducers/AppState'
 
 const dialog = remote.dialog;
 
-class Header extends React.Component {
-  static propTypes = {
-    className: PropTypes.string.isRequired,
-    currentTag: PropTypes.number,
-    currentDate: PropTypes.string,
-    route: PropTypes.string,
-    showOnlyFlagged: PropTypes.bool.isRequired,
-    actions: PropTypes.object.isRequired
-  }
+
+interface ConnectProps {
+    className: any
+    actions: any
+}
+
+interface Props extends ConnectProps {
+    currentDate: string | null
+    showOnlyFlagged: boolean
+    route: Route
+}
+
+export class Header extends React.Component<Props, undefined> {
 
   showSidebar() {
     window.dispatchEvent(new Event('core:toggleSidebar'));
@@ -72,12 +77,11 @@ class Header extends React.Component {
   }
 }
 
-const ReduxHeader = connect(state => ({
-  currentTag: state.currentTag,
+const ReduxHeader = connect<Props, {}, ConnectProps, AppState>((state, props) => ({
+  ...props,
   currentDate: state.currentDate,
   showOnlyFlagged: state.showOnlyFlagged,
   route: state.route
 }))(Header);
 
 export default ReduxHeader;
-export { Header };

@@ -142,9 +142,6 @@ class Ansel extends React.Component<Props, State> {
       }
     }
 
-    const HeaderUntyped = Header as any
-    const ContainerUntyped = Container as any
-
     return (
       <div id="ansel" className="Ansel">
         <Sidebar
@@ -152,11 +149,11 @@ class Ansel extends React.Component<Props, State> {
           className={noSidebarClass}
           setDateFilter={this.handleDateFilter} />
 
-        <HeaderUntyped
+        <Header
           actions={state.actions}
           className={noSidebarClass} />
 
-        <ContainerUntyped
+        <Container
           settingsExists={props.settingsExists}
           actions={state.actions}
           importing={props.importing}

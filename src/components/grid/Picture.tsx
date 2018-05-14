@@ -16,7 +16,7 @@ rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
 
-interface ConnectedProps {
+interface ConnectProps {
     actions: any
     setFlagging: () => void
     setExport: () => void
@@ -24,7 +24,7 @@ interface ConnectedProps {
     photoIndex: number
 }
 
-interface Props extends ConnectedProps {
+interface Props extends ConnectProps {
      highlighted: number[]
 }
 
@@ -145,7 +145,7 @@ class Picture extends React.Component<Props, State> {
   }
 }
 
-const ReduxPicture = connect<Props, {}, ConnectedProps, AppState>((state, props) => ({
+const ReduxPicture = connect<Props, {}, ConnectProps, AppState>((state, props) => ({
      ...props,
     highlighted: state.highlighted
 }))(Picture)

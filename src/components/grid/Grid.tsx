@@ -7,12 +7,14 @@ import AppState from '../../reducers/AppState'
 import Picture from './Picture'
 
 
-interface Props {
+interface ConnectProps {
+    actions: any
     setExport: () => void
-    setScrollTop: () => void
+}
+
+interface Props extends ConnectProps {
     highlighted: number[]
     current: number
-    actions: any
     photos: PhotoType[]
 }
 
@@ -74,9 +76,11 @@ class Grid extends React.Component<Props, undefined> {
   }
 }
 
-const ReduxGrid = connect((state: AppState) => ({
-  current: state.current,
-  highlighted: state.highlighted
+const ReduxGrid = connect<Props, {}, ConnectProps, AppState>((state, props) => ({
+    ...props,
+    current: state.current,
+    highlighted: state.highlighted,
+    photos: state.photos
 }))(Grid);
 
 export default ReduxGrid;
