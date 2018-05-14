@@ -42,14 +42,14 @@ class Picture extends React.Component<Props, State> {
 
     this.state = { showContextMenu: false, thumbnailVersion: Date.now() }
 
-    bindMany(this, 'contextMenu', 'onThumnailChange')
+    bindMany(this, 'contextMenu', 'handleClick', 'handleDblClick', 'onThumnailChange')
   }
 
-  contextMenu(e) {
+  contextMenu(e: React.MouseEvent<HTMLImageElement>) {
     e.preventDefault();
 
     if (!this.props.highlighted)
-      this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey);
+      this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey, e.metaKey)
 
     this.setState({ showContextMenu: true })
   }
@@ -109,10 +109,10 @@ class Picture extends React.Component<Props, State> {
     this.props.actions.setCurrent(this.props.photoIndex);
   }
 
-  handleClick(e) {
+  handleClick(e: React.MouseEvent<HTMLImageElement>) {
     e.preventDefault();
 
-    this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey);
+    this.props.actions.setHighlight(this.props.photoIndex, e.ctrlKey, e.metaKey)
   }
 
   render() {
@@ -133,10 +133,10 @@ class Picture extends React.Component<Props, State> {
       <a
         ref="picture"
         className={anchorClass}
-        onDoubleClick={this.handleDblClick.bind(this)}>
+        onDoubleClick={this.handleDblClick}>
         <span className="v-align"></span>
         <img
-          onClick={this.handleClick.bind(this)}
+          onClick={this.handleClick}
           onContextMenu={this.contextMenu}
           src={photo.thumb_250 + '?v=' + this.state.thumbnailVersion}
           className={imgClass} />
