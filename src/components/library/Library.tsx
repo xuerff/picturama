@@ -73,6 +73,8 @@ class Library extends React.Component<Props, State> {
                     currentDate={props.currentDate}
                     showOnlyFlagged={props.showOnlyFlagged}
                     isShowingTrash={props.isShowingTrash}
+                    highlighted={props.highlighted}
+                    photos={props.photos}
                     actions={props.actions}
                 />
                 <div className="Library-body">

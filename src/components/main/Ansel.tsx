@@ -45,7 +45,7 @@ class Ansel extends React.Component<Props, State> {
       actions: bindActionCreators(actions, props.dispatch)
     };
 
-    bindMany(this, 'toggleSidebar', 'handleFlag', 'handleDateFilter', 'setCurrentLeft', 'setCurrentRight', 'storeCurrentEffects')
+    bindMany(this, 'toggleSidebar', 'handleFlag', 'handleDateFilter', 'setCurrentLeft', 'setCurrentRight')
   }
 
   handleDateFilter(date) {
@@ -113,12 +113,6 @@ class Ansel extends React.Component<Props, State> {
     }
   }
 
-  storeCurrentEffects(effects: PhotoEffect[]) {
-    const props = this.props
-    const photo = props.photos[props.current]
-    this.state.actions.storeEffects(photo, effects)
-  }
-
   render() {
     const props = this.props
     const state = this.state
@@ -150,7 +144,6 @@ class Ansel extends React.Component<Props, State> {
             setCurrentLeft={this.setCurrentLeft}
             setCurrentRight={this.setCurrentRight}
             toggleFlag={this.handleFlag}
-            storeEffects={this.storeCurrentEffects}
           />
       }
     }
