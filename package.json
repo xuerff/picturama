@@ -67,6 +67,7 @@
     "@types/react-dom": "^15.3.1",
     "@types/react-loader": "^2.4.2",
     "@types/react-redux": "^5.0.7",
+    "@types/sharp": "^0.17.3",
     "@types/shortid": "^0.0.29",
     "asar": "0.13.0",
     "babel-eslint": "^7.1.0",

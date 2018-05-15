@@ -1,3 +1,4 @@
+import { BrowserWindow } from 'electron'
 import * as sharp from 'sharp'
 import * as libraw from 'libraw'
 import * as fs from 'fs'
@@ -5,13 +6,14 @@ import * as moment from 'moment'
 import * as Promise from 'bluebird'
 
 import config from './config';
-import { readMetadataOfImage } from './metadata';
+import { readMetadataOfImage } from './MetaData'
 
 import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/Photo'
 import Tag from './models/Tag'
+import { bindMany } from './util/LangUtil'
 
 const readFile = Promise.promisify(fs.readFile);
 
@@ -28,28 +30,27 @@ const extractImg = new RegExp(
   'i'
 );
 
-export default class Scanner {
-  constructor(path, versionsPath, mainWindow) {
-    this.path = path;
-    this.versionsPath = versionsPath;
-    this.mainWindow = mainWindow;
+interface FileInfo {
+  path: string
+  imgPath?: string
+  name: string
+  isRaw: boolean
+}
 
+export default class Scanner {
+  private progress: { processed: number, total: number, photosDir: string }
+
+  constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
     this.progress = {
       processed: 0,
       total: 0,
       photosDir: path
     };
 
-    this.scanPictures = this.scanPictures.bind(this);
-    this.prepare = this.prepare.bind(this);
-    this.setTotal = this.setTotal.bind(this);
-    this.filterStoredPhoto = this.filterStoredPhoto.bind(this);
-    this.importRaw = this.importRaw.bind(this);
-    this.importImg = this.importImg.bind(this);
-    this.populateTags = this.populateTags.bind(this);
+    bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'filterStoredPhoto', 'importRaw', 'importImg', 'populateTags')
   }
 
-  prepare(filePaths) {
+  prepare(filePaths: string[]): FileInfo[] {
     let rawFiles = filePaths.map(filePath =>
       filePath.match(allowed) ? filePath : null
     )
@@ -64,7 +65,7 @@ export default class Scanner {
       let filename = rawFile.match(extract)[1];
       let imgPos = matches(imgFiles, filename);
 
-      let element = {
+      let element: FileInfo = {
         path: rawFile,
         name: filename,
         isRaw: true
@@ -124,7 +125,6 @@ export default class Scanner {
         sharp(`${config.thumbsPath}/${file.name}.thumb.${config.workExt}`)
           .resize(250, 250)
           .max()
-          .quality(100)
           .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`)
       )
       .then(() => readMetadataOfImage(file.path))
@@ -165,7 +165,6 @@ export default class Scanner {
         .rotate()
         .resize(250, 250)
         .max()
-        .quality(100)
         .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`),
       readMetadataOfImage(file.path),
       (img, metaData) =>
@@ -197,7 +196,7 @@ export default class Scanner {
     });
   }
 
-  populateTags(photo, tags) {
+  populateTags(photo, tags: string[]) {
     if (tags.length > 0) {
       return Promise.each(tags, tagName =>
         new Tag({ title: tagName })

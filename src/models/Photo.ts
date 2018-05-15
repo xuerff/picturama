@@ -3,7 +3,7 @@ import * as shortid from 'shortid'
 
 import config from './../config';
 
-import { ExifOrientation } from './DataTypes'
+import { ExifOrientation, BookshelfClass } from './DataTypes'
 import Tag, { TagType } from './Tag'
 import Version from './version'
 
@@ -18,7 +18,7 @@ export interface PhotoType {
     thumb_250: string,          // Example: : '../dot-ansel/thumbs-250/IMG_9700.webp'
     extension: string,          // Example: 'JPG'
     flag: number,               // Example: 0
-    created_at: number,         // Example: 0
+    created_at: number | Date,  // Example: 0  (for saving Dates work too)
     updated_at: number | null,  // Example: null
     orientation: ExifOrientation, // Example: 1 (= ExifOrientation.Up)
     exposure_time: number,      // Example: 0.0166
@@ -29,11 +29,7 @@ export interface PhotoType {
     trashed: 0 | 1,             // Example: 0
     versions: any[],            // Example: []
     tags: TagType[],            // Example: []
-    versionNumber: number       // Example: 1
-}
-
-interface PhotoConstructor {
-    new (): PhotoType
+    versionNumber: number       // Example: 1   
 }
 
 export type PhotoEffect = { type: 'rotate', turns: number }
@@ -65,4 +61,4 @@ export default anselBookshelf.Model.extend({
         return this.query().distinct('date')
             .orderBy('date', 'desc');
     }
-}) as PhotoConstructor
+}) as BookshelfClass<PhotoType>
