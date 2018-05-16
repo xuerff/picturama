@@ -103,5 +103,5 @@
     "spectron": "^3.7.0",
     "typescript": "^2.8.3"
   },
-  "repository": "git@github.com:m0g/ansel.git"
+  "repository": "https://github.com/ansel-app/ansel.git"
 }

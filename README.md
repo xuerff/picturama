@@ -23,7 +23,7 @@
 - [x] Export to external editor
 - [ ] Export
 
-Searching for USB support on Linux? Check out the [Branch linux-usb](https://github.com/til-schneider/ansel/tree/linux-usb).
+Searching for USB support on Linux? Check out the [Branch linux](https://github.com/ansel-app/ansel/tree/linux).
 
 ## Install
 
