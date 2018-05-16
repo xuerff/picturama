@@ -23,14 +23,22 @@
 
 ## Install
 
-### Prerequistes
+Don't need USB support on Linux? Check out the [master Branch](https://github.com/til-schneider/ansel/tree/master).
 
 As of today, only **Ubuntu 14.04 & 16.04 LTS** 64-bits are supported.
 
-In order to be able to run, ansel requires the following libraries:
+In order to be able to run with USB support on Linux, ansel requires the following libraries:
 
 ```bash
 sudo apt-get install zlib1g-dev libudev-dev
+```
+
+Build and run Ansel:
+
+```bash
+cd path/to/ansel
+npm install
+npm start
 ```
 
 ## Supported cameras

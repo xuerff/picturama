@@ -61,6 +61,7 @@
     "sharp": "0.17.3",
     "shortid": "^2.2.8",
     "sqlite3": "3.1.8",
+    "udev": "git+https://github.com/cheery/node-udev#master",
     "walk": "^2.3.9"
   },
   "devDependencies": {
