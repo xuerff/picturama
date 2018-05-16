@@ -5,7 +5,7 @@ export default function reducers(state, action) {
   case 'GET_PHOTOS_SUCCESS':
     return {
       ...state,
-      diff: false,
+      modal: null,  // Hide diff
       current: -1,
       importing: false,
       splashed: true,

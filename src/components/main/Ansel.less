@@ -1,3 +1,31 @@
+.Ansel-sidebar,
+.Ansel-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: left @transition-time ease-out;
+}
+.Ansel-sidebar {
+    z-index: 2;
+
+    left: -@sidebarWidth;
+    width: @sidebarWidth;
+  
+    .Ansel.hasSidebar & {
+        left: 0;
+    }
+}
+.Ansel-container {
+    z-index: 1;
+
+    left: 0;
+    right: 0;
+
+    .Ansel.hasSidebar & {
+        left: @sidebarWidth;
+    }
+}
+
 .Ansel-detail {
     position: absolute;
     width: 100%;

@@ -2,12 +2,25 @@ import * as fs from 'fs'
 
 import * as Promise from 'bluebird'
 import * as ExifParser from 'exif-parser'
+import { ExifOrientation } from './models/DataTypes';
 
 const readFile = Promise.promisify(fs.readFile)
 const fileStat = Promise.promisify(fs.stat)
 
 
-export function readMetadataOfImage(imagePath) {
+export interface MetaData {
+  exposureTime?: number,
+  iso?:          number,
+  aperture?:     number,
+  focalLength?:  number,
+  createdAt:    Date,
+  /** Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html */
+  orientation:  ExifOrientation,
+  tags:         string[]
+}
+
+
+export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
   return readExifOfImage(imagePath)
     .then(extractMetaDataFromExif)
     .catch(error => {
@@ -33,7 +46,7 @@ function readExifOfImage(imagePath) {
 }
 
 
-function extractMetaDataFromExif(exifData) {
+function extractMetaDataFromExif(exifData): MetaData {
   const exifTags = exifData.tags
   let metaData = {
     exposureTime: exifTags.ExposureTime,

@@ -1,3 +1,8 @@
+
+@buttonFontSize: 14px;
+@svgIconSize: 22px;
+
+
 .button-variant(@color; @background) {
     color: @color;
     background-color: @background;
@@ -28,9 +33,9 @@
     user-select: none;
     touch-action: manipulation;
     cursor: pointer;
-    padding: 8px 12px;
-    font-size: 14px;
-    line-height: 14px;
+    padding: 8px 10px;
+    font-size: @buttonFontSize;
+    line-height: @buttonFontSize;
     font-weight: 400;
     text-align: center;
     border-radius: 4px;
@@ -59,10 +64,14 @@
         .button-variant(#eee, @deep-orange-800)
     }
 
-    .Icon {
+    .FaIcon, .SvgIcon {
         &:not(:last-child) {
             margin-right: 10px;
         }
+    }
+    .SvgIcon {
+        font-size: @svgIconSize;
+        margin: (-(@svgIconSize - @buttonFontSize) / 2 - 1px) -2px;
     }
 
 }

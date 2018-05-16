@@ -1,17 +1,10 @@
 #sidebar {
-  position: relative;
-  z-index: 2;
   padding: 0;
-  float: left;
-  margin-left: 0;
-  width: 300px;
   background: @blue-grey-900;
   color: #fff;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
               0px 4px 5px 0px rgba(0, 0, 0, 0.14),
               0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-
-  transition: margin-left 0.4s ease-in;
 
   div.sidebar-content {
     height: ~"calc(100% - 48px)";
@@ -97,9 +90,4 @@
       background: @deep-orange-800;
     }
   }
-}
-
-#sidebar.no-sidebar {
-  margin-left: -301px;
-  transition: margin-left 0.4s ease-out;
 }

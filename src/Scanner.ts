@@ -1,3 +1,4 @@
+import { BrowserWindow } from 'electron'
 import * as sharp from 'sharp'
 import * as libraw from 'libraw'
 import * as fs from 'fs'
@@ -5,13 +6,16 @@ import * as moment from 'moment'
 import * as Promise from 'bluebird'
 
 import config from './config';
-import { readMetadataOfImage } from './metadata';
+import { readMetadataOfImage } from './MetaData'
 
 import walker from './lib/walker';
 import matches from './lib/matches';
 
 import Photo from './models/Photo'
 import Tag from './models/Tag'
+import { renderThumbnail } from './ForegroundClient'
+import { bindMany } from './util/LangUtil'
+import { fetchPhotoWork, storeThumbnail } from './PhotoWorkStore'
 
 const readFile = Promise.promisify(fs.readFile);
 
@@ -28,28 +32,27 @@ const extractImg = new RegExp(
   'i'
 );
 
-export default class Scanner {
-  constructor(path, versionsPath, mainWindow) {
-    this.path = path;
-    this.versionsPath = versionsPath;
-    this.mainWindow = mainWindow;
+interface FileInfo {
+  path: string
+  imgPath?: string
+  name: string
+  isRaw: boolean
+}
 
+export default class Scanner {
+  private progress: { processed: number, total: number, photosDir: string }
+
+  constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
     this.progress = {
       processed: 0,
       total: 0,
       photosDir: path
     };
 
-    this.scanPictures = this.scanPictures.bind(this);
-    this.prepare = this.prepare.bind(this);
-    this.setTotal = this.setTotal.bind(this);
-    this.filterStoredPhoto = this.filterStoredPhoto.bind(this);
-    this.importRaw = this.importRaw.bind(this);
-    this.importImg = this.importImg.bind(this);
-    this.populateTags = this.populateTags.bind(this);
+    bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'onImportedStep', 'filterStoredPhoto', 'populateTags', 'walk')
   }
 
-  prepare(filePaths) {
+  prepare(filePaths: string[]): FileInfo[] {
     let rawFiles = filePaths.map(filePath =>
       filePath.match(allowed) ? filePath : null
     )
@@ -64,7 +67,7 @@ export default class Scanner {
       let filename = rawFile.match(extract)[1];
       let imgPos = matches(imgFiles, filename);
 
-      let element = {
+      let element: FileInfo = {
         path: rawFile,
         name: filename,
         isRaw: true
@@ -95,81 +98,53 @@ export default class Scanner {
   }
 
   walk(file) {
-    if (file.isRaw)
-      return this.importRaw(file);
+    const originalImgPath = file.path
+    const nonRawImgPath = file.isRaw ? `${config.thumbsPath}/${file.name}.thumb.${config.workExt}` : originalImgPath
+    const thumbnailImgPath = `${config.thumbs250Path}/${file.name}.${config.workExt}`
 
-    return this.importImg(file);
-  }
+    let createNonRawImg
+    if (file.isRaw) {
+      let extractThumb
+      if (file.hasOwnProperty('imgPath')) {
+        extractThumb = Promise.resolve(file.imgPath)
+      } else {
+        extractThumb = libraw.extractThumb(
+          `${file.path}`,
+          `${config.tmp}/${file.name}`
+        )
+      }
 
-  importRaw(file) {
-    let waitFor;
-
-    if (file.hasOwnProperty('imgPath'))
-      waitFor = Promise.resolve(file.imgPath);
-    else {
-      waitFor = libraw.extractThumb(
-        `${file.path}`,
-        `${config.tmp}/${file.name}`
-      );
+      createNonRawImg = extractThumb
+        .then(imgPath => readFile(imgPath))
+        .then(img => sharp(img)
+          .rotate()
+          .withMetadata()
+          .toFile(nonRawImgPath)
+        )
+        .then(() => nonRawImgPath)
+    } else {
+      createNonRawImg = Promise.resolve(originalImgPath)
     }
 
-    return waitFor
-      .then(imgPath => readFile(imgPath))
-      .then(img => sharp(img)
-        .rotate()
-        .withMetadata()
-        .toFile(`${config.thumbsPath}/${file.name}.thumb.${config.workExt}`)
-      )
-      .then(() =>
-        sharp(`${config.thumbsPath}/${file.name}.thumb.${config.workExt}`)
-          .resize(250, 250)
-          .max()
-          .quality(100)
-          .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`)
-      )
-      .then(() => readMetadataOfImage(file.path))
-      .then(metaData =>
-        new Photo({ title: file.name })
-          .fetch()
-          .then(photo => {
-            if (photo)
-              return null;
+    const readMetaData = readMetadataOfImage(originalImgPath)
 
-            return Photo.forge({
-              title: file.name,
-              extension: file.path.match(/\.(.+)$/i)[1],
-              orientation: metaData.orientation,
-              date: moment(metaData.createdAt).format('YYYY-MM-DD'),
-              created_at: metaData.createdAt,
-              exposure_time: metaData.exposureTime,
-              iso: metaData.iso,
-              aperture: metaData.aperture,
-              focal_length: metaData.focalLength,
-              master: `${file.path}`,
-              thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
-              thumb: `${config.thumbsPath}/${file.name}.thumb.${config.workExt}`
-            })
-            .save();
-          })
-          .then(photo => this.populateTags(photo, metaData.tags))
+    const createThumbnail = Promise.all([
+        createNonRawImg,
+        readMetaData,
+        fetchPhotoWork(originalImgPath)
+      ])
+      .then(results => {
+        const [ nonRawImgPath, metaData, photoWork ] = results
+        return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork.effects)
+      })
+      .then(thumbnailData =>
+        storeThumbnail(thumbnailImgPath, thumbnailData)
       )
-      .then(this.onImportedStep.bind(this))
-      .catch(err => {
-        console.error('ERR knex', file, err);
-      });
-  }
 
-  importImg(file) {
-    return Promise.join(
-      sharp(file.path)
-        .rotate()
-        .resize(250, 250)
-        .max()
-        .quality(100)
-        .toFile(`${config.thumbs250Path}/${file.name}.${config.workExt}`),
-      readMetadataOfImage(file.path),
-      (img, metaData) =>
-        new Photo({ title: file.name })
+    return Promise.all([createThumbnail, readMetaData])
+      .then(results => {
+        const metaData = results[1]
+        return new Photo({ title: file.name })
           .fetch()
           .then(photo =>
             photo ? null : Photo.forge({
@@ -182,22 +157,21 @@ export default class Scanner {
               iso: metaData.iso,
               aperture: metaData.aperture,
               focal_length: metaData.focalLength,
-              master: file.path,
-              thumb_250: `${config.thumbs250Path}/${file.name}.${config.workExt}`,
-              thumb: file.path
+              master: originalImgPath,
+              thumb_250: thumbnailImgPath,
+              thumb: nonRawImgPath
             })
             .save()
           )
           .then(photo => this.populateTags(photo, metaData.tags))
-    )
-    .then(this.onImportedStep.bind(this))
-    .catch(err => {
-      console.error('err', err);
-      return false;
-    });
+      })
+      .then(this.onImportedStep)
+      .catch(err => {
+        console.error('Importing photo failed', file, err)
+      })
   }
 
-  populateTags(photo, tags) {
+  populateTags(photo, tags: string[]) {
     if (tags.length > 0) {
       return Promise.each(tags, tagName =>
         new Tag({ title: tagName })
@@ -234,7 +208,7 @@ export default class Scanner {
       .then(this.prepare)
       .filter(this.filterStoredPhoto)
       .then(this.setTotal)
-      .map(this.walk.bind(this), {
+      .map(this.walk, {
         concurrency: config.concurrency
       });
   }

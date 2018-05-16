@@ -7,16 +7,17 @@ interface Props {
     name: string
 }
 
-class Icon extends React.Component<Props, undefined> {
+/**
+ * Shows a [Font Awesome Icon](https://fontawesome.com/icons).
+ */
+export default class FaIcon extends React.Component<Props, undefined> {
     render() {
         const props = this.props
         return (
             <i
-                className={classNames(props.className, `Icon fa fa-${props.name}`)}
+                className={classNames(props.className, `FaIcon fa fa-${props.name}`)}
                 style={props.style}
             />
         )
     }
 }
-
-export default Icon

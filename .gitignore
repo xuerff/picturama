@@ -9,6 +9,7 @@ dist/
 tests-dist/
 dot-ansel/
 build/
+.ansel.json
 
 npm-debug.log
 .DS_Store

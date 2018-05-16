@@ -7,6 +7,7 @@ import * as sharp from 'sharp'
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
+import keymapManager from '../keymap-manager'
 import config from './../config';
 import Progress from './progress';
 
@@ -14,7 +15,6 @@ const readFile = Promise.promisify(fs.readFile);
 
 class Export extends React.Component {
   static propTypes = {
-    closeExportDialog: PropTypes.func.isRequired,
     photos: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired
   }
@@ -34,11 +34,13 @@ class Export extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('core:cancel', this.props.closeExportDialog);
+    keymapManager.bind(this.refs.main)
+    window.addEventListener('core:cancel', this.props.actions.closeExport)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('core:cancel', this.props.closeExportDialog);
+    keymapManager.unbind(this.refs.main)
+    window.removeEventListener('core:cancel', this.props.actions.closeExport)
   }
 
   onFolderSelection(filenames) {
@@ -71,7 +73,7 @@ class Export extends React.Component {
       message: `Finish exporting ${this.props.photos.length} photo(s)`
     });
 
-    this.props.closeExportDialog();
+    this.props.actions.closeExport()
   }
 
   onEachPhoto(photo, i) {
@@ -129,7 +131,7 @@ class Export extends React.Component {
       .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>);
 
     return (
-      <div className="outer-modal">
+      <div className="outer-modal" ref="main">
         <div className="modal shadow--2dp">
           <form onSubmit={this.handleSubmit.bind(this)}>
             <div>

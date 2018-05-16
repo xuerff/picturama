@@ -11,6 +11,7 @@ import MainMenu from './main-menu';
 // import Usb from './usb';
 import config from './config';
 import Watch from './watch';
+import { init as initForegroundClient } from './ForegroundClient'
 
 const initLibrary = mainWindow => {
   const knex = require('knex')(config.knex);
@@ -57,6 +58,7 @@ app.on('ready', () => {
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
   mainWindow.setTitle('Ansel');
+  initForegroundClient(mainWindow)
 
   if (fs.existsSync(config.settings))
     initLibrary(mainWindow);
