@@ -3,6 +3,7 @@ import slug from '../lib/slug';
 import anselBookshelf from './ansel-bookshelf';
 
 import Photo from './photo';
+import { BookshelfClass } from './DataTypes'
 
 
 export interface TagType {
@@ -11,10 +12,6 @@ export interface TagType {
     slug: string,
     created_at: number,
     updated_at: number | null,
-}
-
-interface TagConstructor {
-    new (): TagType
 }
 
 export default anselBookshelf.Model.extend({
@@ -32,4 +29,4 @@ export default anselBookshelf.Model.extend({
         });
     }
 
-}) as TagConstructor
+}) as BookshelfClass<TagType>

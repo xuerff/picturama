@@ -26,16 +26,18 @@ UI sandbox
     npm start
     ```
 
-2. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)
-
-3. Change some React code
-
-4. Rebuild (in extra console):
+2. Run watch build (in extra console):
     ```bash
-    ./node_modules/.bin/gulp transpile styles
+    npm run watch
     ```
 
-5. Reload UI sandbox: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
+3. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)
+
+4. Change some React code and save
+
+5. Wait for the watch build to build the changes
+
+6. Reload UI sandbox: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
 
 
 

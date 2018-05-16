@@ -1,19 +1,24 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types'
 
-import keymapManager from './../keymap-manager';
-import Picture from './picture';
+import keymapManager from '../../keymap-manager'
+import { PhotoType } from '../../models/photo'
+import AppState from '../../reducers/AppState'
+import Picture from './Picture'
 
-class Grid extends React.Component {
-  static propTypes = {
-    setExport: PropTypes.func.isRequired,
-    setScrollTop: PropTypes.func.isRequired,
-    highlighted: PropTypes.array.isRequired,
-    current: PropTypes.number,
-    actions: PropTypes.object.isRequired,
-    photos: PropTypes.array.isRequired
-  }
+
+interface ConnectProps {
+    isActive: boolean
+    actions: any
+}
+
+interface Props extends ConnectProps {
+    current: number
+    highlighted: number[]
+    photos: PhotoType[]
+}
+
+class Grid extends React.Component<Props, undefined> {
 
   constructor(props) {
     super(props);
@@ -23,7 +28,7 @@ class Grid extends React.Component {
 
   handleFlagging() {
     let flagSet = this.props.photos
-      .filter((photo, i) => this.state.highlighted.indexOf(i) !== -1);
+      .filter((photo, i) => this.props.highlighted.indexOf(i) !== -1);
 
     this.props.actions.flagSet(this.props.photos, flagSet, true);
   }
@@ -34,6 +39,25 @@ class Grid extends React.Component {
   }
 
   componentDidMount() {
+    this.addListeners()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const props = this.props
+    if (props.isActive !== prevProps.isActive) {
+      if (props.isActive) {
+        this.addListeners()
+      } else {
+        this.removeListeners()
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.removeListeners()
+  }
+
+  addListeners() {
     window.addEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.addEventListener('grid:right', this.props.actions.moveHighlightRight);
     window.addEventListener('grid:up', this.props.actions.moveHighlightUp);
@@ -43,7 +67,7 @@ class Grid extends React.Component {
     keymapManager.bind(this.refs.grid);
   }
 
-  componentWillUnmount() {
+  removeListeners() {
     window.removeEventListener('grid:left', this.props.actions.moveHighlightLeft);
     window.removeEventListener('grid:right', this.props.actions.moveHighlightRight);
     window.removeEventListener('grid:up', this.props.actions.moveHighlightUp);
@@ -55,25 +79,26 @@ class Grid extends React.Component {
 
   render() {
     return (
-      <div className="grid" ref="grid">
+      <div className="Grid" ref="grid">
         {this.props.photos.map((photo, index) =>
           <Picture
             key={index}
-            index={index}
+            photoIndex={index}
             photo={photo}
             actions={this.props.actions}
             setFlagging={this.handleFlagging.bind(this)}
-            setExport={this.props.setExport} />
-          )
-        }
+          />
+        )}
       </div>
     );
   }
 }
 
-const ReduxGrid = connect(state => ({
-  current: state.current,
-  highlighted: state.highlighted
+const ReduxGrid = connect<Props, {}, ConnectProps, AppState>((state, props) => ({
+    ...props,
+    current: state.current,
+    highlighted: state.highlighted,
+    photos: state.photos
 }))(Grid);
 
 export default ReduxGrid;

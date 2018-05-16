@@ -1,0 +1,24 @@
+.Picture {
+    padding: @gridCellPadding;
+    width: @gridCellSize;
+    height: @gridCellSize;
+    display: block;
+    text-align: center;
+    transition: background-color 0.2s ease-in;
+
+    span.v-align {
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+    }
+
+    img {
+        vertical-align: middle;
+        max-width: @thumbnailSize;
+        max-height: @thumbnailSize;
+    }
+
+    &.isHighlighted {
+        background: @deep-orange-500;
+    }
+}

@@ -8,10 +8,13 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
-
-# Disabled in order to keep diffs small
-#trim_trailing_whitespace = true
+trim_trailing_whitespace = true
 
 
 [*.js]
 indent_size = 2
+
+
+[*.md]
+# Disabled for markdown in order to support newlines without new paragraph (using a line ending with two spaces)
+trim_trailing_whitespace = false

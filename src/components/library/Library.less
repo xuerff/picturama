@@ -1,0 +1,16 @@
+.Library {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    background: @blue-grey-100;
+}
+.Library-topBar, .Library-bottomBar {
+    flex: 0 0 auto;
+}
+
+.Library-body {
+    flex: 1 1 100%;
+    overflow-x: hidden;  // Don't show vertical scrollbars during transition when hiding the sidebar
+    overflow-y: auto;
+}

@@ -17,7 +17,7 @@ var npmPkgs = require('./package.json')
 
 
 var typescriptSettings = {
-  target: 'es5',
+  target: 'es6',
   jsx: 'react',
   module: 'commonjs',
   moduleResolution: 'node',
@@ -193,3 +193,10 @@ gulp.task('clear', [
 ]);
 
 gulp.task('tests', ['set-env-test', 'lint', 'transpile', 'styles', 'mocha']);
+
+gulp.task("watch", () => {
+  gulp.watch([ 'src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx' ], [ 'transpile' ])
+  gulp.watch([ 'tests/**/*.js', 'tests/**/*.ts', 'tests/**/*.tsx' ], [ 'transpile-tests' ])
+  gulp.watch([ 'src/less/**/*.less', 'src/components/**/*.less' ], [ 'styles' ])
+  gulp.watch([ 'src/sandbox/**/*.less' ], [ 'styles-sandbox' ])
+});

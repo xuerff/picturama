@@ -4,9 +4,9 @@ import * as notifier from 'node-notifier';
 import * as fs from 'fs'
 import * as Promise from 'bluebird'
 
-import Scanner from './scanner';
+import Scanner from './Scanner'
 import config from './config';
-import { readMetadataOfImage } from './metadata';
+import { readMetadataOfImage } from './MetaData'
 
 import walker from './lib/walker';
 
