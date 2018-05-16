@@ -1,3 +1,5 @@
+[Ansel Telegram discussion group](https://t.me/joinchat/A5eFuRJLW8FnqjCXGkxVWg)
+
 # Ansel
 
 ![](ansel.jpg)
@@ -23,14 +25,16 @@
 
 ## Install
 
-Don't need USB support on Linux? Check out the [master Branch](https://github.com/til-schneider/ansel/tree/master).
+Don't need USB support on Linux? Check out the [master Branch](https://github.com/ansel-app/ansel/tree/master).
 
 As of today, only **Ubuntu 14.04 & 16.04 LTS** 64-bits are supported.
 
 In order to be able to run with USB support on Linux, ansel requires the following libraries:
 
 ```bash
-sudo apt-get install zlib1g-dev libudev-dev
+cd path/to/ansel
+npm install
+npm start
 ```
 
 Build and run Ansel:

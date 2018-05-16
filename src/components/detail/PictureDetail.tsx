@@ -2,6 +2,7 @@ import { ipcRenderer, remote, Menu as MenuType } from 'electron';
 import * as classNames from 'classnames'
 import * as React from 'react'
 import * as Loader from 'react-loader'
+import { findDOMNode } from 'react-dom'
 
 import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
@@ -9,10 +10,17 @@ import AvailableEditors from '../../available-editors'
 
 import AddTags from '../add-tags';
 import Export from '../export';
+import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
+import ButtonGroup from '../widget/ButtonGroup'
+import FaIcon from '../widget/icon/FaIcon'
+import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
+import RotateRightIcon from '../widget/icon/RotateRightIcon'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType } from '../../models/Photo'
+import { PhotoType, PhotoEffect } from '../../models/Photo'
+import { rotate } from '../../util/EffectsUtil'
+import { bindMany } from '../../util/LangUtil'
 
 const { Menu, MenuItem } = remote;
 
@@ -26,16 +34,22 @@ rotation[0] = 'minus-ninety';
 interface Props {
     style?: any
     className?: any
-    actions: any
-    toggleFlag: () => void
-    isLast: () => boolean
     photo: PhotoType
+    effects?: PhotoEffect[]
+    isFirst: boolean
+    isLast: boolean
+    actions: any
+    setCurrentLeft: () => void 
+    setCurrentRight: () => void 
+    toggleFlag: () => void
 }
 
 interface State {
     bound: boolean,
     modal: 'addTags' | 'none' | 'export',
-    loaded: boolean
+    loaded: boolean,
+    canvasWidth?: number
+    canvasHeight?: number
 }
 
 export default class PictureDetail extends React.Component<Props, State> {
@@ -48,15 +62,8 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         this.state = { bound: false, modal: 'none', loaded: false };
 
-        this.contextMenu = this.contextMenu.bind(this);
-        this.bindEventListeners = this.bindEventListeners.bind(this);
-        this.unbindEventListeners = this.unbindEventListeners.bind(this);
-        this.closeDialog = this.closeDialog.bind(this);
-        this.finishLoading = this.finishLoading.bind(this);
-        this.cancelEvent = this.cancelEvent.bind(this);
-        this.toggleDiff = this.toggleDiff.bind(this);
-        this.moveToTrash = this.moveToTrash.bind(this);
-        this.addEditorMenu = this.addEditorMenu.bind(this);
+        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'finishLoading',
+            'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight')
     }
 
     contextMenu(e) {
@@ -79,17 +86,17 @@ export default class PictureDetail extends React.Component<Props, State> {
 
     showTagDialog() {
         this.unbindEventListeners();
-        this.setState({ ...this.state, modal: 'addTags' });
+        this.setState({ modal: 'addTags' });
     }
 
     closeDialog() {
         this.bindEventListeners();
-        this.setState({ ...this.state, modal: 'none' });
+        this.setState({ modal: 'none' });
     }
 
     showExportDialog() {
         this.unbindEventListeners();
-        this.setState({ ...this.state, modal: 'export' });
+        this.setState({ modal: 'export' });
     }
 
     cancelEvent() {
@@ -106,6 +113,26 @@ export default class PictureDetail extends React.Component<Props, State> {
     toggleDiff() {
         if (this.props.photo.versionNumber > 1)
             this.props.actions.toggleDiff();
+    }
+
+    rotateLeft() {
+        this.rotate(-1)
+    }
+
+    rotateRight() {
+        this.rotate(1)
+    }
+
+    rotate(turns: number) {
+        const props = this.props
+        
+        const prevEffects = props.effects
+        if (!prevEffects) {
+            return
+        }
+
+        const nextEffects = rotate(prevEffects, turns)
+        props.actions.storeEffects(props.photo, nextEffects)
     }
 
     componentDidMount() {
@@ -139,24 +166,24 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         window.addEventListener(
             'detail:moveLeft',
-            this.props.actions.setCurrentLeft
+            this.props.setCurrentLeft
         );
 
         window.addEventListener(
             'detail:moveRight',
-            this.props.actions.setCurrentRight
+            this.props.setCurrentRight
         );
 
         keymapManager.bind(this.refs.detail);
         this.bindEventListeners();
     }
 
-    finishLoading() {
-        this.setState({ ...this.state, loaded: true });
-    }
-
     componentWillReceiveProps() {
         this.bindEventListeners();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        this.updateCanvasSize()
     }
 
     componentWillUnmount() {
@@ -169,12 +196,12 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         window.removeEventListener(
             'detail:moveLeft',
-            this.props.actions.setCurrentLeft
+            this.props.setCurrentLeft
         );
 
         window.removeEventListener(
             'detail:moveRight',
-            this.props.actions.setCurrentRight
+            this.props.setCurrentRight
         );
 
         keymapManager.unbind();
@@ -182,8 +209,9 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     bindEventListeners() {
-        this.setState({ ...this.state, bound: true });
+        this.setState({ bound: true });
 
+        window.addEventListener('resize', this.updateCanvasSize);
         document.addEventListener('contextmenu', this.contextMenu);
 
         ipcRenderer.send('toggleAddTagMenu', true);
@@ -193,8 +221,9 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     unbindEventListeners() {
-        this.setState({ ...this.state, bound: false });
+        this.setState({ bound: false });
 
+        window.removeEventListener('resize', this.updateCanvasSize);
         document.removeEventListener('contextmenu', this.contextMenu);
 
         ipcRenderer.send('toggleAddTagMenu', false);
@@ -203,8 +232,25 @@ export default class PictureDetail extends React.Component<Props, State> {
         ipcRenderer.removeAllListeners('addTagClicked');
     }
 
+    finishLoading() {
+        this.setState({ loaded: true });
+    }
+
+    updateCanvasSize() {
+        const state = this.state
+
+        const bodyElem = findDOMNode(this.refs.body)
+        const canvasWidth  = Math.round(bodyElem.clientWidth  * 0.9)
+        const canvasHeight = Math.round(bodyElem.clientHeight * 0.9)
+
+        if (state.canvasWidth !== canvasWidth || state.canvasHeight !== canvasHeight) {
+            this.setState({ canvasWidth, canvasHeight })
+        }
+    }
+
     render() {
         const props = this.props
+        const state = this.state
 
         let imgClass = classNames(
             'PictureDetail-image shadow--2dp',
@@ -229,15 +275,37 @@ export default class PictureDetail extends React.Component<Props, State> {
             <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
                 <Toolbar className="PictureDetail-topBar">
                     <Button onClick={this.cancelEvent}>
-                        <i className="fa fa-chevron-left" aria-hidden="true"/>
-                        Back to library
+                        <FaIcon name="chevron-left"/>
+                        <span>Back to library</span>
                     </Button>
+                    <ButtonGroup>
+                        <Button enabled={!props.isFirst} onClick={props.setCurrentLeft} tip="Previous image [left]">
+                            <FaIcon name="arrow-left"/>
+                        </Button>
+                        <Button enabled={!props.isLast} onClick={props.setCurrentRight} tip="Next image [right]">
+                            <FaIcon name="arrow-right"/>
+                        </Button>
+                    </ButtonGroup>
+                    <span className="PictureDetail-topBarRight">
+                        <ButtonGroup>
+                            <Button onClick={this.rotateLeft} tip="Rotate image left">
+                                <RotateLeftIcon/>
+                            </Button>
+                            <Button onClick={this.rotateRight} tip="Rotate image right">
+                                <RotateRightIcon/>
+                            </Button>
+                        </ButtonGroup>
+                    </span>
                 </Toolbar>
 
-                <div className="PictureDetail-body">
-                    <img
-                        className={imgClass}
+                <div className="PictureDetail-body" ref="body">
+                    <PhotoPane
+                        className="PictureDetail-image"
+                        width={state.canvasWidth}
+                        height={state.canvasHeight}
                         src={props.photo.thumb}
+                        orientation={props.photo.orientation}
+                        effects={props.effects}
                         onLoad={this.finishLoading}
                     />
                 </div>

@@ -1,12 +1,13 @@
 import current from './current';
 import dates from './dates';
 import devices from './devices';
-import diff from './diff';
+import modal from './modal'
 import importation from './importation';
 import photos from './photos';
 import settings from './settings';
 import tags from './tags';
 import grid from './grid';
+import currentPhotoWork from './currentPhotoWork'
 
 const initialState = {
   splashed: false,
@@ -15,7 +16,8 @@ const initialState = {
   currentTag: null,
   showOnlyFlagged: false,
   current: -1,
-  diff: false,
+  currentPhotoWork: null,
+  modal: null,
   settingsExists: false,
   route: '',
   photosCount: 0,
@@ -42,11 +44,12 @@ export default function reducers(state = initialState, action) {
     current,
     dates,
     devices,
-    diff,
+    modal,
     importation,
     photos,
     settings,
     tags,
-    grid
+    grid,
+    currentPhotoWork
   });
 }
