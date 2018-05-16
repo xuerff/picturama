@@ -13,7 +13,9 @@ import matches from './lib/matches';
 
 import Photo from './models/Photo'
 import Tag from './models/Tag'
+import { renderThumbnail } from './ForegroundClient'
 import { bindMany } from './util/LangUtil'
+import { fetchPhotoWork, storeThumbnail } from './PhotoWorkStore'
 
 const readFile = Promise.promisify(fs.readFile);
 
@@ -124,15 +126,20 @@ export default class Scanner {
       createNonRawImg = Promise.resolve(originalImgPath)
     }
 
-    const createThumbnail = createNonRawImg
-      .then(() => sharp(nonRawImgPath)
-        .rotate()
-        .resize(250, 250)
-        .max()
-        .toFile(thumbnailImgPath)
-      )
-
     const readMetaData = readMetadataOfImage(originalImgPath)
+
+    const createThumbnail = Promise.all([
+        createNonRawImg,
+        readMetaData,
+        fetchPhotoWork(originalImgPath)
+      ])
+      .then(results => {
+        const [ nonRawImgPath, metaData, photoWork ] = results
+        return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork.effects)
+      })
+      .then(thumbnailData =>
+        storeThumbnail(thumbnailImgPath, thumbnailData)
+      )
 
     return Promise.all([createThumbnail, readMetaData])
       .then(results => {

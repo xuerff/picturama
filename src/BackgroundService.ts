@@ -1,5 +1,9 @@
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from './PhotoWorkStore'
 import { PhotoWork } from './models/Photo'
+import { assertMainProcess } from './util/ElectronUtil'
+
+
+assertMainProcess()
 
 
 export function fetchPhotoWorkWithCallback(photoPath: string, callback: (error: any, result: PhotoWork) => void) {
