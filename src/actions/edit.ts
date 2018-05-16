@@ -1,5 +1,5 @@
 import { PhotoType, PhotoEffect } from '../models/Photo'
-import { storePhotoWork, storeThumbnail } from '../IpcClient'
+import { storePhotoWork, storeThumbnail } from '../BackgroundClient'
 import { renderThumbnail } from '../renderer/ThumbnailRenderer'
 
 

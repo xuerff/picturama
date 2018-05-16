@@ -15,7 +15,7 @@ interface IpcServerApi {
 }
 
 
-const ipcServer = remote.require('./IpcServer.js') as IpcServerApi
+const ipcServer = remote.require('./BackgroundService.js') as IpcServerApi
 
 
 const ipcFetchPhotoWork = promisify<PhotoWork, string>(ipcServer.fetchPhotoWorkWithCallback)

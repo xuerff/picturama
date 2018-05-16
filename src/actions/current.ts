@@ -1,4 +1,4 @@
-import { fetchPhotoWork } from '../IpcClient'
+import { fetchPhotoWork } from '../BackgroundClient'
 import store from '../store'
 import AppState from '../reducers/AppState'
 import CancelablePromise, { isCancelError } from '../util/CancelablePromise'

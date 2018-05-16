@@ -14,7 +14,7 @@ import { PhotoType } from '../../models/photo'
 import AppState from '../../reducers/AppState'
 import { rotate } from '../../util/EffectsUtil'
 import { bindMany } from '../../util/LangUtil'
-import { fetchPhotoWork } from '../../IpcClient'
+import { fetchPhotoWork } from '../../BackgroundClient'
 
 const dialog = remote.dialog;
 
