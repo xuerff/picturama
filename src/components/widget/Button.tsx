@@ -38,7 +38,7 @@ class Button extends React.Component<Props, undefined> {
         }
 
         return (
-            <div
+            <button
                 className={classNames(props.className, `Button hasType-${props.type}`)}
                 style={props.style}
                 onClick={this.onClick}
@@ -47,7 +47,7 @@ class Button extends React.Component<Props, undefined> {
                 {...dynamicAttributes}
             >
                 {props.children}
-            </div>
+            </button>
         )
     }
 }
