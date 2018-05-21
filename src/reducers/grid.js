@@ -35,11 +35,23 @@ export default function reducers(state, action) {
       ]
     };
 
-  case 'ADD_HIGHLIGHT_SUCCESS':
+  case 'TOGGLE_HIGHLIGHT_SUCCESS': {
+    const highlightedIndex = state.highlighted.indexOf(action.index)
+    let highlighted
+    if (highlightedIndex === -1) {
+      // Add (and copy)
+      highlighted = state.highlighted.concat(action.index)
+    } else {
+      // Remove (on a copy)
+      highlighted = state.highlighted.splice(0)
+      highlighted.splice(highlightedIndex, 1)
+    }
+
     return {
       ...state,
-      highlighted: state.highlighted.concat(action.index)
-    };
+      highlighted
+    }
+  }
 
   case 'CLEAR_HIGHLIGHT_SUCCESS':
     return {

@@ -33,7 +33,7 @@ export const moveHighlightDown = event => dispatch => {
 export const setHighlight = (index, ctrlKey, metaKey) => dispatch => {
   const isMac = process.platform === 'darwin'
   dispatch({
-    type: (isMac ? metaKey : ctrlKey) ? 'ADD_HIGHLIGHT_SUCCESS' : 'SET_HIGHLIGHT_SUCCESS',
+    type: (isMac ? metaKey : ctrlKey) ? 'TOGGLE_HIGHLIGHT_SUCCESS' : 'SET_HIGHLIGHT_SUCCESS',
     index
   });
 };
