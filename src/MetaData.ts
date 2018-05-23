@@ -25,7 +25,7 @@ export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
     .then(extractMetaDataFromExif)
     .catch(error => {
       if (error.message !== 'Invalid JPEG section offset') {
-        console.log(`Reading EXIF data from ${imagePath} failed`, error)
+        console.log(`Reading EXIF data from ${imagePath} failed - continuing without. Error: ${error.message}`)
       }
       return fileStat(imagePath)
         .then(stat => ({
