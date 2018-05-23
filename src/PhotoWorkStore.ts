@@ -1,8 +1,10 @@
 import { dirname, basename } from 'path'
 import * as fs from 'fs'
+import * as readline from 'readline'
 import { promisify } from 'bluebird'
 
 import { PhotoWork } from './models/Photo'
+import { rotate } from './util/EffectsUtil'
 import { assertMainProcess } from './util/ElectronUtil'
 import SerialJobQueue from './util/SerialJobQueue'
 
@@ -26,8 +28,23 @@ declare global {
 assertMainProcess()
 
 
+/** The data as it is stored in ansel.json */
 interface DirectoryWorkData {
     photos: { [key:string]: PhotoWork }
+}
+
+/** The rules of a picasa.ini for one photo */
+type PicasaRules = string[]
+
+/** Data parsed from picasa.ini */
+interface PicasaData {
+    photos: { [key:string]: PicasaRules }
+}
+
+/** All work data we have about one directory */
+interface DirectoryData {
+    anselData: DirectoryWorkData,
+    picasaData?: PicasaData
 }
 
 
@@ -37,9 +54,9 @@ const storeDelay = 2000
 
 class DirectoryWork {
 
-    private data: DirectoryWorkData | null = null
+    private data: DirectoryData | null = null
     private lastFetchTime: number = 0
-    private runningFetch: Promise<DirectoryWorkData>
+    private runningFetch: Promise<DirectoryData>
     private isStoreRunning: boolean = false
     private needsStoreFollowup: boolean = false
 
@@ -53,25 +70,24 @@ class DirectoryWork {
     }
 
 
-    private async fetchData(): Promise<DirectoryWorkData> {
+    private async fetchData(): Promise<DirectoryData> {
         if (this.data && (this.isStoreRunning || this.needsStoreFollowup || Date.now() < this.lastFetchTime + refetchInterval)) {
             return this.data
         } else if (this.runningFetch) {
             return this.runningFetch
         } else {
-            const directoryWorkFile = this.directoryPath + '/ansel.json'
-            this.runningFetch = (async () => {
-                if (! await exists(directoryWorkFile)) {
-                    return { photos: {} }
-                } else {
-                    let buffer = await readFile(directoryWorkFile)
-                    return JSON.parse(buffer) as DirectoryWorkData
-                }
-            })()
+            this.runningFetch = Promise.all(
+                [
+                    fetchAnselJson(this.directoryPath),
+                    fetchPicasaIni(this.directoryPath)
+                ])
+                .then(results => {
+                    const [ anselData, picasaData ] = results
+                    return { anselData, picasaData }
+                })
 
             this.runningFetch.then(
                 data => {
-                    console.log('Fetched ' + directoryWorkFile)
                     this.data = data
                     this.lastFetchTime = Date.now()
                     this.runningFetch = null
@@ -87,29 +103,38 @@ class DirectoryWork {
     public async fetchPhotoWork(photoBasename: string): Promise<PhotoWork> {
         const data = await this.fetchData()
 
-        let photoWork = data.photos[photoBasename]
+        let photoWork = data.anselData.photos[photoBasename]
+
+        if (!photoWork && data.picasaData) {
+            const picasaRules = data.picasaData.photos[photoBasename]
+            if (picasaRules) {
+                photoWork = createPhotoWorkFromPicasaRules(picasaRules, this.directoryPath, photoBasename)
+            }
+        }
+
         return photoWork || { effects: [] }
     }
 
     public async storePhotoWork(photoBasename: string, photoWork: PhotoWork) {
         const data = await this.fetchData()
+        const anselData = data.anselData
 
-        const isNew = !data.photos[photoBasename]
-        data.photos[photoBasename] = photoWork
+        const isNew = !anselData.photos[photoBasename]
+        anselData.photos[photoBasename] = photoWork
 
         if (isNew) {
             // This is a new photo. We store the photos in canonical order so a `ansel.json` file produces less conflicts when version controlled.
             // -> Create a photos map with sorted keys
-            const prevPhotos = data.photos
-            const sortedPhotoNames = Object.keys(data.photos).sort()
+            const prevPhotos = anselData.photos
+            const sortedPhotoNames = Object.keys(anselData.photos).sort()
             const sortedPhotos = {}
             for (const photoName of sortedPhotoNames) {
                 sortedPhotos[photoName] = prevPhotos[photoName]
             }
-            data.photos = sortedPhotos
+            anselData.photos = sortedPhotos
         }
 
-        data.photos[photoBasename] = photoWork
+        anselData.photos[photoBasename] = photoWork
 
         this.onDataChanged()
     }
@@ -126,7 +151,7 @@ class DirectoryWork {
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
                 this.needsStoreFollowup = false
-                const json = JSON.stringify(this.data, null, 2)
+                const json = JSON.stringify(this.data.anselData, null, 2)
                 await writeFile(directoryWorkFile, json)
             })()
             .then(() => {
@@ -145,10 +170,106 @@ class DirectoryWork {
 }
 
 
+async function fetchAnselJson(directoryPath: string): Promise<DirectoryWorkData> {
+    const directoryWorkFile = directoryPath + '/ansel.json'
+    if (! await exists(directoryWorkFile)) {
+        return { photos: {} }
+    } else {
+        const buffer = await readFile(directoryWorkFile)
+        const anselData = JSON.parse(buffer) as DirectoryWorkData
+        console.log('Fetched ' + directoryWorkFile)
+        return anselData
+    }
+}
+
+
+const sectionStartRegExp = /^\[(.*)\]$/
+
+async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null> {
+    let picasaFile = directoryPath + '/.picasa.ini'
+    if (! await exists(picasaFile)) {
+        picasaFile = directoryPath + '/Picasa.ini'
+        if (! await exists(picasaFile)) {
+            return null
+        }
+    }
+
+    return await new Promise<PicasaData>(
+        (resolve, reject) => {
+            const picasaData: PicasaData = { photos: {} }
+
+            const lineReader = readline.createInterface({
+                input: fs.createReadStream(picasaFile)
+            })
+
+            let currentSectionKey: string | null = null
+            let currentSectionRules = []
+            lineReader.on('line', line => {
+                try {
+                    let match: RegExpMatchArray
+                    if (match = sectionStartRegExp.exec(line)) {
+                        if (currentSectionKey) {
+                            picasaData.photos[currentSectionKey] = currentSectionRules
+                        }
+                        currentSectionKey = match[1]
+                        currentSectionRules = []
+                    } else {
+                        currentSectionRules.push(line)
+                    }
+                } catch (error) {
+                    reject(error)
+                }
+            })
+            lineReader.on('close', () => {
+                try {
+                    if (currentSectionKey) {
+                        picasaData.photos[currentSectionKey] = currentSectionRules
+                    }
+                    console.log('Fetched ' + picasaFile)
+                    resolve(picasaData)
+                } catch (error) {
+                    reject(error)
+                }
+            })
+        })
+}
+
+
+const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
+const ignoredRulesRegExp = /^backuphash=/
+
+function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string): PhotoWork {
+    const photoWork: PhotoWork = { effects: [] }
+
+    let importProblems: string[] | null = null
+    let match: RegExpMatchArray
+    for (const rule of picasaRules) {
+        if (match = rotateRuleRegExp.exec(rule)) {
+            photoWork.effects = rotate(photoWork.effects, parseInt(match[1]))
+        } else if (! ignoredRulesRegExp.test(rule)) {
+            // Unknown rule
+            if (!importProblems) {
+                importProblems = []
+            }
+            importProblems.push('Unknown rule: ' + rule)
+        }
+    }
+
+    if (importProblems) {
+        let msg = `Picasa import is incomplete for ${directoryPath}/${photoBasename}:`
+        for (const problem of importProblems) {
+            msg += '\n  - ' + problem
+        }
+        console.warn(msg)
+    }
+
+    return photoWork
+}
+
+
 const directoryWorkByPath: { [key:string]: DirectoryWork } = {}
 let directoryWorkCacheSize = 0
 const maxDirectoryWorkCacheSize = 100
-
 
 function getDirectoryWork(directoryPath: string): DirectoryWork {
     let directoryWork = directoryWorkByPath[directoryPath]
