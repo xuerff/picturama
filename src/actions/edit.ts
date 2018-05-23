@@ -6,7 +6,7 @@ import { renderThumbnailForPhoto } from '../renderer/ThumbnailRenderer'
 export const storeEffects = (photo: PhotoType, effects: PhotoEffect[]) => dispatch => {
     // We do all in parallel:
     //   - Show the new effects in UI
-    //   - Store PhotoWork to .ansel.json
+    //   - Store PhotoWork to ansel.json
     //   - Update Thumbnail
 
     dispatch({

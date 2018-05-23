@@ -59,7 +59,7 @@ class DirectoryWork {
         } else if (this.runningFetch) {
             return this.runningFetch
         } else {
-            const directoryWorkFile = this.directoryPath + '/.ansel.json'
+            const directoryWorkFile = this.directoryPath + '/ansel.json'
             this.runningFetch = (async () => {
                 if (! await exists(directoryWorkFile)) {
                     return { photos: {} }
@@ -98,7 +98,7 @@ class DirectoryWork {
         data.photos[photoBasename] = photoWork
 
         if (isNew) {
-            // This is a new photo. We store the photos in canonical order so a `.ansel.json` file produces less conflicts when version controlled.
+            // This is a new photo. We store the photos in canonical order so a `ansel.json` file produces less conflicts when version controlled.
             // -> Create a photos map with sorted keys
             const prevPhotos = data.photos
             const sortedPhotoNames = Object.keys(data.photos).sort()
@@ -121,7 +121,7 @@ class DirectoryWork {
         }
 
         this.isStoreRunning = true
-        const directoryWorkFile = this.directoryPath + '/.ansel.json'
+        const directoryWorkFile = this.directoryPath + '/ansel.json'
         const storePromise =
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
