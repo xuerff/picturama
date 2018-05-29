@@ -63,7 +63,8 @@ export default class PictureDetail extends React.Component<Props, State> {
         this.state = { bound: false, modal: 'none', loaded: false };
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'finishLoading',
-            'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight')
+            'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight',
+            'toggleFlagged')
     }
 
     contextMenu(e) {
@@ -125,7 +126,7 @@ export default class PictureDetail extends React.Component<Props, State> {
 
     rotate(turns: number) {
         const props = this.props
-        
+
         const prevEffects = props.effects
         if (!prevEffects) {
             return
@@ -133,6 +134,11 @@ export default class PictureDetail extends React.Component<Props, State> {
 
         const nextEffects = rotate(prevEffects, turns)
         props.actions.storeEffects(props.photo, nextEffects)
+    }
+
+    toggleFlagged() {
+        const props = this.props
+        props.actions.toggleFlag(props.photo)
     }
 
     componentDidMount() {
@@ -295,6 +301,12 @@ export default class PictureDetail extends React.Component<Props, State> {
                                 <RotateRightIcon/>
                             </Button>
                         </ButtonGroup>
+                        <Button
+                            className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
+                            onClick={this.toggleFlagged}
+                        >
+                            <FaIcon name="flag" />
+                        </Button>
                     </span>
                 </Toolbar>
 
