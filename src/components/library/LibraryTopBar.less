@@ -1,9 +1,9 @@
 .LibraryTopBar-showSidebar {
-    opacity: 1;
-    transition: opacity @transition-time ease-in;
+    margin-left: 0;
+    transition: margin-left @transition-time ease-out;
 
     .Ansel.hasSidebar & { 
-        opacity: 0;
+        margin-left: -(8px + 32px);  // Padding + button width
     }
 }
 

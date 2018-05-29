@@ -88,6 +88,12 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                 <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar}>
                     <FaIcon name="bars" />
                 </Button>
+                <Button
+                        className={classNames('LibraryTopBar-toggleFlagged', { isActive: props.showOnlyFlagged })}
+                        onClick={this.toggleFlagged}
+                    >
+                    <FaIcon name="flag" />
+                </Button>
 
                 <div className="pull-right">
                     <ButtonGroup>
@@ -103,12 +109,6 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                             <FaIcon name="trash" />
                         </Button>
                     }
-                    <Button
-                        className={classNames('LibraryTopBar-toggleFlagged', { isActive: props.showOnlyFlagged })}
-                        onClick={this.toggleFlagged}
-                    >
-                        <FaIcon name="flag" />
-                    </Button>
                 </div>
             </Toolbar>
         )
