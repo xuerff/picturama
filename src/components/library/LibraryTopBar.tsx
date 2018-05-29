@@ -34,15 +34,15 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
     constructor(props) {
         super(props)
 
-        bindMany(this, 'showSidebar', 'toggleFlagged', 'deleteModal', 'rotateLeft', 'rotateRight')
+        bindMany(this, 'showSidebar', 'toggleShowOnlyFlagged', 'deleteModal', 'rotateLeft', 'rotateRight', 'toggleFlagged')
     }
 
     showSidebar() {
         window.dispatchEvent(new Event('core:toggleSidebar'))
     }
 
-    toggleFlagged() {
-        this.props.actions.toggleFlagged(
+    toggleShowOnlyFlagged() {
+        this.props.actions.toggleShowOnlyFlagged(
             this.props.currentDate,
             !this.props.showOnlyFlagged
         )
@@ -81,29 +81,64 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         }
     }
 
+    toggleFlagged() {
+        const props = this.props
+        const newFlagged = !this.getHighlightedAreFlagged()
+
+        for (const photoIndex of props.highlighted) {
+            const photo = props.photos[photoIndex]
+            if (!!photo.flag !== newFlagged) {
+                props.actions.toggleFlag(photo)
+            }
+        }
+    }
+
+    getHighlightedAreFlagged() {
+        const props = this.props
+        if (props.highlighted.length === 0) {
+            return false
+        } else {
+            for (const photoIndex of props.highlighted) {
+                const photo = props.photos[photoIndex]
+                if (!photo.flag) {
+                    return false
+                }
+            }
+            return true
+        }
+    }
+
     render() {
         const props = this.props
+        const hasHighlight = props.highlighted.length > 0
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
                 <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar}>
                     <FaIcon name="bars" />
                 </Button>
                 <Button
-                        className={classNames('LibraryTopBar-toggleFlagged', { isActive: props.showOnlyFlagged })}
-                        onClick={this.toggleFlagged}
-                    >
+                    className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
+                    onClick={this.toggleShowOnlyFlagged}
+                >
                     <FaIcon name="flag" />
                 </Button>
 
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button enabled={props.highlighted.length > 0} onClick={this.rotateLeft} tip="Rotate images left">
+                        <Button enabled={hasHighlight} onClick={this.rotateLeft} tip="Rotate images left">
                             <RotateLeftIcon/>
                         </Button>
-                        <Button enabled={props.highlighted.length > 0} onClick={this.rotateRight} tip="Rotate images right">
+                        <Button enabled={hasHighlight} onClick={this.rotateRight} tip="Rotate images right">
                             <RotateRightIcon/>
                         </Button>
                     </ButtonGroup>
+                    <Button
+                        className={classNames('LibraryTopBar-toggleButton', { isActive: this.getHighlightedAreFlagged() })}
+                        enabled={hasHighlight}
+                        onClick={this.toggleFlagged}
+                    >
+                        <FaIcon name="flag" />
+                    </Button>
                     {this.props.isShowingTrash &&
                         <Button onClick={this.deleteModal}>
                             <FaIcon name="trash" />
