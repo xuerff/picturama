@@ -15,8 +15,8 @@ import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
 import FaIcon from '../widget/icon/FaIcon'
-import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
-import RotateRightIcon from '../widget/icon/RotateRightIcon'
+import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
+import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType, PhotoEffect } from '../../models/Photo'
 import { rotate } from '../../util/EffectsUtil'
@@ -295,10 +295,10 @@ export default class PictureDetail extends React.Component<Props, State> {
                     <span className="PictureDetail-topBarRight">
                         <ButtonGroup>
                             <Button onClick={this.rotateLeft} tip="Rotate image left">
-                                <RotateLeftIcon/>
+                                <MdRotateLeftIcon/>
                             </Button>
                             <Button onClick={this.rotateRight} tip="Rotate image right">
-                                <RotateRightIcon/>
+                                <MdRotateRightIcon/>
                             </Button>
                         </ButtonGroup>
                         <Button

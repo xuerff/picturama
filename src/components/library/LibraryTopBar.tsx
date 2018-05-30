@@ -7,8 +7,8 @@ import * as PropTypes from 'prop-types'
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
 import FaIcon from '../widget/icon/FaIcon'
-import RotateLeftIcon from '../widget/icon/RotateLeftIcon'
-import RotateRightIcon from '../widget/icon/RotateRightIcon'
+import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
+import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType } from '../../models/photo'
 import AppState from '../../reducers/AppState'
@@ -126,10 +126,10 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                 <div className="pull-right">
                     <ButtonGroup>
                         <Button enabled={hasHighlight} onClick={this.rotateLeft} tip="Rotate images left">
-                            <RotateLeftIcon/>
+                            <MdRotateLeftIcon/>
                         </Button>
                         <Button enabled={hasHighlight} onClick={this.rotateRight} tip="Rotate images right">
-                            <RotateRightIcon/>
+                            <MdRotateRightIcon/>
                         </Button>
                     </ButtonGroup>
                     <Button

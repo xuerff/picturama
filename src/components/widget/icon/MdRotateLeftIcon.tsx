@@ -6,11 +6,11 @@ import SvgIcon, { Props as SvgIconProps } from './SvgIcon'
  * Shows the [rotate-left icon](https://github.com/gorangajic/react-icons/blob/master/md/rotate-left.js)
  * of `react-icons`.
  * 
- * Original icon from [Material Design Icons by Google](https://www.google.com/design/icons/).
+ * Original icon from [Material Design Icons by Google](https://material.io/tools/icons/).
  * 
  * We can't use `react-icons` directly because it provides ES6 module which our build can't import.
  */
-export default class RotateLeftIcon extends React.Component<SvgIconProps, undefined> {
+export default class MdRotateLeftIcon extends React.Component<SvgIconProps, undefined> {
     render() {
         return (
             <SvgIcon viewBox="0 0 40 40" {...this.props}>
