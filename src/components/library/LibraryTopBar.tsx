@@ -9,6 +9,7 @@ import ButtonGroup from '../widget/ButtonGroup'
 import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
+import MdSaveAlt from '../widget/icon/MdSaveAlt'
 import Toolbar from '../widget/Toolbar'
 import { PhotoType } from '../../models/photo'
 import AppState from '../../reducers/AppState'
@@ -138,6 +139,9 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                         onClick={this.toggleFlagged}
                     >
                         <FaIcon name="flag" />
+                    </Button>
+                    <Button enabled={hasHighlight} onClick={props.actions.openExport} tip="Export images">
+                        <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&
                         <Button onClick={this.deleteModal}>
