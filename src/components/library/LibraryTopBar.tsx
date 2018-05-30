@@ -112,35 +112,38 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
     render() {
         const props = this.props
         const hasHighlight = props.highlighted.length > 0
+        const highlightedAreFlagged = this.getHighlightedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
-                <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar}>
+                <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar} tip="Show sidebar [tab]">
                     <FaIcon name="bars" />
                 </Button>
                 <Button
                     className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
                     onClick={this.toggleShowOnlyFlagged}
+                    tip={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
                 >
                     <FaIcon name="flag" />
                 </Button>
 
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button enabled={hasHighlight} onClick={this.rotateLeft} tip="Rotate images left">
+                        <Button enabled={hasHighlight} onClick={this.rotateLeft} tip="Rotate left">
                             <MdRotateLeftIcon/>
                         </Button>
-                        <Button enabled={hasHighlight} onClick={this.rotateRight} tip="Rotate images right">
+                        <Button enabled={hasHighlight} onClick={this.rotateRight} tip="Rotate right">
                             <MdRotateRightIcon/>
                         </Button>
                     </ButtonGroup>
                     <Button
-                        className={classNames('LibraryTopBar-toggleButton', { isActive: this.getHighlightedAreFlagged() })}
+                        className={classNames('LibraryTopBar-toggleButton', { isActive: highlightedAreFlagged })}
                         enabled={hasHighlight}
                         onClick={this.toggleFlagged}
+                        tip={highlightedAreFlagged ? 'Remove flag' : 'Flag'}
                     >
                         <FaIcon name="flag" />
                     </Button>
-                    <Button enabled={hasHighlight} onClick={props.actions.openExport} tip="Export images">
+                    <Button enabled={hasHighlight} onClick={props.actions.openExport} tip="Export">
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&

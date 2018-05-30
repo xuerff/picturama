@@ -294,16 +294,17 @@ export default class PictureDetail extends React.Component<Props, State> {
                     </ButtonGroup>
                     <span className="PictureDetail-topBarRight">
                         <ButtonGroup>
-                            <Button onClick={this.rotateLeft} tip="Rotate image left">
+                            <Button onClick={this.rotateLeft} tip="Rotate left">
                                 <MdRotateLeftIcon/>
                             </Button>
-                            <Button onClick={this.rotateRight} tip="Rotate image right">
+                            <Button onClick={this.rotateRight} tip="Rotate right">
                                 <MdRotateRightIcon/>
                             </Button>
                         </ButtonGroup>
                         <Button
                             className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
                             onClick={this.toggleFlagged}
+                            tip={props.photo.flag ? 'Remove flag' : 'Flag'}
                         >
                             <FaIcon name="flag" />
                         </Button>
