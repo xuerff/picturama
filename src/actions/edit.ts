@@ -1,5 +1,5 @@
 import { PhotoType, PhotoEffect } from '../models/Photo'
-import { storePhotoWork, storeThumbnail } from '../BackgroundClient'
+import { storePhotoWorkUpdate, storeThumbnail } from '../BackgroundClient'
 import { renderThumbnailForPhoto } from '../renderer/ThumbnailRenderer'
 
 
@@ -15,7 +15,7 @@ export const storeEffects = (photo: PhotoType, effects: PhotoEffect[]) => dispat
         effects
     })
 
-    storePhotoWork(photo.master, { effects })
+    storePhotoWorkUpdate(photo.master, photoWork => photoWork.effects = effects)
         .catch(error => console.log('Storing photo failed: ' + photo.master, error))  // TODO: Show error message in UI
 
     renderThumbnailForPhoto(photo, effects)

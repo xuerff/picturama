@@ -51,8 +51,42 @@ export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
 }
 
 
-export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
+// storePhotoWork is not exported, since it shouldn't be called directly (see storePhotoWorkUpdate)
+async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
     return callOnBackground('storePhotoWork', { photoPath, photoWork })
+}
+
+
+const pendingUpdates: { updates: ((photoWork: PhotoWork) => void)[], promise: Promise<void> }[] = []
+
+/**
+ * Updates and stores the work on a photo.
+ *
+ * Lost updates are prevented, since fetch and store will be synchronized for each photo.
+ */
+export async function storePhotoWorkUpdate(photoPath: string, update: (photoWork: PhotoWork) => void): Promise<void> {
+    let pendingUpdate = pendingUpdates[photoPath]
+    if (pendingUpdate) {
+        pendingUpdate.updates.push(update)
+    } else {
+        pendingUpdate = {
+            updates: [ update ],
+            promise: fetchPhotoWork(photoPath)
+                .then(photoWork => {
+                    for (const up of pendingUpdate.updates) {
+                        up(photoWork)
+                    }
+                    delete pendingUpdates[photoPath]
+                    return storePhotoWork(photoPath, photoWork)
+                })
+                .catch(error => {
+                    delete pendingUpdates[photoPath]
+                    throw error
+                })
+        }
+        pendingUpdates[photoPath] = pendingUpdate
+    }
+    return pendingUpdate.promise
 }
 
 

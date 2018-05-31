@@ -17,7 +17,7 @@ export interface PhotoType {
     thumb: string,              // Example: /specs/photos/IMG_9700.JPG'
     thumb_250: string,          // Example: : '../dot-ansel/thumbs-250/IMG_9700.webp'
     extension: string,          // Example: 'JPG'
-    flag: number,               // Example: 0
+    flag: 0 | 1,                // Example: 0
     created_at: number | Date,  // Example: 0  (for saving Dates work too)
     updated_at: number | null,  // Example: null
     orientation: ExifOrientation, // Example: 1 (= ExifOrientation.Up)
@@ -36,6 +36,7 @@ export type PhotoEffect = { type: 'rotate', turns: number }
 
 export interface PhotoWork {
     effects: PhotoEffect[]
+    flagged?: true
 }
 
 

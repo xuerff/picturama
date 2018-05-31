@@ -1,6 +1,7 @@
 import * as Promise from 'bluebird'
 
 import Photo from '../models/Photo'
+import { fetchPhotoWork, storePhotoWorkUpdate } from '../BackgroundClient'
 
 export const toggleShowOnlyFlagged = (date, showOnlyFlagged) => {
   let where = { flag: showOnlyFlagged, trashed: 0 };
@@ -31,20 +32,30 @@ export const getFlagged = () => dispatch => {
 };
 
 export const toggleFlag = photo => dispatch => {
-  new Photo({ id: photo.id })
-    .save('flag', !photo.flag, { patch: true })
-    .then(() => new Photo({ id: photo.id })
-      .fetch({ withRelated: [ 'versions', 'tags' ] })
-    )
-    .then(photoModel => {
-      dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() });
+  const newFlagged = !photo.flag
+
+  Promise.all(
+    [
+      new Photo({ id: photo.id })
+        .save('flag', newFlagged, { patch: true })
+        .then(() => new Photo({ id: photo.id })
+          .fetch({ withRelated: [ 'versions', 'tags' ] })
+        ),
+      storeFlagged(photo.master, newFlagged)
+    ])
+    .then(results => {
+      const photoModel = results[0]
+      return dispatch({ type: 'UPDATED_PHOTO_SUCCESS', photo: photoModel.toJSON() })
     });
 };
 
 export const flagSet = (photos, flaggedPhotos, flag) => dispatch => {
   Promise.each(flaggedPhotos, photo =>
-    new Photo({ id: photo.id })
-      .save('flag', flag, { patch: true })
+    storeFlagged(photo.master, flag)
+      .then(() =>
+        new Photo({ id: photo.id })
+          .save('flag', flag, { patch: true })
+      )
   )
   .then(() => photos)
   .map(photo => new Photo({ id: photo.id })
@@ -59,3 +70,16 @@ export const flagSet = (photos, flaggedPhotos, flag) => dispatch => {
     });
   });
 };
+
+
+function storeFlagged(photoPath, newFlagged) {
+  return storePhotoWorkUpdate(
+    photoPath,
+    photoWork => {
+      if (newFlagged) {
+        photoWork.flagged = true
+      } else {
+        delete photoWork.flagged
+      }
+    })
+}
