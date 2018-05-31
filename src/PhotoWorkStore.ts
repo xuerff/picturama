@@ -11,6 +11,7 @@ import SerialJobQueue from './util/SerialJobQueue'
 
 const readFile = promisify<Buffer, string>(fs.readFile)
 const writeFile = promisify<void, string, any>(fs.writeFile)
+const unlink = promisify<void, string | Buffer>(fs.unlink)
 
 
 async function exists(path: string | Buffer): Promise<boolean> {
@@ -119,21 +120,23 @@ class DirectoryWork {
         // Why `toCanonical`?
         // We store the photos in canonical order (with sorted keys) so a `ansel.json` file produces less conflicts when version controlled.
 
-        photoWork = toCanonical(photoWork)
-
         const data = await this.fetchData()
         const anselData = data.anselData
 
-        const isNew = !anselData.photos[photoBasename]
-        anselData.photos[photoBasename] = photoWork
+        const isEmpty = Object.keys(photoWork).length === 0
+        if (isEmpty) {
+            delete anselData.photos[photoBasename]
+        } else {
+            photoWork = toCanonical(photoWork)
+            anselData.photos[photoBasename] = photoWork
 
-        if (isNew) {
-            // This is a new photo
-            // -> We have to sort the keys
-            anselData.photos = toCanonical(anselData.photos)
+            const isNew = !anselData.photos[photoBasename]
+            if (isNew) {
+                // This is a new photo
+                // -> We have to sort the keys
+                anselData.photos = toCanonical(anselData.photos)
+            }
         }
-
-        anselData.photos[photoBasename] = photoWork
 
         this.onDataChanged()
     }
@@ -150,11 +153,20 @@ class DirectoryWork {
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
                 this.needsStoreFollowup = false
-                const json = JSON.stringify(this.data.anselData, null, 2)
-                await writeFile(directoryWorkFile, json)
+                const anselData = this.data.anselData
+                const isEmpty = Object.keys(anselData.photos).length === 0
+                if (isEmpty) {
+                    if (await exists(directoryWorkFile)) {
+                        await unlink(directoryWorkFile)
+                        console.log('Removed empty ' + directoryWorkFile)
+                    }
+                } else {
+                    const json = JSON.stringify(anselData, null, 2)
+                    await writeFile(directoryWorkFile, json)
+                    console.log('Stored ' + directoryWorkFile)
+                }
             })()
             .then(() => {
-                console.log('Stored ' + directoryWorkFile)
                 this.isStoreRunning = false
                 if (this.needsStoreFollowup) {
                     this.onDataChanged()
