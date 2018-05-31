@@ -128,10 +128,12 @@ export default class Scanner {
 
     const readMetaData = readMetadataOfImage(originalImgPath)
 
+    const readPhotoWork = fetchPhotoWork(originalImgPath)
+
     const createThumbnail = Promise.all([
         createNonRawImg,
         readMetaData,
-        fetchPhotoWork(originalImgPath)
+        readPhotoWork
       ])
       .then(results => {
         const [ nonRawImgPath, metaData, photoWork ] = results
@@ -141,9 +143,10 @@ export default class Scanner {
         storeThumbnail(thumbnailImgPath, thumbnailData)
       )
 
-    return Promise.all([createThumbnail, readMetaData])
+    return Promise.all([createThumbnail, readMetaData, readPhotoWork])
       .then(results => {
         const metaData = results[1]
+        const photoWork = results[2]
         return new Photo({ title: file.name })
           .fetch()
           .then(photo =>
@@ -152,6 +155,7 @@ export default class Scanner {
               extension: file.path.match(/\.(.+)$/i)[1],
               orientation: metaData.orientation,
               date: moment(metaData.createdAt).format('YYYY-MM-DD'),
+              flag: photoWork.flagged,
               created_at: metaData.createdAt,
               exposure_time: metaData.exposureTime,
               iso: metaData.iso,

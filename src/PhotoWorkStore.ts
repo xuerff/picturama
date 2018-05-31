@@ -246,6 +246,8 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
     for (const rule of picasaRules) {
         if (match = rotateRuleRegExp.exec(rule)) {
             photoWork.effects = rotate(photoWork.effects, parseInt(match[1]))
+        } else if (rule == 'star=yes') {
+            photoWork.flagged = true
         } else if (! ignoredRulesRegExp.test(rule)) {
             // Unknown rule
             if (!importProblems) {
