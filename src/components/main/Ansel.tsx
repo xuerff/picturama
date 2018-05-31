@@ -12,7 +12,7 @@ import PictureDiff from '../picture-diff'
 import Container from './Container'
 import Sidebar from '../sidebar'
 import AppState, { ModalType } from '../../reducers/AppState'
-import { PhotoType, PhotoEffect, PhotoWork } from '../../models/Photo'
+import { PhotoType, PhotoWork } from '../../models/Photo'
 import { bindMany } from '../../util/LangUtil'
 
 
@@ -137,7 +137,7 @@ class Ansel extends React.Component<Props, State> {
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
-            effects={props.currentPhotoWork && props.currentPhotoWork.effects}
+            photoWork={props.currentPhotoWork}
             isFirst={props.current === 0}
             isLast={props.current === props.photos.length - 1}
             actions={state.actions}

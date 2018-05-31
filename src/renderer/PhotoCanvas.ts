@@ -3,7 +3,7 @@ import { mat4 } from 'gl-matrix'
 import WebGLCanvas, { GraphicBuffer, Texture } from './WebGLCanvas'
 import { TransformationShader } from './Shaders'
 import { ExifOrientation } from '../models/DataTypes'
-import { PhotoEffect } from '../models/Photo'
+import { PhotoWork } from '../models/Photo'
 import CancelablePromise from '../util/CancelablePromise'
 
 /**
@@ -18,7 +18,7 @@ export default class PhotoCanvas {
 
     private src: string
     private exifOrientation: ExifOrientation
-    private effects: PhotoEffect[] | null
+    private photoWork: PhotoWork | null
 
     private valid: boolean = false
 
@@ -64,8 +64,8 @@ export default class PhotoCanvas {
         return this
     }
 
-    setEffects(effects: PhotoEffect[] | null): this {
-        this.effects = effects
+    setPhotoWork(photoWork: PhotoWork | null): this {
+        this.photoWork = photoWork
         return this
     }
 
@@ -97,8 +97,8 @@ export default class PhotoCanvas {
 
     update(): this {
         const baseTexture = this.baseTexture
-        const effects = this.effects
-        if (!baseTexture || !effects) {
+        const photoWork = this.photoWork
+        if (!baseTexture || !photoWork) {
             const gl = this.webGlCanvas.gl
             gl.clearColor(0.0, 0.0, 0.0, 1.0)
             gl.clear(gl.COLOR_BUFFER_BIT)
@@ -117,11 +117,7 @@ export default class PhotoCanvas {
             case ExifOrientation.Bottom: rotationTurns = 2; break
             case ExifOrientation.Left:   rotationTurns = 3; break
         }
-        for (const effect of effects) {
-            if (effect.type === 'rotate') {
-                rotationTurns = (rotationTurns + effect.turns) % 4
-            }
-        }
+        rotationTurns = (rotationTurns + (photoWork.rotationTurns || 0)) % 4
 
         const textureWidth  = baseTexture.width
         const textureHeight = baseTexture.height

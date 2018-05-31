@@ -112,10 +112,15 @@ class DirectoryWork {
             }
         }
 
-        return photoWork || { effects: [] }
+        return photoWork || {}
     }
 
     public async storePhotoWork(photoBasename: string, photoWork: PhotoWork) {
+        // Why `toCanonical`?
+        // We store the photos in canonical order (with sorted keys) so a `ansel.json` file produces less conflicts when version controlled.
+
+        photoWork = toCanonical(photoWork)
+
         const data = await this.fetchData()
         const anselData = data.anselData
 
@@ -123,15 +128,9 @@ class DirectoryWork {
         anselData.photos[photoBasename] = photoWork
 
         if (isNew) {
-            // This is a new photo. We store the photos in canonical order so a `ansel.json` file produces less conflicts when version controlled.
-            // -> Create a photos map with sorted keys
-            const prevPhotos = anselData.photos
-            const sortedPhotoNames = Object.keys(anselData.photos).sort()
-            const sortedPhotos = {}
-            for (const photoName of sortedPhotoNames) {
-                sortedPhotos[photoName] = prevPhotos[photoName]
-            }
-            anselData.photos = sortedPhotos
+            // This is a new photo
+            // -> We have to sort the keys
+            anselData.photos = toCanonical(anselData.photos)
         }
 
         anselData.photos[photoBasename] = photoWork
@@ -239,13 +238,13 @@ const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
 const ignoredRulesRegExp = /^backuphash=/
 
 function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string): PhotoWork {
-    const photoWork: PhotoWork = { effects: [] }
+    const photoWork: PhotoWork = {}
 
     let importProblems: string[] | null = null
     let match: RegExpMatchArray
     for (const rule of picasaRules) {
         if (match = rotateRuleRegExp.exec(rule)) {
-            photoWork.effects = rotate(photoWork.effects, parseInt(match[1]))
+            rotate(photoWork, parseInt(match[1]))
         } else if (rule == 'star=yes') {
             photoWork.flagged = true
         } else if (! ignoredRulesRegExp.test(rule)) {
@@ -266,6 +265,16 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
     }
 
     return photoWork
+}
+
+
+function toCanonical<T extends { [key:string]: any }>(obj: T): T {
+    const sortedKeys = Object.keys(obj).sort()
+    const sortedObj = {}
+    for (const key of sortedKeys) {
+        sortedObj[key] = obj[key]
+    }
+    return sortedObj as T
 }
 
 

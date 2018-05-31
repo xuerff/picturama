@@ -2,7 +2,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 
 import { assertMainProcess } from './util/ElectronUtil'
 import { ExifOrientation } from './models/DataTypes';
-import { PhotoEffect } from './models/Photo';
+import { PhotoWork } from './models/Photo'
 
 
 assertMainProcess()
@@ -47,6 +47,6 @@ async function callOnForeground(action: string, params: any): Promise<any> {
 }
 
 
-export async function renderThumbnail(photoPath: string, orientation: ExifOrientation, effects: PhotoEffect[]): Promise<string> {
-    return callOnForeground('renderThumbnail', { photoPath, orientation, effects })
+export async function renderThumbnail(photoPath: string, orientation: ExifOrientation, photoWork: PhotoWork): Promise<string> {
+    return callOnForeground('renderThumbnail', { photoPath, orientation, photoWork })
 }

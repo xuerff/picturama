@@ -73,12 +73,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         const props = this.props
         for (const photoIndex of props.highlighted) {
             const photo = props.photos[photoIndex]
-            fetchPhotoWork(photo.master)
-                .then(photoWork => {
-                    const nextEffects = rotate(photoWork.effects, turns)
-                    props.actions.storeEffects(photo, nextEffects)
-                })
-                .catch(error => console.error('Rotating photo failed', error))
+            props.actions.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
         }
     }
 

@@ -2,8 +2,8 @@ import slug from '../lib/slug';
 
 import anselBookshelf from './ansel-bookshelf';
 
-import Photo from './photo';
-import { BookshelfClass } from './DataTypes'
+import Photo, { PhotoType } from './photo';
+import { BookshelfClass, BookshelfModel, BookshelfCollection } from './DataTypes'
 
 
 export interface TagType {
@@ -29,4 +29,4 @@ export default anselBookshelf.Model.extend({
         });
     }
 
-}) as BookshelfClass<TagType>
+}) as BookshelfClass<TagType, { photos(): BookshelfCollection<PhotoType> }>

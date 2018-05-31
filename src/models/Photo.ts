@@ -32,10 +32,8 @@ export interface PhotoType {
     versionNumber: number       // Example: 1   
 }
 
-export type PhotoEffect = { type: 'rotate', turns: number }
-
 export interface PhotoWork {
-    effects: PhotoEffect[]
+    rotationTurns?: 1 | 2 | 3
     flagged?: true
 }
 

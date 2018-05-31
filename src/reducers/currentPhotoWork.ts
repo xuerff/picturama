@@ -1,4 +1,4 @@
-import { PhotoEffect, PhotoWork } from '../models/Photo'
+import { PhotoWork } from '../models/Photo'
 import AppState from './AppState'
 
 
@@ -19,12 +19,12 @@ export default function currentPhotoWork(state: AppState, action): AppState {
                 ...state,
                 currentPhotoWork: action.photoWork
             }
-        case 'EDIT_EFFECTS_CHANGE': {
+        case 'EDIT_PHOTOWORK_CHANGE': {
             const currentPhoto = state.photos[state.current]
             if (currentPhoto && currentPhoto.id === action.photoId) {
                 return {
                     ...state,
-                    currentPhotoWork: { effects: action.effects }
+                    currentPhotoWork: { ...action.photoWork }
                 }
             }
         }

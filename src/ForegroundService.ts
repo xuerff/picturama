@@ -24,7 +24,7 @@ export function init() {
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
     if (action === 'renderThumbnail') {
-        return renderThumbnail(params.photoPath, params.orientation, params.effects)
+        return renderThumbnail(params.photoPath, params.orientation, params.photoWork)
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }

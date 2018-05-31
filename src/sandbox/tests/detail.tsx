@@ -51,12 +51,12 @@ addSection('Detail')
     .add('loading', context => (
         <PictureDetail
             {...defaultProps}
-            effects={null}
+            photoWork={null}
         />
     ))
     .add('done', context => (
         <PictureDetail
             {...defaultProps}
-            effects={[]}
+            photoWork={{}}
         />
     ))

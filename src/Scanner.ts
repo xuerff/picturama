@@ -137,7 +137,7 @@ export default class Scanner {
       ])
       .then(results => {
         const [ nonRawImgPath, metaData, photoWork ] = results
-        return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork.effects)
+        return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork)
       })
       .then(thumbnailData =>
         storeThumbnail(thumbnailImgPath, thumbnailData)

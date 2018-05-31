@@ -18,7 +18,7 @@ import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType, PhotoEffect } from '../../models/Photo'
+import { PhotoType, PhotoWork } from '../../models/Photo'
 import { rotate } from '../../util/EffectsUtil'
 import { bindMany } from '../../util/LangUtil'
 
@@ -35,7 +35,7 @@ interface Props {
     style?: any
     className?: any
     photo: PhotoType
-    effects?: PhotoEffect[]
+    photoWork?: PhotoWork
     isFirst: boolean
     isLast: boolean
     actions: any
@@ -126,14 +126,7 @@ export default class PictureDetail extends React.Component<Props, State> {
 
     rotate(turns: number) {
         const props = this.props
-
-        const prevEffects = props.effects
-        if (!prevEffects) {
-            return
-        }
-
-        const nextEffects = rotate(prevEffects, turns)
-        props.actions.storeEffects(props.photo, nextEffects)
+        props.actions.updatePhotoWork(props.photo, photoWorks => rotate(photoWorks, turns))
     }
 
     toggleFlagged() {
@@ -318,7 +311,7 @@ export default class PictureDetail extends React.Component<Props, State> {
                         height={state.canvasHeight}
                         src={props.photo.thumb}
                         orientation={props.photo.orientation}
-                        effects={props.effects}
+                        photoWork={props.photoWork}
                         onLoad={this.finishLoading}
                     />
                 </div>
