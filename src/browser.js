@@ -11,6 +11,7 @@ import MainMenu from './main-menu';
 // import Usb from './usb';
 import config from './config';
 import Watch from './watch';
+import { init as initBackgroundService } from './BackgroundService'
 import { init as initForegroundClient } from './ForegroundClient'
 
 const initLibrary = mainWindow => {
@@ -58,6 +59,7 @@ app.on('ready', () => {
 
   mainWindow.loadURL('file://' + __dirname + '/../static/index.html');
   mainWindow.setTitle('Ansel');
+  initBackgroundService(mainWindow)
   initForegroundClient(mainWindow)
 
   if (fs.existsSync(config.settings))

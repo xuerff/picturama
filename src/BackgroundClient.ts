@@ -1,5 +1,4 @@
-import { remote } from 'electron'
-import { promisify } from 'bluebird'
+import { BrowserWindow, ipcRenderer } from 'electron'
 
 import { PhotoWork } from './models/Photo'
 import { assertRendererProcess } from './util/ElectronUtil'
@@ -8,29 +7,55 @@ import { assertRendererProcess } from './util/ElectronUtil'
 assertRendererProcess()
 
 
-interface IpcServerApi {
-    fetchPhotoWorkWithCallback(photoPath: string, callback: (error: any, result: PhotoWork) => void)
-    storePhotoWorkWithCallback(photoPath: string, photoWork: PhotoWork, callback: (error: any) => void)
-    storeThumbnailWithCallback(thumbnailPath: string, thumbnailData: string, callback: (error: any) => void)
+// We used to use electron.require for this, but it was too buggy.
+// (I passed a value to an IPC stub and the other side got a value from a previous call)
+
+
+interface CallInfo {
+    resolve(result: any)
+    reject(error: any)
 }
 
 
-const ipcServer = remote.require('./BackgroundService.js') as IpcServerApi
+let nextCallId = 1
+const pendingCalls: { [key:number]: CallInfo } = {}
 
 
-const ipcFetchPhotoWork = promisify<PhotoWork, string>(ipcServer.fetchPhotoWorkWithCallback)
+export function init() {
+    ipcRenderer.on('onBackgroundActionDone', (event, callId, error, result) => {
+        const callInfo = pendingCalls[callId]
+        delete pendingCalls[callId]
+        if (callInfo) {
+            if (error) {
+                callInfo.reject(error)
+            } else {
+                callInfo.resolve(result)
+            }
+        }
+    })
+}
+
+
+async function callOnBackground(action: string, params: any): Promise<any> {
+    const callId = nextCallId++
+
+    return new Promise<any>((resolve, reject) => {
+        pendingCalls[callId] = { resolve, reject }
+        ipcRenderer.send('executeBackgroundAction', callId, action, params)
+    })
+}
+
+
 export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
-    return await ipcFetchPhotoWork(photoPath)
+    return callOnBackground('fetchPhotoWork', { photoPath })
 }
 
 
-const ipcStorePhotoWork = promisify<void, string, PhotoWork>(ipcServer.storePhotoWorkWithCallback)
 export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
-    await ipcStorePhotoWork(photoPath, photoWork)
+    return callOnBackground('storePhotoWork', { photoPath, photoWork })
 }
 
 
-const ipcStoreThumbnail = promisify<void, string, string>(ipcServer.storeThumbnailWithCallback)
 export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
-    await ipcStoreThumbnail(thumbnailPath, thumbnailData)
+    return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
 }
