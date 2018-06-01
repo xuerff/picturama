@@ -12,7 +12,7 @@ const defaultProps = {
     src: '../specs/photos/IMG_9700.JPG',
     orientation: ExifOrientation.Up,
     effects: [],
-    onLoad: action('onLoad')
+    setLoading: action('setLoading')
 }
 
 addSection('PhotoPane')

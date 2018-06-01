@@ -137,6 +137,8 @@ class Ansel extends React.Component<Props, State> {
           <PictureDetail
             className="Ansel-detail"
             photo={props.photos[props.current]}
+            photoPrev={props.photos[props.current - 1]}
+            photoNext={props.photos[props.current + 1]}
             photoWork={props.currentPhotoWork}
             isFirst={props.current === 0}
             isLast={props.current === props.photos.length - 1}

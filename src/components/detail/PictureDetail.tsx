@@ -35,6 +35,8 @@ interface Props {
     style?: any
     className?: any
     photo: PhotoType
+    photoPrev?: PhotoType
+    photoNext?: PhotoType
     photoWork?: PhotoWork
     isFirst: boolean
     isLast: boolean
@@ -47,7 +49,7 @@ interface Props {
 interface State {
     bound: boolean,
     modal: 'addTags' | 'none' | 'export',
-    loaded: boolean,
+    loading: boolean,
     canvasWidth?: number
     canvasHeight?: number
 }
@@ -60,9 +62,9 @@ export default class PictureDetail extends React.Component<Props, State> {
     constructor(props) {
         super(props);
 
-        this.state = { bound: false, modal: 'none', loaded: false };
+        this.state = { bound: false, modal: 'none', loading: true }
 
-        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'finishLoading',
+        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'setLoading',
             'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight',
             'toggleFlagged')
     }
@@ -231,8 +233,10 @@ export default class PictureDetail extends React.Component<Props, State> {
         ipcRenderer.removeAllListeners('addTagClicked');
     }
 
-    finishLoading() {
-        this.setState({ loaded: true });
+    setLoading(loading: boolean) {
+        if (loading !== this.state.loading) {
+            this.setState({ loading })
+        }
     }
 
     updateCanvasSize() {
@@ -310,14 +314,16 @@ export default class PictureDetail extends React.Component<Props, State> {
                         width={state.canvasWidth}
                         height={state.canvasHeight}
                         src={props.photo.thumb}
+                        srcPrev={props.photoPrev && props.photoPrev.thumb}
+                        srcNext={props.photoNext && props.photoNext.thumb}
                         orientation={props.photo.orientation}
                         photoWork={props.photoWork}
-                        onLoad={this.finishLoading}
+                        setLoading={this.setLoading}
                     />
                 </div>
 
                 <PictureInfo className="PictureDetail-infoBar" photo={props.photo} />
-                <Loader loaded={this.state.loaded} />
+                <Loader loaded={!state.loading} />
 
                 {showModal}
             </div>

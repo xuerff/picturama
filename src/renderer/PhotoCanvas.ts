@@ -75,7 +75,7 @@ export default class PhotoCanvas {
         }
         this.setBaseTexture(null)
 
-        this.baseTexturePromise = this.webGlCanvas.createTextureFromSrc(src)
+        this.baseTexturePromise = this.createTextureFromSrc(src)
             .then(texture => {
                 this.baseTexturePromise = null
                 this.setBaseTexture(texture)
@@ -85,8 +85,12 @@ export default class PhotoCanvas {
         return this.baseTexturePromise
     }
 
-    setBaseTexture(texture: Texture | null): this {
-        if (this.baseTexture !== null) {
+    createTextureFromSrc(src: string): CancelablePromise<Texture> {
+        return this.webGlCanvas.createTextureFromSrc(src)
+    }
+
+    setBaseTexture(texture: Texture | null, destroyLast = true): this {
+        if (destroyLast && this.baseTexture !== null) {
             this.baseTexture.destroy()
             this.baseTexture = null
         }
