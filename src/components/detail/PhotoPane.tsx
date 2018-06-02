@@ -43,6 +43,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     private isLoadingTexture = false
     private canvasSrc: string | null = null
     private textureCache: { [key:string]: TextureInfo } = {}
+    private deferredHideCanvasTimeout: NodeJS.Timer | null
 
 
     constructor(props) {
@@ -53,6 +54,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         this.canvas = new PhotoCanvas()
         const canvasElem = this.canvas.getElement()
         canvasElem.className = 'PhotoPane-canvas'
+        canvasElem.style.display = 'none'
         findDOMNode(this.refs.main).appendChild(canvasElem)
 
         this.updateCanvas({})
@@ -75,7 +77,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         this.tryToFetchTexture(props.srcNext)
         this.tryToFetchTexture(props.srcPrev)
 
-        let textureChanged = false
+        let canvasChanged = false
         if (this.canvasSrc !== props.src) {
             let textureToShow = null
             const textureInfo = this.textureCache[props.src]
@@ -85,20 +87,42 @@ export default class PhotoPane extends React.Component<Props, State> {
             }
             canvas.setBaseTexture(textureToShow, false)
             this.canvasSrc = textureToShow ? props.src : null
-            textureChanged = true
-            this.props.setLoading(textureToShow === null)
+            canvasChanged = true
         }
 
-        if (textureChanged || props.width !== prevProps.width || props.height !== prevProps.height || props.orientation !== prevProps.orientation
-            || props.photoWork !== prevProps.photoWork)
-        {
-            canvas
-                .setMaxSize(props.width, props.height)
-                .setExifOrientation(props.orientation)
-                .setPhotoWork(props.photoWork)
-                .update()
+        if (props.width !== prevProps.width || props.height !== prevProps.height) {
+            canvas.setMaxSize(props.width, props.height)
+            canvasChanged = true
+        }
 
-            canvas.getElement().style.display = canvas.isValid() ? null : 'none'
+        if (props.orientation !== prevProps.orientation) {
+            canvas.setExifOrientation(props.orientation)
+            canvasChanged = true
+        }
+
+        if (props.photoWork !== prevProps.photoWork) {
+            canvas.setPhotoWork(props.photoWork)
+            canvasChanged = true
+        }
+
+        if (canvasChanged) {
+            if (canvas.isValid()) {
+                if (this.deferredHideCanvasTimeout) {
+                    clearTimeout(this.deferredHideCanvasTimeout)
+                    this.deferredHideCanvasTimeout = null
+                }
+                canvas.update()
+                canvas.getElement().style.display = null
+                this.props.setLoading(false)
+            } else if (!this.deferredHideCanvasTimeout) {
+                // We hide the old image of an invalid canvas with a little delay,
+                // in order to avoid blinking if loading the next texture and photo work is fast
+                this.deferredHideCanvasTimeout = setTimeout(() => {
+                    this.deferredHideCanvasTimeout = null
+                    canvas.getElement().style.display = 'none'
+                    this.props.setLoading(true)
+                }, 100)
+            }
         }
     }
 

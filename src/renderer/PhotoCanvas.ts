@@ -20,8 +20,6 @@ export default class PhotoCanvas {
     private exifOrientation: ExifOrientation
     private photoWork: PhotoWork | null
 
-    private valid: boolean = false
-
     private baseTexturePromise: CancelablePromise<void> | null = null
     private baseTexture: Texture | null = null
     private unitSquareBuffer: GraphicBuffer
@@ -49,7 +47,7 @@ export default class PhotoCanvas {
     }
 
     isValid(): boolean {
-        return this.valid
+        return !!(this.baseTexture && this.photoWork)
     }
 
     setMaxSize(width: number, height: number): this {
@@ -100,18 +98,15 @@ export default class PhotoCanvas {
     }
 
     update(): this {
-        const baseTexture = this.baseTexture
-        const photoWork = this.photoWork
-        if (!baseTexture || !photoWork) {
+        if (!this.isValid()) {
             const gl = this.webGlCanvas.gl
             gl.clearColor(0.0, 0.0, 0.0, 1.0)
             gl.clear(gl.COLOR_BUFFER_BIT)
 
-            this.valid = false
             return this
         }
 
-        const exifOrientation = this.exifOrientation
+        const { baseTexture, photoWork, exifOrientation} = this
 
         // ===== Calculate =====
 
@@ -164,7 +159,6 @@ export default class PhotoCanvas {
             .setUniforms({ uTransformationMatrix: matrix })
             .draw()
 
-        this.valid = true
         return this
     }
 
