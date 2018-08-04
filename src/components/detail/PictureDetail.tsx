@@ -71,7 +71,7 @@ export default class PictureDetail extends React.Component<Props, State> {
 
     contextMenu(e) {
         e.preventDefault();
-        this.menu.popup(remote.getCurrentWindow());
+        this.menu.popup({})
     }
 
     addEditorMenu(editor) {
@@ -242,7 +242,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     updateCanvasSize() {
         const state = this.state
 
-        const bodyElem = findDOMNode(this.refs.body)
+        const bodyElem = findDOMNode(this.refs.body) as HTMLElement
         const canvasWidth  = Math.round(bodyElem.clientWidth  * 0.9)
         const canvasHeight = Math.round(bodyElem.clientHeight * 0.9)
 

@@ -2,7 +2,7 @@
   "rules": {
     "complexity": [1, 2],
     "prefer-arrow-callback": 1,
-    "indent": [2, 2],
+    "indent": [1, 2],
     "quotes": [2,"single"],
     "linebreak-style": [2, "unix"],
     "semi": [2, "always"],
@@ -56,7 +56,7 @@
     "no-iterator": 2,
     "no-labels": 2,
     "no-lone-blocks": 2,
-    "no-multi-spaces": 2,
+    "no-multi-spaces": 1,
     "no-multi-str": 2,
     "no-new-func": 2,
     "no-new-wrappers": 2,

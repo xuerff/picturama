@@ -36,7 +36,8 @@ class Container extends React.Component<Props, State> {
   }
 
   handleScrollTop(scrollTop) {
-    findDOMNode(this.refs.container).scrollTop = scrollTop
+    const containerElem = findDOMNode(this.refs.container) as HTMLElement
+    containerElem.scrollTop = scrollTop
   }
 
   handleImport(store) {

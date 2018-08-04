@@ -69,7 +69,7 @@ class Picture extends React.Component<Props, State> {
     let state = this.state;
 
     if (this.props.highlighted.indexOf(this.props.photoIndex) !== -1) {
-      const pictureElem = findDOMNode(this.refs.picture)
+      const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
       let rect = pictureElem.getBoundingClientRect()
       let containerElem = pictureElem.parentNode.parentNode.parentNode as Element
       let containerRect = containerElem.getBoundingClientRect()
@@ -83,7 +83,7 @@ class Picture extends React.Component<Props, State> {
 
     if (this.state.showContextMenu && this.props.highlighted) {
       // If no timeout the menu will appears before the highlight
-      setTimeout(() => this.menu.popup(remote.getCurrentWindow()), 10);
+      setTimeout(() => this.menu.popup({}))
 
       this.setState({ showContextMenu: false })
     }

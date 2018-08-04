@@ -29,7 +29,7 @@ export default {
   characters: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZéè',
   acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
   acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
-  watchedFormats: /([\$\#\w\d]+)-([\$\#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
+  watchedFormats: /([$#\w\d]+)-([$#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
   exportFormats: [ 'jpg', 'png', 'webp' ],
   workExt: 'webp',
   dotAnsel,
