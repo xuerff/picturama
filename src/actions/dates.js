@@ -1,8 +1,12 @@
 import Photo from '../models/Photo'
 
 export const setDateFilter = (date, showOnlyFlagged) => dispatch => {
+  const where = { date: date, trashed: false }
+  if (showOnlyFlagged) {
+    where.flag = true
+  }
   new Photo()
-    .where({ date: date, trashed: false, flag: showOnlyFlagged })
+    .where(where)
     .fetchAll({ withRelated: [ 'versions', 'tags' ] })
     .then(photos => {
       dispatch({
@@ -18,4 +22,3 @@ export const getDates = () => dispatch => {
     dispatch({ type: 'GET_DATES_SUCCESS', dates });
   });
 };
-
