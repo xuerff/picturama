@@ -1,13 +1,11 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
-import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation } from '../../models/DataTypes'
 import { PhotoWork } from '../../models/Photo'
 import PhotoCanvas from '../../renderer/PhotoCanvas'
 import { Texture } from '../../renderer/WebGLCanvas'
-import CancelablePromise, { isCancelError } from '../../util/CancelablePromise'
 
 
 const textureCacheMaxSize = 5
@@ -41,6 +39,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     private canvas: PhotoCanvas | null = null
 
     private isLoadingTexture = false
+    private texturesWithError: { [index: string]: boolean } = {}
     private canvasSrc: string | null = null
     private textureCache: { [key:string]: TextureInfo } = {}
     private deferredHideCanvasTimeout: NodeJS.Timer | null
@@ -72,10 +71,22 @@ export default class PhotoPane extends React.Component<Props, State> {
     updateCanvas(prevProps: Partial<Props>) {
         const props = this.props
         const canvas = this.canvas
+        const texturesWithError = this.texturesWithError
+
+        if (props.src !== prevProps.src || props.srcNext !== prevProps.srcNext || props.srcPrev !== prevProps.srcPrev) {
+            this.texturesWithError = {}
+        }
 
         this.tryToFetchTexture(props.src)
         this.tryToFetchTexture(props.srcNext)
         this.tryToFetchTexture(props.srcPrev)
+
+        if (this.texturesWithError[props.src]) {
+            // TODO: Show error
+            canvas.getElement().style.display = 'none'
+            this.props.setLoading(false)
+            return
+        }
 
         let canvasChanged = false
         if (this.canvasSrc !== props.src) {
@@ -129,7 +140,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     tryToFetchTexture(src?: string) {
         const { textureCache } = this
 
-        if (!src || textureCache[src] || this.isLoadingTexture) {
+        if (!src || textureCache[src] || this.isLoadingTexture || this.texturesWithError[src]) {
             return
         }
 
@@ -155,8 +166,10 @@ export default class PhotoPane extends React.Component<Props, State> {
                 this.updateCanvas(this.props)
             })
             .catch(error => {
-                this.isLoadingTexture = false
                 console.error(`Loading ${src} failed`, error)
+                this.isLoadingTexture = false
+                this.texturesWithError[src] = true
+                this.updateCanvas(this.props)
             })
     }
 

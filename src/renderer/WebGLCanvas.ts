@@ -71,6 +71,9 @@ export default class WebGLCanvas {
 
                 resolve(new Texture(gl, textureId, image.width, image.height))
             }
+            image.onerror = errorEvt => {
+                reject(errorEvt)
+            }
             image.src = src
         })
     }
