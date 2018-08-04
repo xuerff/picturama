@@ -1,4 +1,5 @@
 import CancelablePromise from '../util/CancelablePromise'
+import Profiler from '../util/Profiler'
 
 
 /**
@@ -50,13 +51,14 @@ export default class WebGLCanvas {
         return new GraphicBuffer(gl, bufferId, gl.FLOAT, componentSize, data.length / componentSize)
     }
 
-    createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE): CancelablePromise<Texture> {
+    createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler = null): CancelablePromise<Texture> {
         // For details see: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 
         const gl = this.gl
         return new CancelablePromise<Texture>((resolve, reject) => {
             let image: HTMLImageElement | HTMLCanvasElement = new Image()
             image.onload = () => {
+                if (profiler) profiler.addPoint('Loaded image')
                 const textureId = this.gl.createTexture()
                 gl.bindTexture(gl.TEXTURE_2D, textureId)
 
@@ -69,6 +71,7 @@ export default class WebGLCanvas {
                 gl.generateMipmap(gl.TEXTURE_2D);
                 gl.bindTexture(gl.TEXTURE_2D, null);
 
+                if (profiler) profiler.addPoint('Created texture')
                 resolve(new Texture(gl, textureId, image.width, image.height))
             }
             image.onerror = errorEvt => {

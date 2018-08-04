@@ -16,6 +16,8 @@ import Tag from './models/Tag'
 import { renderThumbnail } from './ForegroundClient'
 import { bindMany } from './util/LangUtil'
 import { fetchPhotoWork, storeThumbnail } from './PhotoWorkStore'
+import { profileScanner } from './LogConstants';
+import Profiler from './util/Profiler';
 
 const readFile = Promise.promisify(fs.readFile);
 
@@ -114,43 +116,85 @@ export default class Scanner {
         )
       }
 
+      const nonRawProfiler = profileScanner ? new Profiler(`Importing ${file.path} (non-raw)`) : null
       createNonRawImg = extractThumb
-        .then(imgPath => readFile(imgPath))
-        .then(img => sharp(img)
-          .rotate()
-          .withMetadata()
-          .toFile(nonRawImgPath)
-        )
-        .then(() => nonRawImgPath)
+        .then(imgPath => {
+          if (nonRawProfiler) nonRawProfiler.addPoint('Extracted image')
+          readFile(imgPath)
+        })
+        .then(img => {
+          if (nonRawProfiler) nonRawProfiler.addPoint('Loaded extracted image')
+          return sharp(img)
+            .rotate()
+            .withMetadata()
+            .toFile(nonRawImgPath)
+        })
+        .then(() => {
+          if (nonRawProfiler) {
+            nonRawProfiler.addPoint('Rotated extracted image')
+            nonRawProfiler.logResult()
+          }
+          return nonRawImgPath
+        })
     } else {
       createNonRawImg = Promise.resolve(originalImgPath)
     }
 
+    const metaDataProfiler = profileScanner ? new Profiler(`Importing ${file.path} (meta data)`) : null
     const readMetaData = readMetadataOfImage(originalImgPath)
+      .then(result => {
+        if (metaDataProfiler) {
+          metaDataProfiler.addPoint('Read meta data')
+          metaDataProfiler.logResult()
+        }
+        return result
+      })
 
+    const photoWorkProfiler = profileScanner ? new Profiler(`Importing ${file.path} (photo work)`) : null
     const readPhotoWork = fetchPhotoWork(originalImgPath)
+      .then(result => {
+        if (photoWorkProfiler) {
+          photoWorkProfiler.addPoint('Fetched photo work')
+          photoWorkProfiler.logResult()
+        }
+        return result
+      })
 
+    var thumbnailProfiler: Profiler | null = null
     const createThumbnail = Promise.all([
         createNonRawImg,
         readMetaData,
         readPhotoWork
       ])
       .then(results => {
+        if (profileScanner) {
+          thumbnailProfiler = new Profiler(`Importing ${file.path} (thumbnail)`)
+        }
         const [ nonRawImgPath, metaData, photoWork ] = results
         return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork)
       })
-      .then(thumbnailData =>
-        storeThumbnail(thumbnailImgPath, thumbnailData)
-      )
+      .then(thumbnailData => {
+        if (thumbnailProfiler) thumbnailProfiler.addPoint('Rendered thumbnail')
+        return storeThumbnail(thumbnailImgPath, thumbnailData)
+      })
+      .then (result => {
+        if (thumbnailProfiler) {
+          thumbnailProfiler.addPoint('Stored thumbnail')
+          thumbnailProfiler.logResult()
+        }
+        return result
+      })
 
     return Promise.all([createThumbnail, readMetaData, readPhotoWork])
       .then(results => {
+        const dbProfiler = profileScanner ? new Profiler(`Importing ${file.path} (DB)`) : null
         const metaData = results[1]
         const photoWork = results[2]
         return new Photo({ title: file.name })
           .fetch()
-          .then(photo =>
-            photo ? null : Photo.forge({
+          .then(photo => {
+            if (dbProfiler) dbProfiler.addPoint('Fetched from DB')
+            return photo ? null : Photo.forge({
               title: file.name,
               extension: file.path.match(/\.(.+)$/i)[1],
               orientation: metaData.orientation,
@@ -166,8 +210,15 @@ export default class Scanner {
               thumb: nonRawImgPath
             })
             .save()
-          )
-          .then(photo => this.populateTags(photo, metaData.tags))
+          })
+          .then(photo => {
+            if (dbProfiler) dbProfiler.addPoint('Stored to DB')
+            this.populateTags(photo, metaData.tags)
+            if (dbProfiler) {
+              dbProfiler.addPoint('Populated tags')
+              dbProfiler.logResult()
+            }
+          })
       })
       .then(this.onImportedStep)
       .catch(err => {
@@ -208,12 +259,17 @@ export default class Scanner {
   }
 
   scanPictures() {
+    const startTime = Date.now()
     return walker(this.path, [ this.versionsPath ])
       .then(this.prepare)
       .filter(this.filterStoredPhoto)
       .then(this.setTotal)
       .map(this.walk, {
         concurrency: config.concurrency
-      });
+      })
+      .then(result => {
+        console.log(`Scanning ${this.progress.total} files took ${Date.now() - startTime} ms`)
+        return result
+      })
   }
 }

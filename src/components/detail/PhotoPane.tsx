@@ -2,10 +2,12 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 
+import { profileDetailView } from '../../LogConstants'
 import { ExifOrientation } from '../../models/DataTypes'
 import { PhotoWork } from '../../models/Photo'
 import PhotoCanvas from '../../renderer/PhotoCanvas'
 import { Texture } from '../../renderer/WebGLCanvas'
+import Profiler from '../../util/Profiler'
 
 
 const textureCacheMaxSize = 5
@@ -144,9 +146,11 @@ export default class PhotoPane extends React.Component<Props, State> {
             return
         }
 
+        const profiler = profileDetailView ? new Profiler(`Fetching texture for ${src}`) : null
         this.isLoadingTexture = true
-        this.canvas.createTextureFromSrc(src)
+        this.canvas.createTextureFromSrc(src, profiler)
             .then(texture => {
+                if (profiler) profiler.addPoint('Loaded texture')
                 textureCache[src] = { src, texture, lastUse: Date.now() }
 
                 const cachedSrcs = Object.keys(textureCache)
@@ -164,6 +168,9 @@ export default class PhotoPane extends React.Component<Props, State> {
 
                 this.isLoadingTexture = false
                 this.updateCanvas(this.props)
+                if (profiler) profiler.addPoint('Updated canvas')
+
+                if (profiler) profiler.logResult()
             })
             .catch(error => {
                 console.error(`Loading ${src} failed`, error)

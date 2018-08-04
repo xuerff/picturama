@@ -5,6 +5,7 @@ import { TransformationShader } from './Shaders'
 import { ExifOrientation } from '../models/DataTypes'
 import { PhotoWork } from '../models/Photo'
 import CancelablePromise from '../util/CancelablePromise'
+import Profiler from '../util/Profiler'
 
 /**
  * Renders a photo using a WebGL canvas. Provides a high-level API suited for Ansel's photo rendering.
@@ -67,24 +68,25 @@ export default class PhotoCanvas {
         return this
     }
 
-    loadFromSrc(src: string): CancelablePromise<void> {
+    loadFromSrc(src: string, profiler: Profiler = null): CancelablePromise<void> {
         if (this.baseTexturePromise !== null) {
             this.baseTexturePromise.cancel()
         }
         this.setBaseTexture(null)
 
-        this.baseTexturePromise = this.createTextureFromSrc(src)
+        this.baseTexturePromise = this.createTextureFromSrc(src, profiler)
             .then(texture => {
                 this.baseTexturePromise = null
                 this.setBaseTexture(texture)
                     .update()
+                if (profiler) profiler.addPoint('Updadated canvas')
             })
 
         return this.baseTexturePromise
     }
 
-    createTextureFromSrc(src: string): CancelablePromise<Texture> {
-        return this.webGlCanvas.createTextureFromSrc(src)
+    createTextureFromSrc(src: string, profiler: Profiler = null): CancelablePromise<Texture> {
+        return this.webGlCanvas.createTextureFromSrc(src, undefined, undefined, profiler)
     }
 
     setBaseTexture(texture: Texture | null, destroyLast = true): this {

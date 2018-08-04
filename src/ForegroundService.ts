@@ -3,6 +3,8 @@ import { ipcRenderer } from 'electron'
 import { assertRendererProcess } from './util/ElectronUtil'
 import { ExifOrientation } from './models/DataTypes';
 import { renderThumbnail } from './renderer/ThumbnailRenderer';
+import { profileThumbnailRenderer } from './LogConstants';
+import Profiler from './util/Profiler';
 
 
 assertRendererProcess()
@@ -24,7 +26,12 @@ export function init() {
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
     if (action === 'renderThumbnail') {
-        return renderThumbnail(params.photoPath, params.orientation, params.photoWork)
+        const profiler = profileThumbnailRenderer ? new Profiler(`Rendering thumbail of ${params.photoPath}`) : null
+        return renderThumbnail(params.photoPath, params.orientation, params.photoWork, profiler)
+            .then(result => {
+                if (profiler) profiler.logResult()
+                return result
+            })
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }
