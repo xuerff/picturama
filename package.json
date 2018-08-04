@@ -17,7 +17,8 @@
     "build": "./scripts/build.sh",
     "postbuild": "./scripts/build-deb.sh",
     "build-no-bump": "./scripts/build.sh",
-    "start": "./node_modules/.bin/gulp"
+    "start": "./node_modules/.bin/gulp",
+    "start-no-build": "./node_modules/.bin/gulp run"
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",
   "license": "MIT",

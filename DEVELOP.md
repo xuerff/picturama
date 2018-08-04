@@ -6,7 +6,7 @@ Build from sources
 ------------------
 
 ```bash
-npm install
+npm i
 npm start
 ```
 
@@ -14,6 +14,7 @@ If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try ag
 
 ```bash
 rm -rf ~/.node-gyp
+npm i
 ```
 
 
@@ -38,6 +39,26 @@ UI sandbox
 5. Wait for the watch build to build the changes
 
 6. Reload UI sandbox: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
+
+
+
+Developing main thread code
+---------------------------
+
+If you change code that runs on the main thread, you have to restart Ansel each time in order to see your changes.
+Here's how you can use a watch build in order to reduce turnaround time:
+
+1. Run watch build (in extra console):
+    ```bash
+    npm run watch
+    ```
+
+2. Change your code.
+
+3. Restart Ansel without building (since building is done by the watch):
+    ```bash
+    npm run start-no-build
+    ```
 
 
 
