@@ -1,0 +1,95 @@
+import anselBookshelf from './ansel-bookshelf'
+import * as fs from 'fs.extra/fs.extra'
+import * as Promise from 'bluebird'
+import * as sharp from 'sharp'
+import * as libraw from 'libraw'
+
+import config from '../config'
+
+import Photo from './Photo'
+import { BookshelfClass } from './DataTypes'
+
+
+const copy = Promise.promisify(fs.copy) as ((fromPath: string, toPath: string) => Promise<void>)
+
+export interface VersionType {
+    id: number,
+    type: string | null,
+    master: string | null,
+    output: string | null,
+    thumbnail: string | null,
+    version: number | null,
+    photo_id: number | null,
+}
+
+const Version = anselBookshelf.Model.extend({
+    tableName: 'versions',
+
+    photo: function() {
+        this.belongsTo(Photo)
+    },
+
+    initialize: function() {
+        this.on('creating', model => new Photo({ id: model.get('photo_id') })
+            .fetch()
+            .then(photoModel => {
+                const photo = photoModel.toJSON()
+
+                let fileName = [
+                    photo.title,
+                    photo.id,
+                    model.get('version')
+                ].join('-')
+
+                if (model.get('type') === 'RAW') {
+                    let fileNamePath = `${config.tmp}/${fileName}.${photo.extension}`
+
+                    model.set('master', fileNamePath)
+
+                    return copy(photo.master, fileNamePath)
+                }
+
+                let fileNamePath = `${config.tmp}/${fileName}`
+
+                model.set('master', `${fileNamePath}.tiff`)
+
+                return libraw.extract(photo.master, fileNamePath)
+                    .then(output => {
+                        model.set('master', output)
+                        return output
+                    })
+            })
+            .catch(err => {
+                console.error('ERR', err)
+            }))
+    }
+}, {
+    updateImage: data => {
+        let filename = [ data[1], data[2], data[3] ].join('-')
+        let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`
+
+        return sharp(data.input)
+            .resize(250, 250)
+            .max()
+            .toFile(thumbPathName)
+            .then(() => Version.where({ photo_id: data[2], version: data[3] })
+                    .fetch()
+            )
+            .then(version => {
+                if (version) {
+                    return version.save(
+                        { output: data.input, thumbnail: thumbPathName },
+                        { method: 'update' }
+                    )
+                }
+
+                throw new Error('not-found')
+            })
+            .catch(err => {
+                console.error(err)
+                return null
+            })
+    }
+}) as BookshelfClass<VersionType>
+
+export default Version
