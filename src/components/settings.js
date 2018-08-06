@@ -4,8 +4,8 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import config from '../config';
+import Logo from './widget/icon/Logo'
 
-import Logo from './logo';
 
 const dialog = remote.dialog;
 

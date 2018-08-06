@@ -1,7 +1,7 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux'
 
 import * as actions from '../../actions'
@@ -10,7 +10,7 @@ import Export from '../export'
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../picture-diff'
 import Container from './Container'
-import Sidebar from '../sidebar'
+import Sidebar from '../sidebar/Sidebar'
 import AppState, { ModalType } from '../../reducers/AppState'
 import { PhotoType, PhotoWork } from '../../models/Photo'
 import { bindMany } from '../../util/LangUtil'

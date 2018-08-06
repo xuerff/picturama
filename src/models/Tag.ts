@@ -6,8 +6,9 @@ import Photo, { PhotoType } from './photo';
 import { BookshelfClass, BookshelfModel, BookshelfCollection } from './DataTypes'
 
 
+export type TagId = number
 export interface TagType {
-    id: string,
+    id: TagId,
     title: string,
     slug: string,
     created_at: number,
