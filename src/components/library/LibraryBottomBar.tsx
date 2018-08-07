@@ -1,10 +1,7 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
-import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types'
 
 import Toolbar from '../widget/Toolbar'
-import AppState from '../../reducers/AppState'
 
 
 interface Props {

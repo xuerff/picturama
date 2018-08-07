@@ -1,8 +1,6 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
-import { connect } from 'react-redux';
 import { remote, ipcRenderer } from 'electron';
-import * as PropTypes from 'prop-types'
 
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
@@ -11,11 +9,9 @@ import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import MdSaveAlt from '../widget/icon/MdSaveAlt'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType } from '../../models/photo'
-import AppState from '../../reducers/AppState'
+import { PhotoType } from '../../models/Photo'
 import { rotate } from '../../util/EffectsUtil'
 import { bindMany } from '../../util/LangUtil'
-import { fetchPhotoWork } from '../../BackgroundClient'
 
 const dialog = remote.dialog;
 

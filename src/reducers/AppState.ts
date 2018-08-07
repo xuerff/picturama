@@ -22,6 +22,6 @@ export default interface AppState {
     tags: TagType[]
     devices: { readonly name: string }[]
     dates: { readonly years: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }[] }
-    progress: { processed: number, total: number }
+    progress: { processed: number, total: number, photosDir: string }
     highlighted: number[]
 }

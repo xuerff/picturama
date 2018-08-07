@@ -2,11 +2,11 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux';
 
-import ReadyToScan from '../ready-to-scan'
+import ReadyToScan from './ReadyToScan'
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid from './Grid'
-import { PhotoType } from '../../models/photo'
+import { PhotoType } from '../../models/Photo'
 import AppState, { Route } from '../../reducers/AppState'
 
 

@@ -8,7 +8,7 @@ import * as actions from '../../actions'
 
 import Export from '../export'
 import PictureDetail from '../detail/PictureDetail'
-import PictureDiff from '../picture-diff'
+import PictureDiff from '../PictureDiff'
 import Container from './Container'
 import Sidebar from '../sidebar/Sidebar'
 import AppState, { ModalType } from '../../reducers/AppState'

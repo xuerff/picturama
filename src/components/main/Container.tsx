@@ -2,7 +2,6 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types'
 
 import Library from '../library/Library'
 import Settings from '../settings'

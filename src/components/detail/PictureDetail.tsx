@@ -8,8 +8,8 @@ import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
 import AvailableEditors from '../../available-editors'
 
-import AddTags from '../add-tags';
-import Export from '../export';
+import AddTags from '../AddTags'
+import Export from '../Export'
 import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
@@ -271,7 +271,7 @@ export default class PictureDetail extends React.Component<Props, State> {
             showModal = <Export
                 actions={props.actions}
                 photos={[ props.photo ]}
-                closeExportDialog={this.closeDialog} />;
+            />
         }
 
         return (
