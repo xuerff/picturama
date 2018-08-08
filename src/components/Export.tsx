@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 
 import keymapManager from '../keymap-manager'
 import config from '../config'
-import Progress from './progress'
+import Progress from './Progress'
 import { PhotoId } from '../models/Photo'
 import { closeExportAction } from '../state/actions'
 import { AppState } from '../state/reducers'

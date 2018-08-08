@@ -1,3 +1,4 @@
+import * as classNames from 'classnames'
 import { remote, ipcRenderer } from 'electron'
 import * as fs from 'fs'
 import * as React from 'react'
@@ -12,6 +13,7 @@ import Logo from './widget/icon/Logo'
 const dialog = remote.dialog
 
 interface OwnProps {
+    className?: any
 }
 
 interface StateProps {
@@ -81,7 +83,7 @@ class Settings extends React.Component<Props, State> {
 
     render() {
         return (
-            <div className="settings-container">
+            <div className={classNames(this.props.className, 'settings-container')}>
                 <div className="info">
                     <h1>Ansel</h1>
                     <h2>Digital image organizer powered by the web</h2>

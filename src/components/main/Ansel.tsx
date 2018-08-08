@@ -5,10 +5,13 @@ import { connect } from 'react-redux'
 import Export from '../export'
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../PictureDiff'
-import Container from './Container'
 import AddTags from '../AddTags'
+import Settings from '../Settings'
+import Progress from '../Progress'
+import Library from '../library/Library'
 import Sidebar from '../sidebar/Sidebar'
 import { AppState } from '../../state/reducers'
+import { ImportProgress } from '../../state/reducers/import'
 import { ModalState } from '../../state/reducers/navigation'
 import { bindMany } from '../../util/LangUtil'
 
@@ -20,6 +23,7 @@ interface OwnProps {
 
 interface StateProps {
     settingsExist: boolean
+    importProgress: ImportProgress
     showDetail: boolean
     showDiff: boolean
     showExport: boolean
@@ -88,15 +92,26 @@ class Ansel extends React.Component<Props, State> {
             }
         }
 
-        return (
-            <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExist && state.showSidebar })}>
-                <Sidebar className="Ansel-sidebar" />
-
-                <Container
+        let container
+        if (props.importProgress) {
+            container =
+                <div className="Ansel-container">
+                    <Progress progress={props.importProgress} />
+                </div>
+        } else if (!props.settingsExist) {
+            container = <Settings className="Ansel-container" />
+        } else {
+            container =
+                <Library
                     className="Ansel-container"
                     isActive={!mainView && !modalView}
                 />
+        }
 
+        return (
+            <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExist && state.showSidebar })}>
+                <Sidebar className="Ansel-sidebar" />
+                {container}
                 {mainView}
                 {modalView}
             </div>
@@ -111,6 +126,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             settingsExist: state.navigation.settingsExist,
+            importProgress: state.import && state.import.progress,
             showDetail: !!state.detail,
             showDiff: state.detail && state.detail.showDiff,
             showExport: !!state.export,
