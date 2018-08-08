@@ -28,6 +28,7 @@ const defaultMenuSettings = [ 'dates', 'tags' ]
 
 
 interface OwnProps {
+    style?: any
     className?: any
 }
 
@@ -111,7 +112,7 @@ export class Sidebar extends React.Component<Props> {
         })
 
         return (
-            <div id="sidebar" className={props.className}>
+            <div id="sidebar" className={props.className} style={props.style}>
                 <Toolbar className="Sidebar-topBar"><Logo /> Library</Toolbar>
 
                 <div className="sidebar-content">

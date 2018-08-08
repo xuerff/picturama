@@ -18,6 +18,7 @@ import { bindMany } from '../../../common/util/LangUtil'
 
 
 interface OwnProps {
+    style?: any
     className?: any
     isActive: boolean
 }
@@ -44,7 +45,7 @@ interface DispatchProps {
 interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
-class Library extends React.Component<Props, undefined> {
+export class Library extends React.Component<Props> {
 
     constructor(props) {
         super(props);
@@ -101,7 +102,7 @@ class Library extends React.Component<Props, undefined> {
         }
 
         return (
-            <div ref="library" className={classNames(props.className, 'Library')}>
+            <div ref="library" className={classNames(props.className, 'Library')} style={props.style}>
                 <LibraryTopBar
                     className="Library-topBar"
                     photos={props.photos}

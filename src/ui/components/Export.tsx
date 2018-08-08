@@ -21,6 +21,7 @@ const readFile = Promise.promisify(fs.readFile)
 
 
 interface OwnProps {
+    style?: any
 }
 
 interface StateProps {
@@ -150,7 +151,7 @@ export class Export extends React.Component<Props, State> {
             .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>)
 
         return (
-            <div className="outer-modal" ref="main">
+            <div className="outer-modal" ref="main" style={this.props.style}>
                 <div className="modal shadow--2dp">
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <div>

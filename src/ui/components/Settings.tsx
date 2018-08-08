@@ -13,6 +13,7 @@ import Logo from './widget/icon/Logo'
 const dialog = remote.dialog
 
 interface OwnProps {
+    style?: any
     className?: any
 }
 
@@ -30,7 +31,7 @@ interface State {
     directories: { photos: string, versions: string }
 }
 
-class Settings extends React.Component<Props, State> {
+export class Settings extends React.Component<Props, State> {
 
     constructor(props) {
         super(props)
@@ -83,7 +84,7 @@ class Settings extends React.Component<Props, State> {
 
     render() {
         return (
-            <div className={classNames(this.props.className, 'settings-container')}>
+            <div className={classNames(this.props.className, 'settings-container')} style={this.props.style}>
                 <div className="info">
                     <h1>Ansel</h1>
                     <h2>Digital image organizer powered by the web</h2>
