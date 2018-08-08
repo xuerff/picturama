@@ -1,10 +1,12 @@
 import { ExifOrientation } from '../../common/models/DataTypes'
 import { PhotoType, PhotoWork } from '../../common/models/Photo'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import PhotoCanvas from './PhotoCanvas'
-import { Texture } from './WebGLCanvas'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
+
+import { getNonRawImgPath } from '../data/ImageProvider'
+import PhotoCanvas from './PhotoCanvas'
+import { Texture } from './WebGLCanvas'
 
 
 assertRendererProcess()
@@ -22,7 +24,7 @@ let canvas: PhotoCanvas | null = null
 
 
 export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
-    return await renderThumbnail(photo.thumb, photo.orientation, photoWork, profiler)
+    return await renderThumbnail(getNonRawImgPath(photo), photo.orientation, photoWork, profiler)
 }
 
 

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 
 import { PhotoId, PhotoType } from '../../../common/models/Photo'
+import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 import FaIcon from '../widget/icon/FaIcon'
 
@@ -13,6 +14,7 @@ const { Menu, MenuItem } = remote
 interface Props {
     photo: PhotoType
     isHighlighted: boolean
+    getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
     setDetailPhotoById: (photoId: PhotoId) => void
     openExport: () => void
     setHighlightedFlagged: () => void
@@ -22,17 +24,18 @@ interface Props {
 
 interface State {
     showContextMenu: boolean
-    thumbnailVersion: number
+    thumbnailPath: string | null
 }
 
 export default class Picture extends React.Component<Props, State> {
 
     private menu: Electron.Menu | null = null
+    private runningThumbnailPathPromise: CancelablePromise<void> | null = null
 
     constructor(props) {
         super(props)
 
-        this.state = { showContextMenu: false, thumbnailVersion: Date.now() }
+        this.state = { showContextMenu: false, thumbnailPath: null }
 
         bindMany(this, 'contextMenu', 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange')
     }
@@ -61,12 +64,17 @@ export default class Picture extends React.Component<Props, State> {
         }))
 
         window.addEventListener('edit:thumnailChange', this.onThumnailChange)
+        this.updateThumnail()
     }
 
-    componentDidUpdate() {
-        let state = this.state
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        const props = this.props
 
-        if (this.props.isHighlighted) {
+        if (props.photo != prevProps.photo) {
+            this.updateThumnail()
+        }
+
+        if (props.isHighlighted) {
             const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
             let rect = pictureElem.getBoundingClientRect()
             let containerElem = pictureElem.parentNode.parentNode.parentNode as Element
@@ -79,7 +87,7 @@ export default class Picture extends React.Component<Props, State> {
             }
         }
 
-        if (this.state.showContextMenu && this.props.isHighlighted) {
+        if (this.state.showContextMenu && props.isHighlighted) {
             // If no timeout the menu will appears before the highlight
             setTimeout(() => this.menu.popup({}))
 
@@ -89,6 +97,10 @@ export default class Picture extends React.Component<Props, State> {
 
     componentWillUnmount() {
         window.removeEventListener('edit:thumnailChange', this.onThumnailChange)
+        if (this.runningThumbnailPathPromise) {
+            this.runningThumbnailPathPromise.cancel()
+            this.runningThumbnailPathPromise = null
+        }
     }
 
     onAfterRender() {
@@ -118,8 +130,25 @@ export default class Picture extends React.Component<Props, State> {
     onThumnailChange(evt: CustomEvent) {
         const photoId = evt.detail.photoId
         if (photoId === this.props.photo.id) {
-            this.setState({ thumbnailVersion: Date.now() })
+            this.updateThumnail()
         }
+    }
+
+    updateThumnail() {
+        this.setState({ thumbnailPath: null })
+
+        if (this.runningThumbnailPathPromise) {
+            this.runningThumbnailPathPromise.cancel()
+        }
+
+        this.runningThumbnailPathPromise = this.props.getThumbnailPath(this.props.photo)
+            .then(thumbnailPath => this.setState({ thumbnailPath }))
+            .catch(error => {
+                if (!isCancelError(error)) {
+                    // TODO: Show error in UI
+                    console.error('Getting thumbnail failed', error)
+                }
+            })
     }
 
     handleDblClick() {
@@ -138,21 +167,28 @@ export default class Picture extends React.Component<Props, State> {
     }
 
     render() {
-        let photo = this.props.photo
-        setTimeout(this.onAfterRender)
+        const props = this.props
+        const thumbnailPath = this.state.thumbnailPath
+        const showFlag = !! (thumbnailPath && props.photo.flag)
+
+        if (showFlag) {
+            setTimeout(this.onAfterRender)
+        }
         return (
             <a
                 ref="picture"
                 className={classNames('Picture', { isHighlighted: this.props.isHighlighted })}
                 onDoubleClick={this.handleDblClick}>
                 <span className="v-align"></span>
-                <img
-                    ref="image"
-                    onClick={this.handleClick}
-                    onContextMenu={this.contextMenu}
-                    src={photo.thumb_250 + '?v=' + this.state.thumbnailVersion}
-                    className="shadow--2dp" />
-                {!!photo.flag &&
+                {thumbnailPath &&
+                    <img
+                        ref="image"
+                        onClick={this.handleClick}
+                        onContextMenu={this.contextMenu}
+                        src={thumbnailPath}
+                        className="shadow--2dp" />
+                }
+                {showFlag &&
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
                 }
             </a>

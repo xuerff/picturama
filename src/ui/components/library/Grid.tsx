@@ -4,6 +4,7 @@ import { findDOMNode } from 'react-dom'
 import keymapManager from '../../keymap-manager'
 import { PhotoId, PhotoType } from '../../../common/models/Photo'
 import { PhotoData } from '../../state/reducers/library'
+import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
 import Picture from './Picture'
 
@@ -13,6 +14,7 @@ interface Props {
     photos: PhotoData
     photoIds: PhotoId[]
     highlightedPhotoIds: PhotoId[]
+    getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
     setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
     setDetailPhotoById: (photoId: PhotoId) => void
     openExport: () => void
@@ -131,6 +133,7 @@ export default class Grid extends React.Component<Props, undefined> {
                         key={photoId}
                         photo={props.photos[photoId]}
                         isHighlighted={props.highlightedPhotoIds.indexOf(photoId) !== -1}
+                        getThumbnailPath={props.getThumbnailPath}
                         setDetailPhotoById={props.setDetailPhotoById}
                         openExport={props.openExport}
                         setHighlightedFlagged={this.setHighlightedFlagged}

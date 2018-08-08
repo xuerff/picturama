@@ -8,12 +8,14 @@ import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid from './Grid'
 import { setDetailPhotoById } from '../../data/DetailStore'
+import { getThumbnailPath } from '../../data/ImageProvider'
 import { fetchPhotos, setPhotosFilter, updatePhotoWork, setPhotosFlagged } from '../../data/PhotoStore'
 import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
 import { setHighlightedPhotosAction, openExportAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
 import { PhotoData } from '../../state/reducers/library'
 import store from '../../state/store'
+import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
 
@@ -34,6 +36,7 @@ interface StateProps {
 
 interface DispatchProps {
     fetchPhotos: () => void
+    getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
     setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
     setDetailPhotoById: (photoId: PhotoId) => void
     openExport: (photoIds: PhotoId[]) => void
@@ -94,6 +97,7 @@ export class Library extends React.Component<Props> {
                     photos={props.photos}
                     photoIds={props.photoIds}
                     highlightedPhotoIds={props.highlightedPhotoIds}
+                    getThumbnailPath={props.getThumbnailPath}
                     setHighlightedPhotos={props.setHighlightedPhotos}
                     setDetailPhotoById={props.setDetailPhotoById}
                     openExport={this.openExport}
@@ -128,6 +132,7 @@ export class Library extends React.Component<Props> {
     }
 }
 
+
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
         return {
@@ -142,6 +147,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     },
     dispatch => ({
         fetchPhotos,
+        getThumbnailPath,
         setHighlightedPhotos: highlightedIds => dispatch(setHighlightedPhotosAction(highlightedIds)),
         setDetailPhotoById,
         openExport: photoIds => dispatch(openExportAction(photoIds)),

@@ -18,6 +18,7 @@ import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import Toolbar from '../widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../data/DetailStore'
+import { getNonRawImgPath } from '../../data/ImageProvider'
 import { updatePhotoWork, movePhotosToTrash } from '../../data/PhotoStore'
 import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
 import { openExportAction, openTagsEditorAction, openDiffAction } from '../../state/actions'
@@ -27,6 +28,7 @@ import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
 const { MenuItem } = remote;
+
 
 const availableEditors = new AvailableEditors();
 
@@ -296,9 +298,9 @@ export class PictureDetail extends React.Component<Props, State> {
                         className="PictureDetail-image"
                         width={state.canvasWidth}
                         height={state.canvasHeight}
-                        src={props.photo.thumb}
-                        srcPrev={props.photoPrev && props.photoPrev.thumb}
-                        srcNext={props.photoNext && props.photoNext.thumb}
+                        src={getNonRawImgPath(props.photo)}
+                        srcPrev={props.photoPrev && getNonRawImgPath(props.photoPrev)}
+                        srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}
                         orientation={props.photo.orientation}
                         photoWork={props.photoWork}
                         setLoading={this.setLoading}

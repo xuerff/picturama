@@ -10,6 +10,7 @@ import store from '../state/store'
 import { changePhotoWorkAction, changePhotosAction, fetchPhotosAction } from '../state/actions'
 import { FilterState } from '../state/reducers/library'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
+import { onThumnailChange } from './ImageProvider'
 
 
 assertRendererProcess()
@@ -92,7 +93,6 @@ function addVersionToPhoto(photo: PhotoType): PhotoType {
 
         const lastVersion = photo.versions[photo.versions.length - 1]
         photo.thumb = lastVersion.output || photo.thumb
-        photo.thumb_250 = lastVersion.thumbnail || photo.thumb_250
     }
 
     return photo
@@ -130,9 +130,7 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
                 return Promise.all([
                     storePhotoWork(photoPath, photoWork),
-                    renderThumbnailForPhoto(photo, photoWork)
-                        .then(thumbnailData => storeThumbnail(photo.thumb_250, thumbnailData))
-                        .then(() => window.dispatchEvent(new CustomEvent('edit:thumnailChange', { detail: { photoId: photo.id } })))
+                    onThumnailChange(photo.id)
                 ])
             })
             .catch(error => {
@@ -146,8 +144,12 @@ export function updatePhotoVersion(version: any) {  // Type should be `Version`,
     new Photo({ id: version.attributes.photo_id })
         .fetch({ withRelated: [ 'versions', 'tags' ] })
         .then(photoModel => {
-            const updatedPhoto = addVersionToPhoto(photoModel.toJSON())
-            store.dispatch(changePhotosAction([ updatedPhoto ]))
+            const photo = photoModel.toJSON()
+            return onThumnailChange(photo.id)
+                .then(() => {
+                    const updatedPhoto = addVersionToPhoto(photo)
+                    store.dispatch(changePhotosAction([ updatedPhoto ]))
+                })
         })
 }
 

@@ -8,14 +8,16 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
-import keymapManager from '../keymap-manager'
 import config from '../../common/config'
-import Progress from './Progress'
+import { bindMany } from '../../common/util/LangUtil'
 import { PhotoId } from '../../common/models/Photo'
+
+import keymapManager from '../keymap-manager'
+import { getNonRawImgPath } from '../data/ImageProvider'
 import { closeExportAction } from '../state/actions'
 import { AppState } from '../state/reducers'
 import { PhotoData } from '../state/reducers/library'
-import { bindMany } from '../../common/util/LangUtil'
+import Progress from './Progress'
 
 const readFile = Promise.promisify(fs.readFile)
 
@@ -118,7 +120,7 @@ export class Export extends React.Component<Props, State> {
         })
 
         if (photo.versions.length > 0)
-            return this.processImg(photo, photo.thumb)
+            return this.processImg(photo, getNonRawImgPath(photo))
 
         if (config.acceptedRawFormats.indexOf(extension) !== -1) {
             return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
@@ -126,7 +128,7 @@ export class Export extends React.Component<Props, State> {
                 .then(img => this.processImg(photo, img))
         }
 
-        return this.processImg(photo, photo.thumb)
+        return this.processImg(photo, getNonRawImgPath(photo))
     }
 
     handleSubmit(e) {

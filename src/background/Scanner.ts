@@ -100,46 +100,10 @@ export default class Scanner {
         return preparedFiles;
     }
 
-    walk(file) {
+    walk(file: FileInfo): Promise<void> {
+        const overallProfiler = profileScanner ? new Profiler(`Importing ${file.path} (overall)`) : null
+
         const originalImgPath = file.path
-        const nonRawImgPath = file.isRaw ? `${config.thumbsPath}/${file.name}.thumb.${config.workExt}` : originalImgPath
-        const thumbnailImgPath = `${config.thumbs250Path}/${file.name}.${config.workExt}`
-
-        let createNonRawImg
-        if (file.isRaw) {
-            let extractThumb
-            if (file.hasOwnProperty('imgPath')) {
-                extractThumb = Promise.resolve(file.imgPath)
-            } else {
-                extractThumb = libraw.extractThumb(
-                    `${file.path}`,
-                    `${config.tmp}/${file.name}`
-                )
-            }
-
-            const nonRawProfiler = profileScanner ? new Profiler(`Importing ${file.path} (non-raw)`) : null
-            createNonRawImg = extractThumb
-                .then(imgPath => {
-                    if (nonRawProfiler) nonRawProfiler.addPoint('Extracted image')
-                    readFile(imgPath)
-                })
-                .then(img => {
-                    if (nonRawProfiler) nonRawProfiler.addPoint('Loaded extracted image')
-                    return sharp(img)
-                        .rotate()
-                        .withMetadata()
-                        .toFile(nonRawImgPath)
-                })
-                .then(() => {
-                    if (nonRawProfiler) {
-                        nonRawProfiler.addPoint('Rotated extracted image')
-                        nonRawProfiler.logResult()
-                    }
-                    return nonRawImgPath
-                })
-        } else {
-            createNonRawImg = Promise.resolve(originalImgPath)
-        }
 
         const metaDataProfiler = profileScanner ? new Profiler(`Importing ${file.path} (meta data)`) : null
         const readMetaData = readMetadataOfImage(originalImgPath)
@@ -161,40 +125,15 @@ export default class Scanner {
                 return result
             })
 
-        var thumbnailProfiler: Profiler | null = null
-        const createThumbnail = Promise.all([
-                createNonRawImg,
-                readMetaData,
-                readPhotoWork
-            ])
+        let overallPromise: Promise<any> = Promise.all([readMetaData, readPhotoWork])
             .then(results => {
-                if (profileScanner) {
-                    thumbnailProfiler = new Profiler(`Importing ${file.path} (thumbnail)`)
-                }
-                const [ nonRawImgPath, metaData, photoWork ] = results
-                return renderThumbnail(nonRawImgPath, metaData.orientation, photoWork)
-            })
-            .then(thumbnailData => {
-                if (thumbnailProfiler) thumbnailProfiler.addPoint('Rendered thumbnail')
-                return storeThumbnail(thumbnailImgPath, thumbnailData)
-            })
-            .then (result => {
-                if (thumbnailProfiler) {
-                    thumbnailProfiler.addPoint('Stored thumbnail')
-                    thumbnailProfiler.logResult()
-                }
-                return result
-            })
+                if (overallProfiler) overallProfiler.addPoint('Waited for meta data and PhotoWork')
 
-        return Promise.all([createThumbnail, readMetaData, readPhotoWork])
-            .then(results => {
-                const dbProfiler = profileScanner ? new Profiler(`Importing ${file.path} (DB)`) : null
-                const metaData = results[1]
-                const photoWork = results[2]
+                const [ metaData, photoWork ] = results
                 return new Photo({ title: file.name })
                     .fetch()
                     .then(photo => {
-                        if (dbProfiler) dbProfiler.addPoint('Fetched from DB')
+                        if (overallProfiler) overallProfiler.addPoint('Fetched from DB')
                         return photo ? null : Photo.forge({
                             title: file.name,
                             extension: file.path.match(/\.(.+)$/i)[1],
@@ -207,21 +146,63 @@ export default class Scanner {
                             aperture: metaData.aperture,
                             focal_length: metaData.focalLength,
                             master: originalImgPath,
-                            thumb_250: thumbnailImgPath,
-                            thumb: nonRawImgPath
+                            thumb_250: null,  // Never used. Thumbnails are created lazy by `src/ui/data/ImageProvider.ts`
+                            thumb: null       // Will be set further down for raw images
                         })
                         .save()
                     })
                     .then(photo => {
-                        if (dbProfiler) dbProfiler.addPoint('Stored to DB')
+                        if (overallProfiler) overallProfiler.addPoint('Stored to DB')
                         this.populateTags(photo, metaData.tags)
-                        if (dbProfiler) {
-                            dbProfiler.addPoint('Populated tags')
-                            dbProfiler.logResult()
-                        }
+                        if (overallProfiler) overallProfiler.addPoint('Populated tags')
+                        return photo
                     })
             })
+
+        if (file.isRaw) {
+            overallPromise = overallPromise
+                .then(photo => {
+                    const nonRawImgPath = file.isRaw ? `${config.thumbsPath}/${photo.id}.${config.workExt}` : null
+
+                    let extractThumb
+                    if (file.hasOwnProperty('imgPath')) {
+                        extractThumb = Promise.resolve(file.imgPath)
+                    } else {
+                        extractThumb = libraw.extractThumb(
+                            file.path,
+                            `${config.tmp}/${file.name}`
+                        )
+                    }
+
+                    return extractThumb
+                        .then(imgPath => {
+                            if (overallProfiler) overallProfiler.addPoint('Extracted non-raw image')
+                            return readFile(imgPath)
+                        })
+                        .then(img => {
+                            if (overallProfiler) overallProfiler.addPoint('Loaded extracted image')
+                            return sharp(img)
+                                .rotate()
+                                .withMetadata()
+                                .toFile(nonRawImgPath)
+                        })
+                        .then(() => {
+                            if (overallProfiler) overallProfiler.addPoint('Rotated extracted image')
+                            return photo
+                                .save('thumb', nonRawImgPath, { patch: true })
+                        })
+                        .then(result => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return result })
+                })
+        }
+    
+        return overallPromise
             .then(this.onImportedStep)
+            .then(() => {
+                if (overallProfiler) {
+                    overallProfiler.addPoint('Updated import progress')
+                    overallProfiler.logResult()
+                }
+            })
             .catch(err => {
                 console.error('Importing photo failed', file, err)
             })

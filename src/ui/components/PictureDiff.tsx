@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import keymapManager from '../keymap-manager'
 import Photo, { PhotoType } from '../../common/models/Photo'
+import { getNonRawImgPath } from '../data/ImageProvider'
 import { closeDiffAction } from '../state/actions'
 import { AppState } from '../state/reducers'
 
@@ -31,7 +32,7 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
-    photo: Partial<PhotoType>
+    photo: PhotoType
     loaded: boolean
     loadingCount: number
 }
@@ -44,7 +45,7 @@ export class PictureDiff extends React.Component<Props, State> {
         this.onImgLoad = this.onImgLoad.bind(this)
 
         this.state = {
-            photo: { thumb: null },
+            photo: { thumb: null } as PhotoType,
             loaded: false,
             loadingCount: 0
         }
@@ -97,7 +98,7 @@ export class PictureDiff extends React.Component<Props, State> {
                 <div className="before v-align">
                     <h3>Before</h3>
                     <img
-                        src={this.state.photo.thumb}
+                        src={getNonRawImgPath(this.state.photo)}
                         onLoad={this.onImgLoad}
                         className={className} />
                 </div>
