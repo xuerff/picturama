@@ -7,7 +7,7 @@ node_modules/
 static/bundle.css
 dist/
 tests-dist/
-dot-ansel/
+dot-ansel*/
 build/
 ansel.json
 

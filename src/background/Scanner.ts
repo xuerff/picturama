@@ -260,17 +260,24 @@ export default class Scanner {
     }
 
     scanPictures() {
-        const startTime = Date.now()
+        const profiler = profileScanner ? new Profiler('Overall scanning') : null
         return walker(this.path, [ this.versionsPath ])
+            .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
             .then(this.prepare)
+            .then(result => { if (profiler) { profiler.addPoint('Prepared files') }; return result })
             .filter(this.filterStoredPhoto)
+            .then(result => { if (profiler) { profiler.addPoint('Filtered files') }; return result })
             .then(this.setTotal)
+            .then(result => { if (profiler) { profiler.addPoint('Set total') }; return result })
             .map(this.walk, {
                 concurrency: config.concurrency
             })
             .then(result => {
-                console.log(`Scanning ${this.progress.total} files took ${Date.now() - startTime} ms`)
+                if (profiler) {
+                    profiler.addPoint(`Scanned ${this.progress.total} images`)
+                    profiler.logResult()
+                }
                 return result
             })
-    }
+      }
 }
