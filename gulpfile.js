@@ -74,7 +74,12 @@ gulp.task('lint-tests', () => {
 });
 
 
-gulp.task('run', [ 'set-env' ],
+gulp.task('run', [ 'set-env', 'transpile', 'styles' ],
+  () => {
+    childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
+  });
+
+gulp.task('run-no-build', [ 'set-env' ],
   () => {
     childProcess.spawn(electron, ['.'], { stdio: 'inherit' }); 
   });
