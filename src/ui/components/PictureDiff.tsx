@@ -1,7 +1,7 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
-import * as Loader from 'react-loader'
 import { connect } from 'react-redux'
+import { Spinner } from '@blueprintjs/core'
 
 import keymapManager from '../keymap-manager'
 import Photo, { PhotoType } from '../../common/models/Photo'
@@ -111,7 +111,9 @@ export class PictureDiff extends React.Component<Props, State> {
                         className={className} />
                 </div>
 
-                <Loader loaded={this.state.loaded} />
+                {!this.state.loaded &&
+                    <Spinner size={Spinner.SIZE_LARGE} />
+                }
             </div>
         )
     }

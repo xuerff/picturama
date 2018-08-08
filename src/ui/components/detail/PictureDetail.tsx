@@ -2,8 +2,8 @@ import { ipcRenderer, remote, Menu as MenuType } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import * as Loader from 'react-loader'
 import { findDOMNode } from 'react-dom'
+import { Button, ButtonGroup, Spinner } from '@blueprintjs/core'
 
 import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
@@ -11,8 +11,6 @@ import AvailableEditors from '../../available-editors'
 
 import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
-import Button from '../widget/Button'
-import ButtonGroup from '../widget/ButtonGroup'
 import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
@@ -267,26 +265,26 @@ export class PictureDetail extends React.Component<Props, State> {
                         <span>Back to library</span>
                     </Button>
                     <ButtonGroup>
-                        <Button enabled={!props.isFirst} onClick={props.setPreviousDetailPhoto} tip="Previous image [left]">
+                        <Button disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title="Previous image [left]">
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button enabled={!props.isLast} onClick={props.setNextDetailPhoto} tip="Next image [right]">
+                        <Button disabled={props.isLast} onClick={props.setNextDetailPhoto} title="Next image [right]">
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
-                    <span className="PictureDetail-topBarRight">
+                    <span className="pull-right">
                         <ButtonGroup>
-                            <Button onClick={this.rotateLeft} tip="Rotate left">
+                            <Button onClick={this.rotateLeft} title="Rotate left">
                                 <MdRotateLeftIcon/>
                             </Button>
-                            <Button onClick={this.rotateRight} tip="Rotate right">
+                            <Button onClick={this.rotateRight} title="Rotate right">
                                 <MdRotateRightIcon/>
                             </Button>
                         </ButtonGroup>
                         <Button
                             className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
                             onClick={props.toggleFlag}
-                            tip={props.photo.flag ? 'Remove flag' : 'Flag'}
+                            title={props.photo.flag ? 'Remove flag' : 'Flag'}
                         >
                             <FaIcon name="flag" />
                         </Button>
@@ -308,7 +306,9 @@ export class PictureDetail extends React.Component<Props, State> {
                 </div>
 
                 <PictureInfo className="PictureDetail-infoBar" photo={props.photo} />
-                <Loader loaded={!state.loading} />
+                {state.loading &&
+                    <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
+                }
             </div>
         );
     }

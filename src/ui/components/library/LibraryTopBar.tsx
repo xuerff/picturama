@@ -1,9 +1,8 @@
 import { remote, ipcRenderer } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
+import { Button, ButtonGroup } from '@blueprintjs/core'
 
-import Button from '../widget/Button'
-import ButtonGroup from '../widget/ButtonGroup'
 import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
@@ -105,35 +104,35 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         const highlightedAreFlagged = this.getHighlightedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
-                <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar} tip="Show sidebar [tab]">
+                <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar} title="Show sidebar [tab]">
                     <FaIcon name="bars" />
                 </Button>
                 <Button
                     className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
                     onClick={this.props.toggleShowOnlyFlagged}
-                    tip={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
+                    title={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
                 >
                     <FaIcon name="flag" />
                 </Button>
 
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button enabled={hasHighlight} onClick={this.rotateLeft} tip="Rotate left">
+                        <Button disabled={!hasHighlight} onClick={this.rotateLeft} title="Rotate left">
                             <MdRotateLeftIcon/>
                         </Button>
-                        <Button enabled={hasHighlight} onClick={this.rotateRight} tip="Rotate right">
+                        <Button disabled={!hasHighlight} onClick={this.rotateRight} title="Rotate right">
                             <MdRotateRightIcon/>
                         </Button>
                     </ButtonGroup>
                     <Button
                         className={classNames('LibraryTopBar-toggleButton', { isActive: highlightedAreFlagged })}
-                        enabled={hasHighlight}
+                        disabled={!hasHighlight}
                         onClick={this.toggleFlagged}
-                        tip={highlightedAreFlagged ? 'Remove flag' : 'Flag'}
+                        title={highlightedAreFlagged ? 'Remove flag' : 'Flag'}
                     >
                         <FaIcon name="flag" />
                     </Button>
-                    <Button enabled={hasHighlight} onClick={this.props.openExport} tip="Export">
+                    <Button disabled={!hasHighlight} onClick={this.props.openExport} title="Export">
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&

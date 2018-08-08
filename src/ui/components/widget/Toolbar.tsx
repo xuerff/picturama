@@ -12,7 +12,7 @@ class Toolbar extends React.Component<Props, undefined> {
     render() {
         const props = this.props
         return (
-            <div id={props.id} className={classNames(props.className, "Toolbar")} style={props.style}>
+            <div id={props.id} className={classNames(props.className, "Toolbar bp3-dark")} style={props.style}>
                 {props.children}
             </div>
         )
