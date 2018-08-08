@@ -2,6 +2,7 @@ import { remote } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
+import { Spinner } from '@blueprintjs/core'
 
 import { PhotoId, PhotoType } from '../../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
@@ -180,6 +181,9 @@ export default class Picture extends React.Component<Props, State> {
                 className={classNames('Picture', { isHighlighted: this.props.isHighlighted })}
                 onDoubleClick={this.handleDblClick}>
                 <span className="v-align"></span>
+                {!thumbnailPath &&
+                    <Spinner />
+                }
                 {thumbnailPath &&
                     <img
                         ref="image"
