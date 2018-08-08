@@ -3,7 +3,7 @@
   "productName": "Ansel",
   "version": "0.4.1",
   "description": "",
-  "main": "dist/browser.js",
+  "main": "dist/background/entry.js",
   "engineStrict": true,
   "engines": {
     "node": ">=6.10.0",

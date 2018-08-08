@@ -48,9 +48,9 @@ gulp.task("transpile-tests", () => {
 });
 
 gulp.task('styles', () => {
-  return gulp.src('src/less/index.less')
+  return gulp.src('src/ui/less/index.less')
     .pipe(less())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist/ui'));
 });
 
 gulp.task('styles-sandbox', () => {

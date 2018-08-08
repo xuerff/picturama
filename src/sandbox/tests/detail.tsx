@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import { PictureDetail } from '../../components/detail/PictureDetail'
-import { PhotoType } from '../../models/Photo'
+import { PictureDetail } from '../../ui/components/detail/PictureDetail'
+import { PhotoType } from '../../common/models/Photo'
 
 
 const testPhoto: PhotoType = {

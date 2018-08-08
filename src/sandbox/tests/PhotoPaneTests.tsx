@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import PhotoPane from '../../components/detail/PhotoPane'
-import { ExifOrientation } from '../../models/DataTypes'
+import PhotoPane from '../../ui/components/detail/PhotoPane'
+import { ExifOrientation } from '../../common/models/DataTypes'
 
 const defaultProps = {
     style:  { backgroundColor: '#888' },

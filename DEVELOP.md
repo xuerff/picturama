@@ -2,6 +2,16 @@ How to develop Ansel
 ====================
 
 
+Directory structure
+-------------------
+
+    +-- src/
+      +-- background/         Code running in main electron process
+      +-- common/             Shared code
+      +-- sandbox/            Code running in renderer electron process of sandbox UI
+      +-- ui/                 Code running in renderer electron process of main UI
+
+
 Build from sources
 ------------------
 
