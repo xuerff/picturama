@@ -12,8 +12,9 @@ import { BookshelfClass } from './DataTypes'
 
 const copy = Promise.promisify(fs.copy) as ((fromPath: string, toPath: string) => Promise<void>)
 
+export type VersionId = number
 export interface VersionType {
-    id: number,
+    id: VersionId
     type: string | null,
     master: string | null,
     output: string | null,
@@ -64,7 +65,7 @@ const Version = anselBookshelf.Model.extend({
             }))
     }
 }, {
-    updateImage: data => {
+    updateImage(data) {
         let filename = [ data[1], data[2], data[3] ].join('-')
         let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`
 
@@ -82,7 +83,7 @@ const Version = anselBookshelf.Model.extend({
                         { method: 'update' }
                     )
                 }
-
+    
                 throw new Error('not-found')
             })
             .catch(err => {

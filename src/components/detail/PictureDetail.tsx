@@ -1,6 +1,7 @@
-import { ipcRenderer, remote, Menu as MenuType } from 'electron';
+import { ipcRenderer, remote, Menu as MenuType } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
+import { connect } from 'react-redux'
 import * as Loader from 'react-loader'
 import { findDOMNode } from 'react-dom'
 
@@ -8,8 +9,6 @@ import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
 import AvailableEditors from '../../available-editors'
 
-import AddTags from '../AddTags'
-import Export from '../Export'
 import PhotoPane from './PhotoPane'
 import PictureInfo from './PictureInfo'
 import Button from '../widget/Button'
@@ -18,11 +17,16 @@ import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType, PhotoWork } from '../../models/Photo'
+import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../data/DetailStore'
+import { updatePhotoWork, movePhotosToTrash } from '../../data/PhotoStore'
+import { PhotoId, PhotoType, PhotoWork } from '../../models/Photo'
+import { openExportAction, openTagsEditorAction, openDiffAction } from '../../state/actions'
+import { AppState } from '../../state/reducers'
+import { getPhotoById, getPhotoByIndex } from '../../state/selectors'
 import { rotate } from '../../util/EffectsUtil'
 import { bindMany } from '../../util/LangUtil'
 
-const { Menu, MenuItem } = remote;
+const { MenuItem } = remote;
 
 const availableEditors = new AvailableEditors();
 
@@ -31,30 +35,45 @@ let rotation = {};
 rotation[1] = '';
 rotation[0] = 'minus-ninety';
 
-interface Props {
+
+interface OwnProps {
     style?: any
     className?: any
+    isActive: boolean
+}
+
+interface StateProps {
     photo: PhotoType
     photoPrev?: PhotoType
     photoNext?: PhotoType
     photoWork?: PhotoWork
     isFirst: boolean
     isLast: boolean
-    actions: any
-    setCurrentLeft: () => void 
-    setCurrentRight: () => void 
+}
+
+interface DispatchProps {
+    setPreviousDetailPhoto: () => void
+    setNextDetailPhoto: () => void
+    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleFlag: () => void
+    movePhotosToTrash: (photos: PhotoType[]) => void
+    openExport: (photoIds: PhotoId[]) => void
+    openTagsEditor: () => void
+    openDiff: () => void
+    closeDetail: () => void
+}
+
+interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
     bound: boolean,
-    modal: 'addTags' | 'none' | 'export',
     loading: boolean,
     canvasWidth?: number
     canvasHeight?: number
 }
 
-export default class PictureDetail extends React.Component<Props, State> {
+export class PictureDetail extends React.Component<Props, State> {
 
     menu: MenuType
 
@@ -62,11 +81,113 @@ export default class PictureDetail extends React.Component<Props, State> {
     constructor(props) {
         super(props);
 
-        this.state = { bound: false, modal: 'none', loading: true }
+        this.state = { bound: false, loading: true }
 
-        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'closeDialog', 'setLoading',
-            'cancelEvent', 'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight',
-            'toggleFlagged')
+        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
+            'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight')
+    }
+
+    componentDidMount() {
+        this.menu = new remote.Menu();
+
+        this.menu.append(new MenuItem({
+            label: 'Add tag',
+            click: this.props.openTagsEditor
+        }));
+
+        this.menu.append(new MenuItem({
+            label: 'Export',
+            click: this.openExport
+        }));
+
+        this.menu.append(new MenuItem({
+            label: 'Move to trash',
+            click: this.moveToTrash
+        }));
+
+        this.menu.append(new MenuItem({
+            type: 'separator'
+        }));
+
+        availableEditors.editors.forEach(this.addEditorMenu);
+
+        this.bindEventListeners()
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        this.updateCanvasSize()
+
+        if (this.props.isActive !== prevProps.isActive) {
+            if (this.props.isActive) {
+                this.bindEventListeners()
+            } else {
+                this.unbindEventListeners()
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        this.unbindEventListeners();
+
+        delete this.menu;
+    }
+
+    bindEventListeners() {
+        this.setState({ bound: true })
+
+        window.addEventListener('resize', this.updateCanvasSize)
+        document.addEventListener('contextmenu', this.contextMenu)
+
+        ipcRenderer.send('toggleAddTagMenu', true)
+        ipcRenderer.send('toggleExportMenu', true)
+
+        ipcRenderer.on('addTagClicked', this.props.openTagsEditor)
+
+        window.addEventListener('core:cancel', this.props.closeDetail)
+        window.addEventListener('detail:diff', this.toggleDiff);
+        window.addEventListener('detail:flag', this.props.toggleFlag);
+        window.addEventListener('detail:moveToTrash', this.moveToTrash);
+
+        window.addEventListener(
+            'detail:moveLeft',
+            this.props.setPreviousDetailPhoto
+        );
+
+        window.addEventListener(
+            'detail:moveRight',
+            this.props.setNextDetailPhoto
+        );
+
+        keymapManager.bind(this.refs.detail);
+    }
+
+    unbindEventListeners() {
+        this.setState({ bound: false })
+
+        window.removeEventListener('resize', this.updateCanvasSize)
+        document.removeEventListener('contextmenu', this.contextMenu)
+
+        ipcRenderer.send('toggleAddTagMenu', false)
+        ipcRenderer.send('toggleExportMenu', false)
+
+        ipcRenderer.removeListener('addTagClicked', this.props.openTagsEditor)
+
+        window.removeEventListener('core:cancel', this.props.closeDetail)
+        window.removeEventListener('detail:diff', this.toggleDiff);
+        window.removeEventListener('detail:flag', this.props.toggleFlag);
+        window.removeEventListener('detail:moveToTrash', this.moveToTrash);
+
+        window.removeEventListener(
+            'detail:moveLeft',
+            this.props.setPreviousDetailPhoto
+        );
+
+        window.removeEventListener(
+            'detail:moveRight',
+            this.props.setNextDetailPhoto
+        );
+
+        keymapManager.unbind();
     }
 
     contextMenu(e) {
@@ -87,35 +208,19 @@ export default class PictureDetail extends React.Component<Props, State> {
         }));
     }
 
-    showTagDialog() {
+    openExport() {
         this.unbindEventListeners();
-        this.setState({ modal: 'addTags' });
-    }
-
-    closeDialog() {
-        this.bindEventListeners();
-        this.setState({ modal: 'none' });
-    }
-
-    showExportDialog() {
-        this.unbindEventListeners();
-        this.setState({ modal: 'export' });
-    }
-
-    cancelEvent() {
-        if (this.state.modal === 'none') // escape
-            this.props.actions.setCurrent(-1);
-        else
-            this.closeDialog();
+        this.props.openExport([ this.props.photo.id ])
     }
 
     moveToTrash() {
-        this.props.actions.moveToTrash(this.props.photo);
+        this.props.movePhotosToTrash([ this.props.photo ])
     }
 
     toggleDiff() {
-        if (this.props.photo.versionNumber > 1)
-            this.props.actions.toggleDiff();
+        if (this.props.photo.versionNumber > 1) {
+            this.props.openDiff()
+        }
     }
 
     rotateLeft() {
@@ -127,110 +232,7 @@ export default class PictureDetail extends React.Component<Props, State> {
     }
 
     rotate(turns: number) {
-        const props = this.props
-        props.actions.updatePhotoWork(props.photo, photoWorks => rotate(photoWorks, turns))
-    }
-
-    toggleFlagged() {
-        const props = this.props
-        props.actions.toggleFlag(props.photo)
-    }
-
-    componentDidMount() {
-        this.menu = new remote.Menu();
-
-        this.menu.append(new MenuItem({
-            label: 'Add tag',
-            click: this.showTagDialog.bind(this)
-        }));
-
-        this.menu.append(new MenuItem({
-            label: 'Export',
-            click: this.showExportDialog.bind(this)
-        }));
-
-        this.menu.append(new MenuItem({
-            label: 'Move to trash',
-            click: this.moveToTrash
-        }));
-
-        this.menu.append(new MenuItem({
-            type: 'separator'
-        }));
-
-        availableEditors.editors.forEach(this.addEditorMenu);
-
-        window.addEventListener('core:cancel', this.cancelEvent);
-        window.addEventListener('detail:diff', this.toggleDiff);
-        window.addEventListener('detail:flag', this.props.toggleFlag);
-        window.addEventListener('detail:moveToTrash', this.moveToTrash);
-
-        window.addEventListener(
-            'detail:moveLeft',
-            this.props.setCurrentLeft
-        );
-
-        window.addEventListener(
-            'detail:moveRight',
-            this.props.setCurrentRight
-        );
-
-        keymapManager.bind(this.refs.detail);
-        this.bindEventListeners();
-    }
-
-    componentWillReceiveProps() {
-        this.bindEventListeners();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        this.updateCanvasSize()
-    }
-
-    componentWillUnmount() {
-        this.unbindEventListeners();
-
-        window.removeEventListener('core:cancel', this.cancelEvent);
-        window.removeEventListener('detail:diff', this.toggleDiff);
-        window.removeEventListener('detail:flag', this.props.toggleFlag);
-        window.removeEventListener('detail:moveToTrash', this.moveToTrash);
-
-        window.removeEventListener(
-            'detail:moveLeft',
-            this.props.setCurrentLeft
-        );
-
-        window.removeEventListener(
-            'detail:moveRight',
-            this.props.setCurrentRight
-        );
-
-        keymapManager.unbind();
-        delete this.menu;
-    }
-
-    bindEventListeners() {
-        this.setState({ bound: true });
-
-        window.addEventListener('resize', this.updateCanvasSize);
-        document.addEventListener('contextmenu', this.contextMenu);
-
-        ipcRenderer.send('toggleAddTagMenu', true);
-        ipcRenderer.send('toggleExportMenu', true);
-
-        ipcRenderer.on('addTagClicked', this.showTagDialog.bind(this));
-    }
-
-    unbindEventListeners() {
-        this.setState({ bound: false });
-
-        window.removeEventListener('resize', this.updateCanvasSize);
-        document.removeEventListener('contextmenu', this.contextMenu);
-
-        ipcRenderer.send('toggleAddTagMenu', false);
-        ipcRenderer.send('toggleExportMenu', false);
-
-        ipcRenderer.removeAllListeners('addTagClicked');
+        this.props.updatePhotoWork(this.props.photo, photoWorks => rotate(photoWorks, turns))
     }
 
     setLoading(loading: boolean) {
@@ -255,37 +257,18 @@ export default class PictureDetail extends React.Component<Props, State> {
         const props = this.props
         const state = this.state
 
-        let imgClass = classNames(
-            'PictureDetail-image shadow--2dp',
-            rotation[props.photo.orientation]
-        );
-
-        let showModal;
-
-        if (this.state.modal === 'addTags') {
-            showModal = <AddTags
-                photo={props.photo}
-                actions={props.actions}
-                closeTagDialog={this.closeDialog} />;
-        } else if (this.state.modal === 'export') {
-            showModal = <Export
-                actions={props.actions}
-                photos={[ props.photo ]}
-            />
-        }
-
         return (
             <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
                 <Toolbar className="PictureDetail-topBar">
-                    <Button onClick={this.cancelEvent}>
+                    <Button onClick={props.closeDetail}>
                         <FaIcon name="chevron-left"/>
                         <span>Back to library</span>
                     </Button>
                     <ButtonGroup>
-                        <Button enabled={!props.isFirst} onClick={props.setCurrentLeft} tip="Previous image [left]">
+                        <Button enabled={!props.isFirst} onClick={props.setPreviousDetailPhoto} tip="Previous image [left]">
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button enabled={!props.isLast} onClick={props.setCurrentRight} tip="Next image [right]">
+                        <Button enabled={!props.isLast} onClick={props.setNextDetailPhoto} tip="Next image [right]">
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
@@ -300,7 +283,7 @@ export default class PictureDetail extends React.Component<Props, State> {
                         </ButtonGroup>
                         <Button
                             className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
-                            onClick={this.toggleFlagged}
+                            onClick={props.toggleFlag}
                             tip={props.photo.flag ? 'Remove flag' : 'Flag'}
                         >
                             <FaIcon name="flag" />
@@ -324,9 +307,35 @@ export default class PictureDetail extends React.Component<Props, State> {
 
                 <PictureInfo className="PictureDetail-infoBar" photo={props.photo} />
                 <Loader loaded={!state.loading} />
-
-                {showModal}
             </div>
         );
     }
 }
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state, props) => {
+        const currentPhoto = state.detail && state.detail.currentPhoto
+        return {
+            ...props,
+            photo: getPhotoById(currentPhoto.id),
+            photoPrev: getPhotoByIndex(currentPhoto.index - 1),
+            photoNext: getPhotoByIndex(currentPhoto.index + 1),
+            photoWork: currentPhoto.photoWork,
+            isFirst: currentPhoto.index === 0,
+            isLast: currentPhoto.index === state.library.photos.ids.length - 1
+        }
+    },
+    dispatch => ({
+        setPreviousDetailPhoto,
+        setNextDetailPhoto,
+        updatePhotoWork,
+        toggleFlag: toggleDetailPhotoFlag,
+        movePhotosToTrash,
+        openExport: photoIds => dispatch(openExportAction(photoIds)),
+        openTagsEditor: () => dispatch(openTagsEditorAction()),
+        openDiff: () => dispatch(openDiffAction()),
+        closeDetail: () => setDetailPhotoByIndex(null)
+    })
+)(PictureDetail)
+
+export default Connected

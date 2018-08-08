@@ -1,4 +1,4 @@
-import config from './../config';
+import config from '../config'
 
 const knex = require('knex')(config.knex);
 

@@ -6,37 +6,43 @@ import * as libraw from 'libraw'
 import * as sharp from 'sharp'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
+import { connect } from 'react-redux'
 
 import keymapManager from '../keymap-manager'
 import config from '../config'
 import Progress from './progress'
-import { PhotoType } from '../models/Photo'
+import { PhotoId } from '../models/Photo'
+import { closeExportAction } from '../state/actions'
+import { AppState } from '../state/reducers'
+import { PhotoData } from '../state/reducers/library'
 import { bindMany } from '../util/LangUtil'
 
 const readFile = Promise.promisify(fs.readFile)
 
 
-interface Props {
-    photos: PhotoType[]
-    actions: any
+interface OwnProps {
+}
+
+interface StateProps {
+    photoIds: PhotoId[]
+    photos: PhotoData
+}
+
+interface DispatchProps {
+    closeExport: () => void
+}
+
+interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
     folder: string
     quality: number
     format: string
-    showProgress: boolean
+    progress: { processed: number, total: number, photosDir: string } | null
 }
 
-declare global {
-    namespace sharp {
-        interface SharpInstance {
-            quality()
-        }
-    }
-}
-
-class Export extends React.Component<Props, State> {
+export class Export extends React.Component<Props, State> {
 
     constructor(props) {
         super(props)
@@ -47,7 +53,7 @@ class Export extends React.Component<Props, State> {
             folder: null,
             quality: 90,
             format: config.exportFormats[0],
-            showProgress: false
+            progress: null
         }
 
         this.onEachPhoto = this.onEachPhoto.bind(this)
@@ -56,12 +62,12 @@ class Export extends React.Component<Props, State> {
 
     componentDidMount() {
         keymapManager.bind(this.refs.main)
-        window.addEventListener('core:cancel', this.props.actions.closeExport)
+        window.addEventListener('core:cancel', this.props.closeExport)
     }
 
     componentWillUnmount() {
         keymapManager.unbind()
-        window.removeEventListener('core:cancel', this.props.actions.closeExport)
+        window.removeEventListener('core:cancel', this.props.closeExport)
     }
 
     onFolderSelection(filenames: string[]) {
@@ -91,19 +97,23 @@ class Export extends React.Component<Props, State> {
             message: `Finish exporting ${this.props.photos.length} photo(s)`
         })
 
-        this.props.actions.closeExport()
+        this.props.closeExport()
     }
 
-    onEachPhoto(photo, i) {
+    onEachPhoto(photoId: PhotoId, i: number) {
+        const photo = this.props.photos[photoId]
+
         let extension = photo.extension.toLowerCase()
 
         if (!this.state.folder)
             return false
 
-        this.props.actions.importProgress(null, {
-            processed: i + 1,
-            total: this.props.photos.length,
-            photosDir: this.state.folder
+        this.setState({
+            progress: {
+                processed: i + 1,
+                total: this.props.photoIds.length,
+                photosDir: this.state.folder
+            }
         })
 
         if (photo.versions.length > 0)
@@ -121,9 +131,7 @@ class Export extends React.Component<Props, State> {
     handleSubmit(e) {
         e.preventDefault()
 
-        this.setState({ showProgress: true })
-
-        Promise.each(this.props.photos, this.onEachPhoto)
+        Promise.each(this.props.photoIds, this.onEachPhoto)
             .then(this.afterExport.bind(this))
     }
 
@@ -182,11 +190,28 @@ class Export extends React.Component<Props, State> {
                         <button>Save</button>
                     </form>
 
-                    {this.state.showProgress ? <Progress /> : null}
+                    {this.state.progress &&
+                        <Progress progress={this.state.progress} />
+                    }
                 </div>
             </div>
         )
     }
 }
 
-export default Export
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state, props) => {
+        const mainFilter = state.library.filter.mainFilter
+        return {
+            ...props,
+            photoIds: state.export.photoIds,
+            photos: state.library.photos.data
+        }
+    },
+    {
+        closeExport: closeExportAction
+    }
+)(Export)
+
+export default Connected

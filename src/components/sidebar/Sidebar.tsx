@@ -7,10 +7,13 @@ import Dates from './Dates'
 import Devices from './Devices'
 import Logo from '../widget/icon/Logo'
 import Toolbar from '../widget/Toolbar'
-import AppState from '../../reducers/AppState'
-
 import config from '../../config'
+import { setPhotosFilter } from '../../data/PhotoStore'
+import { fetchDates } from '../../data/PhotoDateStore'
+import { fetchTags } from '../../data/PhotoTagStore'
 import { TagId, TagType } from '../../models/Tag'
+import { AppState } from '../../state/reducers'
+import { FilterState } from '../../state/reducers/library'
 import { bindMany } from '../../util/LangUtil'
 
 
@@ -26,11 +29,9 @@ const defaultMenuSettings = [ 'dates', 'tags' ]
 
 interface OwnProps {
     className?: any
-    actions: any
 }
 
 interface StateProps {
-    showOnlyFlagged: boolean
     dates: { readonly years: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }[] }
     currentDate: string
     tags: TagType[]
@@ -39,6 +40,9 @@ interface StateProps {
 }
 
 interface DispatchProps {
+    fetchDates: () => void
+    fetchTags: () => void
+    setPhotosFilter: (newFilter: FilterState) => void
 }
 
 interface Props extends OwnProps, StateProps, DispatchProps {
@@ -48,19 +52,31 @@ export class Sidebar extends React.Component<Props> {
 
     constructor(props) {
         super(props)
-        bindMany(this, 'onDateSelected', 'onTagSelected')
+        bindMany(this, 'onDateSelected', 'onTagSelected', 'showFlagged', 'showProcessed', 'showTrash', 'clearFilter')
     }
 
     onDateSelected(date: string) {
-        const props = this.props
-        props.actions.setDateFilter(
-            date,
-            props.showOnlyFlagged
-        )
+        this.props.setPhotosFilter({ mainFilter: { type: 'date', date }, showOnlyFlagged: false })
     }
 
     onTagSelected(tag: TagType) {
-        this.props.actions.setTagFilter(tag)
+        this.props.setPhotosFilter({ mainFilter: { type: 'tag', tagId: tag.id }, showOnlyFlagged: false })
+    }
+
+    showFlagged() {
+        this.props.setPhotosFilter({ mainFilter: null, showOnlyFlagged: true })
+    }
+
+    showProcessed() {
+        this.props.setPhotosFilter({ mainFilter: { type: 'processed' }, showOnlyFlagged: false })
+    }
+
+    showTrash() {
+        this.props.setPhotosFilter({ mainFilter: { type: 'trash' }, showOnlyFlagged: false })
+    }
+
+    clearFilter() {
+        this.props.setPhotosFilter({ mainFilter: null, showOnlyFlagged: false })
     }
 
     render() {
@@ -75,7 +91,7 @@ export class Sidebar extends React.Component<Props> {
                         key={key}
                         dates={props.dates}
                         currentDate={props.currentDate}
-                        fetchDates={props.actions.getDates}
+                        fetchDates={props.fetchDates}
                         onDateSelected={this.onDateSelected}
                     />
                 )
@@ -85,7 +101,7 @@ export class Sidebar extends React.Component<Props> {
                         key={key}
                         tags={props.tags}
                         currentTagId={props.currentTagId}
-                        fetchTags={props.actions.getTags}
+                        fetchTags={props.fetchTags}
                         onTagSelected={this.onTagSelected}
                     />
                 )
@@ -100,25 +116,25 @@ export class Sidebar extends React.Component<Props> {
 
                 <div className="sidebar-content">
                     <button
-                        onClick={props.actions.getPhotos}
+                        onClick={this.clearFilter}
                         className="button">
                         <i className="fa fa-book"></i> All content
                     </button>
 
                     <button
-                        onClick={props.actions.getFlagged}
+                        onClick={this.showFlagged}
                         className="button flagged">
                         <i className="fa fa-flag"></i> Flagged
                     </button>
 
                     <button
-                        onClick={props.actions.getProcessed}
+                        onClick={this.showProcessed}
                         className="button">
                         <i className="fa fa-pencil-square-o"></i> Processed
                     </button>
 
                     <button
-                        onClick={props.actions.getTrashed}
+                        onClick={this.showTrash}
                         className="button">
                         <i className="fa fa-trash-o"></i> Trash
                     </button>
@@ -133,14 +149,21 @@ export class Sidebar extends React.Component<Props> {
 
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => ({
-        ...props,
-        showOnlyFlagged: state.showOnlyFlagged,
-        dates: state.dates,
-        currentDate: state.currentDate,
-        tags: state.tags,
-        currentTagId: state.currentTag,
-        devices: state.devices
+    (state, props) => {
+        const mainFilter = state.library.filter.mainFilter
+        return {
+            ...props,
+            dates: state.library.dates,
+            currentDate: (mainFilter && mainFilter.type === 'date') ? mainFilter.date : null,
+            tags: state.library.tags,
+            currentTagId: (mainFilter && mainFilter.type === 'tag') ? mainFilter.tagId : null,
+            devices: state.library.devices
+        }
+    },
+    dispatch => ({
+        fetchDates,
+        fetchTags,
+        setPhotosFilter
     })
 )(Sidebar)
 

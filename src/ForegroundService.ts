@@ -1,10 +1,18 @@
 import { ipcRenderer } from 'electron'
 
+import { profileThumbnailRenderer } from './LogConstants'
+import { fetchDates } from './data/PhotoDateStore'
+import { updatePhotoVersion, fetchPhotos } from './data/PhotoStore'
+import { fetchTags } from './data/PhotoTagStore'
+import { Device } from './models/DataTypes'
+import { PhotoId } from './models/Photo'
+import Version from './models/Version'
+import { renderThumbnail } from './renderer/ThumbnailRenderer'
+import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from './state/actions'
+import store from './state/store'
 import { assertRendererProcess } from './util/ElectronUtil'
-import { ExifOrientation } from './models/DataTypes';
-import { renderThumbnail } from './renderer/ThumbnailRenderer';
-import { profileThumbnailRenderer } from './LogConstants';
-import Profiler from './util/Profiler';
+import Profiler from './util/Profiler'
+import { ImportProgress } from './state/reducers/import'
 
 
 assertRendererProcess()
@@ -21,6 +29,21 @@ export function init() {
                 ipcRenderer.send('onForegroundActionDone', callId, msg, null)
             })
     })
+
+    ipcRenderer.on('start-import', () => store.dispatch(startImportAction()))
+    ipcRenderer.on('progress', (event, progress: ImportProgress) => store.dispatch(setImportProgressAction(progress)))
+
+    ipcRenderer.on('finish-import', () => {
+        fetchPhotos()
+        fetchDates()
+        fetchTags()
+    })
+
+    ipcRenderer.on('new-version', (event, version: any /* Type should be `Version`, but it doesn't work */) => updatePhotoVersion(version))
+    ipcRenderer.on('scanned-devices', (event, devices: Device[]) => store.dispatch(initDevicesAction(devices)))
+    ipcRenderer.on('add-device', (event, device: Device) => store.dispatch(addDeviceAction(device)))
+    ipcRenderer.on('remove-device', (event, device: Device) => store.dispatch(removeDeviceAction(device)))
+    ipcRenderer.on('photos-trashed', (event, photoIds: PhotoId[]) => store.dispatch(emptyTrashAction(photoIds)))
 }
 
 

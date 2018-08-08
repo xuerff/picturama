@@ -11,7 +11,7 @@ const defaultProps = {
     height: 600,
     src: '../specs/photos/IMG_9700.JPG',
     orientation: ExifOrientation.Up,
-    effects: [],
+    photoWork: {},
     setLoading: action('setLoading')
 }
 

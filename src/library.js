@@ -12,7 +12,8 @@ import walker from './lib/walker';
 
 import Tag from './models/Tag'
 import Photo from './models/Photo'
-import Version from './models/version';
+import Version from './models/Version'
+
 
 class Library {
 

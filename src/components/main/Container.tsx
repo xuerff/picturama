@@ -1,79 +1,66 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
-import { findDOMNode } from 'react-dom'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 
-import Library from '../library/Library'
-import Settings from '../settings'
+import Settings from '../Settings'
 import Progress from '../progress'
-import AppState from '../../reducers/AppState'
+import Library from '../library/Library'
+import { AppState } from '../../state/reducers'
+import { ImportProgress } from '../../state/reducers/import'
 
 
-interface ConnectProps {
-  className?: any
-  isActive: boolean
-  settingsExists: boolean
-  importing: boolean
-  actions: any
+
+interface OwnProps {
+    className?: any
+    isActive: boolean
 }
 
-interface Props extends ConnectProps {
-  current: number
+interface StateProps {
+    settingsExist: boolean
+    importProgress: ImportProgress
 }
 
-interface State {
-  scrollTop: 0
-  isImporting: boolean
+interface DispatchProps {
 }
 
-class Container extends React.Component<Props, State> {
+interface Props extends OwnProps, StateProps, DispatchProps {
+}
 
-  constructor(props) {
-    super(props);
+class Container extends React.Component<Props> {
 
-    this.state = { scrollTop: 0, isImporting: false };
-  }
+    render() {
+        const props = this.props
 
-  handleScrollTop(scrollTop) {
-    const containerElem = findDOMNode(this.refs.container) as HTMLElement
-    containerElem.scrollTop = scrollTop
-  }
+        let content
+        if (props.importProgress) {
+            content = <Progress progress={props.importProgress} />
+        } else if (!props.settingsExist) {
+            content = <Settings />
+        } else {
+            content =
+                <Library
+                    className="Container-body"
+                    isActive={props.isActive}
+                />
+        }
 
-  handleImport(store) {
-    this.setState({ isImporting: store.importing })
-  }
-
-  componentDidMount() {
-    this.props.actions.areSettingsExisting();
-  }
-
-  render() {
-    const props = this.props
-
-    let content
-    if (props.importing) {
-      content = <Progress />
-    } else if (!props.settingsExists) {
-      content = <Settings actions={props.actions} />
-    } else {
-      content =
-        <Library
-          className="Container-body"
-          isActive={props.isActive}
-          actions={props.actions}
-          setScrollTop={this.handleScrollTop.bind(this)}
-        />
+        return (
+            <div ref="container" className={classNames(props.className, 'Container')}>
+                {content}
+            </div>
+        );
     }
-
-    return (
-      <div ref="container" className={classNames(props.className, 'Container')}>
-        {content}
-      </div>
-    );
-  }
 }
 
-export default connect<Props, {}, ConnectProps, AppState>((state, props) => ({
-  ...props,
-  current: state.current
-}))(Container);
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state, props) => {
+        return {
+            ...props,
+            settingsExist: state.navigation.settingsExist,
+            importProgress: state.import && state.import.progress
+        }
+    }
+)(Container)
+
+export default Connected

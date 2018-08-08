@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-import Version from './models/version';
+import Version from './models/Version';
 
 const createVersionSuccessOpenWith = data => {
   let version = data.version.toJSON();

@@ -1,18 +1,18 @@
-import slug from '../lib/slug';
+import slug from '../lib/slug'
 
-import anselBookshelf from './ansel-bookshelf';
+import anselBookshelf from './ansel-bookshelf'
 
-import Photo, { PhotoType } from './photo';
-import { BookshelfClass, BookshelfModel, BookshelfCollection } from './DataTypes'
+import Photo, { PhotoType } from './Photo'
+import { BookshelfClass, BookshelfCollection } from './DataTypes'
 
 
 export type TagId = number
 export interface TagType {
-    id: TagId,
-    title: string,
-    slug: string,
-    created_at: number,
-    updated_at: number | null,
+    id: TagId
+    title: string
+    slug: string
+    created_at: number
+    updated_at: number | null
 }
 
 export default anselBookshelf.Model.extend({

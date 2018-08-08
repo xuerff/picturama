@@ -1,17 +1,19 @@
 import anselBookshelf from './ansel-bookshelf';
 import * as shortid from 'shortid'
 
-import config from './../config';
+import config from '../config';
 
 import { ExifOrientation, BookshelfClass } from './DataTypes'
 import Tag, { TagType } from './Tag'
-import Version from './version'
+import Version from './Version'
 
 shortid.characters(config.characters);
 
 
+/** Example: 'B1m80éAMpf' */
+export type PhotoId = string
 export interface PhotoType {
-    id: string,                 // Example: 'B1m80éAMpf'
+    id: PhotoId,                // Example: 'B1m80éAMpf'
     title: string,              // Example: 'IMG_9700'
     master: string,             // Example: /specs/photos/IMG_9700.JPG'
     thumb: string,              // Example: /specs/photos/IMG_9700.JPG'
@@ -53,11 +55,5 @@ export default anselBookshelf.Model.extend({
         this.on('creating', model => {
             model.set('id', shortid.generate());
         });
-    }
-
-}, {
-    getDates: function() {
-        return this.query().distinct('date')
-            .orderBy('date', 'desc');
     }
 }) as BookshelfClass<PhotoType>

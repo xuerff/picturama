@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import PictureDetail from '../../components/detail/PictureDetail'
+import { PictureDetail } from '../../components/detail/PictureDetail'
 import { PhotoType } from '../../models/Photo'
 
 
@@ -31,19 +31,20 @@ const testPhoto: PhotoType = {
 
 const defaultProps = {
     style: { width: '100%', height: '100%' },
+    isActive: true,
     photo: testPhoto,
     isFirst: true,
     isLast: false,
-    actions: {
-        setCurrent:  action('setCurrent'),
-        moveToTrash: action('moveToTrash'),
-        toggleDiff:  action('toggleDiff'),
-        toggleFlag:  action('toggleFlag (action)')
-    },
-    setCurrentLeft: action('setCurrentLeft'),
-    setCurrentRight: action('setCurrentRight'),
-    toggleFlag: action('toggleFlag (direct)'),
-    storeEffects: action('storeEffects')
+
+    setPreviousDetailPhoto: action('setPreviousDetailPhoto'),
+    setNextDetailPhoto: action('setNextDetailPhoto'),
+    updatePhotoWork: action('updatePhotoWork'),
+    toggleFlag: action('toggleFlag'),
+    movePhotosToTrash: action('movePhotosToTrash'),
+    openExport: action('openExport'),
+    openTagsEditor: action('openTagsEditor'),
+    openDiff: action('openDiff'),
+    closeDetail: action('closeDetail'),
 }
 
 

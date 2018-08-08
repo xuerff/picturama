@@ -1,23 +1,14 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 
-import AppState from '../reducers/AppState'
+import { ImportProgress } from '../state/reducers/import'
 
 
-interface OwnProps {
+interface Props {
+    progress: ImportProgress
 }
 
-interface StateProps {
-    progress: { processed: number, total: number, photosDir: string }
-}
-
-interface DispatchProps {
-}
-
-interface Props extends OwnProps, StateProps, DispatchProps {
-}
-
-export class Progress extends React.Component<Props> {
+/** Shows the progress of import or export */
+export default class Progress extends React.Component<Props> {
 
     constructor(props) {
         super(props)
@@ -53,13 +44,3 @@ export class Progress extends React.Component<Props> {
         )
     }
 }
-
-
-const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => ({
-        ...props,
-        progress: state.progress
-    })
-)(Progress)
-
-export default Connected

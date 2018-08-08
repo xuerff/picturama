@@ -1,5 +1,5 @@
 import { ExifOrientation } from '../models/DataTypes'
-import { PhotoType, PhotoWork } from '../models/photo'
+import { PhotoType, PhotoWork } from '../models/Photo'
 import { assertRendererProcess } from '../util/ElectronUtil'
 import PhotoCanvas from './PhotoCanvas'
 import { Texture } from './WebGLCanvas'

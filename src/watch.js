@@ -1,7 +1,8 @@
 import * as chokidar from 'chokidar'
 
-import Version from './models/version';
-import config from './config';
+import Version from './models/Version'
+import config from './config'
+
 
 const allowed = config.watchedFormats;
 

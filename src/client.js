@@ -5,6 +5,7 @@ import App from './../dist/components/app';
 import pkgs from './../package.json';
 import { init as initBackgroundClient } from './BackgroundClient'
 import { init as initForegroundService } from './ForegroundService'
+import { checkSettingsExist } from './data/SettingsStore'
 
 if (process.env.ANSEL_DEV_MODE)
   document.title = 'Ansel - DEV MODE';
@@ -16,5 +17,6 @@ if (process.env.ANSEL_TEST_MODE)
 
 initBackgroundClient()
 initForegroundService()
+checkSettingsExist()
 
 render(React.createElement(App), document.getElementById('app'))

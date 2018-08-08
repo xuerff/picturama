@@ -57,12 +57,14 @@
     "sharp": "0.20.5",
     "shortid": "^2.2.12",
     "sqlite3": "4.0.2",
+    "typesafe-actions": "^2.0.4",
     "walk": "^2.3.14"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.23",
     "@types/classnames": "^2.2.6",
     "@types/gl-matrix": "^2.4.1",
+    "@types/knex": "^0.14.19",
     "@types/react": "^16.4.7",
     "@types/react-dom": "^16.0.6",
     "@types/react-loader": "^2.4.3",

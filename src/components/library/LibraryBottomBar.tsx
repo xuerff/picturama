@@ -6,9 +6,9 @@ import Toolbar from '../widget/Toolbar'
 
 interface Props {
     className?: any
-    highlighted: number[]
+    highlightedCount: number
     photosCount: number
-    actions: any
+    clearHighlight: () => void
 }
 
 export default class LibraryBottomBar extends React.Component<Props, undefined> {
@@ -18,11 +18,11 @@ export default class LibraryBottomBar extends React.Component<Props, undefined> 
             <Toolbar className={classNames(props.className, 'LibraryBottomBar')}>
                 <div className="LibraryBottomBar-content">
                     <span className="LibraryBottomBar-selection">
-                        <span>{this.props.highlighted.length} selected</span>
-                        {this.props.highlighted.length > 0 &&
+                        <span>{props.highlightedCount} selected</span>
+                        {props.highlightedCount > 0 &&
                             <button
                                 className="LibraryBottomBar-deselectAll"
-                                onClick={this.props.actions.clearHighlight}>
+                                onClick={props.clearHighlight}>
                                 Deselect all
                             </button>
                         }

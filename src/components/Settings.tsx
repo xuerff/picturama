@@ -1,15 +1,27 @@
 import { remote, ipcRenderer } from 'electron'
 import * as fs from 'fs'
 import * as React from 'react'
+import { connect } from 'react-redux'
 
 import config from '../config'
+import { checkSettingsExist } from '../data/SettingsStore'
+import { AppState } from '../state/reducers'
 import Logo from './widget/icon/Logo'
 
 
 const dialog = remote.dialog
 
-interface Props {
-    actions: any
+interface OwnProps {
+}
+
+interface StateProps {
+}
+
+interface DispatchProps {
+    checkSettingsExist: () => void
+}
+
+interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
@@ -63,7 +75,7 @@ class Settings extends React.Component<Props, State> {
     onSavedFile(err) {
         if (!err) {
             ipcRenderer.send('settings-created', true)
-            this.props.actions.areSettingsExisting()
+            this.props.checkSettingsExist()
         }
     }
 
@@ -100,4 +112,17 @@ class Settings extends React.Component<Props, State> {
     }
 }
 
-export default Settings
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state, props) => {
+        const mainFilter = state.library.filter.mainFilter
+        return {
+            ...props,
+        }
+    },
+    dispatch => ({
+        checkSettingsExist
+    })
+)(Settings)
+
+export default Connected

@@ -1,6 +1,6 @@
+import { remote, ipcRenderer } from 'electron'
 import * as classNames from 'classnames'
 import * as React from 'react'
-import { remote, ipcRenderer } from 'electron';
 
 import Button from '../widget/Button'
 import ButtonGroup from '../widget/ButtonGroup'
@@ -9,7 +9,8 @@ import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import MdSaveAlt from '../widget/icon/MdSaveAlt'
 import Toolbar from '../widget/Toolbar'
-import { PhotoType } from '../../models/Photo'
+import { PhotoId, PhotoType, PhotoWork } from '../../models/Photo'
+import { PhotoData } from '../../state/reducers/library'
 import { rotate } from '../../util/EffectsUtil'
 import { bindMany } from '../../util/LangUtil'
 
@@ -18,12 +19,14 @@ const dialog = remote.dialog;
 
 interface Props {
     className?: any
-    currentDate: string | null
     showOnlyFlagged: boolean
     isShowingTrash: boolean
-    highlighted: number[]
-    photos: PhotoType[]
-    actions: any
+    photos: PhotoData
+    highlightedPhotoIds: PhotoId[]
+    openExport: () => void
+    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
+    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
+    toggleShowOnlyFlagged: () => void
 }
 
 export default class LibraryTopBar extends React.Component<Props, undefined> {
@@ -31,18 +34,11 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
     constructor(props) {
         super(props)
 
-        bindMany(this, 'showSidebar', 'toggleShowOnlyFlagged', 'deleteModal', 'rotateLeft', 'rotateRight', 'toggleFlagged')
+        bindMany(this, 'showSidebar', 'deleteModal', 'rotateLeft', 'rotateRight', 'toggleFlagged')
     }
 
     showSidebar() {
         window.dispatchEvent(new Event('core:toggleSidebar'))
-    }
-
-    toggleShowOnlyFlagged() {
-        this.props.actions.toggleShowOnlyFlagged(
-            this.props.currentDate,
-            !this.props.showOnlyFlagged
-        )
     }
 
     deleteModal() {
@@ -67,9 +63,9 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
     rotate(turns: number) {
         const props = this.props
-        for (const photoIndex of props.highlighted) {
-            const photo = props.photos[photoIndex]
-            props.actions.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
+        for (const photoId of props.highlightedPhotoIds) {
+            const photo = props.photos[photoId]
+            props.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
         }
     }
 
@@ -77,21 +73,24 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         const props = this.props
         const newFlagged = !this.getHighlightedAreFlagged()
 
-        for (const photoIndex of props.highlighted) {
-            const photo = props.photos[photoIndex]
+        let photosToChange = []
+        for (const photoId of props.highlightedPhotoIds) {
+            const photo = props.photos[photoId]
             if (!!photo.flag !== newFlagged) {
-                props.actions.toggleFlag(photo)
+                photosToChange.push(photo)
             }
         }
+
+        this.props.setPhotosFlagged(photosToChange, newFlagged)
     }
 
     getHighlightedAreFlagged() {
         const props = this.props
-        if (props.highlighted.length === 0) {
+        if (props.highlightedPhotoIds.length === 0) {
             return false
         } else {
-            for (const photoIndex of props.highlighted) {
-                const photo = props.photos[photoIndex]
+            for (const photoId of props.highlightedPhotoIds) {
+                const photo = props.photos[photoId]
                 if (!photo.flag) {
                     return false
                 }
@@ -102,7 +101,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
     render() {
         const props = this.props
-        const hasHighlight = props.highlighted.length > 0
+        const hasHighlight = props.highlightedPhotoIds.length > 0
         const highlightedAreFlagged = this.getHighlightedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
@@ -111,7 +110,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                 </Button>
                 <Button
                     className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
-                    onClick={this.toggleShowOnlyFlagged}
+                    onClick={this.props.toggleShowOnlyFlagged}
                     tip={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
                 >
                     <FaIcon name="flag" />
@@ -134,7 +133,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                     >
                         <FaIcon name="flag" />
                     </Button>
-                    <Button enabled={hasHighlight} onClick={props.actions.openExport} tip="Export">
+                    <Button enabled={hasHighlight} onClick={this.props.openExport} tip="Export">
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&

@@ -40,7 +40,7 @@ export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
 function readExifOfImage(imagePath) {
   return readFile(imagePath)
     .then(buffer => {
-      const parser = ExifParser.create(buffer)
+      const parser = ExifParser.create(buffer) as any
       return parser.parse()
     })
 }

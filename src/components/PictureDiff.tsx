@@ -1,9 +1,12 @@
 import * as classNames from 'classnames'
 import * as React from 'react'
 import * as Loader from 'react-loader'
+import { connect } from 'react-redux'
 
 import keymapManager from '../keymap-manager'
 import Photo, { PhotoType } from '../models/Photo'
+import { closeDiffAction } from '../state/actions'
+import { AppState } from '../state/reducers'
 
 
 let rotation = {}
@@ -11,10 +14,20 @@ let rotation = {}
 rotation[1] = ''
 rotation[8] = 'minus-ninety'
 
-interface Props {
+
+interface OwnProps {
     className?: any
+}
+
+interface StateProps {
     photo: PhotoType
-    actions: any
+}
+
+interface DispatchProps {
+    closeDiff: () => {}
+}
+
+interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
@@ -23,7 +36,7 @@ interface State {
     loadingCount: number
 }
 
-class PictureDiff extends React.Component<Props, State> {
+export class PictureDiff extends React.Component<Props, State> {
 
     constructor(props) {
         super(props)
@@ -44,8 +57,8 @@ class PictureDiff extends React.Component<Props, State> {
                 this.setState({ photo: photo.toJSON() })
             })
 
-        window.addEventListener('core:cancel', this.props.actions.toggleDiff)
-        window.addEventListener('diff:cancel', this.props.actions.toggleDiff)
+        window.addEventListener('core:cancel', this.props.closeDiff)
+        window.addEventListener('diff:cancel', this.props.closeDiff)
 
         keymapManager.bind(this.refs.diff)
     }
@@ -63,8 +76,8 @@ class PictureDiff extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        window.removeEventListener('core:cancel', this.props.actions.toggleDiff)
-        window.removeEventListener('diff:cancel', this.props.actions.toggleDiff)
+        window.removeEventListener('core:cancel', this.props.closeDiff)
+        window.removeEventListener('diff:cancel', this.props.closeDiff)
         keymapManager.unbind()
     }
 
@@ -103,4 +116,18 @@ class PictureDiff extends React.Component<Props, State> {
     }
 }
 
-export default PictureDiff
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state, props) => {
+        const mainFilter = state.library.filter.mainFilter
+        return {
+            ...props,
+            photo: state.library.photos.data[state.detail.currentPhoto.id]
+        }
+    },
+    {
+        closeDiff: closeDiffAction
+    }
+)(PictureDiff)
+
+export default Connected
