@@ -2,7 +2,7 @@ import { action, createAsyncAction } from 'typesafe-actions'
 
 import {
     SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
-    CLOSE_DETAIL, SET_HIGHLIGHTED_PHOTOS, FETCH_PHOTOS_REQUEST, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE,
+    CLOSE_DETAIL, SET_HIGHLIGHTED_PHOTOS, FETCH_TOTAL_PHOTO_COUNT, FETCH_PHOTOS_REQUEST, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE,
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_DATES, FETCH_TAGS, CREATE_TAGS,
     INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, TOGGLE_DIFF
 } from './actionTypes'
@@ -20,6 +20,7 @@ export const closeDetailAction = () => action(CLOSE_DETAIL)
 
 export const setHighlightedPhotosAction = (highlightedIds: PhotoId[]) => action(SET_HIGHLIGHTED_PHOTOS, { highlightedIds })
 
+export const fetchTotalPhotoCountAction = (totalPhotoCount: number) => action(FETCH_TOTAL_PHOTO_COUNT, { totalPhotoCount })
 export const fetchPhotosAction = createAsyncAction(FETCH_PHOTOS_REQUEST, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE)<{ newFilter: FilterState | null }, { photos: PhotoType[], photosCount: number }, Error>()
 export const changePhotoWorkAction = (photoId: PhotoId, photoWork: PhotoWork) => action(CHANGE_PHOTOWORK, { photoId, photoWork })
 export const changePhotosAction = (photos: PhotoType[]) => action(CHANGE_PHOTOS, { photos })

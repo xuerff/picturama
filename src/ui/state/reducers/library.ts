@@ -4,7 +4,7 @@ import { Device } from '../../../common/models/DataTypes'
 import { PhotoId, PhotoType } from '../../../common/models/Photo'
 import { Action } from '../ActionType'
 import {
-    SET_HIGHLIGHTED_PHOTOS, FETCH_PHOTOS_REQUEST, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE, CHANGE_PHOTOS, EMPTY_TRASH,
+    SET_HIGHLIGHTED_PHOTOS, FETCH_TOTAL_PHOTO_COUNT, FETCH_PHOTOS_REQUEST, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE, CHANGE_PHOTOS, EMPTY_TRASH,
     FETCH_DATES, FETCH_TAGS, CREATE_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE
 } from '../actionTypes'
 import { TagId, TagType } from '../../../common/models/Tag'
@@ -121,7 +121,10 @@ export type PhotoData = { [index: string]: PhotoType }
 type PhotosState = {
     readonly isFetching: boolean
     readonly fetchError: Error | null
+    /** The number of photos with the current filter applied */
     readonly count: number
+    /** The total number of photos (when no filter is applied) */
+    readonly totalCount: number
     readonly ids: PhotoId[]
     readonly highlightedIds: PhotoId[]
     readonly data: PhotoData
@@ -131,6 +134,7 @@ const initialPhotosState: PhotosState = {
     isFetching: false,
     fetchError: null,
     count: 0,
+    totalCount: 0,
     ids: [],
     highlightedIds: [],
     data: {}
@@ -138,6 +142,11 @@ const initialPhotosState: PhotosState = {
 
 const photos = (state: PhotosState = initialPhotosState, action: Action): PhotosState => {
     switch (action.type) {
+        case FETCH_TOTAL_PHOTO_COUNT:
+            return {
+                ...state,
+                totalCount: action.payload.totalPhotoCount
+            }
         case FETCH_PHOTOS_REQUEST:
             return {
                 ...state,  // We keep the old photos while loading
@@ -153,6 +162,7 @@ const photos = (state: PhotosState = initialPhotosState, action: Action): Photos
             }
 
             return {
+                ...state,
                 isFetching: false,
                 fetchError: null,
                 count: action.payload.photosCount,

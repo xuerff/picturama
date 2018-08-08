@@ -20,6 +20,7 @@ interface Props {
     className?: any
     showOnlyFlagged: boolean
     isShowingTrash: boolean
+    photosCount: number
     photos: PhotoData
     highlightedPhotoIds: PhotoId[]
     openExport: () => void
@@ -136,7 +137,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&
-                        <Button onClick={this.deleteModal}>
+                        <Button disabled={props.photosCount === 0} onClick={this.deleteModal}>
                             <FaIcon name="trash" />
                         </Button>
                     }

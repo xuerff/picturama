@@ -5,15 +5,20 @@ import { BookshelfCollection } from '../../common/models/DataTypes'
 import Photo, { PhotoWork, PhotoType } from '../../common/models/Photo'
 import Tag from '../../common/models/Tag'
 import Version from '../../common/models/Version'
-import { renderThumbnailForPhoto } from '../renderer/ThumbnailRenderer'
 import store from '../state/store'
-import { changePhotoWorkAction, changePhotosAction, fetchPhotosAction } from '../state/actions'
+import { fetchTotalPhotoCountAction, fetchPhotosAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
 import { FilterState } from '../state/reducers/library'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import { onThumnailChange } from './ImageProvider'
 
 
 assertRendererProcess()
+
+export function fetchTotalPhotoCount() {
+    Photo.forge()
+        .count()
+        .then(totalPhotoCount => store.dispatch(fetchTotalPhotoCountAction(totalPhotoCount)))
+}
 
 export function fetchPhotos() {
     internalFetchPhotos(null)

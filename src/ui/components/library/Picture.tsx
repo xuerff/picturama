@@ -7,6 +7,8 @@ import { Spinner } from '@blueprintjs/core'
 import { PhotoId, PhotoType } from '../../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
+
+import { isMac } from '../../UiConstants'
 import FaIcon from '../widget/icon/FaIcon'
 
 const { Menu, MenuItem } = remote
@@ -159,7 +161,6 @@ export default class Picture extends React.Component<Props, State> {
     handleClick(e: React.MouseEvent<HTMLImageElement>) {
         e.preventDefault()
 
-        const isMac = process.platform === 'darwin'
         if (isMac ? e.metaKey : e.ctrlKey) {
             this.props.togglePhotoHighlighted(this.props.photo.id, !this.props.isHighlighted)
         } else {

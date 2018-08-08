@@ -14,13 +14,16 @@ const defaultProps = {
     style: { width: '100%', height: '100%' },
     isActive: true,
 
+    isFetching: false,
     photos: { [testPhoto.id]: testPhoto },
     photoIds: [ testPhoto.id ],
     photosCount: 1042,
+    totalPhotosCount: 12345,
     highlightedPhotoIds: [],
     showOnlyFlagged: false,
     isShowingTrash: false,
 
+    fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
     fetchPhotos: action('fetchPhotos'),
     getThumbnailPath: (photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
@@ -36,6 +39,7 @@ const defaultProps = {
     setPhotosFlagged: action('setPhotosFlagged'),
     updatePhotoWork: action('updatePhotoWork'),
     toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
+    startScanning: action('startScanning'),
 }
 
 
@@ -74,10 +78,24 @@ addSection('Library')
             />
         )
     })
-    .add('empty', context => (
+    .add('Fetching photos', context => (
+        <Library
+            {...defaultProps}
+            isFetching={true}
+        />
+    ))
+    .add('Selection empty', context => (
         <Library
             {...defaultProps}
             photoIds={[]}
             photosCount={0}
+        />
+    ))
+    .add('No photos', context => (
+        <Library
+            {...defaultProps}
+            photoIds={[]}
+            photosCount={0}
+            totalPhotosCount={0}
         />
     ))

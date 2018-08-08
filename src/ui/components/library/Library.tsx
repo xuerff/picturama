@@ -2,21 +2,23 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { ipcRenderer } from 'electron'
+import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
 
-import ReadyToScan from './ReadyToScan'
-import LibraryTopBar from './LibraryTopBar'
-import LibraryBottomBar from './LibraryBottomBar'
-import Grid from './Grid'
+import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
+import CancelablePromise from '../../../common/util/CancelablePromise'
+import { bindMany } from '../../../common/util/LangUtil'
+
 import { setDetailPhotoById } from '../../data/DetailStore'
 import { getThumbnailPath } from '../../data/ImageProvider'
-import { fetchPhotos, setPhotosFilter, updatePhotoWork, setPhotosFlagged } from '../../data/PhotoStore'
-import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
+import { fetchTotalPhotoCount, fetchPhotos, setPhotosFilter, updatePhotoWork, setPhotosFlagged } from '../../data/PhotoStore'
 import { setHighlightedPhotosAction, openExportAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
 import { PhotoData } from '../../state/reducers/library'
 import store from '../../state/store'
-import CancelablePromise from '../../../common/util/CancelablePromise'
-import { bindMany } from '../../../common/util/LangUtil'
+import { keySymbols } from '../../UiConstants'
+import LibraryTopBar from './LibraryTopBar'
+import LibraryBottomBar from './LibraryBottomBar'
+import Grid from './Grid'
 
 
 interface OwnProps {
@@ -26,15 +28,18 @@ interface OwnProps {
 }
 
 interface StateProps {
+    isFetching: boolean
     photos: PhotoData
     photoIds: PhotoId[]
     photosCount: number
+    totalPhotosCount: number
     highlightedPhotoIds: PhotoId[]
     showOnlyFlagged: boolean
     isShowingTrash: boolean
 }
 
 interface DispatchProps {
+    fetchTotalPhotoCount: () => void
     fetchPhotos: () => void
     getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
     setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
@@ -43,6 +48,7 @@ interface DispatchProps {
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleShowOnlyFlagged: () => void
+    startScanning: () => void
 }
 
 interface Props extends OwnProps, StateProps, DispatchProps {
@@ -72,6 +78,7 @@ export class Library extends React.Component<Props> {
     }
 
     componentDidMount() {
+        this.props.fetchTotalPhotoCount()
         this.props.fetchPhotos()
     }
 
@@ -88,8 +95,31 @@ export class Library extends React.Component<Props> {
 
         let currentView;
 
-        if (props.photosCount === 0) {
-            currentView = <ReadyToScan />
+        if (props.isFetching) {
+            currentView = <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
+        } else if (props.totalPhotosCount === 0) {
+            const description =
+                <>
+                    Press <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code> or button below to start scanning.
+                </>
+            const action =
+                <div className="bp3-dark">
+                    <Button onClick={props.startScanning}>Start scanning</Button>
+                </div>
+            currentView =
+                <NonIdealState
+                    icon="zoom-out"
+                    title="No photos imported"
+                    description={description}
+                    action={action}
+                />
+        } else if (props.photosCount === 0) {
+            currentView =
+                <NonIdealState
+                    icon="zoom-out"
+                    title="No photos found"
+                    description="Your current selection doesn't match any photo. Please change your selection on the left."
+                />
         } else {
             currentView =
                 <Grid
@@ -109,6 +139,7 @@ export class Library extends React.Component<Props> {
             <div ref="library" className={classNames(props.className, 'Library')} style={props.style}>
                 <LibraryTopBar
                     className="Library-topBar"
+                    photosCount={props.photosCount}
                     photos={props.photos}
                     highlightedPhotoIds={props.highlightedPhotoIds}
                     showOnlyFlagged={props.showOnlyFlagged}
@@ -137,15 +168,18 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
         return {
             ...props,
+            isFetching: state.library.photos.isFetching,
             photos: state.library.photos.data,
             photoIds: state.library.photos.ids,
             photosCount: state.library.photos.count,
+            totalPhotosCount: state.library.photos.totalCount,
             highlightedPhotoIds: state.library.photos.highlightedIds,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
             isShowingTrash: state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash'
         }
     },
     dispatch => ({
+        fetchTotalPhotoCount,
         fetchPhotos,
         getThumbnailPath,
         setHighlightedPhotos: highlightedIds => dispatch(setHighlightedPhotosAction(highlightedIds)),
@@ -156,6 +190,9 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         toggleShowOnlyFlagged: () => {
             const oldFilter = store.getState().library.filter
             setPhotosFilter({ ...oldFilter, showOnlyFlagged: !oldFilter.showOnlyFlagged })
+        },
+        startScanning: () => {
+            ipcRenderer.send('start-scanning')
         }
     })
 )(Library)

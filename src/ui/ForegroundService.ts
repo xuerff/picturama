@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron'
 
 import { profileThumbnailRenderer } from '../common/LogConstants'
 import { fetchDates } from './data/PhotoDateStore'
-import { updatePhotoVersion, fetchPhotos } from './data/PhotoStore'
+import { fetchTotalPhotoCount, fetchPhotos, updatePhotoVersion } from './data/PhotoStore'
 import { fetchTags } from './data/PhotoTagStore'
 import { Device } from '../common/models/DataTypes'
 import { PhotoId } from '../common/models/Photo'
@@ -34,6 +34,7 @@ export function init() {
     ipcRenderer.on('progress', (event, progress: ImportProgress) => store.dispatch(setImportProgressAction(progress)))
 
     ipcRenderer.on('finish-import', () => {
+        fetchTotalPhotoCount()
         fetchPhotos()
         fetchDates()
         fetchTags()
