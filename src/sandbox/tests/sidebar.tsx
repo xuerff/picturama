@@ -69,7 +69,22 @@ const defaultProps = {
         ]
     },
     currentDate: '2018-07-06',
-    tags: [],
+    tags: [
+        {
+            id: 2,
+            title: 'Bla',
+            slug: 'bla',
+            created_at: null,
+            updated_at: null
+        },
+        {
+            id: 1,
+            title: 'Test',
+            slug: 'test',
+            created_at: null,
+            updated_at: null
+        }
+    ],
     currentTagId: null,
     devices: [],
 

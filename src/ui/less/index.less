@@ -132,16 +132,16 @@ button {
   float: right;
 }
 
-div.outer-modal {
+div.ansel-outer-modal {
   position: fixed;
   top: 0;
   left: @sidebarWidth;
   width: ~"calc(100% - @{sidebarWidth})";
   height: 100%;
   background-color: rgba(0,0,0,0.6);
-  z-index: 3;
+  z-index: 20;  // Show above .Ansel-detail
 
-  div.modal {
+  div.ansel-modal {
     width: 400px;
     height: @sidebarWidth;
     background-color: @blue-grey-100;

@@ -20,11 +20,11 @@ export function fetchTags() {
 }
 
 
-export function createTagsAndAssociateToPhoto(tags: string[], photoId: PhotoId) {
+export function createTagsAndAssociateToPhoto(tagNames: string[], photoId: PhotoId) {
     new Photo({ id: photoId })
         .fetch()
         // TODO: Remove all the previous tag before adding the new one
-        .then(photo => Promise.map(tags, tagName => new Tag({ title: tagName })
+        .then(photo => Promise.map(tagNames, tagName => new Tag({ title: tagName })
             .fetch()
             .then(tag => {
                 if (tag) {
@@ -41,5 +41,9 @@ export function createTagsAndAssociateToPhoto(tags: string[], photoId: PhotoId) 
         ))
         .then(tags => {
             store.dispatch(createTagsAction(tags))
+        })
+        .catch(error => {
+            // TODO: Show error to the user
+            console.error('Creating tags failed', error)
         })
 }

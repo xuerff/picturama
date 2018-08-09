@@ -2,10 +2,10 @@ import * as classNames from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import Export from '../export'
+import Export from '../Export'
 import PictureDetail from '../detail/PictureDetail'
 import PictureDiff from '../PictureDiff'
-import AddTags from '../AddTags'
+import TagEditor from '../TagEditor'
 import Settings from '../Settings'
 import Progress from '../Progress'
 import Library from '../library/Library'
@@ -80,7 +80,7 @@ class Ansel extends React.Component<Props, State> {
         if (props.showExport) {
             modalView = <Export />
         } else if (props.modal === 'tags') {
-            modalView = <AddTags/>
+            modalView = <TagEditor/>
         }
 
         let mainView

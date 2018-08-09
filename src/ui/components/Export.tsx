@@ -153,8 +153,8 @@ export class Export extends React.Component<Props, State> {
             .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>)
 
         return (
-            <div className="outer-modal" ref="main" style={this.props.style}>
-                <div className="modal shadow--2dp">
+            <div className="ansel-outer-modal" ref="main" style={this.props.style}>
+                <div className="ansel-modal shadow--2dp">
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <div>
                             <label htmlFor="format">Format:</label>

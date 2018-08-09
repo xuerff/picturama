@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
-import TagsInput from 'react-tagsinput'
+import * as TagsInput from 'react-tagsinput'
 
 import { createTagsAndAssociateToPhoto } from '../data/PhotoTagStore'
 import { PhotoId, PhotoType } from '../../common/models/Photo'
@@ -13,6 +13,7 @@ import { bindMany } from '../../common/util/LangUtil'
 const btnClass = 'button button--raised button--colored'
 
 interface OwnProps {
+    style?: any
 }
 
 interface StateProps {
@@ -31,7 +32,7 @@ interface State {
     tags: string[]
 }
 
-export class AddTags extends React.Component<Props, State> {
+export class TagEditor extends React.Component<Props, State> {
 
     constructor(props) {
         super(props)
@@ -71,8 +72,8 @@ export class AddTags extends React.Component<Props, State> {
 
     render() {
         return (
-            <div className="outer-modal" id="add-tags">
-                <div className="modal shadow--2dp">
+            <div className="ansel-outer-modal" id="add-tags" style={this.props.style}>
+                <div className="ansel-modal shadow--2dp">
                     <form onSubmit={this.handleSubmit}>
                         <h3>Add a tag</h3>
 
@@ -105,6 +106,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         createTagsAndAssociateToPhoto,
         closeTagsEditor: () => dispatch(closeTagsEditorAction())
     })
-)(AddTags)
+)(TagEditor)
 
 export default Connected

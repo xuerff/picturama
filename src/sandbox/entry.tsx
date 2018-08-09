@@ -8,7 +8,8 @@ import './tests/detail'
 import './tests/settings'
 import './tests/import'
 import './tests/export'
-import './tests/PhotoPaneTests'
+import './tests/PhotoPaneTest'
+import './tests/TagEditorTest'
 
 export function start(elem) {
   render(
