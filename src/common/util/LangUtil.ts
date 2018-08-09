@@ -9,6 +9,10 @@ export function bindMany(object: object, ...keys: string[]) {
     }
 }
 
+export function cloneDeep<T>(object: T): T {
+    return JSON.parse(JSON.stringify(object)) as T
+}
+
 /**
  * Clones an array while removing one item.
  * 

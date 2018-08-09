@@ -1,4 +1,5 @@
 import * as Promise from 'bluebird'
+import * as isDeepEqual from 'fast-deep-equal'
 
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from '../BackgroundClient'
 import { BookshelfCollection } from '../../common/models/DataTypes'
@@ -10,6 +11,7 @@ import { fetchTotalPhotoCountAction, fetchPhotosAction, changePhotoWorkAction, c
 import { FilterState } from '../state/reducers/library'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import { onThumnailChange } from './ImageProvider'
+import { cloneDeep } from '../../common/util/LangUtil'
 
 
 assertRendererProcess()
@@ -121,10 +123,19 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
         fetchPhotoWork(photoPath)
             .then(photoWork => {
+                const photoWorkCopyBefore = cloneDeep(photoWork)
                 for (const up of pendingUpdate.updates) {
                     up(photoWork)
                 }
                 delete pendingUpdates[photoPath]
+
+                // Ignore changes on flagged
+                if (photoWork.flagged) {
+                    photoWorkCopyBefore.flagged = true
+                } else {
+                    delete photoWorkCopyBefore.flagged
+                }
+                const thumbnailNeedsUpdate = !isDeepEqual(photoWorkCopyBefore, photoWork)
 
                 // We do all in parallel:
                 //   - Show the new effects in UI
@@ -135,12 +146,13 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
                 return Promise.all([
                     storePhotoWork(photoPath, photoWork),
-                    onThumnailChange(photo.id)
+                    thumbnailNeedsUpdate ? onThumnailChange(photo.id) : null
                 ])
             })
             .catch(error => {
                 delete pendingUpdates[photoPath]
-                console.log('Updating photo work failed: ' + photo.master, error)  // TODO: Show error message in UI
+                // TODO: Show error message in UI
+                console.error('Updating photo work failed: ' + photo.master, error)
             })
     }
 }

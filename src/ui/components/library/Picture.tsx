@@ -67,14 +67,15 @@ export default class Picture extends React.Component<Props, State> {
         }))
 
         window.addEventListener('edit:thumnailChange', this.onThumnailChange)
-        this.updateThumnail()
+        this.updateThumbnail()
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
         const props = this.props
 
-        if (props.photo != prevProps.photo) {
-            this.updateThumnail()
+        if (props.photo.id != prevProps.photo.id) {
+            this.setState({ thumbnailPath: null })
+            this.updateThumbnail()
         }
 
         if (props.isHighlighted) {
@@ -133,13 +134,11 @@ export default class Picture extends React.Component<Props, State> {
     onThumnailChange(evt: CustomEvent) {
         const photoId = evt.detail.photoId
         if (photoId === this.props.photo.id) {
-            this.updateThumnail()
+            this.updateThumbnail()
         }
     }
 
-    updateThumnail() {
-        this.setState({ thumbnailPath: null })
-
+    updateThumbnail() {
         if (this.runningThumbnailPathPromise) {
             this.runningThumbnailPathPromise.cancel()
         }
