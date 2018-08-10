@@ -52,10 +52,10 @@ UI sandbox
 
 
 
-Developing main thread code
----------------------------
+Developing main process code
+----------------------------
 
-If you change code that runs on the main thread, you have to restart Ansel each time in order to see your changes.
+If you change code that runs in the main process, you have to restart Ansel each time in order to see your changes.
 Here's how you can use a watch build in order to reduce turnaround time:
 
 1. Run watch build (in extra console):
@@ -69,6 +69,19 @@ Here's how you can use a watch build in order to reduce turnaround time:
     ```bash
     npm run start-no-build
     ```
+
+
+
+Debug main process
+------------------
+
+Main process debugging is already pre-configured in `.vscode/launch.json`.
+
+So debugging is easy:
+
+1. Open project in [VS Code](https://code.visualstudio.com/)
+
+2. Start debugging in the Debug View
 
 
 

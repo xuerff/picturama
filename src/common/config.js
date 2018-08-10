@@ -4,11 +4,12 @@ import * as os from 'os'
 let dotAnsel = `${process.env.HOME}/.ansel`;
 let migrationsFolder = `${process.resourcesPath}/app/migrations`;
 let anselFolder = `${process.resourcesPath}/app`;
+const cwd = process.cwd()
 
 if (process.env.ANSEL_DEV_MODE) {
-  dotAnsel = `${process.env.INIT_CWD}/dot-ansel`;
-  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
-  anselFolder = `${process.env.INIT_CWD}`;
+  dotAnsel = `${cwd}/dot-ansel`
+  migrationsFolder = `${cwd}/migrations`
+  anselFolder = `${cwd}`
 }
 
 if (process.env.ANSEL_TEST_MODE) {
@@ -18,7 +19,7 @@ if (process.env.ANSEL_TEST_MODE) {
     fs.mkdirSync(testsPath);
 
   dotAnsel = `${testsPath}/dot-ansel`;
-  migrationsFolder = `${process.env.INIT_CWD}/migrations`;
+  migrationsFolder = `${cwd}/migrations`
 }
 
 const menusFolder = `${anselFolder}/menus`;
