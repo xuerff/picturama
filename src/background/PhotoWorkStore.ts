@@ -247,7 +247,7 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
 
 
 const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
-const ignoredRulesRegExp = /^backuphash=/
+const ignoredRulesRegExp = /^([ \t]*$|backuphash=)/
 
 function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string): PhotoWork {
     const photoWork: PhotoWork = {}
