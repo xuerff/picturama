@@ -15,7 +15,7 @@ interface State {
 
 export default class DateMonth extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         this.toggleDropdown = this.toggleDropdown.bind(this)

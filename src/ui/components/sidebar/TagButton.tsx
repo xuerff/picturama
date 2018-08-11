@@ -11,7 +11,7 @@ interface Props {
 
 export default class TagButton extends React.Component<Props> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         this.handleClick = this.handleClick.bind(this)

@@ -39,7 +39,7 @@ interface State {
 
 export class PictureDiff extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         this.onImgLoad = this.onImgLoad.bind(this)

@@ -47,7 +47,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     private deferredHideCanvasTimeout: NodeJS.Timer | null
 
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
     }
 

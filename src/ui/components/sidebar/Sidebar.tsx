@@ -51,7 +51,7 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 
 export class Sidebar extends React.Component<Props> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
         bindMany(this, 'onDateSelected', 'onTagSelected', 'showFlagged', 'showProcessed', 'showTrash', 'clearFilter')
     }

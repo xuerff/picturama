@@ -78,7 +78,7 @@ interface State {
 
 export default class UiTester extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         let currentSection = null,

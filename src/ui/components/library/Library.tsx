@@ -57,7 +57,7 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 
 export class Library extends React.Component<Props> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         bindMany(this, 'openExport', 'clearHighlight')

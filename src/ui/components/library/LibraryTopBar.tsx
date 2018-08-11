@@ -31,7 +31,7 @@ interface Props {
 
 export default class LibraryTopBar extends React.Component<Props, undefined> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         bindMany(this, 'showSidebar', 'deleteModal', 'rotateLeft', 'rotateRight', 'toggleFlagged')

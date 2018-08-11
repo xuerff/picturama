@@ -24,7 +24,7 @@ interface Props {
 
 export default class Grid extends React.Component<Props, undefined> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         bindMany(this, 'setHighlightedFlagged', 'pressedEnter', 'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown', 'togglePhotoHighlighted', 'setHighlightedPhoto')

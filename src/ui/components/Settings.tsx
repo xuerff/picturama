@@ -33,7 +33,7 @@ interface State {
 
 export class Settings extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         this.state = { directories: { photos: '', versions: '' } }

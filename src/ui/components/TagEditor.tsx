@@ -34,7 +34,7 @@ interface State {
 
 export class TagEditor extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         bindMany(this, 'handleChange', 'handleSubmit')

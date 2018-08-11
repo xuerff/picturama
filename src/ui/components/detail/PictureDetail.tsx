@@ -78,7 +78,7 @@ export class PictureDetail extends React.Component<Props, State> {
     menu: MenuType
 
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = { bound: false, loading: true }

@@ -42,7 +42,7 @@ interface State {
 
 class Ansel extends React.Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
         bindMany(this, 'toggleSidebar')
