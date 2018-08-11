@@ -9,21 +9,23 @@
     text-align: center;
     transition: background-color 0.2s ease-in;
 
-    span.v-align {
-        display: inline-block;
-        height: 100%;
-        vertical-align: middle;
-    }
-
-    img {
-        vertical-align: middle;
-        max-width: @thumbnailSize;
-        max-height: @thumbnailSize;
-    }
-
     &.isHighlighted {
         background: @deep-orange-500;
     }
+}
+
+.Picture-thumbnail,
+.Picture-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.Picture-thumbnail {
+    max-width: @thumbnailSize;
+    max-height: @thumbnailSize;
 }
 
 .Picture-flag {

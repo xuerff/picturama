@@ -14,7 +14,8 @@ interface Props {
     photos: PhotoData
     photoIds: PhotoId[]
     highlightedPhotoIds: PhotoId[]
-    getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: PhotoType) => string
+    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
     setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
     setDetailPhotoById: (photoId: PhotoId) => void
     openExport: () => void
@@ -133,7 +134,8 @@ export default class Grid extends React.Component<Props, undefined> {
                         key={photoId}
                         photo={props.photos[photoId]}
                         isHighlighted={props.highlightedPhotoIds.indexOf(photoId) !== -1}
-                        getThumbnailPath={props.getThumbnailPath}
+                        getThumbnailSrc={props.getThumbnailSrc}
+                        createThumbnail={props.createThumbnail}
                         setDetailPhotoById={props.setDetailPhotoById}
                         openExport={props.openExport}
                         setHighlightedFlagged={this.setHighlightedFlagged}

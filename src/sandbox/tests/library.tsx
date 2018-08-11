@@ -25,12 +25,13 @@ const defaultProps = {
 
     fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
     fetchPhotos: action('fetchPhotos'),
-    getThumbnailPath: (photo: PhotoType) => {
+    getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
+    createThumbnail: (photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
-        if (thumbnailPath) {
-            return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
-        } else {
+        if (thumbnailPath === 'dummy') {
             return new CancelablePromise<string>(() => {})
+        } else {
+            return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
         }
     },
     setHighlightedPhotos: action('setHighlightedPhotos'),
@@ -63,7 +64,7 @@ addSection('Library')
                 ...testPhoto,
                 id: `dummy-${i}`,
                 title: `dummy-${i}.JPG`,
-                master: null,
+                master: 'dummy',
                 thumb: null
             }
             photos[photo.id] = photo

@@ -17,7 +17,8 @@ const { Menu, MenuItem } = remote
 interface Props {
     photo: PhotoType
     isHighlighted: boolean
-    getThumbnailPath: (photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: PhotoType) => string
+    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
     setDetailPhotoById: (photoId: PhotoId) => void
     openExport: () => void
     setHighlightedFlagged: () => void
@@ -27,20 +28,26 @@ interface Props {
 
 interface State {
     showContextMenu: boolean
-    thumbnailPath: string | null
+    thumbnailSrc: string | null
+    isThumbnailLoaded: boolean
 }
 
 export default class Picture extends React.Component<Props, State> {
 
     private menu: Electron.Menu | null = null
-    private runningThumbnailPathPromise: CancelablePromise<void> | null = null
+    private createThumbnailPromise: CancelablePromise<void> | null = null
+    private delayedUpdateTimout: number | null = null
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props)
 
-        this.state = { showContextMenu: false, thumbnailPath: null }
+        this.state = {
+            showContextMenu: false,
+            thumbnailSrc: this.props.getThumbnailSrc(props.photo),
+            isThumbnailLoaded: false
+        }
 
-        bindMany(this, 'contextMenu', 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange')
+        bindMany(this, 'contextMenu', 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
     }
 
     contextMenu(e: React.MouseEvent<HTMLImageElement>) {
@@ -67,18 +74,21 @@ export default class Picture extends React.Component<Props, State> {
         }))
 
         window.addEventListener('edit:thumnailChange', this.onThumnailChange)
-        this.updateThumbnail()
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
         const props = this.props
 
         if (props.photo.id != prevProps.photo.id) {
-            this.setState({ thumbnailPath: null })
-            this.updateThumbnail()
+            window.clearTimeout(this.delayedUpdateTimout)
+            if (this.createThumbnailPromise) {
+                this.createThumbnailPromise.cancel()
+                this.createThumbnailPromise = null
+            }
+            this.setState({ thumbnailSrc: this.props.getThumbnailSrc(this.props.photo), isThumbnailLoaded: false })
         }
 
-        if (props.isHighlighted) {
+        if (props.isHighlighted && props.isHighlighted !== prevProps.isHighlighted) {
             const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
             let rect = pictureElem.getBoundingClientRect()
             let containerElem = pictureElem.parentNode.parentNode.parentNode as Element
@@ -101,9 +111,10 @@ export default class Picture extends React.Component<Props, State> {
 
     componentWillUnmount() {
         window.removeEventListener('edit:thumnailChange', this.onThumnailChange)
-        if (this.runningThumbnailPathPromise) {
-            this.runningThumbnailPathPromise.cancel()
-            this.runningThumbnailPathPromise = null
+        if (this.createThumbnailPromise) {
+            window.clearTimeout(this.delayedUpdateTimout)
+            this.createThumbnailPromise.cancel()
+            this.createThumbnailPromise = null
         }
     }
 
@@ -134,23 +145,18 @@ export default class Picture extends React.Component<Props, State> {
     onThumnailChange(evt: CustomEvent) {
         const photoId = evt.detail.photoId
         if (photoId === this.props.photo.id) {
-            this.updateThumbnail()
+            this.createThumbnail(true)
         }
     }
 
-    updateThumbnail() {
-        if (this.runningThumbnailPathPromise) {
-            this.runningThumbnailPathPromise.cancel()
-        }
+    onThumbnailLoad() {
+        this.setState({ isThumbnailLoaded: true })
+    }
 
-        this.runningThumbnailPathPromise = this.props.getThumbnailPath(this.props.photo)
-            .then(thumbnailPath => this.setState({ thumbnailPath }))
-            .catch(error => {
-                if (!isCancelError(error)) {
-                    // TODO: Show error in UI
-                    console.error('Getting thumbnail failed', error)
-                }
-            })
+    onThumbnailLoadError() {
+        if (!this.createThumbnailPromise) {
+            this.createThumbnail(false)
+        }
     }
 
     handleDblClick() {
@@ -167,10 +173,44 @@ export default class Picture extends React.Component<Props, State> {
         }
     }
 
+    createThumbnail(delayUpdate: boolean) {
+        window.clearTimeout(this.delayedUpdateTimout)
+        if (delayUpdate) {
+            this.delayedUpdateTimout = window.setTimeout(() => this.setState({ thumbnailSrc: null, isThumbnailLoaded: false }), 1000)
+        } else {
+            this.setState({ thumbnailSrc: null, isThumbnailLoaded: false })
+        }
+
+        this.createThumbnailPromise = this.props.createThumbnail(this.props.photo)
+            .then(thumbnailSrc => {
+                window.clearTimeout(this.delayedUpdateTimout)
+                if (thumbnailSrc === this.state.thumbnailSrc) {
+                    // Force loading the same image again
+                    this.setState({ thumbnailSrc: null, isThumbnailLoaded: false })
+                    window.setTimeout(() => this.setState({ thumbnailSrc }))
+                } else {
+                    this.setState({ thumbnailSrc, isThumbnailLoaded: false })
+                }
+            })
+            .catch(error => {
+                if (!isCancelError(error)) {
+                    // TODO: Show error in UI
+                    console.error('Getting thumbnail failed', error)
+                }
+            })
+    }
+
     render() {
+        // Wanted behaviour:
+        // - If the photo changes, the thumbnail should load fast, so no spinner should be shown.
+        // - If there is no thumbnail yet, we trigger creating the thumbnail and show a spinner.
+        // - If the flagged state changes, the thumbnail should not flicker.
+        // - If the photo is changed (e.g. rotated), the old thumbnail should stay until the new one is created.
+        //   Only if creating the thumbnail takes a long time, a spinner should be shown.
+
         const props = this.props
-        const thumbnailPath = this.state.thumbnailPath
-        const showFlag = !! (thumbnailPath && props.photo.flag)
+        const state = this.state
+        const showFlag = !!(props.photo.flag && state.isThumbnailLoaded)
 
         if (showFlag) {
             setTimeout(this.onAfterRender)
@@ -180,20 +220,22 @@ export default class Picture extends React.Component<Props, State> {
                 ref="picture"
                 className={classNames('Picture', { isHighlighted: this.props.isHighlighted })}
                 onDoubleClick={this.handleDblClick}>
-                <span className="v-align"></span>
-                {!thumbnailPath &&
-                    <Spinner />
-                }
-                {thumbnailPath &&
+                {state.thumbnailSrc &&
                     <img
                         ref="image"
+                        className="Picture-thumbnail shadow--2dp"
+                        src={state.thumbnailSrc}
+                        onLoad={this.onThumbnailLoad}
+                        onError={this.onThumbnailLoadError}
                         onClick={this.handleClick}
                         onContextMenu={this.contextMenu}
-                        src={thumbnailPath}
-                        className="shadow--2dp" />
+                    />
                 }
                 {showFlag &&
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
+                }
+                {state.thumbnailSrc === null &&
+                    <Spinner className="Picture-spinner" />
                 }
             </a>
         )
