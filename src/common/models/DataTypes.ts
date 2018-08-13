@@ -1,5 +1,5 @@
 import { QueryInterface } from 'knex'
-import { counters } from 'sharp';
+import * as Promise from 'bluebird'
 
 
 // Bookshelf API see: http://bookshelfjs.org/
@@ -8,6 +8,8 @@ export interface BookshelfClass<Fields, ExtraApi = {}> {
     new (where?: Partial<Fields>): Fields & BookshelfModel<Fields> & ExtraApi
     forge(attributes?: Partial<Fields>, options?: any): BookshelfModel<Fields>
     where(whereClause: object): BookshelfModel<Fields>
+    query(...args: any[]): BookshelfModel<Fields>
+    fetchAll(options?: any): Promise<BookshelfCollection<Fields>>
 }
 
 export type BookshelfSaveOptions = {
@@ -32,6 +34,7 @@ export interface BookshelfModel<Fields> {
     save(): Promise<this>
     save(fieldName: string, newValue: any, options?: BookshelfSaveOptions): Promise<this>
     save(attrs: Partial<Fields>, options?: BookshelfSaveOptions): Promise<this>
+    destroy(): Promise<void>
     toJSON(): Fields
 }
 
