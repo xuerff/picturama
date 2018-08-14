@@ -42,6 +42,11 @@ export function generatePhotoId() {
 }
 
 
+export function getThumbnailPath(photoId: PhotoId): string {
+    return `${config.thumbs250Path}/${photoId}.${config.workExt}`
+}
+
+
 export default anselBookshelf.Model.extend({
     tableName: 'photos',
 

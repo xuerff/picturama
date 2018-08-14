@@ -1,7 +1,6 @@
 import fs from 'fs'
 
-import config from '../../common/config'
-import { PhotoId, PhotoType } from '../../common/models/Photo'
+import { PhotoId, PhotoType, getThumbnailPath } from '../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import { profileThumbnailRenderer } from '../../common/LogConstants'
@@ -41,10 +40,6 @@ export async function onThumnailChange(photoId: PhotoId): Promise<void> {
     window.dispatchEvent(new CustomEvent('edit:thumnailChange', { detail: { photoId } }))
 }
 
-
-function getThumbnailPath(photoId: PhotoId): string {
-    return `${config.thumbs250Path}/${photoId}.${config.workExt}`
-}
 
 export function getThumbnailSrc(photo: PhotoType): string {
     const thumbnailPath = getThumbnailPath(photo.id)

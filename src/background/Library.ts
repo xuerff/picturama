@@ -11,7 +11,7 @@ import { readMetadataOfImage } from './MetaData'
 import walker from './lib/walker'
 
 import Tag from '../common/models/Tag'
-import Photo, { PhotoType } from '../common/models/Photo'
+import Photo, { PhotoType, getThumbnailPath } from '../common/models/Photo'
 import Version from '../common/models/Version'
 
 
@@ -85,10 +85,10 @@ class Library {
             .where({ trashed: 1 })
             .fetchAll({ withRelated: [ 'versions', 'tags' ] })
             .then(photos => photos.toJSON())
-            .map(photo => Promise
-                .each(
-                    [ 'master', 'thumb', 'thumb_250' ],
-                    key => shell.moveItemToTrash(photo[key])
+            .map(photo =>
+                Promise.each(
+                    [ photo.master, photo.thumb, getThumbnailPath(photo.id) ],
+                    imgPath => shell.moveItemToTrash(imgPath)
                 )
                 .then(() => new Photo({ id: photo.id })
                     .destroy()
