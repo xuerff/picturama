@@ -1,5 +1,5 @@
 import keymapManager from '../keymap-manager'
-import * as React from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 
 import Ansel from './main/Ansel'

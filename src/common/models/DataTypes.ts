@@ -1,5 +1,5 @@
 import { QueryInterface } from 'knex'
-import * as Promise from 'bluebird'
+import Promise from 'bluebird'
 
 
 // Bookshelf API see: http://bookshelfjs.org/

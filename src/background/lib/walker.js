@@ -1,6 +1,6 @@
-import * as fs from 'fs'
-import * as Path from 'path';
-import * as Promise from 'bluebird'
+import fs from 'fs'
+import Path from 'path'
+import Promise from 'bluebird'
 
 const fsReadDir = Promise.promisify(fs.readdir);
 const fsStat = Promise.promisify(fs.stat);

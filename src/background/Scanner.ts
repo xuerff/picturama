@@ -1,9 +1,9 @@
 import { BrowserWindow } from 'electron'
-import * as sharp from 'sharp'
-import * as libraw from 'libraw'
-import * as fs from 'fs'
-import * as moment from 'moment'
-import * as Promise from 'bluebird'
+import sharp from 'sharp'
+import libraw from 'libraw'
+import fs from 'fs'
+import moment from 'moment'
+import Promise from 'bluebird'
 
 import config from '../common/config';
 import { readMetadataOfImage } from './MetaData'

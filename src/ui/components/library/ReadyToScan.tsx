@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import * as React from 'react'
+import React from 'react'
 
 
 export default class ReadyToScan extends React.Component {

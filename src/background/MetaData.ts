@@ -1,7 +1,7 @@
-import * as fs from 'fs'
+import fs from 'fs'
 
-import * as Promise from 'bluebird'
-import * as ExifParser from 'exif-parser'
+import Promise from 'bluebird'
+import ExifParser from 'exif-parser'
 import { ExifOrientation } from '../common/models/DataTypes'
 
 const readFile = Promise.promisify(fs.readFile)

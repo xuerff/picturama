@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as os from 'os'
+import fs from 'fs'
+import os from 'os'
 
 let dotAnsel = `${process.env.HOME}/.ansel`
 let migrationsFolder = `${process.resourcesPath}/app/migrations`

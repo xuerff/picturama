@@ -1,8 +1,8 @@
 import anselBookshelf from './ansel-bookshelf'
-import * as fs from 'fs.extra/fs.extra'
-import * as Promise from 'bluebird'
-import * as sharp from 'sharp'
-import * as libraw from 'libraw'
+import fs from 'fs.extra/fs.extra'
+import Promise from 'bluebird'
+import sharp from 'sharp'
+import libraw from 'libraw'
 
 import config from '../config'
 

@@ -1,6 +1,6 @@
 import { app, screen, ipcMain, BrowserWindow } from 'electron'
 
-import * as fs from 'fs'
+import fs from 'fs'
 
 import MainMenu from './MainMenu'
 // import Usb from './usb'

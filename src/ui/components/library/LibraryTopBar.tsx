@@ -1,6 +1,6 @@
 import { remote, ipcRenderer } from 'electron'
-import * as classNames from 'classnames'
-import * as React from 'react'
+import classNames from 'classnames'
+import React from 'react'
 import { Button, ButtonGroup } from '@blueprintjs/core'
 
 import FaIcon from '../widget/icon/FaIcon'

@@ -1,5 +1,5 @@
-import * as Promise from 'bluebird'
-import * as isDeepEqual from 'fast-deep-equal'
+import Promise from 'bluebird'
+import isDeepEqual from 'fast-deep-equal'
 
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from '../BackgroundClient'
 import { BookshelfCollection } from '../../common/models/DataTypes'

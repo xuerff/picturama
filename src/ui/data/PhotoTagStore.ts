@@ -1,4 +1,4 @@
-import * as Promise from 'bluebird'
+import Promise from 'bluebird'
 
 import Photo, { PhotoId } from '../../common/models/Photo'
 import Tag from '../../common/models/Tag'

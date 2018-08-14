@@ -1,6 +1,6 @@
 import { ipcRenderer, remote, Menu as MenuType } from 'electron'
-import * as classNames from 'classnames'
-import * as React from 'react'
+import classNames from 'classnames'
+import React from 'react'
 import { connect } from 'react-redux'
 import { findDOMNode } from 'react-dom'
 import { Button, ButtonGroup, Spinner } from '@blueprintjs/core'

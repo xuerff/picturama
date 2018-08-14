@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 
 import UiTester from './core/UiTester'
@@ -10,6 +10,8 @@ import './tests/import'
 import './tests/export'
 import './tests/PhotoPaneTest'
 import './tests/TagEditorTest'
+
+import "./entry.less"
 
 export function start(elem) {
   render(

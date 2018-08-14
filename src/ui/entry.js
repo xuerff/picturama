@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 
 import App from './components/App'
@@ -6,6 +6,9 @@ import pkgs from '../../package.json'
 import { init as initBackgroundClient } from './BackgroundClient'
 import { init as initForegroundService } from './ForegroundService'
 import { checkSettingsExist } from './data/SettingsStore'
+
+import "./entry.css"
+import "./less/index.less"
 
 
 if (process.env.ANSEL_DEV_MODE)

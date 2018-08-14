@@ -1,6 +1,6 @@
 import { remote } from 'electron'
-import * as classNames from 'classnames'
-import * as React from 'react'
+import classNames from 'classnames'
+import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { Spinner } from '@blueprintjs/core'
 

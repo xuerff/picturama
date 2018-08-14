@@ -1,7 +1,7 @@
-import * as React from 'react'
+import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
-import * as TagsInput from 'react-tagsinput'
+import TagsInput from 'react-tagsinput'
 
 import { createTagsAndAssociateToPhoto } from '../data/PhotoTagStore'
 import { PhotoId, PhotoType } from '../../common/models/Photo'

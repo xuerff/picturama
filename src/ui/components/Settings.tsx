@@ -1,7 +1,7 @@
-import * as classNames from 'classnames'
+import classNames from 'classnames'
 import { remote, ipcRenderer } from 'electron'
-import * as fs from 'fs'
-import * as React from 'react'
+import fs from 'fs'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import config from '../../common/config'

@@ -1,5 +1,5 @@
-import * as React from 'react'
-import * as classNames from 'classnames'
+import React from 'react'
+import classNames from 'classnames'
 
 
 // UI-Tester. Inspired by [react-storyboard](https://github.com/storybooks/react-storybook) - but not so bloated

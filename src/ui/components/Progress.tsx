@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 
 import { ImportProgress } from '../state/reducers/import'
 

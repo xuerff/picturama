@@ -1,6 +1,6 @@
 import { dirname, basename } from 'path'
-import * as fs from 'fs'
-import * as readline from 'readline'
+import fs from 'fs'
+import readline from 'readline'
 import { promisify } from 'bluebird'
 
 import { PhotoWork } from '../common/models/Photo'

@@ -1,5 +1,5 @@
 import anselBookshelf from './ansel-bookshelf';
-import * as shortid from 'shortid'
+import shortid from 'shortid'
 
 import config from '../config';
 

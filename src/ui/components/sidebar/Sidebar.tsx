@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as React from 'react'
+import fs from 'fs'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import Tags from './Tags'
