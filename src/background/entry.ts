@@ -23,6 +23,7 @@ const initLibrary = (mainWindow: BrowserWindow) => {
         DB({
             path: config.knex.connection.filename,
             migrate: {
+                force: false,
                 migrationsPath: config.knex.migrations.directory
             }
         })

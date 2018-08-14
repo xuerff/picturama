@@ -153,7 +153,6 @@ export default class Scanner {
                             aperture: metaData.aperture,
                             focal_length: metaData.focalLength,
                             master: originalImgPath,
-                            thumb_250: null,  // Never used. Thumbnails are created lazy by `src/ui/data/ImageProvider.ts`
                             thumb: null       // Will be set further down for raw images
                         }
 

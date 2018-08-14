@@ -6,7 +6,6 @@ export const testPhoto: PhotoType = {
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
     thumb: null,
-    thumb_250: null,
     extension: 'JPG',
     flag: 0,
     created_at: 1474222345000,
@@ -17,8 +16,5 @@ export const testPhoto: PhotoType = {
     focal_length: 55,
     aperture: 5.6,
     date: '2016-09-18',
-    trashed: 0,
-    versions: [],
-    tags: [],
-    versionNumber: 1
+    trashed: 0
 }

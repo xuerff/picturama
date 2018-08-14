@@ -17,7 +17,6 @@ export interface PhotoType {
     title: string,              // Example: 'IMG_9700'
     master: string,             // Example: '/specs/photos/IMG_9700.JPG'
     thumb: string | null,       // Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp'
-    thumb_250: null,            // Never used. Thumbnails are created lazy by `src/ui/data/ImageProvider.ts`
     extension: string,          // Example: 'JPG'
     flag: 0 | 1,                // Example: 0  (for saving booleans work too)
     created_at: number | Date,  // Example: 0  (for saving Dates work too)
