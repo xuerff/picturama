@@ -1,6 +1,6 @@
-import { app, screen, ipcMain, BrowserWindow } from 'electron'
-
 import fs from 'fs'
+import { app, screen, ipcMain, BrowserWindow } from 'electron'
+import DB from 'sqlite3-helper'
 
 import MainMenu from './MainMenu'
 // import Usb from './usb'
@@ -15,6 +15,15 @@ const initLibrary = (mainWindow: BrowserWindow) => {
     const Library = require('./Library').default
 
     knex.migrate.latest().finally(() => {
+        DB({
+            path: config.knex.connection.filename,
+            migrate: {
+                migrationsPath: config.knex.migrations.directory
+            }
+        })
+        .connection()
+        .catch(error => console.error('Initializing database failed', error))
+
         let library = new Library(mainWindow)
         let watcher = new Watch(mainWindow)
 
