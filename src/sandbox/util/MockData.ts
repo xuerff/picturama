@@ -5,6 +5,8 @@ export const testPhoto: PhotoType = {
     id: 'B1m80éAMpf',
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
+    master_width: 5184,
+    master_height: 3456,
     thumb: null,
     extension: 'JPG',
     flag: 0,

@@ -13,21 +13,40 @@ shortid.characters(config.characters);
 /** Example: 'B1m80éAMpf' */
 export type PhotoId = string
 export interface PhotoType {
-    id: PhotoId,                // Example: 'B1m80éAMpf'
-    title: string,              // Example: 'IMG_9700'
-    master: string,             // Example: '/specs/photos/IMG_9700.JPG'
-    thumb: string | null,       // Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp'
-    extension: string,          // Example: 'JPG'
-    flag: 0 | 1,                // Example: 0  (for saving booleans work too)
-    created_at: number | Date,  // Example: 0  (for saving Dates work too)
-    updated_at: number | null,  // Example: null
-    orientation: ExifOrientation, // Example: 1 (= ExifOrientation.Up)
-    exposure_time: number,      // Example: 0.0166
-    iso: number,                // Example: 0
-    focal_length: number,       // Example: 5
-    aperture: number,           // Example: 5.6
-    date: string,               // Example: '2016-09-18'
-    trashed: 0 | 1              // Example: 0
+    /** Example: 'B1m80éAMpf' */
+    id: PhotoId,
+    /** Example: 'IMG_9700' */
+    title: string,
+    /** The original image. Example: '/specs/photos/IMG_9700.JPG' */
+    master: string,
+    /** The width of the original image (in px). */
+    master_width: number | null
+    /** The height of the original image (in px). */
+    master_height: number | null
+    /** Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp' */
+    thumb: string | null,
+    /** Example: 'JPG' */
+    extension: string,
+    /** Whether the image is flagged. */
+    flag: 0 | 1,
+    /** Example: 0  (for saving Dates work too) */
+    created_at: number | Date,
+    /** Example: null */
+    updated_at: number | null,
+    /** Example: 1 (= ExifOrientation.Up) */
+    orientation: ExifOrientation,
+    /** Example: 0.0166 */
+    exposure_time: number,
+    /** Example: 0 */
+    iso: number,
+    /** Example: 5 */
+    focal_length: number,
+    /** Example: 5.6 */
+    aperture: number,
+    /** Example: '2016-09-18' */
+    date: string,
+    /** Example: 0 */
+    trashed: 0 | 1
 }
 
 export interface PhotoWork {

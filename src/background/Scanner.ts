@@ -141,6 +141,10 @@ export default class Scanner {
                         const photo: PhotoType = {
                             id: generatePhotoId(),
                             title: file.name,
+                            master: originalImgPath,
+                            master_width: metaData.imgWidth,
+                            master_height: metaData.imgHeight,
+                            thumb: null,   // Will be set further down for raw images
                             extension: file.path.match(/\.(.+)$/i)[1],
                             orientation: metaData.orientation,
                             date: moment(metaData.createdAt).format('YYYY-MM-DD'),
@@ -151,9 +155,7 @@ export default class Scanner {
                             exposure_time: metaData.exposureTime,
                             iso: metaData.iso,
                             aperture: metaData.aperture,
-                            focal_length: metaData.focalLength,
-                            master: originalImgPath,
-                            thumb: null       // Will be set further down for raw images
+                            focal_length: metaData.focalLength
                         }
 
                         return DB().insert('photos', photo)
@@ -200,9 +202,9 @@ export default class Scanner {
                                 .withMetadata()
                                 .toFile(nonRawImgPath)
                         })
-                        .then(() => {
+                        .then(outputInfo => {
                             if (overallProfiler) overallProfiler.addPoint('Rotated extracted image')
-                            return DB().update('photos', { thumb: nonRawImgPath }, photo.id)
+                            return DB().update<PhotoType>('photos', { thumb: nonRawImgPath, master_width: outputInfo.width, master_height: outputInfo.height }, photo.id)
                         })
                         .then(() => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return photo })
                 })

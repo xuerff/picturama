@@ -9,14 +9,16 @@ const fileStat = Promise.promisify(fs.stat)
 
 
 export interface MetaData {
-    exposureTime?: number,
-    iso?:          number,
-    aperture?:     number,
-    focalLength?:  number,
-    createdAt:    Date,
+    imgWidth?:     number
+    imgHeight?:    number
+    exposureTime?: number
+    iso?:          number
+    aperture?:     number
+    focalLength?:  number
+    createdAt:     Date
     /** Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html */
-    orientation:  ExifOrientation,
-    tags:         string[]
+    orientation:   ExifOrientation
+    tags:          string[]
 }
 
 
@@ -49,6 +51,8 @@ function readExifOfImage(imagePath) {
 function extractMetaDataFromExif(exifData): MetaData {
     const exifTags = exifData.tags
     let metaData = {
+        imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
+        imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
         exposureTime: exifTags.ExposureTime,
         iso:          exifTags.ISO,
         aperture:     exifTags.FNumber,
