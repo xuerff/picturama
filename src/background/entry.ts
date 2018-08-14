@@ -1,6 +1,8 @@
 import fs from 'fs'
 import { app, screen, ipcMain, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper'
+import { install as initSourceMapSupport } from 'source-map-support'
+import { start as initPrettyError } from 'pretty-error'
 
 import MainMenu from './MainMenu'
 // import Usb from './usb'
@@ -9,6 +11,9 @@ import Watch from './watch'
 import { init as initBackgroundService } from './BackgroundService'
 import { init as initForegroundClient } from './ForegroundClient'
 
+
+initSourceMapSupport()
+initPrettyError()
 
 const initLibrary = (mainWindow: BrowserWindow) => {
     const knex = require('knex')(config.knex)

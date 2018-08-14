@@ -143,6 +143,10 @@ class Library {
                     message: `Finish importing ${pics.length} in ${time.humanize()}`
                 })
             })
+            .catch(error => {
+                // TODO: Show error in UI
+                console.error('Scanning for pictures failed', error)
+            })
 
         notifier.notify({
             title: 'Ansel',
