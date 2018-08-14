@@ -40,7 +40,7 @@ export default {
     dbFile: `${dotAnsel}/db.sqlite3`,
     settings: `${dotAnsel}/settings.json`,
     thumbsPath: `${dotAnsel}/thumbs`,
-    thumbs250Path: `${dotAnsel}/thumbs-250`,
+    thumbnailPath: `${dotAnsel}/thumbnails`,
     tmp: '/tmp/ansel',
     concurrency: 3,
 

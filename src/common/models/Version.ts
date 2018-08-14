@@ -67,7 +67,7 @@ const Version = anselBookshelf.Model.extend({
 }, {
     updateImage(data) {
         let filename = [ data[1], data[2], data[3] ].join('-')
-        let thumbPathName = `${config.thumbs250Path}/${filename}.jpg`
+        let thumbPathName = `${config.thumbnailPath}/${filename}.jpg`
 
         return sharp(data.input)
             .resize(250, 250)

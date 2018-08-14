@@ -39,8 +39,8 @@ class Library {
             if (!fs.existsSync(config.thumbsPath))
                 fs.mkdirSync(config.thumbsPath)
 
-            if (!fs.existsSync(config.thumbs250Path))
-                fs.mkdirSync(config.thumbs250Path)
+            if (!fs.existsSync(config.thumbnailPath))
+                fs.mkdirSync(config.thumbnailPath)
         }
 
         if (!fs.existsSync(config.tmp))

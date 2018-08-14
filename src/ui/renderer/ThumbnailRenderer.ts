@@ -19,7 +19,11 @@ const queue = new SerialJobQueue(
     renderNextThumbnail)
 
 
-const thumbnailSize = 250
+// Target row height of our overview (class Grid) is 320px.
+// Max width is relatively high in order to get most panorama images with full row height.
+const maxThumbnailWidth = 1024
+const maxThumbnailHeight = 320
+
 let canvas: PhotoCanvas | null = null
 
 
@@ -31,7 +35,7 @@ export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: Photo
 export async function renderThumbnail(nonRawImgPath: string, orientation: ExifOrientation, photoWork: PhotoWork, profiler: Profiler | null): Promise<string> {
     if (canvas === null) {
         canvas = new PhotoCanvas()
-            .setMaxSize(thumbnailSize, thumbnailSize)
+            .setMaxSize(maxThumbnailWidth, maxThumbnailHeight)
         if (profiler) profiler.addPoint('Created canvas')
     }
 

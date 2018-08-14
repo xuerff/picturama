@@ -61,7 +61,7 @@ export function generatePhotoId() {
 
 
 export function getThumbnailPath(photoId: PhotoId): string {
-    return `${config.thumbs250Path}/${photoId}.${config.workExt}`
+    return `${config.thumbnailPath}/${photoId}.${config.workExt}`
 }
 
 
