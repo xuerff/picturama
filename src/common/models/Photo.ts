@@ -19,7 +19,7 @@ export interface PhotoType {
     thumb: string | null,       // Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp'
     thumb_250: null,            // Never used. Thumbnails are created lazy by `src/ui/data/ImageProvider.ts`
     extension: string,          // Example: 'JPG'
-    flag: 0 | 1 | boolean,      // Example: 0  (for saving booleans work too)
+    flag: 0 | 1,                // Example: 0  (for saving booleans work too)
     created_at: number | Date,  // Example: 0  (for saving Dates work too)
     updated_at: number | null,  // Example: null
     orientation: ExifOrientation, // Example: 1 (= ExifOrientation.Up)
@@ -28,15 +28,17 @@ export interface PhotoType {
     focal_length: number,       // Example: 5
     aperture: number,           // Example: 5.6
     date: string,               // Example: '2016-09-18'
-    trashed: 0 | 1,             // Example: 0
-    versions: any[],            // Example: []
-    tags: TagType[],            // Example: []
-    versionNumber: number       // Example: 1   
+    trashed: 0 | 1              // Example: 0
 }
 
 export interface PhotoWork {
     rotationTurns?: 1 | 2 | 3
     flagged?: true
+}
+
+
+export function generatePhotoId() {
+    return shortid.generate()
 }
 
 
@@ -53,7 +55,7 @@ export default anselBookshelf.Model.extend({
 
     initialize: function() {
         this.on('creating', model => {
-            model.set('id', shortid.generate());
-        });
+            model.set('id', generatePhotoId())
+        })
     }
 }) as BookshelfClass<PhotoType>

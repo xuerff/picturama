@@ -3,7 +3,8 @@ import sharp from 'sharp'
 import libraw from 'libraw'
 import fs from 'fs'
 import moment from 'moment'
-import Promise from 'bluebird'
+import BluebirdPromise from 'bluebird'
+import DB from 'sqlite3-helper'
 
 import config from '../common/config';
 import { readMetadataOfImage } from './MetaData'
@@ -11,16 +12,15 @@ import { readMetadataOfImage } from './MetaData'
 import walker from './lib/walker';
 import matches from './lib/matches';
 
-import Photo from '../common/models/Photo'
+import { PhotoType, generatePhotoId } from '../common/models/Photo'
 import Tag from '../common/models/Tag'
-import { renderThumbnail } from './ForegroundClient'
 import { bindMany } from '../common/util/LangUtil'
-import { fetchPhotoWork, storeThumbnail } from './PhotoWorkStore'
+import { fetchPhotoWork } from './PhotoWorkStore'
 import { profileScanner } from '../common/LogConstants'
 import Profiler from '../common/util/Profiler'
 
 
-const readFile = Promise.promisify(fs.readFile);
+const readFile = BluebirdPromise.promisify(fs.readFile)
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
@@ -125,22 +125,29 @@ export default class Scanner {
                 return result
             })
 
-        let overallPromise: Promise<any> = Promise.all([readMetaData, readPhotoWork])
+        let overallPromise: Promise<PhotoType | null> = Promise.all([readMetaData, readPhotoWork])
             .then(results => {
                 if (overallProfiler) overallProfiler.addPoint('Waited for meta data and PhotoWork')
 
                 const [ metaData, photoWork ] = results
-                return new Photo({ title: file.name })
-                    .fetch()
-                    .then(photo => {
+
+                return this.photoExists(originalImgPath)
+                    .then(alreadyExists => {
                         if (overallProfiler) overallProfiler.addPoint('Fetched from DB')
-                        return photo ? null : Photo.forge({
+                        if (alreadyExists) {
+                            return null
+                        }
+
+                        const photo: PhotoType = {
+                            id: generatePhotoId(),
                             title: file.name,
                             extension: file.path.match(/\.(.+)$/i)[1],
                             orientation: metaData.orientation,
                             date: moment(metaData.createdAt).format('YYYY-MM-DD'),
-                            flag: photoWork.flagged,
+                            flag: photoWork.flagged ? 1 : 0,
+                            trashed: 0,
                             created_at: metaData.createdAt,
+                            updated_at: null,
                             exposure_time: metaData.exposureTime,
                             iso: metaData.iso,
                             aperture: metaData.aperture,
@@ -148,13 +155,17 @@ export default class Scanner {
                             master: originalImgPath,
                             thumb_250: null,  // Never used. Thumbnails are created lazy by `src/ui/data/ImageProvider.ts`
                             thumb: null       // Will be set further down for raw images
-                        })
-                        .save()
+                        }
+
+                        return DB().insert('photos', photo)
+                            .then(() => photo)
                     })
                     .then(photo => {
                         if (overallProfiler) overallProfiler.addPoint('Stored to DB')
-                        this.populateTags(photo, metaData.tags)
-                        if (overallProfiler) overallProfiler.addPoint('Populated tags')
+                        if (photo) {
+                            this.populateTags(photo, metaData.tags)
+                            if (overallProfiler) overallProfiler.addPoint('Populated tags')
+                        }
                         return photo
                     })
             })
@@ -162,9 +173,13 @@ export default class Scanner {
         if (file.isRaw) {
             overallPromise = overallPromise
                 .then(photo => {
+                    if (!photo) {
+                        return null
+                    }
+
                     const nonRawImgPath = file.isRaw ? `${config.thumbsPath}/${photo.id}.${config.workExt}` : null
 
-                    let extractThumb
+                    let extractThumb: Promise<string>
                     if (file.hasOwnProperty('imgPath')) {
                         extractThumb = Promise.resolve(file.imgPath)
                     } else {
@@ -188,10 +203,9 @@ export default class Scanner {
                         })
                         .then(() => {
                             if (overallProfiler) overallProfiler.addPoint('Rotated extracted image')
-                            return photo
-                                .save('thumb', nonRawImgPath, { patch: true })
+                            return DB().update('photos', { thumb: nonRawImgPath }, photo.id)
                         })
-                        .then(result => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return result })
+                        .then(() => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return photo })
                 })
         }
     
@@ -210,7 +224,7 @@ export default class Scanner {
 
     populateTags(photo, tags: string[]) {
         if (tags.length > 0) {
-            return Promise.each(tags, tagName =>
+            return BluebirdPromise.each(tags, tagName =>
                 new Tag({ title: tagName })
                     .fetch()
                     .then(tag =>
@@ -223,16 +237,21 @@ export default class Scanner {
 
         return photo;
     }
+
     onImportedStep() {
         this.progress.processed++;
         this.mainWindow.webContents.send('progress', this.progress);
         return true;
     }
 
-    filterStoredPhoto(file) {
-        return new Photo({ master: file.path })
-            .fetch()
-            .then(photo => !photo);
+    photoExists(originalImgPath: string): Promise<boolean> {
+        return DB().queryFirstCell<0 | 1>('select exists(select 1 from photos where master = ?)', originalImgPath)
+            .then(rawBoolean => !!rawBoolean)
+    }
+
+    filterStoredPhoto(fileInfo: FileInfo) {
+        return this.photoExists(fileInfo.path)
+            .then(photoExists => !photoExists)
     }
 
     setTotal(files) {
