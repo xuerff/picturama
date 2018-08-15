@@ -5,7 +5,7 @@ import { setDetailPhotoAction, closeDetailAction } from '../state/actions'
 import { getPhotoByIndex, getPhotoById } from '../state/selectors'
 import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import { setPhotosFlagged } from './PhotoStore'
+import { setPhotosFlagged } from './PhotoController'
 
 
 assertRendererProcess()

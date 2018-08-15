@@ -14,7 +14,7 @@ import { PhotoId } from '../../common/models/Photo'
 
 import { fetchPhotoDetail } from '../BackgroundClient'
 import keymapManager from '../keymap-manager'
-import { getNonRawImgPath } from '../data/ImageProvider'
+import { getNonRawImgPath } from '../controller/ImageProvider'
 import { closeExportAction } from '../state/actions'
 import { AppState } from '../state/reducers'
 import { PhotoData } from '../state/reducers/library'

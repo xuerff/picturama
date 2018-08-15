@@ -1,8 +1,8 @@
 import { ipcRenderer } from 'electron'
 
-import { fetchDates } from './data/PhotoDateStore'
-import { fetchTotalPhotoCount, fetchPhotos, updatePhotoVersion } from './data/PhotoStore'
-import { fetchTags } from './data/PhotoTagStore'
+import { fetchDates } from './controller/PhotoDateController'
+import { fetchTotalPhotoCount, fetchPhotos, updatePhotoVersion } from './controller/PhotoController'
+import { fetchTags } from './controller/PhotoTagController'
 import { Device } from '../common/models/DataTypes'
 import { PhotoId } from '../common/models/Photo'
 import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from './state/actions'

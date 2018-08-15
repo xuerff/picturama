@@ -5,7 +5,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import config from '../../common/config'
-import { checkSettingsExist } from '../data/SettingsStore'
+import { checkSettingsExist } from '../controller/SettingsController'
 import { AppState } from '../state/reducers'
 import Logo from './widget/icon/Logo'
 

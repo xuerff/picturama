@@ -3,7 +3,7 @@ import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import TagsInput from 'react-tagsinput'
 
-import { createTagsAndAssociateToPhoto } from '../data/PhotoTagStore'
+import { createTagsAndAssociateToPhoto } from '../controller/PhotoTagController'
 import { PhotoId, PhotoType, PhotoDetail } from '../../common/models/Photo'
 import { closeTagsEditorAction } from '../state/actions'
 import { AppState } from '../state/reducers'

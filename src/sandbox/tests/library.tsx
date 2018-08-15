@@ -6,7 +6,7 @@ import { PhotoType } from '../../common/models/Photo';
 import CancelablePromise from '../../common/util/CancelablePromise';
 import { Library } from '../../ui/components/library/Library'
 
-import { getNonRawImgPath } from '../../ui/data/ImageProvider'
+import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
 import { testPhoto } from '../util/MockData'
 
 

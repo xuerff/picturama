@@ -6,7 +6,7 @@ import { Spinner } from '@blueprintjs/core'
 import keymapManager from '../keymap-manager'
 import { PhotoType, PhotoDetail } from '../../common/models/Photo'
 import { VersionType } from '../../common/models/Version'
-import { getNonRawImgPath } from '../data/ImageProvider'
+import { getNonRawImgPath } from '../controller/ImageProvider'
 import { closeDiffAction } from '../state/actions'
 import { AppState } from '../state/reducers'
 

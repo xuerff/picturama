@@ -3,8 +3,8 @@ import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
 
-import { getNonRawImgPath } from '../data/ImageProvider'
-import { updatePhoto } from '../data/PhotoStore'
+import { getNonRawImgPath } from '../controller/ImageProvider'
+import { updatePhoto } from '../controller/PhotoController'
 import PhotoCanvas from './PhotoCanvas'
 import { Texture } from './WebGLCanvas'
 
