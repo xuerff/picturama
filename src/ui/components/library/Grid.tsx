@@ -18,8 +18,6 @@ interface Props {
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
     setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
     setDetailPhotoById: (photoId: PhotoId) => void
-    openExport: () => void
-    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
 }
 
 export default class Grid extends React.Component<Props, undefined> {
@@ -27,7 +25,7 @@ export default class Grid extends React.Component<Props, undefined> {
     constructor(props: Props) {
         super(props);
 
-        bindMany(this, 'setHighlightedFlagged', 'pressedEnter', 'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown', 'togglePhotoHighlighted', 'setHighlightedPhoto')
+        bindMany(this, 'pressedEnter', 'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown', 'togglePhotoHighlighted', 'setHighlightedPhoto')
     }
 
     componentDidMount() {
@@ -47,11 +45,6 @@ export default class Grid extends React.Component<Props, undefined> {
 
     componentWillUnmount() {
         this.removeListeners()
-    }
-
-    setHighlightedFlagged() {
-        const highlightedPhotos = this.props.highlightedPhotoIds.map(photoId => this.props.photos[photoId])
-        this.props.setPhotosFlagged(highlightedPhotos, true)
     }
 
     pressedEnter() {
@@ -137,8 +130,6 @@ export default class Grid extends React.Component<Props, undefined> {
                         getThumbnailSrc={props.getThumbnailSrc}
                         createThumbnail={props.createThumbnail}
                         setDetailPhotoById={props.setDetailPhotoById}
-                        openExport={props.openExport}
-                        setHighlightedFlagged={this.setHighlightedFlagged}
                         togglePhotoHighlighted={this.togglePhotoHighlighted}
                         setHighlightedPhoto={this.setHighlightedPhoto}
                     />

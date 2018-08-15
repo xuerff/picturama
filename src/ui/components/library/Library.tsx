@@ -132,8 +132,6 @@ export class Library extends React.Component<Props> {
                     createThumbnail={props.createThumbnail}
                     setHighlightedPhotos={props.setHighlightedPhotos}
                     setDetailPhotoById={props.setDetailPhotoById}
-                    openExport={this.openExport}
-                    setPhotosFlagged={props.setPhotosFlagged}
                 />
         }
 

@@ -1,4 +1,3 @@
-import { remote } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
@@ -11,8 +10,6 @@ import { bindMany } from '../../../common/util/LangUtil'
 import { isMac } from '../../UiConstants'
 import FaIcon from '../widget/icon/FaIcon'
 
-const { Menu, MenuItem } = remote
-
 
 interface Props {
     photo: PhotoType
@@ -20,21 +17,17 @@ interface Props {
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
     setDetailPhotoById: (photoId: PhotoId) => void
-    openExport: () => void
-    setHighlightedFlagged: () => void
     togglePhotoHighlighted: (photoId: PhotoId, highlighted: boolean) => void
     setHighlightedPhoto: (photoId: PhotoId) => void
 }
 
 interface State {
-    showContextMenu: boolean
     thumbnailSrc: string | null
     isThumbnailLoaded: boolean
 }
 
 export default class Picture extends React.Component<Props, State> {
 
-    private menu: Electron.Menu | null = null
     private createThumbnailPromise: CancelablePromise<void> | null = null
     private delayedUpdateTimout: number | null = null
 
@@ -42,37 +35,14 @@ export default class Picture extends React.Component<Props, State> {
         super(props)
 
         this.state = {
-            showContextMenu: false,
             thumbnailSrc: this.props.getThumbnailSrc(props.photo),
             isThumbnailLoaded: false
         }
 
-        bindMany(this, 'contextMenu', 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
-    }
-
-    contextMenu(e: React.MouseEvent<HTMLImageElement>) {
-        e.preventDefault()
-
-        if (!this.props.isHighlighted) {
-            this.props.togglePhotoHighlighted(this.props.photo.id, true)
-        }
-
-        this.setState({ showContextMenu: true })
+        bindMany(this, 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
     }
 
     componentDidMount() {
-        this.menu = new Menu()
-
-        this.menu.append(new MenuItem({
-            label: 'Flag picture(s)',
-            click: this.props.setHighlightedFlagged
-        }))
-
-        this.menu.append(new MenuItem({
-            label: 'Export picture(s)',
-            click: this.props.openExport
-        }))
-
         window.addEventListener('edit:thumnailChange', this.onThumnailChange)
     }
 
@@ -99,13 +69,6 @@ export default class Picture extends React.Component<Props, State> {
             } else if (rect.top < 0) {
                 containerElem.scrollTop += rect.top
             }
-        }
-
-        if (this.state.showContextMenu && props.isHighlighted) {
-            // If no timeout the menu will appears before the highlight
-            setTimeout(() => this.menu.popup({}))
-
-            this.setState({ showContextMenu: false })
         }
     }
 
@@ -228,7 +191,6 @@ export default class Picture extends React.Component<Props, State> {
                         onLoad={this.onThumbnailLoad}
                         onError={this.onThumbnailLoadError}
                         onClick={this.handleClick}
-                        onContextMenu={this.contextMenu}
                     />
                 }
                 {showFlag &&
