@@ -2,7 +2,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 
 import { assertMainProcess } from '../common/util/ElectronUtil'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from './PhotoWorkStore'
-import { fetchPhotoDetail } from './PhotoStore'
+import { updatePhotos, fetchPhotoDetail } from './PhotoStore'
 
 
 assertMainProcess()
@@ -28,7 +28,9 @@ export function init(mainWin: BrowserWindow) {
 
 
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
-    if (action === 'fetchPhotoDetail') {
+    if (action === 'updatePhotos') {
+        return updatePhotos(params.photoIds, params.update)
+    } else if (action === 'fetchPhotoDetail') {
         return fetchPhotoDetail(params.photoId)
     } else if (action === 'fetchPhotoWork') {
         return fetchPhotoWork(params.photoPath)

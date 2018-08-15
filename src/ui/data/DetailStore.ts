@@ -5,7 +5,7 @@ import { setDetailPhotoAction, closeDetailAction } from '../state/actions'
 import { getPhotoByIndex, getPhotoById } from '../state/selectors'
 import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import { toggleFlag } from './PhotoStore'
+import { setPhotosFlagged } from './PhotoStore'
 
 
 assertRendererProcess()
@@ -79,6 +79,6 @@ export function toggleDetailPhotoFlag() {
     const state = store.getState()
     if (state.detail) {
         const detailPhoto = getPhotoById(state.detail.currentPhoto.id)
-        toggleFlag(detailPhoto)
+        setPhotosFlagged([ detailPhoto ], !detailPhoto.flag)
     }
 }

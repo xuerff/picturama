@@ -1,11 +1,11 @@
 import Promise from 'bluebird'
 import isDeepEqual from 'fast-deep-equal'
 
-import { fetchPhotoWork, storePhotoWork, storeThumbnail } from '../BackgroundClient'
+import { updatePhotos as updatePhotosInDb, fetchPhotoWork, storePhotoWork } from '../BackgroundClient'
 import { BookshelfCollection } from '../../common/models/DataTypes'
 import Photo, { PhotoWork, PhotoType } from '../../common/models/Photo'
 import Tag from '../../common/models/Tag'
-import Version, { VersionType } from '../../common/models/Version'
+import { VersionType } from '../../common/models/Version'
 import store from '../state/store'
 import { fetchTotalPhotoCountAction, fetchPhotosAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
 import { FilterState } from '../state/reducers/library'
@@ -158,52 +158,41 @@ export function updatePhotoVersion(version: VersionType) {  // Type should be `V
     //    })
 }
 
-export function toggleFlag(photo: PhotoType) {
-    const newFlagged = !photo.flag
-
-    storeFlagged(photo, newFlagged)
-
-    new Photo({ id: photo.id })
-        .save('flag', newFlagged, { patch: true })
-        .then(() => new Photo({ id: photo.id })
-            .fetch({ withRelated: [ 'versions', 'tags' ] })
-        )
-        .then(photoModel =>
-            store.dispatch(changePhotosAction([ photoModel.toJSON() ]))
-        )
-}
-
-export function setPhotosFlagged(photos: PhotoType[], flag: boolean) {
-    Promise.each(photos, photo => {
-        storeFlagged(photo, flag)
-        return new Photo({ id: photo.id })
-            .save('flag', flag, { patch: true })
-    })
-    .then(() => {
-        const changedPhotos = photos.map(photo => ({ ...photo, flag: flag ? 1 : 0 } as PhotoType))
-        store.dispatch(changePhotosAction(changedPhotos))
-    })
-}
-
-function storeFlagged(photo: PhotoType, newFlagged: boolean) {
-    updatePhotoWork(
-        photo,
-        photoWork => {
-            if (newFlagged) {
-                photoWork.flagged = true
-            } else {
-                delete photoWork.flagged
-            }
-        })
+export function setPhotosFlagged(photos: PhotoType[], flagged: boolean) {
+    updatePhotos(photos, { flag: flagged ? 1 : 0 })
 }
 
 export function movePhotosToTrash(photos: PhotoType[]) {
-    Promise.each(photos, photo => {
-        return new Photo({ id: photo.id })
-            .save('trashed', true, { patch: true })
-    })
+    updatePhotos(photos, { trashed: 1 })
+}
+
+export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
+    let updatePhotoWorkPromise = null
+    if (update.hasOwnProperty('flag')) {
+        updatePhotoWorkPromise = Promise.all(photos.map(photo =>
+            updatePhotoWork(
+                photo,
+                photoWork => {
+                    if (update.flag) {
+                        photoWork.flagged = true
+                    } else {
+                        delete photoWork.flagged
+                    }
+                })
+        ))
+    }
+
+    const photoIds = photos.map(photo => photo.id)
+    Promise.all([
+        updatePhotoWorkPromise,
+        updatePhotosInDb(photoIds, update)
+    ])
     .then(() => {
-        const changedPhotos = photos.map(photo => ({ ...photo, trashed: 1 })) as PhotoType[]
+        const changedPhotos = photos.map(photo => ({ ...photo, ...update } as PhotoType))
         store.dispatch(changePhotosAction(changedPhotos))
+    })
+    .catch(error => {
+        // TODO: Show error in UI
+        console.error('Updating photos failed', error)
     })
 }
