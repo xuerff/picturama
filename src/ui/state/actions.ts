@@ -7,7 +7,7 @@ import {
     INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, TOGGLE_DIFF
 } from './actionTypes'
 import { Device } from '../../common/models/DataTypes'
-import { PhotoWork, PhotoType, PhotoId } from '../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoDetail, PhotoWork } from '../../common/models/Photo'
 import { TagType } from '../../common/models/Tag'
 import { ImportProgress } from './reducers/import'
 import { FilterState, DatesState } from './reducers/library'
@@ -15,7 +15,7 @@ import { FilterState, DatesState } from './reducers/library'
 
 export const checkSettingsExistAction = createAsyncAction(SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE)<void, void, Error>()
 
-export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ photoIndex: number, photoId: string }, { photoWork: PhotoWork }, Error>()
+export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ photoIndex: number, photoId: string }, { photoDetail: PhotoDetail, photoWork: PhotoWork }, Error>()
 export const closeDetailAction = () => action(CLOSE_DETAIL)
 
 export const setHighlightedPhotosAction = (highlightedIds: PhotoId[]) => action(SET_HIGHLIGHTED_PHOTOS, { highlightedIds })

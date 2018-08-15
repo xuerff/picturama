@@ -1,12 +1,13 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { PhotoType } from '../../../common/models/Photo'
+import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
 
 
 interface Props {
     className?: any
     photo: PhotoType
+    photoDetail?: PhotoDetail
 }
 
 class PictureInfo extends React.Component<Props, undefined> {
@@ -17,20 +18,25 @@ class PictureInfo extends React.Component<Props, undefined> {
     }
 
     displayTags() {
-        if (!this.props.photo.hasOwnProperty('tags'))
-            return '';
+        const photoDetail = this.props.photoDetail
 
-        if (this.props.photo.tags.length === 0)
-            return 'none';
+        if (!photoDetail) {
+            return ''
+        }
 
-        return this.props.photo.tags
+        if (photoDetail.tags.length === 0) {
+            return 'none'
+        }
+
+        return photoDetail.tags
             .map(tag => tag.title)
-            .join(', ');
+            .join(', ')
     }
 
     render() {
         const props = this.props
         const photo = props.photo
+        const photoDetail = props.photoDetail
         return (
             <div className={classNames(props.className, "PictureInfo picture-info shadow--2dp")}>
                 <ul>
@@ -38,7 +44,7 @@ class PictureInfo extends React.Component<Props, undefined> {
                     <li>ISO: {photo.iso}</li>
                     <li>f/{photo.aperture}</li>
                     <li>@ {this.shutterSpeed(photo.exposure_time)}</li>
-                    <li>v#: {photo.versionNumber}</li>
+                    <li>v#: {photoDetail && (photoDetail.versions.length + 1)}</li>
                     <li>Orientation: {photo.orientation}</li>
                     <li>Flag: {photo.flag}</li>
                     <li className="tags">Tags: {this.displayTags()}</li>

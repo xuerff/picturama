@@ -1,4 +1,4 @@
-import { PhotoId, PhotoWork } from '../../../common/models/Photo'
+import { PhotoId, PhotoWork, PhotoDetail } from '../../../common/models/Photo'
 import { Action } from '../ActionType'
 import { SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK, FETCH_PHOTOS_SUCCESS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH } from '../actionTypes';
 
@@ -10,6 +10,8 @@ export type DetailState = {
         readonly fetchFailed: boolean
         readonly index: number
         readonly id: PhotoId
+        /** Is `null` while loading */
+        readonly photoDetail: PhotoDetail | null
         /** Is `null` while loading */
         readonly photoWork: PhotoWork | null
     }
@@ -25,6 +27,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                     fetchFailed: false,
                     index: action.payload.photoIndex,
                     id: action.payload.photoId,
+                    photoDetail: null,
                     photoWork: null
                 }
             }
@@ -34,6 +37,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 currentPhoto: {
                     ...state.currentPhoto,
                     isFetching: false,
+                    photoDetail: action.payload.photoDetail,
                     photoWork: action.payload.photoWork
                 }
             }

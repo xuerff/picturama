@@ -1,5 +1,5 @@
-import { fetchPhotoWork } from '../BackgroundClient'
-import { PhotoId, PhotoWork } from '../../common/models/Photo'
+import { fetchPhotoDetail, fetchPhotoWork } from '../BackgroundClient'
+import { PhotoId } from '../../common/models/Photo'
 import store from '../state/store'
 import { setDetailPhotoAction, closeDetailAction } from '../state/actions'
 import { getPhotoByIndex, getPhotoById } from '../state/selectors'
@@ -36,9 +36,14 @@ export function setDetailPhotoByIndex(photoIndex: number | null) {
     }
 
     const photoPath = photo.master
-    runningDetailPhotoFetch = new CancelablePromise<PhotoWork>(fetchPhotoWork(photoPath))
-        .then(photoWork => {
-            store.dispatch(setDetailPhotoAction.success({ photoWork }))
+    runningDetailPhotoFetch = new CancelablePromise(Promise.all(
+        [
+            fetchPhotoDetail(photo.id),
+            fetchPhotoWork(photoPath)
+        ]))
+        .then(results => {
+            const [ photoDetail, photoWork ] = results
+            store.dispatch(setDetailPhotoAction.success({ photoDetail, photoWork }))
         })
         .catch(error => {
             if (!isCancelError(error)) {

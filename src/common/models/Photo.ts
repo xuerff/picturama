@@ -5,7 +5,7 @@ import config from '../config';
 
 import { ExifOrientation, BookshelfClass } from './DataTypes'
 import Tag, { TagType } from './Tag'
-import Version from './Version'
+import Version, { VersionType } from './Version'
 
 shortid.characters(config.characters);
 
@@ -47,6 +47,11 @@ export interface PhotoType {
     date: string,
     /** Example: 0 */
     trashed: 0 | 1
+}
+
+export interface PhotoDetail {
+    versions: VersionType[],
+    tags: TagType[]
 }
 
 export interface PhotoWork {

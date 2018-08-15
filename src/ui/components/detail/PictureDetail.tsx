@@ -18,7 +18,7 @@ import Toolbar from '../widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../data/DetailStore'
 import { getNonRawImgPath } from '../../data/ImageProvider'
 import { updatePhotoWork, movePhotosToTrash } from '../../data/PhotoStore'
-import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoDetail, PhotoWork } from '../../../common/models/Photo'
 import { openExportAction, openTagsEditorAction, openDiffAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
 import { getPhotoById, getPhotoByIndex } from '../../state/selectors'
@@ -46,6 +46,7 @@ interface StateProps {
     photo: PhotoType
     photoPrev?: PhotoType
     photoNext?: PhotoType
+    photoDetail?: PhotoDetail
     photoWork?: PhotoWork
     isFirst: boolean
     isLast: boolean
@@ -218,7 +219,8 @@ export class PictureDetail extends React.Component<Props, State> {
     }
 
     toggleDiff() {
-        if (this.props.photo.versionNumber > 1) {
+        const photoDetail = this.props.photoDetail
+        if (photoDetail && photoDetail.versions.length > 0) {
             this.props.openDiff()
         }
     }
@@ -305,7 +307,11 @@ export class PictureDetail extends React.Component<Props, State> {
                     />
                 </div>
 
-                <PictureInfo className="PictureDetail-infoBar" photo={props.photo} />
+                <PictureInfo
+                    className="PictureDetail-infoBar"
+                    photo={props.photo}
+                    photoDetail={props.photoDetail}
+                />
                 {state.loading &&
                     <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
                 }
@@ -322,6 +328,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             photo: getPhotoById(currentPhoto.id),
             photoPrev: getPhotoByIndex(currentPhoto.index - 1),
             photoNext: getPhotoByIndex(currentPhoto.index + 1),
+            photoDetail: currentPhoto.photoDetail,
             photoWork: currentPhoto.photoWork,
             isFirst: currentPhoto.index === 0,
             isLast: currentPhoto.index === state.library.photos.ids.length - 1

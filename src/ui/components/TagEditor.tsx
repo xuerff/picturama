@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import TagsInput from 'react-tagsinput'
 
 import { createTagsAndAssociateToPhoto } from '../data/PhotoTagStore'
-import { PhotoId, PhotoType } from '../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoDetail } from '../../common/models/Photo'
 import { closeTagsEditorAction } from '../state/actions'
 import { AppState } from '../state/reducers'
 import { bindMany } from '../../common/util/LangUtil'
@@ -18,6 +18,7 @@ interface OwnProps {
 
 interface StateProps {
     photo: PhotoType
+    photoDetail: PhotoDetail
 }
 
 interface DispatchProps {
@@ -40,8 +41,8 @@ export class TagEditor extends React.Component<Props, State> {
         bindMany(this, 'handleChange', 'handleSubmit')
 
         let tags = []
-        if (this.props.photo.tags.length > 0) {
-            tags = this.props.photo.tags.map(tag => tag.title)
+        if (props.photoDetail.tags.length > 0) {
+            tags = props.photoDetail.tags.map(tag => tag.title)
         }
 
         this.state = { tags: tags }
@@ -99,7 +100,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         return {
             ...props,
-            photo: state.library.photos.data[state.detail.currentPhoto.id]
+            photo: state.library.photos.data[state.detail.currentPhoto.id],
+            photoDetail: state.detail.currentPhoto.photoDetail
         }
     },
     dispatch => ({

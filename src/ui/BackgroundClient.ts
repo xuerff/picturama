@@ -1,6 +1,6 @@
-import { BrowserWindow, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 
-import { PhotoWork } from '../common/models/Photo'
+import { PhotoId, PhotoDetail, PhotoWork } from '../common/models/Photo'
 import { assertRendererProcess } from '../common/util/ElectronUtil'
 
 
@@ -46,15 +46,17 @@ async function callOnBackground(action: string, params: any): Promise<any> {
 }
 
 
+export async function fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
+    return callOnBackground('fetchPhotoDetail', { photoId })
+}
+
 export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
     return callOnBackground('fetchPhotoWork', { photoPath })
 }
 
-
 export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
     return callOnBackground('storePhotoWork', { photoPath, photoWork })
 }
-
 
 export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
     return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })

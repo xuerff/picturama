@@ -1,6 +1,6 @@
 import { remote } from 'electron'
 import fs from 'fs'
-import Promise from 'bluebird'
+import BluebirdPromise from 'bluebird'
 import notifier from 'node-notifier'
 import libraw from 'libraw'
 import sharp from 'sharp'
@@ -12,6 +12,7 @@ import config from '../../common/config'
 import { bindMany } from '../../common/util/LangUtil'
 import { PhotoId } from '../../common/models/Photo'
 
+import { fetchPhotoDetail } from '../BackgroundClient'
 import keymapManager from '../keymap-manager'
 import { getNonRawImgPath } from '../data/ImageProvider'
 import { closeExportAction } from '../state/actions'
@@ -19,7 +20,8 @@ import { AppState } from '../state/reducers'
 import { PhotoData } from '../state/reducers/library'
 import Progress from './Progress'
 
-const readFile = Promise.promisify(fs.readFile)
+
+const readFile = BluebirdPromise.promisify(fs.readFile)
 
 
 interface OwnProps {
@@ -103,7 +105,7 @@ export class Export extends React.Component<Props, State> {
         this.props.closeExport()
     }
 
-    onEachPhoto(photoId: PhotoId, i: number) {
+    async onEachPhoto(photoId: PhotoId, i: number) {
         const photo = this.props.photos[photoId]
 
         let extension = photo.extension.toLowerCase()
@@ -119,8 +121,11 @@ export class Export extends React.Component<Props, State> {
             }
         })
 
-        if (photo.versions.length > 0)
-            return this.processImg(photo, getNonRawImgPath(photo))
+        const photoDetail = await fetchPhotoDetail(photoId)
+        if (photoDetail.versions.length > 0) {
+            const last = photoDetail.versions[photoDetail.versions.length - 1]
+            return this.processImg(photo, last.output)
+        }
 
         if (config.acceptedRawFormats.indexOf(extension) !== -1) {
             return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
@@ -134,7 +139,7 @@ export class Export extends React.Component<Props, State> {
     handleSubmit(e) {
         e.preventDefault()
 
-        Promise.each(this.props.photoIds, this.onEachPhoto)
+        BluebirdPromise.each(this.props.photoIds, this.onEachPhoto)
             .then(this.afterExport.bind(this))
     }
 

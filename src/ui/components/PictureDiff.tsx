@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { Spinner } from '@blueprintjs/core'
 
 import keymapManager from '../keymap-manager'
-import Photo, { PhotoType } from '../../common/models/Photo'
+import { PhotoType, PhotoDetail } from '../../common/models/Photo'
+import { VersionType } from '../../common/models/Version'
 import { getNonRawImgPath } from '../data/ImageProvider'
 import { closeDiffAction } from '../state/actions'
 import { AppState } from '../state/reducers'
@@ -22,6 +23,7 @@ interface OwnProps {
 
 interface StateProps {
     photo: PhotoType
+    photoDetail: PhotoDetail
 }
 
 interface DispatchProps {
@@ -32,7 +34,6 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
-    photo: PhotoType
     loaded: boolean
     loadingCount: number
 }
@@ -45,19 +46,12 @@ export class PictureDiff extends React.Component<Props, State> {
         this.onImgLoad = this.onImgLoad.bind(this)
 
         this.state = {
-            photo: { thumb: null } as PhotoType,
             loaded: false,
             loadingCount: 0
         }
     }
 
     componentDidMount() {
-        new Photo({ id: this.props.photo.id })
-            .fetch({ withRelated: [ 'versions' ] })
-            .then(photo => {
-                this.setState({ photo: photo.toJSON() })
-            })
-
         window.addEventListener('core:cancel', this.props.closeDiff)
         window.addEventListener('diff:cancel', this.props.closeDiff)
 
@@ -83,22 +77,25 @@ export class PictureDiff extends React.Component<Props, State> {
     }
 
     render() {
-        let last: Partial<PhotoType> & { output?: string } = { thumb: null }
+        const props = this.props
 
         let className = [
             'shadow--2dp',
-            rotation[this.props.photo.orientation]
+            rotation[props.photo.orientation]
         ].join(' ')
 
-        if (this.state.photo.hasOwnProperty('versions'))
-            last = this.state.photo.versions[this.state.photo.versions.length - 1]
+        const photoDetail = props.photoDetail
+        let last: VersionType
+        if (photoDetail) {
+            last = photoDetail.versions[photoDetail.versions.length - 1]
+        }
 
         return (
-            <div className={classNames(this.props.className, "picture-diff")} ref="diff">
+            <div className={classNames(props.className, "picture-diff")} ref="diff">
                 <div className="before v-align">
                     <h3>Before</h3>
                     <img
-                        src={getNonRawImgPath(this.state.photo)}
+                        src={getNonRawImgPath(props.photo)}
                         onLoad={this.onImgLoad}
                         className={className} />
                 </div>
@@ -121,11 +118,12 @@ export class PictureDiff extends React.Component<Props, State> {
 
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => {
+    (state: AppState, props) => {
         const mainFilter = state.library.filter.mainFilter
         return {
             ...props,
-            photo: state.library.photos.data[state.detail.currentPhoto.id]
+            photo: state.library.photos.data[state.detail.currentPhoto.id],
+            photoDetail: state.detail.currentPhoto.photoDetail
         }
     },
     {

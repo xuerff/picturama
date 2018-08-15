@@ -5,7 +5,7 @@ import { fetchPhotoWork, storePhotoWork, storeThumbnail } from '../BackgroundCli
 import { BookshelfCollection } from '../../common/models/DataTypes'
 import Photo, { PhotoWork, PhotoType } from '../../common/models/Photo'
 import Tag from '../../common/models/Tag'
-import Version from '../../common/models/Version'
+import Version, { VersionType } from '../../common/models/Version'
 import store from '../state/store'
 import { fetchTotalPhotoCountAction, fetchPhotosAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
 import { FilterState } from '../state/reducers/library'
@@ -40,7 +40,7 @@ function internalFetchPhotos(newFilter: FilterState | null) {
             .fetch({ withRelated: [ 'photos' ] })
             .then(tag => {
                 const photosCollection = (tag as any).related('photos') as BookshelfCollection<PhotoType>
-                const photos = photosCollection.toJSON().map(addVersionToPhoto)
+                const photos = photosCollection.toJSON()
                 const photosCount = photos.length  // TODO
                 store.dispatch(fetchPhotosAction.success({ photos, photosCount }))
             })
@@ -82,27 +82,13 @@ function internalFetchPhotos(newFilter: FilterState | null) {
         Promise.all([ countForge, photosForge ])
             .then(result => {
                 const [ photosCount, photosCollection] = result
-                const photos = photosCollection.toJSON().map(addVersionToPhoto)
+                const photos = photosCollection.toJSON()
                 store.dispatch(fetchPhotosAction.success({ photos, photosCount }))
             })
             .catch(error =>
                 store.dispatch(fetchPhotosAction.failure(error))
             )
     }
-}
-
-
-function addVersionToPhoto(photo: PhotoType): PhotoType {
-    photo.versionNumber = 1
-
-    if (photo.hasOwnProperty('versions') && photo.versions.length > 0) {
-        photo.versionNumber = 1 + photo.versions.length
-
-        const lastVersion = photo.versions[photo.versions.length - 1]
-        photo.thumb = lastVersion.output || photo.thumb
-    }
-
-    return photo
 }
 
 
@@ -157,17 +143,19 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
     }
 }
 
-export function updatePhotoVersion(version: any) {  // Type should be `Version`, but it doesn't work...
-    new Photo({ id: version.attributes.photo_id })
-        .fetch({ withRelated: [ 'versions', 'tags' ] })
-        .then(photoModel => {
-            const photo = photoModel.toJSON()
-            return onThumnailChange(photo.id)
-                .then(() => {
-                    const updatedPhoto = addVersionToPhoto(photo)
-                    store.dispatch(changePhotosAction([ updatedPhoto ]))
-                })
-        })
+export function updatePhotoVersion(version: VersionType) {  // Type should be `Version`, but it doesn't work...
+    // TODO: Fix
+    throw new Error('Not implemented')
+    //new Photo({ id: version.photo_id })
+    //    .fetch({ withRelated: [ 'versions', 'tags' ] })
+    //    .then(photoModel => {
+    //        const photo = photoModel.toJSON()
+    //        return onThumnailChange(photo.id)
+    //            .then(() => {
+    //                const updatedPhoto = addVersionToPhoto(photo)
+    //                store.dispatch(changePhotosAction([ updatedPhoto ]))
+    //            })
+    //    })
 }
 
 export function toggleFlag(photo: PhotoType) {
@@ -192,7 +180,7 @@ export function setPhotosFlagged(photos: PhotoType[], flag: boolean) {
             .save('flag', flag, { patch: true })
     })
     .then(() => {
-        const changedPhotos = photos.map(photo => ({ ...photo, flag }))
+        const changedPhotos = photos.map(photo => ({ ...photo, flag: flag ? 1 : 0 } as PhotoType))
         store.dispatch(changePhotosAction(changedPhotos))
     })
 }
