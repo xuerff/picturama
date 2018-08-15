@@ -4,18 +4,18 @@ import { connect } from 'react-redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById } from '../../../common/models/Photo'
 import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc, createThumbnail } from '../../controller/ImageProvider'
-import { fetchTotalPhotoCount, fetchPhotos, setPhotosFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
-import { setHighlightedPhotosAction, openExportAction } from '../../state/actions'
+import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
+import { setSelectedPhotosAction, openExportAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
-import { PhotoData } from '../../state/reducers/library'
-import store from '../../state/store'
 import { keySymbols } from '../../UiConstants'
+import { FetchState } from '../../UITypes'
+import store from '../../state/store'
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid from './Grid'
@@ -29,23 +29,24 @@ interface OwnProps {
 
 interface StateProps {
     isFetching: boolean
-    photos: PhotoData
-    photoIds: PhotoId[]
-    photosCount: number
-    totalPhotosCount: number
-    highlightedPhotoIds: PhotoId[]
+    photoCount: number
+    totalPhotoCount: number
+    sectionIds: PhotoSectionId[]
+    sectionById: PhotoSectionById
+    selectedSectionId: PhotoSectionId
+    selectedPhotoIds: PhotoId[]
     showOnlyFlagged: boolean
     isShowingTrash: boolean
 }
 
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
-    fetchPhotos: () => void
+    fetchSections: () => void
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
-    setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
-    setDetailPhotoById: (photoId: PhotoId) => void
-    openExport: (photoIds: PhotoId[]) => void
+    setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
+    setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
+    openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleShowOnlyFlagged: () => void
@@ -63,11 +64,11 @@ export class Library extends React.Component<Props> {
         bindMany(this, 'openExport', 'clearHighlight')
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps: Props, prevState) {
         const props = this.props
 
-        const isExportEnabled = props.isActive && props.highlightedPhotoIds.length > 0
-        const prevIsExportEnabled = prevProps.isActive && prevProps.highlightedPhotoIds.length > 0
+        const isExportEnabled = props.isActive && props.selectedPhotoIds.length > 0
+        const prevIsExportEnabled = prevProps.isActive && prevProps.selectedPhotoIds.length > 0
         if (isExportEnabled !== prevIsExportEnabled) {
             ipcRenderer.send('toggleExportMenu', isExportEnabled)
             if (isExportEnabled) {
@@ -80,15 +81,17 @@ export class Library extends React.Component<Props> {
 
     componentDidMount() {
         this.props.fetchTotalPhotoCount()
-        this.props.fetchPhotos()
+        this.props.fetchSections()
     }
 
     openExport() {
-        this.props.openExport(this.props.highlightedPhotoIds)
+        const props = this.props
+        props.openExport(props.selectedSectionId, props.selectedPhotoIds)
     }
 
     clearHighlight() {
-        this.props.setHighlightedPhotos([])
+        const props = this.props
+        props.setSelectedPhotos(props.selectedSectionId, [])
     }
 
     render() {
@@ -98,7 +101,7 @@ export class Library extends React.Component<Props> {
 
         if (props.isFetching) {
             currentView = <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
-        } else if (props.totalPhotosCount === 0) {
+        } else if (props.totalPhotoCount === 0) {
             const description =
                 <>
                     Press <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code> or button below to start scanning.
@@ -114,7 +117,7 @@ export class Library extends React.Component<Props> {
                     description={description}
                     action={action}
                 />
-        } else if (props.photosCount === 0) {
+        } else if (props.photoCount === 0) {
             currentView =
                 <NonIdealState
                     icon="zoom-out"
@@ -125,12 +128,13 @@ export class Library extends React.Component<Props> {
             currentView =
                 <Grid
                     isActive={props.isActive}
-                    photos={props.photos}
-                    photoIds={props.photoIds}
-                    highlightedPhotoIds={props.highlightedPhotoIds}
+                    sectionIds={props.sectionIds}
+                    sectionById={props.sectionById}
+                    selectedSectionId={props.selectedSectionId}
+                    selectedPhotoIds={props.selectedPhotoIds}
                     getThumbnailSrc={props.getThumbnailSrc}
                     createThumbnail={props.createThumbnail}
-                    setHighlightedPhotos={props.setHighlightedPhotos}
+                    setSelectedPhotos={props.setSelectedPhotos}
                     setDetailPhotoById={props.setDetailPhotoById}
                 />
         }
@@ -139,9 +143,9 @@ export class Library extends React.Component<Props> {
             <div ref="library" className={classNames(props.className, 'Library')} style={props.style}>
                 <LibraryTopBar
                     className="Library-topBar"
-                    photosCount={props.photosCount}
-                    photos={props.photos}
-                    highlightedPhotoIds={props.highlightedPhotoIds}
+                    photosCount={props.photoCount}
+                    selectedSection={props.sectionById[props.selectedSectionId]}
+                    selectedPhotoIds={props.selectedPhotoIds}
                     showOnlyFlagged={props.showOnlyFlagged}
                     isShowingTrash={props.isShowingTrash}
                     openExport={this.openExport}
@@ -154,8 +158,8 @@ export class Library extends React.Component<Props> {
                 </div>
                 <LibraryBottomBar
                     className="Library-bottomBar"
-                    highlightedCount={props.highlightedPhotoIds.length}
-                    photosCount={props.photosCount}
+                    highlightedCount={props.selectedPhotoIds.length}
+                    photosCount={props.photoCount}
                     clearHighlight={this.clearHighlight}
                 />
             </div>
@@ -165,32 +169,34 @@ export class Library extends React.Component<Props> {
 
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => {
+    (state: AppState, props) => {
+        const sections = state.data.sections
         return {
             ...props,
-            isFetching: state.library.photos.isFetching,
-            photos: state.library.photos.data,
-            photoIds: state.library.photos.ids,
-            photosCount: state.library.photos.count,
-            totalPhotosCount: state.library.photos.totalCount,
-            highlightedPhotoIds: state.library.photos.highlightedIds,
+            isFetching: sections.fetchState === FetchState.FETCHING,
+            photoCount: sections.photoCount,
+            totalPhotoCount: sections.totalPhotoCount,
+            sectionIds: sections.ids,
+            sectionById: sections.data,
+            selectedSectionId: state.library.selection.sectionId, 
+            selectedPhotoIds: state.library.selection.photoIds,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
             isShowingTrash: state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash'
         }
     },
     dispatch => ({
         fetchTotalPhotoCount,
-        fetchPhotos,
+        fetchSections,
         getThumbnailSrc,
         createThumbnail,
-        setHighlightedPhotos: highlightedIds => dispatch(setHighlightedPhotosAction(highlightedIds)),
+        setSelectedPhotos: (sectionId, photoIds) => dispatch(setSelectedPhotosAction(sectionId, photoIds)),
         setDetailPhotoById,
-        openExport: photoIds => dispatch(openExportAction(photoIds)),
+        openExport: (sectionId, photoIds) => dispatch(openExportAction(sectionId, photoIds)),
         setPhotosFlagged,
         updatePhotoWork,
         toggleShowOnlyFlagged: () => {
             const oldFilter = store.getState().library.filter
-            setPhotosFilter({ ...oldFilter, showOnlyFlagged: !oldFilter.showOnlyFlagged })
+            setLibraryFilter({ ...oldFilter, showOnlyFlagged: !oldFilter.showOnlyFlagged })
         },
         startScanning: () => {
             ipcRenderer.send('start-scanning')

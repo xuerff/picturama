@@ -2,7 +2,7 @@ import React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import { PhotoType } from '../../common/models/Photo';
+import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models/Photo';
 import CancelablePromise from '../../common/util/CancelablePromise';
 import { Library } from '../../ui/components/library/Library'
 
@@ -10,21 +10,35 @@ import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
 import { testPhoto } from '../util/MockData'
 
 
+const defaultSectionId: PhotoSectionId = '2018-08-15'
+const defaultPhotoIds = [ testPhoto.id ]
+const defaultPhotoData = { [testPhoto.id]: testPhoto }
+
 const defaultProps = {
     style: { width: '100%', height: '100%' },
     isActive: true,
 
     isFetching: false,
-    photos: { [testPhoto.id]: testPhoto },
-    photoIds: [ testPhoto.id ],
-    photosCount: 1042,
-    totalPhotosCount: 12345,
-    highlightedPhotoIds: [],
+
+    photoCount: 1042,
+    totalPhotoCount: 12345,
+    sectionIds: [ defaultSectionId ],
+    sectionById: {
+        [defaultSectionId]: {
+            id: defaultSectionId,
+            title: defaultSectionId,
+            count: defaultPhotoIds.length,
+            photoIds: defaultPhotoIds,
+            photoData: defaultPhotoData
+        }
+    } as PhotoSectionById,
+    selectedSectionId: null,
+    selectedPhotoIds: [],
     showOnlyFlagged: false,
     isShowingTrash: false,
 
     fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
-    fetchPhotos: action('fetchPhotos'),
+    fetchSections: action('fetchSections'),
     getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
     createThumbnail: (photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
@@ -34,7 +48,7 @@ const defaultProps = {
             return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
         }
     },
-    setHighlightedPhotos: action('setHighlightedPhotos'),
+    setSelectedPhotos: action('setSelectedPhotos'),
     setDetailPhotoById: action('setDetailPhotoById'),
     openExport: action('openExport'),
     setPhotosFlagged: action('setPhotosFlagged'),
@@ -50,15 +64,15 @@ addSection('Library')
             {...defaultProps}
         />
     ))
-    .add('highlight', context => (
+    .add('selection', context => (
         <Library
             {...defaultProps}
-            highlightedPhotoIds={[ testPhoto.id ]}
+            selectedPhotoIds={[ testPhoto.id ]}
         />
     ))
     .add('creating thumbnails', context => {
-        let photos = { ...defaultProps.photos }
-        let photoIds = [ ...defaultProps.photoIds ]
+        let photoIds = [ ...defaultPhotoIds ]
+        let photoData = { ...defaultPhotoData }
         for (let i = 0; i < 100; i++) {
             const photo: PhotoType = {
                 ...testPhoto,
@@ -67,15 +81,23 @@ addSection('Library')
                 master: 'dummy',
                 non_raw: null
             }
-            photos[photo.id] = photo
+            photoData[photo.id] = photo
             photoIds.push(photo.id)
         }
 
         return (
             <Library
                 {...defaultProps}
-                photos={photos}
-                photoIds={photoIds}
+                sectionIds={[ defaultSectionId ]}
+                sectionById={{
+                    [defaultSectionId]: {
+                        id: defaultSectionId,
+                        title: defaultSectionId,
+                        count: photoIds.length,
+                        photoIds,
+                        photoData
+                    }
+                } as PhotoSectionById}
             />
         )
     })
@@ -88,15 +110,17 @@ addSection('Library')
     .add('Selection empty', context => (
         <Library
             {...defaultProps}
-            photoIds={[]}
-            photosCount={0}
+            photoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
         />
     ))
     .add('No photos', context => (
         <Library
             {...defaultProps}
-            photoIds={[]}
-            photosCount={0}
-            totalPhotosCount={0}
+            photoCount={0}
+            totalPhotoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
         />
     ))

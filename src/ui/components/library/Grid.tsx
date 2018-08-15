@@ -1,31 +1,33 @@
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 
-import keymapManager from '../../keymap-manager'
-import { PhotoId, PhotoType } from '../../../common/models/Photo'
-import { PhotoData } from '../../state/reducers/library'
+import { PhotoId, PhotoType, PhotoSectionId, PhotoSectionById } from '../../../common/models/Photo'
 import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
-import Picture from './Picture'
+
+import keymapManager from '../../keymap-manager'
+import { isMac } from '../../UiConstants'
+import GridSection from './GridSection'
 
 
 interface Props {
     isActive: boolean
-    photos: PhotoData
-    photoIds: PhotoId[]
-    highlightedPhotoIds: PhotoId[]
+    sectionIds: PhotoSectionId[]
+    sectionById: PhotoSectionById
+    selectedSectionId: PhotoSectionId
+    selectedPhotoIds: PhotoId[]
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
-    setHighlightedPhotos: (highlightedIds: PhotoId[]) => void
-    setDetailPhotoById: (photoId: PhotoId) => void
+    setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
+    setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
 }
 
 export default class Grid extends React.Component<Props, undefined> {
 
     constructor(props: Props) {
-        super(props);
+        super(props)
 
-        bindMany(this, 'pressedEnter', 'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown', 'togglePhotoHighlighted', 'setHighlightedPhoto')
+        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'pressedEnter', 'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown')
     }
 
     componentDidMount() {
@@ -47,9 +49,33 @@ export default class Grid extends React.Component<Props, undefined> {
         this.removeListeners()
     }
 
+    onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
+        const props = this.props
+
+        event.preventDefault()
+
+        if (sectionId === props.selectedSectionId && isMac ? event.metaKey : event.ctrlKey) {
+            const highlighted = props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1
+            if (highlighted) {
+                if (props.selectedPhotoIds.indexOf(photoId) === -1) {
+                    props.setSelectedPhotos(sectionId, [ ...this.props.selectedPhotoIds, photoId ])
+                }
+            } else {
+                props.setSelectedPhotos(sectionId, cloneArrayWithItemRemoved(this.props.selectedPhotoIds, photoId))
+            }
+        } else {
+            props.setSelectedPhotos(sectionId, [ photoId ])
+        }
+    }
+
+    onPhotoDoubleClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
+        this.props.setDetailPhotoById(sectionId, photoId)
+    }
+
     pressedEnter() {
-        if (this.props.highlightedPhotoIds.length === 1) {
-            this.props.setDetailPhotoById(this.props.highlightedPhotoIds[0])
+        const props = this.props
+        if (props.selectedPhotoIds.length === 1) {
+            props.setDetailPhotoById(props.selectedSectionId, props.selectedPhotoIds[0])
         }
     }
 
@@ -70,7 +96,13 @@ export default class Grid extends React.Component<Props, undefined> {
     }
 
     moveHighlight(x: number, y: number) {
-        let currentIndex = this.props.photoIds.indexOf(this.props.highlightedPhotoIds[0])
+        const props = this.props
+        const selectedSection = props.sectionById[props.selectedSectionId]
+        if (!selectedSection) {
+            return
+        }
+
+        let currentIndex = selectedSection.photoIds.indexOf(props.selectedPhotoIds[0])
 
         const gridElem = findDOMNode(this.refs.grid) as HTMLElement
         const gridWidth = gridElem.getBoundingClientRect().width
@@ -78,24 +110,10 @@ export default class Grid extends React.Component<Props, undefined> {
         const columnCount = Math.floor(gridWidth / pictureWidth)
 
         const newHighlightedIndex = currentIndex + x + y * columnCount
-        const newHighlightedPhotoId = this.props.photoIds[newHighlightedIndex]
+        const newHighlightedPhotoId = selectedSection.photoIds[newHighlightedIndex]
         if (newHighlightedPhotoId) {
-            this.props.setHighlightedPhotos([ newHighlightedPhotoId ])
+            props.setSelectedPhotos(selectedSection.id, [ newHighlightedPhotoId ])
         }
-    }
-
-    togglePhotoHighlighted(photoId: PhotoId, highlighted: boolean) {
-        if (highlighted) {
-            if (this.props.highlightedPhotoIds.indexOf(photoId) === -1) {
-                this.props.setHighlightedPhotos([ ...this.props.highlightedPhotoIds, photoId ])
-            }
-        } else {
-            this.props.setHighlightedPhotos(cloneArrayWithItemRemoved(this.props.highlightedPhotoIds, photoId))
-        }
-    }
-
-    setHighlightedPhoto(photoId: PhotoId) {
-        this.props.setHighlightedPhotos([ photoId ])
     }
 
     addListeners() {
@@ -122,19 +140,18 @@ export default class Grid extends React.Component<Props, undefined> {
         const props = this.props
         return (
             <div className="Grid" ref="grid">
-                {props.photoIds.map(photoId =>
-                    <Picture
-                        key={photoId}
-                        photo={props.photos[photoId]}
-                        isHighlighted={props.highlightedPhotoIds.indexOf(photoId) !== -1}
+                {props.sectionIds.map(sectionId =>
+                    <GridSection
+                        key={sectionId}
+                        section={props.sectionById[sectionId]}
+                        selectedPhotoIds={props.selectedPhotoIds}
                         getThumbnailSrc={props.getThumbnailSrc}
                         createThumbnail={props.createThumbnail}
-                        setDetailPhotoById={props.setDetailPhotoById}
-                        togglePhotoHighlighted={this.togglePhotoHighlighted}
-                        setHighlightedPhoto={this.setHighlightedPhoto}
+                        onPhotoClick={this.onPhotoClick}
+                        onPhotoDoubleClick={this.onPhotoDoubleClick}
                     />
                 )}
             </div>
-        );
+        )
     }
 }

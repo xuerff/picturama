@@ -3,15 +3,15 @@ import classNames from 'classnames'
 import React from 'react'
 import { Button, ButtonGroup } from '@blueprintjs/core'
 
+import { PhotoId, PhotoType, PhotoWork, PhotoSection } from '../../../common/models/Photo'
+import { rotate } from '../../../common/util/EffectsUtil'
+import { bindMany } from '../../../common/util/LangUtil'
+
 import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import MdSaveAlt from '../widget/icon/MdSaveAlt'
 import Toolbar from '../widget/Toolbar'
-import { PhotoId, PhotoType, PhotoWork } from '../../../common/models/Photo'
-import { PhotoData } from '../../state/reducers/library'
-import { rotate } from '../../../common/util/EffectsUtil'
-import { bindMany } from '../../../common/util/LangUtil'
 
 const dialog = remote.dialog;
 
@@ -21,8 +21,8 @@ interface Props {
     showOnlyFlagged: boolean
     isShowingTrash: boolean
     photosCount: number
-    photos: PhotoData
-    highlightedPhotoIds: PhotoId[]
+    selectedSection: PhotoSection | null
+    selectedPhotoIds: PhotoId[]
     openExport: () => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
@@ -63,19 +63,19 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
     rotate(turns: number) {
         const props = this.props
-        for (const photoId of props.highlightedPhotoIds) {
-            const photo = props.photos[photoId]
+        for (const photoId of props.selectedPhotoIds) {
+            const photo = props.selectedSection.photoData[photoId]
             props.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
         }
     }
 
     toggleFlagged() {
         const props = this.props
-        const newFlagged = !this.getHighlightedAreFlagged()
+        const newFlagged = !this.getSelectedAreFlagged()
 
         let photosToChange = []
-        for (const photoId of props.highlightedPhotoIds) {
-            const photo = props.photos[photoId]
+        for (const photoId of props.selectedPhotoIds) {
+            const photo = props.selectedSection.photoData[photoId]
             if (!!photo.flag !== newFlagged) {
                 photosToChange.push(photo)
             }
@@ -84,13 +84,13 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         this.props.setPhotosFlagged(photosToChange, newFlagged)
     }
 
-    getHighlightedAreFlagged() {
+    getSelectedAreFlagged() {
         const props = this.props
-        if (props.highlightedPhotoIds.length === 0) {
+        if (!props.selectedSection || props.selectedPhotoIds.length === 0) {
             return false
         } else {
-            for (const photoId of props.highlightedPhotoIds) {
-                const photo = props.photos[photoId]
+            for (const photoId of props.selectedPhotoIds) {
+                const photo = props.selectedSection.photoData[photoId]
                 if (!photo.flag) {
                     return false
                 }
@@ -101,8 +101,8 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
     render() {
         const props = this.props
-        const hasHighlight = props.highlightedPhotoIds.length > 0
-        const highlightedAreFlagged = this.getHighlightedAreFlagged()
+        const hasSelection = props.selectedPhotoIds.length > 0
+        const selectedAreFlagged = this.getSelectedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
                 <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar} title="Show sidebar [tab]">
@@ -118,22 +118,22 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button disabled={!hasHighlight} onClick={this.rotateLeft} title="Rotate left">
+                        <Button disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
                             <MdRotateLeftIcon/>
                         </Button>
-                        <Button disabled={!hasHighlight} onClick={this.rotateRight} title="Rotate right">
+                        <Button disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
                             <MdRotateRightIcon/>
                         </Button>
                     </ButtonGroup>
                     <Button
-                        className={classNames('LibraryTopBar-toggleButton', { isActive: highlightedAreFlagged })}
-                        disabled={!hasHighlight}
+                        className={classNames('LibraryTopBar-toggleButton', { isActive: selectedAreFlagged })}
+                        disabled={!hasSelection}
                         onClick={this.toggleFlagged}
-                        title={highlightedAreFlagged ? 'Remove flag' : 'Flag'}
+                        title={selectedAreFlagged ? 'Remove flag' : 'Flag'}
                     >
                         <FaIcon name="flag" />
                     </Button>
-                    <Button disabled={!hasHighlight} onClick={this.props.openExport} title="Export">
+                    <Button disabled={!hasSelection} onClick={this.props.openExport} title="Export">
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&

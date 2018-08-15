@@ -1,5 +1,5 @@
 import { Action } from '../ActionType'
-import { START_IMPORT, SET_IMPORT_PROGRESS, FETCH_PHOTOS_SUCCESS, FETCH_PHOTOS_FAILURE } from '../actionTypes'
+import { START_IMPORT, SET_IMPORT_PROGRESS, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE } from '../actionTypes'
 
 
 export type ImportProgress = {
@@ -26,8 +26,8 @@ export const importReducer = (state: ImportState = null, action: Action): Import
             return {
                 progress: { ...action.payload.progress }
             }
-        case FETCH_PHOTOS_SUCCESS:
-        case FETCH_PHOTOS_FAILURE:
+        case FETCH_SECTIONS_SUCCESS:
+        case FETCH_SECTIONS_FAILURE:
             return null
         default:
             return state

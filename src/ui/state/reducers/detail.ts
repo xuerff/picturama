@@ -1,15 +1,17 @@
-import { PhotoId, PhotoWork, PhotoDetail } from '../../../common/models/Photo'
+import { PhotoId, PhotoWork, PhotoDetail, PhotoSectionId } from '../../../common/models/Photo'
+
+import { FetchState } from '../../UITypes'
 import { Action } from '../ActionType'
-import { SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK, FETCH_PHOTOS_SUCCESS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH } from '../actionTypes';
+import { SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK, FETCH_SECTIONS_SUCCESS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH } from '../actionTypes'
 
 
 export type DetailState = {
     readonly showDiff: boolean
     readonly currentPhoto: {
-        readonly isFetching: boolean
-        readonly fetchFailed: boolean
-        readonly index: number
-        readonly id: PhotoId
+        readonly fetchState: FetchState
+        readonly sectionId: PhotoSectionId
+        readonly photoIndex: number
+        readonly photoId: PhotoId
         /** Is `null` while loading */
         readonly photoDetail: PhotoDetail | null
         /** Is `null` while loading */
@@ -23,10 +25,10 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
             return {
                 showDiff: false,
                 currentPhoto: {
-                    isFetching: true,
-                    fetchFailed: false,
-                    index: action.payload.photoIndex,
-                    id: action.payload.photoId,
+                    fetchState: FetchState.FETCHING,
+                    sectionId: action.payload.sectionId,
+                    photoIndex: action.payload.photoIndex,
+                    photoId: action.payload.photoId,
                     photoDetail: null,
                     photoWork: null
                 }
@@ -36,7 +38,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 ...state,
                 currentPhoto: {
                     ...state.currentPhoto,
-                    isFetching: false,
+                    fetchState: FetchState.IDLE,
                     photoDetail: action.payload.photoDetail,
                     photoWork: action.payload.photoWork
                 }
@@ -46,12 +48,11 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 ...state,
                 currentPhoto: {
                     ...state.currentPhoto,
-                    isFetching: false,
-                    fetchFailed: true
+                    fetchState: FetchState.FAILURE
                 }
             }
         case CHANGE_PHOTOWORK:
-            if (state && state.currentPhoto.id === action.payload.photoId) {
+            if (state && state.currentPhoto.photoId === action.payload.photoId) {
                 return {
                     ...state,
                     currentPhoto: {
@@ -62,7 +63,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
             } else {
                 return state
             }
-        case FETCH_PHOTOS_SUCCESS:
+        case FETCH_SECTIONS_SUCCESS:
         case CLOSE_DETAIL:
             return null
         case CHANGE_PHOTOS: {
@@ -74,7 +75,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
             }
         }
         case EMPTY_TRASH:
-            if (state && action.payload.trashedPhotoIds.indexOf(state.currentPhoto.id) !== -1) {
+            if (state && action.payload.trashedPhotoIds.indexOf(state.currentPhoto.photoId) !== -1) {
                 return null
             } else {
                 return state

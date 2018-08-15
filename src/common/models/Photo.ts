@@ -4,7 +4,7 @@ import shortid from 'shortid'
 import config from '../config';
 
 import { ExifOrientation, BookshelfClass } from './DataTypes'
-import Tag, { TagType } from './Tag'
+import Tag, { TagType, TagId } from './Tag'
 import Version, { VersionType } from './Version'
 
 shortid.characters(config.characters);
@@ -57,6 +57,28 @@ export interface PhotoDetail {
 export interface PhotoWork {
     rotationTurns?: 1 | 2 | 3
     flagged?: true
+}
+
+export type PhotoSectionId = string
+export type PhotoById = { [index: string]: PhotoType }
+export interface PhotoSection {
+    id: PhotoSectionId
+    title: string
+    count: number
+    photoIds?: PhotoId[]
+    photoData?: PhotoById
+}
+export type PhotoSectionById = { [index: string]: PhotoSection }
+
+
+export type PhotoFilter = {
+    readonly mainFilter:
+        { readonly type: 'date', readonly date: string } |
+        { readonly type: 'tag', readonly tagId: TagId } |
+        { readonly type: 'trash' } |
+        { readonly type: 'processed' } |
+        null
+    readonly showOnlyFlagged: boolean
 }
 
 

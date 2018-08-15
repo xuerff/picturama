@@ -3,11 +3,13 @@ import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import TagsInput from 'react-tagsinput'
 
-import { createTagsAndAssociateToPhoto } from '../controller/PhotoTagController'
 import { PhotoId, PhotoType, PhotoDetail } from '../../common/models/Photo'
+import { bindMany } from '../../common/util/LangUtil'
+
+import { createTagsAndAssociateToPhoto } from '../controller/PhotoTagController'
 import { closeTagsEditorAction } from '../state/actions'
 import { AppState } from '../state/reducers'
-import { bindMany } from '../../common/util/LangUtil'
+import { getPhotoById } from '../state/selectors'
 
 
 const btnClass = 'button button--raised button--colored'
@@ -98,10 +100,11 @@ export class TagEditor extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
+        const currentPhoto = state.detail.currentPhoto
         return {
             ...props,
-            photo: state.library.photos.data[state.detail.currentPhoto.id],
-            photoDetail: state.detail.currentPhoto.photoDetail
+            photo: getPhotoById(currentPhoto.sectionId, currentPhoto.photoId),
+            photoDetail: currentPhoto.photoDetail
         }
     },
     dispatch => ({

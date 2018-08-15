@@ -1,17 +1,15 @@
 import Promise from 'bluebird'
 import isDeepEqual from 'fast-deep-equal'
 
-import { updatePhotos as updatePhotosInDb, fetchPhotoWork, storePhotoWork } from '../BackgroundClient'
-import { BookshelfCollection } from '../../common/models/DataTypes'
-import Photo, { PhotoWork, PhotoType } from '../../common/models/Photo'
-import Tag from '../../common/models/Tag'
+import Photo, { PhotoWork, PhotoType, PhotoFilter } from '../../common/models/Photo'
 import { VersionType } from '../../common/models/Version'
-import store from '../state/store'
-import { fetchTotalPhotoCountAction, fetchPhotosAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
-import { FilterState } from '../state/reducers/library'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import { onThumnailChange } from './ImageProvider'
 import { cloneDeep } from '../../common/util/LangUtil'
+
+import { fetchSections as fetchSectionsFromDb, updatePhotos as updatePhotosInDb, fetchPhotoWork, storePhotoWork } from '../BackgroundClient'
+import store from '../state/store'
+import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
+import { onThumnailChange } from './ImageProvider'
 
 
 assertRendererProcess()
@@ -22,73 +20,26 @@ export function fetchTotalPhotoCount() {
         .then(totalPhotoCount => store.dispatch(fetchTotalPhotoCountAction(totalPhotoCount)))
 }
 
-export function fetchPhotos() {
-    internalFetchPhotos(null)
+export function fetchSections() {
+    internalFetchSections(null)
 }
 
-export function setPhotosFilter(newFilter: FilterState) {
-    internalFetchPhotos(newFilter)
+export function setLibraryFilter(newFilter: PhotoFilter) {
+    internalFetchSections(newFilter)
 }
 
-function internalFetchPhotos(newFilter: FilterState | null) {
+function internalFetchSections(newFilter: PhotoFilter | null) {
     const filter = newFilter || store.getState().library.filter
-    const mainFilter = filter.mainFilter
 
-    store.dispatch(fetchPhotosAction.request({ newFilter }))
-    if (mainFilter && mainFilter.type === 'tag') {
-        new Tag({ id: mainFilter.tagId })
-            .fetch({ withRelated: [ 'photos' ] })
-            .then(tag => {
-                const photosCollection = (tag as any).related('photos') as BookshelfCollection<PhotoType>
-                const photos = photosCollection.toJSON()
-                const photosCount = photos.length  // TODO
-                store.dispatch(fetchPhotosAction.success({ photos, photosCount }))
-            })
-            .catch(error =>
-                store.dispatch(fetchPhotosAction.failure(error))
-            )
-    } else {
-        function buildQuery(q) {
-            let where: any = {
-                trashed: !!(mainFilter && mainFilter.type === 'trash')
-            }
-            if (mainFilter && mainFilter.type === 'date') {
-                where.date = mainFilter.date
-            }
-            if (filter.showOnlyFlagged) {
-                where.flag = true
-            }
-            q.where(where)
-
-            if (mainFilter && mainFilter.type === 'processed') {
-                q.join('versions', 'versions.photo_id', '=', 'photos.id')
-            }
-        }
-
-        const countForge = Photo.forge()
-            .query(q => buildQuery(q))
-            .count()
-
-        const photosForge = Photo.forge()
-            .query(q => {
-                buildQuery(q)
-                q
-                    .offset(0)
-                    .limit(100)
-                    .orderBy('created_at', 'desc')
-            })
-            .fetchAll({ withRelated: [ 'versions', 'tags' ] })
-
-        Promise.all([ countForge, photosForge ])
-            .then(result => {
-                const [ photosCount, photosCollection] = result
-                const photos = photosCollection.toJSON()
-                store.dispatch(fetchPhotosAction.success({ photos, photosCount }))
-            })
-            .catch(error =>
-                store.dispatch(fetchPhotosAction.failure(error))
-            )
-    }
+    store.dispatch(fetchSectionsAction.request({ newFilter }))
+    fetchSectionsFromDb(filter)
+        .then(sections => {
+            store.dispatch(fetchSectionsAction.success({ sections }))
+        })
+        .catch(error => {
+            console.error('Fetching sections failed', error)
+            store.dispatch(fetchSectionsAction.failure(error))
+        })
 }
 
 

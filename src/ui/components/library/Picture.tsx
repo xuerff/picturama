@@ -3,22 +3,21 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { Spinner } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoSectionId } from '../../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
-import { isMac } from '../../UiConstants'
 import FaIcon from '../widget/icon/FaIcon'
 
 
 interface Props {
+    sectionId: PhotoSectionId
     photo: PhotoType
     isHighlighted: boolean
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
-    setDetailPhotoById: (photoId: PhotoId) => void
-    togglePhotoHighlighted: (photoId: PhotoId, highlighted: boolean) => void
-    setHighlightedPhoto: (photoId: PhotoId) => void
+    onPhotoClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
+    onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }
 
 interface State {
@@ -39,7 +38,7 @@ export default class Picture extends React.Component<Props, State> {
             isThumbnailLoaded: false
         }
 
-        bindMany(this, 'onAfterRender', 'positionFlag', 'handleClick', 'handleDblClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
+        bindMany(this, 'onAfterRender', 'positionFlag', 'onClick', 'onDoubleClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
     }
 
     componentDidMount() {
@@ -122,18 +121,14 @@ export default class Picture extends React.Component<Props, State> {
         }
     }
 
-    handleDblClick() {
-        this.props.setDetailPhotoById(this.props.photo.id)
+    onClick(event: React.MouseEvent) {
+        const props = this.props
+        props.onPhotoClick(event, props.sectionId, props.photo.id)
     }
 
-    handleClick(e: React.MouseEvent<HTMLImageElement>) {
-        e.preventDefault()
-
-        if (isMac ? e.metaKey : e.ctrlKey) {
-            this.props.togglePhotoHighlighted(this.props.photo.id, !this.props.isHighlighted)
-        } else {
-            this.props.setHighlightedPhoto(this.props.photo.id)
-        }
+    onDoubleClick(event: React.MouseEvent) {
+        const props = this.props
+        props.onPhotoDoubleClick(event, props.sectionId, props.photo.id)
     }
 
     createThumbnail(delayUpdate: boolean) {
@@ -182,7 +177,7 @@ export default class Picture extends React.Component<Props, State> {
             <a
                 ref="picture"
                 className={classNames('Picture', { isHighlighted: this.props.isHighlighted })}
-                onDoubleClick={this.handleDblClick}>
+                onDoubleClick={this.onDoubleClick}>
                 {state.thumbnailSrc &&
                     <img
                         ref="image"
@@ -190,7 +185,7 @@ export default class Picture extends React.Component<Props, State> {
                         src={state.thumbnailSrc}
                         onLoad={this.onThumbnailLoad}
                         onError={this.onThumbnailLoadError}
-                        onClick={this.handleClick}
+                        onClick={this.onClick}
                     />
                 }
                 {showFlag &&

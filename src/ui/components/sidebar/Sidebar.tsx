@@ -2,19 +2,20 @@ import fs from 'fs'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import config from '../../../common/config'
+import { PhotoFilter } from '../../../common/models/Photo'
+import { TagId, TagType } from '../../../common/models/Tag'
+import { bindMany } from '../../../common/util/LangUtil'
+
+import { setLibraryFilter } from '../../controller/PhotoController'
+import { fetchDates } from '../../controller/PhotoDateController'
+import { fetchTags } from '../../controller/PhotoTagController'
+import { AppState } from '../../state/reducers'
+import Logo from '../widget/icon/Logo'
+import Toolbar from '../widget/Toolbar'
 import Tags from './Tags'
 import Dates from './Dates'
 import Devices from './Devices'
-import Logo from '../widget/icon/Logo'
-import Toolbar from '../widget/Toolbar'
-import config from '../../../common/config'
-import { setPhotosFilter } from '../../controller/PhotoController'
-import { fetchDates } from '../../controller/PhotoDateController'
-import { fetchTags } from '../../controller/PhotoTagController'
-import { TagId, TagType } from '../../../common/models/Tag'
-import { AppState } from '../../state/reducers'
-import { FilterState } from '../../state/reducers/library'
-import { bindMany } from '../../../common/util/LangUtil'
 
 
 let settings
@@ -43,7 +44,7 @@ interface StateProps {
 interface DispatchProps {
     fetchDates: () => void
     fetchTags: () => void
-    setPhotosFilter: (newFilter: FilterState) => void
+    setLibraryFilter: (newFilter: PhotoFilter) => void
 }
 
 interface Props extends OwnProps, StateProps, DispatchProps {
@@ -57,27 +58,27 @@ export class Sidebar extends React.Component<Props> {
     }
 
     onDateSelected(date: string) {
-        this.props.setPhotosFilter({ mainFilter: { type: 'date', date }, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ mainFilter: { type: 'date', date }, showOnlyFlagged: false })
     }
 
     onTagSelected(tag: TagType) {
-        this.props.setPhotosFilter({ mainFilter: { type: 'tag', tagId: tag.id }, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ mainFilter: { type: 'tag', tagId: tag.id }, showOnlyFlagged: false })
     }
 
     showFlagged() {
-        this.props.setPhotosFilter({ mainFilter: null, showOnlyFlagged: true })
+        this.props.setLibraryFilter({ mainFilter: null, showOnlyFlagged: true })
     }
 
     showProcessed() {
-        this.props.setPhotosFilter({ mainFilter: { type: 'processed' }, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ mainFilter: { type: 'processed' }, showOnlyFlagged: false })
     }
 
     showTrash() {
-        this.props.setPhotosFilter({ mainFilter: { type: 'trash' }, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ mainFilter: { type: 'trash' }, showOnlyFlagged: false })
     }
 
     clearFilter() {
-        this.props.setPhotosFilter({ mainFilter: null, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ mainFilter: null, showOnlyFlagged: false })
     }
 
     render() {
@@ -150,21 +151,21 @@ export class Sidebar extends React.Component<Props> {
 
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => {
+    (state: AppState, props) => {
         const mainFilter = state.library.filter.mainFilter
         return {
             ...props,
-            dates: state.library.dates,
+            dates: state.data.dates,
             currentDate: (mainFilter && mainFilter.type === 'date') ? mainFilter.date : null,
-            tags: state.library.tags,
+            tags: state.data.tags,
             currentTagId: (mainFilter && mainFilter.type === 'tag') ? mainFilter.tagId : null,
-            devices: state.library.devices
+            devices: state.data.devices
         }
     },
     dispatch => ({
         fetchDates,
         fetchTags,
-        setPhotosFilter
+        setLibraryFilter
     })
 )(Sidebar)
 

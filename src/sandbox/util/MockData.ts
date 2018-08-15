@@ -1,4 +1,4 @@
-import { PhotoType } from '../../common/models/Photo'
+import { PhotoType, PhotoDetail } from '../../common/models/Photo'
 
 
 export const testPhoto: PhotoType = {
@@ -19,4 +19,9 @@ export const testPhoto: PhotoType = {
     aperture: 5.6,
     date: '2016-09-18',
     trashed: 0
+}
+
+export const testPhotoDetail: PhotoDetail = {
+    tags: [],
+    versions: []
 }

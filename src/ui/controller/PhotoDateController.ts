@@ -1,5 +1,5 @@
 import Photo from '../../common/models/Photo'
-import { DatesState } from '../state/reducers/library'
+import { DatesState } from '../state/reducers/data'
 import store from '../state/store'
 import { fetchDatesAction } from '../state/actions'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'

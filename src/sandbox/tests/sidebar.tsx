@@ -3,19 +3,10 @@ import React from 'react'
 import {addSection, action} from '../core/UiTester'
 
 import { Sidebar } from '../../ui/components/sidebar/Sidebar'
-import { testPhoto } from '../util/MockData'
 
 
 const defaultProps = {
     style: { width: '285px', height: '100%' },
-    isActive: true,
-
-    photos: { [testPhoto.id]: testPhoto },
-    photoIds: [ testPhoto.id ],
-    photosCount: 1042,
-    highlightedPhotoIds: [],
-    showOnlyFlagged: false,
-    isShowingTrash: false,
 
     dates: {
         years: [
@@ -90,7 +81,7 @@ const defaultProps = {
 
     fetchDates: action('fetchDates'),
     fetchTags: action('fetchTags'),
-    setPhotosFilter: action('setPhotosFilter'),
+    setLibraryFilter: action('setLibraryFilter'),
 }
 
 

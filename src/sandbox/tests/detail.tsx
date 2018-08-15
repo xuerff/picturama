@@ -9,6 +9,7 @@ import { testPhoto } from '../util/MockData'
 const defaultProps = {
     style: { width: '100%', height: '100%' },
     isActive: true,
+    sectionId: 'dummy',
     photo: testPhoto,
     isFirst: true,
     isLast: false,

@@ -10,14 +10,13 @@ import { connect } from 'react-redux'
 
 import config from '../../common/config'
 import { bindMany } from '../../common/util/LangUtil'
-import { PhotoId } from '../../common/models/Photo'
+import { PhotoId, PhotoById } from '../../common/models/Photo'
 
 import { fetchPhotoDetail } from '../BackgroundClient'
 import keymapManager from '../keymap-manager'
 import { getNonRawImgPath } from '../controller/ImageProvider'
 import { closeExportAction } from '../state/actions'
 import { AppState } from '../state/reducers'
-import { PhotoData } from '../state/reducers/library'
 import Progress from './Progress'
 
 
@@ -30,7 +29,7 @@ interface OwnProps {
 
 interface StateProps {
     photoIds: PhotoId[]
-    photos: PhotoData
+    photos: PhotoById
 }
 
 interface DispatchProps {
@@ -209,12 +208,11 @@ export class Export extends React.Component<Props, State> {
 
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => {
-        const mainFilter = state.library.filter.mainFilter
+    (state: AppState, props) => {
         return {
             ...props,
             photoIds: state.export.photoIds,
-            photos: state.library.photos.data
+            photos: state.data.sections[state.export.sectionId].photoData
         }
     },
     {

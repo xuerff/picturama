@@ -9,6 +9,7 @@ import { VersionType } from '../../common/models/Version'
 import { getNonRawImgPath } from '../controller/ImageProvider'
 import { closeDiffAction } from '../state/actions'
 import { AppState } from '../state/reducers'
+import { getPhotoById } from '../state/selectors'
 
 
 let rotation = {}
@@ -119,10 +120,10 @@ export class PictureDiff extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
-        const mainFilter = state.library.filter.mainFilter
+        const currentPhoto = state.detail.currentPhoto
         return {
             ...props,
-            photo: state.library.photos.data[state.detail.currentPhoto.id],
+            photo: getPhotoById(currentPhoto.sectionId, currentPhoto.photoId),
             photoDetail: state.detail.currentPhoto.photoDetail
         }
     },

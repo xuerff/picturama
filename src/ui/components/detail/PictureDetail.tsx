@@ -18,10 +18,10 @@ import Toolbar from '../widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../controller/DetailController'
 import { getNonRawImgPath } from '../../controller/ImageProvider'
 import { updatePhotoWork, movePhotosToTrash } from '../../controller/PhotoController'
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { openExportAction, openTagsEditorAction, openDiffAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
-import { getPhotoById, getPhotoByIndex } from '../../state/selectors'
+import { getPhotoById, getPhotoByIndex, getSectionById } from '../../state/selectors'
 import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
@@ -43,6 +43,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+    sectionId: PhotoSectionId
     photo: PhotoType
     photoPrev?: PhotoType
     photoNext?: PhotoType
@@ -58,7 +59,7 @@ interface DispatchProps {
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleFlag: () => void
     movePhotosToTrash: (photos: PhotoType[]) => void
-    openExport: (photoIds: PhotoId[]) => void
+    openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     openTagsEditor: () => void
     openDiff: () => void
     closeDetail: () => void
@@ -210,8 +211,9 @@ export class PictureDetail extends React.Component<Props, State> {
     }
 
     openExport() {
+        const props = this.props
         this.unbindEventListeners();
-        this.props.openExport([ this.props.photo.id ])
+        props.openExport(props.sectionId, [ props.photo.id ])
     }
 
     moveToTrash() {
@@ -321,17 +323,19 @@ export class PictureDetail extends React.Component<Props, State> {
 }
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
-    (state, props) => {
+    (state: AppState, props) => {
         const currentPhoto = state.detail && state.detail.currentPhoto
+        const sectionId = currentPhoto.sectionId
         return {
             ...props,
-            photo: getPhotoById(currentPhoto.id),
-            photoPrev: getPhotoByIndex(currentPhoto.index - 1),
-            photoNext: getPhotoByIndex(currentPhoto.index + 1),
+            sectionId: currentPhoto.sectionId,
+            photo: getPhotoById(sectionId, currentPhoto.photoId),
+            photoPrev: getPhotoByIndex(sectionId, currentPhoto.photoIndex - 1),
+            photoNext: getPhotoByIndex(sectionId, currentPhoto.photoIndex + 1),
             photoDetail: currentPhoto.photoDetail,
             photoWork: currentPhoto.photoWork,
-            isFirst: currentPhoto.index === 0,
-            isLast: currentPhoto.index === state.library.photos.ids.length - 1
+            isFirst: currentPhoto.photoIndex === 0,
+            isLast: currentPhoto.photoIndex === getSectionById(sectionId).photoIds.length - 1
         }
     },
     dispatch => ({
@@ -340,10 +344,10 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         updatePhotoWork,
         toggleFlag: toggleDetailPhotoFlag,
         movePhotosToTrash,
-        openExport: photoIds => dispatch(openExportAction(photoIds)),
+        openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => dispatch(openExportAction(sectionId, photoIds)),
         openTagsEditor: () => dispatch(openTagsEditorAction()),
         openDiff: () => dispatch(openDiffAction()),
-        closeDetail: () => setDetailPhotoByIndex(null)
+        closeDetail: () => setDetailPhotoByIndex(null, null)
     })
 )(PictureDetail)
 

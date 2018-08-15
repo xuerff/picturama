@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork } from '../common/models/Photo'
+import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection } from '../common/models/Photo'
 import { assertRendererProcess } from '../common/util/ElectronUtil'
 
 
@@ -45,6 +45,10 @@ async function callOnBackground(action: string, params: any): Promise<any> {
     })
 }
 
+
+export async function fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
+    return callOnBackground('fetchSections', { filter })
+}
 
 export async function updatePhotos(photoIds: PhotoId[], update: Partial<PhotoType>): Promise<void> {
     return callOnBackground('updatePhotos', { photoIds, update })
