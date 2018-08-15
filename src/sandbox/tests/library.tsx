@@ -65,7 +65,7 @@ addSection('Library')
                 id: `dummy-${i}`,
                 title: `dummy-${i}.JPG`,
                 master: 'dummy',
-                thumb: null
+                non_raw: null
             }
             photos[photo.id] = photo
             photoIds.push(photo.id)

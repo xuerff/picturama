@@ -144,7 +144,7 @@ export default class Scanner {
                             master: originalImgPath,
                             master_width: metaData.imgWidth,
                             master_height: metaData.imgHeight,
-                            thumb: null,   // Will be set further down for raw images
+                            non_raw: null,   // Will be set further down for raw images
                             extension: file.path.match(/\.(.+)$/i)[1],
                             orientation: metaData.orientation,
                             date: moment(metaData.createdAt).format('YYYY-MM-DD'),
@@ -178,7 +178,7 @@ export default class Scanner {
                         return null
                     }
 
-                    const nonRawImgPath = file.isRaw ? `${config.thumbsPath}/${photo.id}.${config.workExt}` : null
+                    const nonRawImgPath = file.isRaw ? `${config.nonRawPath}/${photo.id}.${config.workExt}` : null
 
                     let extractThumb: Promise<string>
                     if (file.hasOwnProperty('imgPath')) {
@@ -204,7 +204,7 @@ export default class Scanner {
                         })
                         .then(outputInfo => {
                             if (overallProfiler) overallProfiler.addPoint('Rotated extracted image')
-                            return DB().update<PhotoType>('photos', { thumb: nonRawImgPath, master_width: outputInfo.width, master_height: outputInfo.height }, photo.id)
+                            return DB().update<PhotoType>('photos', { non_raw: nonRawImgPath, master_width: outputInfo.width, master_height: outputInfo.height }, photo.id)
                         })
                         .then(() => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return photo })
                 })

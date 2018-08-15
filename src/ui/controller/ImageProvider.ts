@@ -25,7 +25,7 @@ const createThumbnailQueue = new SerialJobQueue(() => null, createNextThumbnail)
 
 
 export function getNonRawImgPath(photo: PhotoType): string {
-    return photo.thumb || photo.master
+    return photo.non_raw || photo.master
 }
 
 export async function onThumnailChange(photoId: PhotoId): Promise<void> {

@@ -39,7 +39,7 @@ export default {
     menuPath: `${menusFolder}/${platform}.json`,
     dbFile: `${dotAnsel}/db.sqlite3`,
     settings: `${dotAnsel}/settings.json`,
-    thumbsPath: `${dotAnsel}/thumbs`,
+    nonRawPath: `${dotAnsel}/non-raw`,
     thumbnailPath: `${dotAnsel}/thumbnails`,
     tmp: '/tmp/ansel',
     concurrency: 3,

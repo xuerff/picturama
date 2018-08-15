@@ -4,7 +4,8 @@
 --   - Using text instead of varchar
 --   - Added 'NOT NULL'
 --   - Added columns 'master_width' and 'master_height'
---   - drop column 'thumb_250'
+--   - Dropped column 'thumb_250'
+--   - Renamed column 'thumb' to 'non_raw' (since it holds the path to a full-size image)
 -- We have to create a new table since sqlite doesn't support 'ALTER TABLE ... DROP ...'
 -- See: https://www.sqlite.org/lang_altertable.html
 PRAGMA foreign_keys=OFF;
@@ -14,7 +15,7 @@ CREATE TABLE photos_new (
     `master` text NOT NULL,
     `master_width` integer,
     `master_height` integer,
-    `thumb` text,
+    `non_raw` text,
     `extension` text NOT NULL,
     `flag` boolean default '0' NOT NULL,
     `created_at` datetime,
@@ -28,7 +29,7 @@ CREATE TABLE photos_new (
     `trashed` boolean default '0' NOT NULL,
     primary key (`id`)
 );
-INSERT INTO photos_new (id, title, master, thumb, extension, flag, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed)
+INSERT INTO photos_new (id, title, master, non_raw, extension, flag, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed)
     SELECT id, title, master, thumb, extension, case when flag is null then 0 else flag end, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed
     FROM photos;
 DROP TABLE photos;
@@ -61,7 +62,7 @@ CREATE TABLE photos_new (
     primary key (`id`)
 );
 INSERT INTO photos_new (id, title, master, thumb, extension, flag, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed)
-    SELECT id, title, master, thumb, extension, flag, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed
+    SELECT id, title, master, non_raw, extension, flag, created_at, updated_at, orientation, exposure_time, iso, focal_length, aperture, date, trashed
     FROM photos;
 DROP TABLE photos;
 ALTER TABLE photos_new RENAME TO photos;

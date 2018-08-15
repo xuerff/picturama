@@ -24,7 +24,7 @@ export interface PhotoType {
     /** The height of the original image (in px). */
     master_height: number | null
     /** Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp' */
-    thumb: string | null,
+    non_raw: string | null,
     /** Example: 'JPG' */
     extension: string,
     /** Whether the image is flagged. */

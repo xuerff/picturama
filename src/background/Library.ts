@@ -36,15 +36,18 @@ class Library {
             this.path = settings.directories.photos
             this.versionsPath = settings.directories.versions
 
-            if (!fs.existsSync(config.thumbsPath))
-                fs.mkdirSync(config.thumbsPath)
+            if (!fs.existsSync(config.nonRawPath)) {
+                fs.mkdirSync(config.nonRawPath)
+            }
 
-            if (!fs.existsSync(config.thumbnailPath))
+            if (!fs.existsSync(config.thumbnailPath)) {
                 fs.mkdirSync(config.thumbnailPath)
+            }
         }
 
-        if (!fs.existsSync(config.tmp))
+        if (!fs.existsSync(config.tmp)) {
             fs.mkdirSync(config.tmp)
+        }
 
         ipcMain.on('start-scanning', this.scan)
         ipcMain.on('empty-trash', this.emptyTrash)
@@ -87,8 +90,12 @@ class Library {
             .then(photos => photos.toJSON())
             .map(photo =>
                 Promise.each(
-                    [ photo.master, photo.thumb, getThumbnailPath(photo.id) ],
-                    imgPath => shell.moveItemToTrash(imgPath)
+                    [ photo.master, photo.non_raw, getThumbnailPath(photo.id) ],
+                    imgPath => {
+                        if (imgPath) {
+                            shell.moveItemToTrash(imgPath)
+                        }
+                    }
                 )
                 .then(() => new Photo({ id: photo.id })
                     .destroy()

@@ -15,7 +15,7 @@ export async function fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
 
     // TODO
     //const lastVersion = photo.versions[photo.versions.length - 1]
-    //photo.thumb = lastVersion.output || photo.thumb
+    //photo.non_raw = lastVersion.output || photo.non_raw
 }
 
 

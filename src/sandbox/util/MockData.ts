@@ -7,7 +7,7 @@ export const testPhoto: PhotoType = {
     master: '../specs/photos/IMG_9700.JPG',
     master_width: 5184,
     master_height: 3456,
-    thumb: null,
+    non_raw: null,
     extension: 'JPG',
     flag: 0,
     created_at: 1474222345000,
