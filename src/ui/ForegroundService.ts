@@ -1,17 +1,13 @@
 import { ipcRenderer } from 'electron'
 
-import { profileThumbnailRenderer } from '../common/LogConstants'
 import { fetchDates } from './data/PhotoDateStore'
 import { fetchTotalPhotoCount, fetchPhotos, updatePhotoVersion } from './data/PhotoStore'
 import { fetchTags } from './data/PhotoTagStore'
 import { Device } from '../common/models/DataTypes'
 import { PhotoId } from '../common/models/Photo'
-import Version from '../common/models/Version'
-import { renderThumbnail } from './renderer/ThumbnailRenderer'
 import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from './state/actions'
 import store from './state/store'
 import { assertRendererProcess } from '../common/util/ElectronUtil'
-import Profiler from '../common/util/Profiler'
 import { ImportProgress } from './state/reducers/import'
 
 
@@ -49,14 +45,8 @@ export function init() {
 
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
-    if (action === 'renderThumbnail') {
-        const profiler = profileThumbnailRenderer ? new Profiler(`Rendering thumbail of ${params.photoPath}`) : null
-        return renderThumbnail(params.photoPath, params.orientation, params.photoWork, profiler)
-            .then(result => {
-                if (profiler) profiler.logResult()
-                return result
-            })
-    } else {
+    //if (action === 'todo') {
+    //} else {
         throw new Error('Unknown foreground action: ' + action)
-    }
+    //}
 }

@@ -45,8 +45,3 @@ async function callOnForeground(action: string, params: any): Promise<any> {
         mainWindow.webContents.send('executeForegroundAction', callId, action, params)
     })
 }
-
-
-export async function renderThumbnail(photoPath: string, orientation: ExifOrientation, photoWork: PhotoWork): Promise<string> {
-    return callOnForeground('renderThumbnail', { photoPath, orientation, photoWork })
-}

@@ -166,6 +166,10 @@ export function movePhotosToTrash(photos: PhotoType[]) {
     updatePhotos(photos, { trashed: 1 })
 }
 
+export function updatePhoto(photo: PhotoType, update: Partial<PhotoType>) {
+    updatePhotos([ photo ], update)
+}
+
 export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
     let updatePhotoWorkPromise = null
     if (update.hasOwnProperty('flag')) {

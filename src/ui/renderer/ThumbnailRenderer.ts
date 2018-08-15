@@ -1,10 +1,10 @@
-import { ExifOrientation } from '../../common/models/DataTypes'
 import { PhotoType, PhotoWork } from '../../common/models/Photo'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
 
 import { getNonRawImgPath } from '../data/ImageProvider'
+import { updatePhoto } from '../data/PhotoStore'
 import PhotoCanvas from './PhotoCanvas'
 import { Texture } from './WebGLCanvas'
 
@@ -12,7 +12,7 @@ import { Texture } from './WebGLCanvas'
 assertRendererProcess()
 
 
-type RenderJob = { nonRawImgPath: string, texture: Texture, orientation: ExifOrientation, photoWork: PhotoWork, profiler: Profiler | null }
+type RenderJob = { nonRawImgPath: string, texture: Texture, photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null }
 
 const queue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.nonRawImgPath === existingJob.nonRawImgPath) ? newJob : null,
@@ -28,37 +28,38 @@ let canvas: PhotoCanvas | null = null
 
 
 export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
-    return await renderThumbnail(getNonRawImgPath(photo), photo.orientation, photoWork, profiler)
-}
-
-
-export async function renderThumbnail(nonRawImgPath: string, orientation: ExifOrientation, photoWork: PhotoWork, profiler: Profiler | null): Promise<string> {
     if (canvas === null) {
         canvas = new PhotoCanvas()
             .setMaxSize(maxThumbnailWidth, maxThumbnailHeight)
         if (profiler) profiler.addPoint('Created canvas')
     }
 
+    const nonRawImgPath = getNonRawImgPath(photo)
     return canvas.createTextureFromSrc(nonRawImgPath, profiler)
         .then(texture => {
-            return queue.addJob({ nonRawImgPath, texture, orientation, photoWork, profiler })
+            if (!photo.master_width || !photo.master_height) {
+                // Photo has no master size yet -> Store master size to DB
+                updatePhoto(photo, { master_width: texture.width, master_height: texture.height })
+            }
+
+            return queue.addJob({ nonRawImgPath, texture, photo, photoWork, profiler })
         })
 }
 
 
 async function renderNextThumbnail(job: RenderJob): Promise<string> {
-    const { nonRawImgPath, texture, orientation, photoWork, profiler } = job
+    const { texture, photo, photoWork, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
     canvas
         .setBaseTexture(texture)
-        .setExifOrientation(orientation)
+        .setExifOrientation(photo.orientation)
         .setPhotoWork(photoWork)
         .update()
     if (profiler) profiler.addPoint('Rendered canvas')
 
     if (!canvas.isValid()) {
-        throw new Error(`Thumbnail canvas not valid`)
+        throw new Error('Thumbnail canvas not valid')
     }
 
     const dataUrl = canvas.getElement().toDataURL('image/webp')
