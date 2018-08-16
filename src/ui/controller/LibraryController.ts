@@ -31,7 +31,7 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
 
-    let sectionLayouts: GridSectionLayout[] | null = null
+    let sectionLayouts: GridSectionLayout[] = []
     const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth)
 
     let sectionIdsToProtect: { [index: string]: true }
@@ -87,20 +87,47 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
                 // Calculate boxes
                 layout = createLayoutForLoadedSection(section, viewportWidth)
             }
+        }
 
-            if (!sectionLayouts) {
-                // We have to return a new layout array -> Add all prevLayouts we skipped so far
-                sectionLayouts = prevSectionLayouts.slice(0, sectionIndex)
+        const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
+        if (layout.boxes) {
+            if (sectionBottom < keepMinY || sectionTop > keepMaxY) {
+                // This section is fully invisible -> Keep the layout but add no photos to the DOM
+                layout.fromBoxIndex = null
+                layout.toBoxIndex = null
+            } else {
+                // This section is visible (fully or partly)
+                layout.fromBoxIndex = 0
+                layout.toBoxIndex = section.count
+
+                if (sectionTop < keepMinY || sectionBottom > keepMaxY) {
+                    // This section is party visible -> Go throw the boxes and find the correct boundaries
+                    const boxes = layout.boxes
+                    const boxCount = boxes.length
+
+                    let searchingStart = true
+                    for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
+                        const box = boxes[boxIndex]
+                        const boxTop = sectionTop + sectionHeadHeight + box.top
+                        const boxBottom = boxTop + box.height
+                        if (searchingStart) {
+                            if (boxBottom >= keepMinY) {
+                                layout.fromBoxIndex = boxIndex
+                                searchingStart = false
+                            }
+                        } else if (boxTop > keepMaxY) {
+                            layout.toBoxIndex = boxIndex
+                            break
+                        }
+                    }
+                }
             }
         }
 
-        if (sectionLayouts) {
-            sectionLayouts.push(layout)
-        }
+        sectionLayouts.push(layout)
 
         // -- Check whether we have to load or forget this section --
 
-        const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
         if (section.photoIds) {
             const keepSection = sectionBottom > keepMinY && sectionTop < keepMaxY
             if (!keepSection) {
@@ -151,11 +178,11 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
 
     prevSectionIds = sectionIds
     prevSectionById = sectionById
-    prevSectionLayouts = sectionLayouts || prevSectionLayouts
+    prevSectionLayouts = sectionLayouts
     prevScrollTop = scrollTop
     prevViewportWidth = viewportWidth
 
-    return prevSectionLayouts
+    return sectionLayouts
 }
 
 
@@ -170,7 +197,9 @@ export function createLayoutForLoadedSection(section: PhotoSection, containerWid
         //   - `getLayoutForSections` will detect that the section changed and so it will get a ney layout using the correct master size
         return (master_width && master_height) ? (master_width / master_height) : averageAspect
     })
-    return createLayout(aspects, { containerWidth })
+    const layout: JustifiedLayoutResult = createLayout(aspects, { containerWidth })
+    layout.containerHeight = Math.round(layout.containerHeight)
+    return layout
 }
 
 

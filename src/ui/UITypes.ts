@@ -17,5 +17,9 @@ export interface JustifiedLayoutBox {
 
 export interface GridSectionLayout {
     containerHeight: number
+    /** The index of the first photo to render (inclusive) */
+    fromBoxIndex?: number
+    /** The index of the last photo to render (exclusive) */
+    toBoxIndex?: number
     boxes?: JustifiedLayoutBox[]
 }

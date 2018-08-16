@@ -160,6 +160,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                         ...state.data,
                         [sectionId]: {
                             ...prevSection,
+                            count: photoIds.length,  // Should be correct already, but we set it just in case
                             photoIds,
                             photoData
                         }

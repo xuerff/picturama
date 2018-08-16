@@ -25,29 +25,31 @@ interface Props {
 
 export default class GridSection extends React.Component<Props, undefined> {
 
-    constructor(props: Props) {
-        super(props)
-
-        bindMany(this, 'renderPicture')
-    }
-
-    renderPicture(photoId: PhotoId, index: number) {
+    renderPictures() {
         const props = this.props
-        const boxLayout = props.layout.boxes[index]
+        if (!props.section.photoIds || !props.layout.boxes || props.layout.toBoxIndex === null) {
+            return
+        }
 
-        return (
-            <Picture
-                key={photoId}
-                sectionId={props.section.id}
-                photo={props.section.photoData[photoId]}
-                layoutBox={boxLayout}
-                isHighlighted={props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
-                getThumbnailSrc={props.getThumbnailSrc}
-                createThumbnail={props.createThumbnail}
-                onPhotoClick={props.onPhotoClick}
-                onPhotoDoubleClick={props.onPhotoDoubleClick}
-            />
-        )
+        const toBoxIndex = props.layout.toBoxIndex
+        let elems = []
+        for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
+            const photoId = props.section.photoIds[photoIndex]
+            elems.push(
+                <Picture
+                    key={photoId}
+                    sectionId={props.section.id}
+                    photo={props.section.photoData[photoId]}
+                    layoutBox={props.layout.boxes[photoIndex]}
+                    isHighlighted={props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
+                    getThumbnailSrc={props.getThumbnailSrc}
+                    createThumbnail={props.createThumbnail}
+                    onPhotoClick={props.onPhotoClick}
+                    onPhotoDoubleClick={props.onPhotoDoubleClick}
+                />
+            )
+        }
+        return elems
     }
 
     render() {
@@ -57,11 +59,10 @@ export default class GridSection extends React.Component<Props, undefined> {
             <div className="GridSection">
                 <div className="GridSection-head">{props.section.title}</div>
                 <div className="GridSection-body" style={{ height: props.layout.containerHeight }}>
-                    {props.section.photoIds && props.layout.boxes &&
-                        props.section.photoIds.map(this.renderPicture)
-                    }
+                    {this.renderPictures()}
                 </div>
             </div>
         );
     }
+
 }
