@@ -7,6 +7,7 @@ import { TagType } from '../../common/models/Tag'
 import {
     SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
+    FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_DATES, FETCH_TAGS, CREATE_TAGS,
     INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, TOGGLE_DIFF
 } from './actionTypes'
@@ -23,6 +24,8 @@ export const setSelectedPhotosAction = (sectionId: PhotoSectionId, photoIds: Pho
 
 export const fetchTotalPhotoCountAction = (totalPhotoCount: number) => action(FETCH_TOTAL_PHOTO_COUNT, { totalPhotoCount })
 export const fetchSectionsAction = createAsyncAction(FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE)<{ newFilter: PhotoFilter | null }, { sections: PhotoSection[] }, Error>()
+export const fetchSectionPhotosAction = (sectionId: PhotoSectionId, photos: PhotoType[]) => action(FETCH_SECTION_PHOTOS, { sectionId, photos })
+export const forgetSectionPhotosAction = (sectionIds: { [index: string]: true }) => action(FORGET_SECTION_PHOTOS, { sectionIds })
 export const changePhotoWorkAction = (photoId: PhotoId, photoWork: PhotoWork) => action(CHANGE_PHOTOWORK, { photoId, photoWork })
 export const changePhotosAction = (photos: PhotoType[]) => action(CHANGE_PHOTOS, { photos })
 export const emptyTrashAction = (trashedPhotoIds: PhotoId[]) => action(EMPTY_TRASH, { trashedPhotoIds })

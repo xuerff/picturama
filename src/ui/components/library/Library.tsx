@@ -10,6 +10,7 @@ import { bindMany } from '../../../common/util/LangUtil'
 
 import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc, createThumbnail } from '../../controller/ImageProvider'
+import { getLayoutForSections } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
 import { setSelectedPhotosAction, openExportAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
@@ -18,7 +19,7 @@ import { FetchState } from '../../UITypes'
 import store from '../../state/store'
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
-import Grid from './Grid'
+import Grid, { LayoutForSectionsFunction } from './Grid'
 
 import './Library.less'
 
@@ -44,6 +45,7 @@ interface StateProps {
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
+    getLayoutForSections: LayoutForSectionsFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
@@ -129,11 +131,13 @@ export class Library extends React.Component<Props> {
         } else {
             currentView =
                 <Grid
+                    className="Library-grid"
                     isActive={props.isActive}
                     sectionIds={props.sectionIds}
                     sectionById={props.sectionById}
                     selectedSectionId={props.selectedSectionId}
                     selectedPhotoIds={props.selectedPhotoIds}
+                    getLayoutForSections={props.getLayoutForSections}
                     getThumbnailSrc={props.getThumbnailSrc}
                     createThumbnail={props.createThumbnail}
                     setSelectedPhotos={props.setSelectedPhotos}
@@ -189,6 +193,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     dispatch => ({
         fetchTotalPhotoCount,
         fetchSections,
+        getLayoutForSections,
         getThumbnailSrc,
         createThumbnail,
         setSelectedPhotos: (sectionId, photoIds) => dispatch(setSelectedPhotosAction(sectionId, photoIds)),

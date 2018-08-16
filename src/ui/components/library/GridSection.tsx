@@ -10,6 +10,9 @@ import Picture from './Picture'
 import './GridSection.less'
 
 
+export const sectionHeadHeight = 60  // Keep in sync with `GridSection.less`
+
+
 interface Props {
     section: PhotoSection
     layout: GridSectionLayout

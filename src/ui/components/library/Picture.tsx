@@ -162,6 +162,7 @@ export default class Picture extends React.Component<Props, State> {
                     width:  Math.round(layoutBox.width),
                     height: Math.round(layoutBox.height)
                 }}
+                onClick={this.onClick}
                 onDoubleClick={this.onDoubleClick}>
                 {state.thumbnailSrc &&
                     <img
@@ -172,7 +173,6 @@ export default class Picture extends React.Component<Props, State> {
                         src={state.thumbnailSrc}
                         onLoad={this.onThumbnailLoad}
                         onError={this.onThumbnailLoadError}
-                        onClick={this.onClick}
                     />
                 }
                 {showFlag &&

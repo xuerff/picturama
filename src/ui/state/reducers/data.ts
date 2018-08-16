@@ -8,7 +8,7 @@ import { cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
 import { Action } from '../ActionType'
 import {
     FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, CHANGE_PHOTOS, EMPTY_TRASH,
-    FETCH_DATES, FETCH_TAGS, CREATE_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE
+    FETCH_DATES, FETCH_TAGS, CREATE_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
 } from '../actionTypes'
 import { FetchState } from '../../UITypes'
 
@@ -143,6 +143,51 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                 ...state,  // We keep the old photos
                 fetchState: FetchState.FAILURE
             }
+        case FETCH_SECTION_PHOTOS: {
+            const sectionId = action.payload.sectionId
+            const prevSection = state.data[sectionId]
+            if (prevSection) {
+                let photoIds = []
+                let photoData = {}
+                for (const photo of action.payload.photos) {
+                    photoIds.push(photo.id)
+                    photoData[photo.id] = photo
+                }
+
+                return {
+                    ...state,
+                    data: {
+                        ...state.data,
+                        [sectionId]: {
+                            ...prevSection,
+                            photoIds,
+                            photoData
+                        }
+                    }
+                }
+            } else {
+                return state
+            }
+        }
+        case FORGET_SECTION_PHOTOS: {
+            const sectionIdsToForget = action.payload.sectionIds
+            let newSectionData = {}
+            for (const sectionId of state.ids) {
+                const prevSection = state.data[sectionId]
+                newSectionData[sectionId] = sectionIdsToForget[sectionId] ?
+                    {
+                        id: prevSection.id,
+                        title: prevSection.title,
+                        count: prevSection.count
+                    } :
+                    prevSection
+            }
+
+            return {
+                ...state,
+                data: newSectionData
+            }
+        }
         case CHANGE_PHOTOS: {
             const updatedPhotos = action.payload.photos
             let newSectionData = {}

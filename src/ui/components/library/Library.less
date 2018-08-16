@@ -14,8 +14,14 @@
 .Library-body {
     position: relative;
     flex: 1 1 100%;
-    overflow-x: hidden;  // Don't show vertical scrollbars during transition when hiding the sidebar
-    overflow-y: auto;
+}
+
+.Library-grid {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .Library-spinner {

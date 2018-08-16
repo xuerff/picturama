@@ -6,7 +6,9 @@ import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models
 import CancelablePromise from '../../common/util/CancelablePromise';
 import { Library } from '../../ui/components/library/Library'
 
+import { GridSectionLayout } from '../../ui/UITypes'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
+import { createLayoutForLoadedSection } from '../../ui/controller/LibraryController'
 import { testPhoto, testUprightPhoto, testPanoramaPhoto } from '../util/MockData'
 import { createRandomDummyPhoto, createSection } from '../util/TestUtil'
 
@@ -34,6 +36,7 @@ const defaultProps = {
 
     fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
     fetchSections: action('fetchSections'),
+    getLayoutForSections,
     getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
     createThumbnail: (photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
@@ -50,6 +53,14 @@ const defaultProps = {
     updatePhotoWork: action('updatePhotoWork'),
     toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
     startScanning: action('startScanning'),
+}
+
+
+export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
+    scrollTop: number, viewportWidth: number, viewportHeight: number):
+    GridSectionLayout[]
+{
+    return sectionIds.map(sectionId => createLayoutForLoadedSection(sectionById[sectionId], viewportWidth))
 }
 
 
