@@ -7,12 +7,13 @@ import CancelablePromise from '../../common/util/CancelablePromise';
 import { Library } from '../../ui/components/library/Library'
 
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
-import { testPhoto } from '../util/MockData'
+import { testPhoto, testUprightPhoto, testPanoramaPhoto } from '../util/MockData'
+import { createRandomDummyPhoto, createSection } from '../util/TestUtil'
 
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
-const defaultPhotoIds = [ testPhoto.id ]
-const defaultPhotoData = { [testPhoto.id]: testPhoto }
+const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
+const defaultSection = createSection(defaultSectionId, defaultPhotos)
 
 const defaultProps = {
     style: { width: '100%', height: '100%' },
@@ -24,13 +25,7 @@ const defaultProps = {
     totalPhotoCount: 12345,
     sectionIds: [ defaultSectionId ],
     sectionById: {
-        [defaultSectionId]: {
-            id: defaultSectionId,
-            title: defaultSectionId,
-            count: defaultPhotoIds.length,
-            photoIds: defaultPhotoIds,
-            photoData: defaultPhotoData
-        }
+        [defaultSectionId]: defaultSection
     } as PhotoSectionById,
     selectedSectionId: null,
     selectedPhotoIds: [],
@@ -71,32 +66,18 @@ addSection('Library')
         />
     ))
     .add('creating thumbnails', context => {
-        let photoIds = [ ...defaultPhotoIds ]
-        let photoData = { ...defaultPhotoData }
+        let photos = [ ...defaultPhotos ]
         for (let i = 0; i < 100; i++) {
-            const photo: PhotoType = {
-                ...testPhoto,
-                id: `dummy-${i}`,
-                title: `dummy-${i}.JPG`,
-                master: 'dummy',
-                non_raw: null
-            }
-            photoData[photo.id] = photo
-            photoIds.push(photo.id)
+            photos.push(createRandomDummyPhoto())
         }
+        const section = createSection(defaultSectionId, photos)
 
         return (
             <Library
                 {...defaultProps}
                 sectionIds={[ defaultSectionId ]}
                 sectionById={{
-                    [defaultSectionId]: {
-                        id: defaultSectionId,
-                        title: defaultSectionId,
-                        count: photoIds.length,
-                        photoIds,
-                        photoData
-                    }
+                    [defaultSectionId]: section
                 } as PhotoSectionById}
             />
         )

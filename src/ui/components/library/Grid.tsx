@@ -144,6 +144,7 @@ export default class Grid extends React.Component<Props, undefined> {
                     <GridSection
                         key={sectionId}
                         section={props.sectionById[sectionId]}
+                        layout={{ containerHeight: 100 } /* TODO */ }
                         selectedPhotoIds={props.selectedPhotoIds}
                         getThumbnailSrc={props.getThumbnailSrc}
                         createThumbnail={props.createThumbnail}

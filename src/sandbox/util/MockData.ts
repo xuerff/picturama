@@ -21,6 +21,46 @@ export const testPhoto: PhotoType = {
     trashed: 0
 }
 
+export const testUprightPhoto: PhotoType = {
+    id: 'FRL1FAT1G3',
+    title: 'upright',
+    master: '../specs/photos/upright.jpg',
+    master_width: 785,
+    master_height: 1024,
+    non_raw: null,
+    extension: 'jpg',
+    flag: 1,
+    created_at: null,
+    updated_at: null,
+    orientation: 1,
+    exposure_time: null,
+    iso: null,
+    focal_length: null,
+    aperture: null,
+    date: '2018-05-15',
+    trashed: 0
+}
+
+export const testPanoramaPhoto: PhotoType = {
+    id: 'BRllCnsu7y',
+    title: 'panorama',
+    master: '../specs/photos/panorama.jpg',
+    master_width: 1024,
+    master_height: 225,
+    non_raw: null,
+    extension: 'jpg',
+    flag: 0,
+    created_at: null,
+    updated_at: null,
+    orientation: 1,
+    exposure_time: null,
+    iso: null,
+    focal_length: null,
+    aperture: null,
+    date: '2018-05-15',
+    trashed: 0
+}
+
 export const testPhotoDetail: PhotoDetail = {
     tags: [],
     versions: []

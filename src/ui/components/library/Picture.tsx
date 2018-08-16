@@ -7,12 +7,15 @@ import { PhotoId, PhotoType, PhotoSectionId } from '../../../common/models/Photo
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
+import { JustifiedLayoutBox } from '../../UITypes'
 import FaIcon from '../widget/icon/FaIcon'
 
 
 interface Props {
+    className?: any
     sectionId: PhotoSectionId
     photo: PhotoType
+    layoutBox: JustifiedLayoutBox
     isHighlighted: boolean
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (photo: PhotoType) => CancelablePromise<string>
@@ -38,7 +41,7 @@ export default class Picture extends React.Component<Props, State> {
             isThumbnailLoaded: false
         }
 
-        bindMany(this, 'onAfterRender', 'positionFlag', 'onClick', 'onDoubleClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
+        bindMany(this, 'onClick', 'onDoubleClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
     }
 
     componentDidMount() {
@@ -77,30 +80,6 @@ export default class Picture extends React.Component<Props, State> {
             window.clearTimeout(this.delayedUpdateTimout)
             this.createThumbnailPromise.cancel()
             this.createThumbnailPromise = null
-        }
-    }
-
-    onAfterRender() {
-        if (this.refs.flag) {
-            const imageElem = findDOMNode(this.refs.image) as HTMLImageElement & { _loadAdded: boolean }
-            if (imageElem.complete) {
-                this.positionFlag()
-            } else if (!imageElem._loadAdded) {
-                imageElem.addEventListener('load', this.positionFlag)
-                imageElem._loadAdded = true
-            }
-        }
-    }
-
-    positionFlag() {
-        if (this.refs.flag) {
-            const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
-            const imageElem = findDOMNode(this.refs.image) as HTMLImageElement
-            const flagElem = findDOMNode(this.refs.flag) as HTMLElement
-
-            flagElem.style.display = 'block'
-            flagElem.style.right  = `${Math.round((pictureElem.offsetWidth  - imageElem.offsetWidth ) / 2)}px`
-            flagElem.style.bottom = `${Math.round((pictureElem.offsetHeight - imageElem.offsetHeight) / 2)}px`
         }
     }
 
@@ -169,19 +148,25 @@ export default class Picture extends React.Component<Props, State> {
         const props = this.props
         const state = this.state
         const showFlag = !!(props.photo.flag && state.isThumbnailLoaded)
+        const layoutBox = props.layoutBox
 
-        if (showFlag) {
-            setTimeout(this.onAfterRender)
-        }
         return (
-            <a
+            <div
                 ref="picture"
-                className={classNames('Picture', { isHighlighted: this.props.isHighlighted })}
+                className={classNames(props.className, 'Picture', { isHighlighted: this.props.isHighlighted })}
+                style={{
+                    left:   Math.round(layoutBox.left),
+                    top:    Math.round(layoutBox.top),
+                    width:  Math.round(layoutBox.width),
+                    height: Math.round(layoutBox.height)
+                }}
                 onDoubleClick={this.onDoubleClick}>
                 {state.thumbnailSrc &&
                     <img
                         ref="image"
-                        className="Picture-thumbnail shadow--2dp"
+                        className="Picture-thumbnail"
+                        width={layoutBox.width}
+                        height={layoutBox.height}
                         src={state.thumbnailSrc}
                         onLoad={this.onThumbnailLoad}
                         onError={this.onThumbnailLoadError}
@@ -194,7 +179,7 @@ export default class Picture extends React.Component<Props, State> {
                 {state.thumbnailSrc === null &&
                     <Spinner className="Picture-spinner" />
                 }
-            </a>
+            </div>
         )
     }
 }
