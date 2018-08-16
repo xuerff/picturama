@@ -18,6 +18,7 @@ import { bindMany } from '../common/util/LangUtil'
 import { fetchPhotoWork } from './PhotoWorkStore'
 import { profileScanner } from '../common/LogConstants'
 import Profiler from '../common/util/Profiler'
+import { ExifOrientation } from '../common/models/DataTypes';
 
 
 const readFile = BluebirdPromise.promisify(fs.readFile)
@@ -120,6 +121,7 @@ export default class Scanner {
             }
 
             const photoId = generatePhotoId()
+            let switchSides = (metaData.orientation == ExifOrientation.Left) || (metaData.orientation == ExifOrientation.Right)
             let master_width = metaData.imgWidth
             let master_height = metaData.imgHeight
             let nonRawImgPath: string = null
@@ -144,17 +146,22 @@ export default class Scanner {
                     .rotate()
                     .withMetadata()
                     .toFile(nonRawImgPath)
+                switchSides = false
                 master_width = outputInfo.width
                 master_height = outputInfo.height
                 if (profiler) profiler.addPoint('Rotated extracted image')
+            }
+
+            if ((photoWork.rotationTurns || 0) === 1) {
+                switchSides = !switchSides
             }
 
             const photo: PhotoType = {
                 id: photoId,
                 title: file.name,
                 master: originalImgPath,
-                master_width,
-                master_height,
+                master_width:  switchSides ? master_height : master_width,
+                master_height: switchSides ? master_width : master_height,
                 non_raw: nonRawImgPath,
                 extension: file.path.match(/\.(.+)$/i)[1],
                 orientation: metaData.orientation,
