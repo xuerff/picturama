@@ -25,6 +25,8 @@ import { getPhotoById, getPhotoByIndex, getSectionById } from '../../state/selec
 import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
+import './PictureDetail.less'
+
 const { MenuItem } = remote;
 
 

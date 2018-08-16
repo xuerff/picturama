@@ -20,6 +20,8 @@ import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid from './Grid'
 
+import './Library.less'
+
 
 interface OwnProps {
     style?: any

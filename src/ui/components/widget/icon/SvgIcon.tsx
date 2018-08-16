@@ -1,6 +1,9 @@
 import classNames from 'classnames'
 import React from 'react'
 
+import './SvgIcon.less'
+
+
 export interface Props {
     className?: any
     style?: any

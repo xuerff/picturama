@@ -1,6 +1,9 @@
 import classNames from 'classnames'
 import React from 'react'
 
+import './Toolbar.less'
+
+
 interface Props {
     id?: string
     className?: any

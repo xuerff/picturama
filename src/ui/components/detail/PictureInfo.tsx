@@ -3,6 +3,8 @@ import React from 'react'
 
 import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
 
+import './PictureInfo.less'
+
 
 interface Props {
     className?: any

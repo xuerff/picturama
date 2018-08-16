@@ -10,6 +10,8 @@ import { bindMany } from '../../../common/util/LangUtil'
 import { JustifiedLayoutBox } from '../../UITypes'
 import FaIcon from '../widget/icon/FaIcon'
 
+import './Picture.less'
+
 
 interface Props {
     className?: any

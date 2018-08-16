@@ -3,6 +3,8 @@ import React from 'react'
 
 import Toolbar from '../widget/Toolbar'
 
+import './LibraryBottomBar.less'
+
 
 interface Props {
     className?: any

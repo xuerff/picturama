@@ -17,6 +17,8 @@ import Tags from './Tags'
 import Dates from './Dates'
 import Devices from './Devices'
 
+import './Sidebar.less'
+
 
 let settings
 

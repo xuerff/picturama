@@ -15,6 +15,8 @@ import { ImportProgress } from '../../state/reducers/import'
 import { ModalState } from '../../state/reducers/navigation'
 import { bindMany } from '../../../common/util/LangUtil'
 
+import './Ansel.less'
+
 
 interface OwnProps {
     style?: any

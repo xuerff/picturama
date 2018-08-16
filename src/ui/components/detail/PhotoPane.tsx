@@ -9,6 +9,8 @@ import PhotoCanvas from '../../renderer/PhotoCanvas'
 import { Texture } from '../../renderer/WebGLCanvas'
 import Profiler from '../../../common/util/Profiler'
 
+import './PhotoPane.less'
+
 
 const textureCacheMaxSize = 5
 

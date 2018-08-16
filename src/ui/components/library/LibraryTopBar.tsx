@@ -13,6 +13,8 @@ import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
 import MdSaveAlt from '../widget/icon/MdSaveAlt'
 import Toolbar from '../widget/Toolbar'
 
+import './LibraryTopBar.less'
+
 const dialog = remote.dialog;
 
 
