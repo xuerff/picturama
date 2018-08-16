@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
-import { Spinner } from '@blueprintjs/core'
 
 import { PhotoId, PhotoType, PhotoSectionId } from '../../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
@@ -177,9 +176,6 @@ export default class Picture extends React.Component<Props, State> {
                 }
                 {showFlag &&
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
-                }
-                {state.thumbnailSrc === null &&
-                    <Spinner className="Picture-spinner" />
                 }
             </div>
         )
