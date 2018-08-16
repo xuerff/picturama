@@ -25,7 +25,11 @@ export default class SerialJobQueue<Job, JobResult> {
     private isJobRunning = false
 
 
-    constructor(private combineJobs: (newJob: Job, existingJob: Job) => Job | null, private processJob: (job: Job) => Promise<JobResult>) {
+    constructor(
+        private combineJobs: (newJob: Job, existingJob: Job) => Job | null,
+        private processJob: (job: Job) => Promise<JobResult>,
+        private getJobPriority?: (job: Job) => number)
+    {
     }
 
 
@@ -52,7 +56,11 @@ export default class SerialJobQueue<Job, JobResult> {
         if (this.isJobRunning) {
             return
         }
-    
+
+        if (this.getJobPriority) {
+            this.jobQueue.sort((jobInfo1, jobInfo2) => this.getJobPriority(jobInfo2.job) - this.getJobPriority(jobInfo1.job))
+        }
+
         const nextJobInfo = this.jobQueue.shift()
         if (!nextJobInfo) {
             return

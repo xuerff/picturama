@@ -9,7 +9,7 @@ import { cloneDeep } from '../../common/util/LangUtil'
 import { fetchSections as fetchSectionsFromDb, updatePhotos as updatePhotosInDb, fetchPhotoWork, storePhotoWork } from '../BackgroundClient'
 import store from '../state/store'
 import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
-import { onThumnailChange } from './ImageProvider'
+import { onThumbnailChange } from './ImageProvider'
 
 
 assertRendererProcess()
@@ -83,7 +83,7 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
                 return Promise.all([
                     storePhotoWork(photoPath, photoWork),
-                    thumbnailNeedsUpdate ? onThumnailChange(photo.id) : null
+                    thumbnailNeedsUpdate ? onThumbnailChange(photo.id) : null
                 ])
             })
             .catch(error => {

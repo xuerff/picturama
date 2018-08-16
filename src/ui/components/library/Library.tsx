@@ -9,8 +9,8 @@ import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import { setDetailPhotoById } from '../../controller/DetailController'
-import { getThumbnailSrc, createThumbnail } from '../../controller/ImageProvider'
-import { getLayoutForSections } from '../../controller/LibraryController'
+import { getThumbnailSrc } from '../../controller/ImageProvider'
+import { getLayoutForSections, createThumbnail } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
 import { setSelectedPhotosAction, openExportAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
@@ -47,7 +47,7 @@ interface DispatchProps {
     fetchSections: () => void
     getLayoutForSections: LayoutForSectionsFunction
     getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void

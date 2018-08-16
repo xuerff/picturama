@@ -18,7 +18,7 @@ interface Props {
     layout: GridSectionLayout
     selectedPhotoIds: PhotoId[] | null
     getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     onPhotoClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
     onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }

@@ -12,7 +12,7 @@ import { Texture } from './WebGLCanvas'
 assertRendererProcess()
 
 
-type RenderJob = { nonRawImgPath: string, texture: Texture, photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null }
+type RenderJob = { nonRawImgPath: string, photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null }
 
 const queue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.nonRawImgPath === existingJob.nonRawImgPath) ? newJob : null,
@@ -28,34 +28,34 @@ let canvas: PhotoCanvas | null = null
 
 
 export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
+    const nonRawImgPath = getNonRawImgPath(photo)
+    return queue.addJob({ nonRawImgPath, photo, photoWork, profiler })
+}
+
+
+async function renderNextThumbnail(job: RenderJob): Promise<string> {
+    const { nonRawImgPath, photo, photoWork, profiler } = job
+    if (profiler) profiler.addPoint('Waited in queue')
+
     if (canvas === null) {
         canvas = new PhotoCanvas()
             .setMaxSize(maxThumbnailWidth, maxThumbnailHeight)
         if (profiler) profiler.addPoint('Created canvas')
     }
 
-    const nonRawImgPath = getNonRawImgPath(photo)
-    return canvas.createTextureFromSrc(nonRawImgPath, profiler)
-        .then(texture => {
-            // Update photo size in DB
-            const rotationTurns = getTotalRotationTurns(photo.orientation, photoWork)
-            const switchSides = (rotationTurns % 2) === 1
-            const master_width = switchSides ? texture.height : texture.width
-            const master_height = switchSides ? texture.width : texture.height
-            if (master_width !== photo.master_width || photo.master_height !== master_height) {
-                updatePhoto(photo, { master_width, master_height })
-            }
+    const texture = await canvas.createTextureFromSrc(nonRawImgPath, profiler)
 
-            // Update thumbnail
-            return queue.addJob({ nonRawImgPath, texture, photo, photoWork, profiler })
-        })
-}
+    // Update photo size in DB (asynchronously)
+    const rotationTurns = getTotalRotationTurns(photo.orientation, photoWork)
+    const switchSides = (rotationTurns % 2) === 1
+    const master_width = switchSides ? texture.height : texture.width
+    const master_height = switchSides ? texture.width : texture.height
+    if (master_width !== photo.master_width || photo.master_height !== master_height) {
+        updatePhoto(photo, { master_width, master_height })
+    }
+    if (profiler) profiler.addPoint('Checked photo size in DB')
 
-
-async function renderNextThumbnail(job: RenderJob): Promise<string> {
-    const { texture, photo, photoWork, profiler } = job
-    if (profiler) profiler.addPoint('Waited in queue')
-
+    // Render thumbnail
     canvas
         .setBaseTexture(texture)
         .setExifOrientation(photo.orientation)

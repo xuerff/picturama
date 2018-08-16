@@ -28,7 +28,7 @@ interface Props {
     selectedPhotoIds: PhotoId[]
     getLayoutForSections: LayoutForSectionsFunction
     getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
 }

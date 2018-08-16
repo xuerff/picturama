@@ -20,7 +20,7 @@ interface Props {
     layoutBox: JustifiedLayoutBox
     isHighlighted: boolean
     getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (photo: PhotoType) => CancelablePromise<string>
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     onPhotoClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
     onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }
@@ -120,7 +120,7 @@ export default class Picture extends React.Component<Props, State> {
             this.setState({ thumbnailSrc: null, isThumbnailLoaded: false })
         }
 
-        this.createThumbnailPromise = this.props.createThumbnail(this.props.photo)
+        this.createThumbnailPromise = this.props.createThumbnail(this.props.sectionId, this.props.photo)
             .then(thumbnailSrc => {
                 window.clearTimeout(this.delayedUpdateTimout)
                 if (thumbnailSrc === this.state.thumbnailSrc) {
