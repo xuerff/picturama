@@ -303,17 +303,19 @@ function getThumbnailPriority(job: CreateThumbnailJob): number {
     }
 
     const boxTop = layout.sectionTop + sectionHeadHeight + box.top
-    if (boxTop > prevScrollTop + prevViewportHeight) {
-        // Box is below viewport
-        return prevScrollTop + prevViewportHeight - boxTop  // should be negative
+    const scrollBottom = prevScrollTop + prevViewportHeight
+    if (boxTop > scrollBottom) {
+        // Box is below viewport -> Use a negative prio reflecting the distance
+        return scrollBottom - boxTop
     }
 
     const boxBottom = boxTop + box.height
     if (boxBottom < prevScrollTop) {
-        // Box is above viewport
-        return boxBottom - prevScrollTop  // should be negative
+        // Box is above viewport -> Use a negative prio reflecting the distance
+        return boxBottom - prevScrollTop
     }
 
-    // Box is visible
-    return 0
+    // Box is visible -> Use a positive prio reflecting position (images should appear in reading order)
+    const prio = (scrollBottom - boxTop) + (prevViewportWidth - box.left) / prevViewportWidth
+    return prio
 }
