@@ -100,127 +100,90 @@ export default class Scanner {
         return preparedFiles;
     }
 
-    walk(file: FileInfo): Promise<void> {
-        const overallProfiler = profileScanner ? new Profiler(`Importing ${file.path} (overall)`) : null
+    async walk(file: FileInfo): Promise<void> {
+        const profiler = profileScanner ? new Profiler(`Importing ${file.path}`) : null
 
-        const originalImgPath = file.path
-
-        const metaDataProfiler = profileScanner ? new Profiler(`Importing ${file.path} (meta data)`) : null
-        const readMetaData = readMetadataOfImage(originalImgPath)
-            .then(result => {
-                if (metaDataProfiler) {
-                    metaDataProfiler.addPoint('Read meta data')
-                    metaDataProfiler.logResult()
+        try {
+            const originalImgPath = file.path
+            const [ metaData, photoWork, alreadyExists ] = await Promise.all([
+                readMetadataOfImage(originalImgPath),
+                fetchPhotoWork(originalImgPath),
+                this.photoExists(originalImgPath)
+            ])
+            if (profiler) profiler.addPoint('Fetched meta data and PhotoWork')
+            if (alreadyExists) {
+                if (profiler) {
+                    profiler.addPoint('Photo already exists in DB')
+                    profiler.logResult()
                 }
-                return result
-            })
+                return
+            }
 
-        const photoWorkProfiler = profileScanner ? new Profiler(`Importing ${file.path} (photo work)`) : null
-        const readPhotoWork = fetchPhotoWork(originalImgPath)
-            .then(result => {
-                if (photoWorkProfiler) {
-                    photoWorkProfiler.addPoint('Fetched photo work')
-                    photoWorkProfiler.logResult()
+            const photoId = generatePhotoId()
+            let master_width = metaData.imgWidth
+            let master_height = metaData.imgHeight
+            let nonRawImgPath: string = null
+            if (file.isRaw) {
+                nonRawImgPath = `${config.nonRawPath}/${photoId}.${config.workExt}`
+
+                let imgPath: string
+                if (file.hasOwnProperty('imgPath')) {
+                    imgPath = file.imgPath
+                } else {
+                    imgPath = await libraw.extractThumb(
+                        file.path,
+                        `${config.tmp}/${file.name}`
+                    )
+                    if (profiler) profiler.addPoint('Extracted non-raw image')
                 }
-                return result
-            })
 
-        let overallPromise: Promise<PhotoType | null> = Promise.all([readMetaData, readPhotoWork])
-            .then(results => {
-                if (overallProfiler) overallProfiler.addPoint('Waited for meta data and PhotoWork')
+                const imgBuffer = await readFile(imgPath)
+                if (profiler) profiler.addPoint('Loaded extracted image')
 
-                const [ metaData, photoWork ] = results
+                const outputInfo = await sharp(imgBuffer)
+                    .rotate()
+                    .withMetadata()
+                    .toFile(nonRawImgPath)
+                master_width = outputInfo.width
+                master_height = outputInfo.height
+                if (profiler) profiler.addPoint('Rotated extracted image')
+            }
 
-                return this.photoExists(originalImgPath)
-                    .then(alreadyExists => {
-                        if (overallProfiler) overallProfiler.addPoint('Fetched from DB')
-                        if (alreadyExists) {
-                            return null
-                        }
+            const photo: PhotoType = {
+                id: photoId,
+                title: file.name,
+                master: originalImgPath,
+                master_width,
+                master_height,
+                non_raw: nonRawImgPath,
+                extension: file.path.match(/\.(.+)$/i)[1],
+                orientation: metaData.orientation,
+                date: moment(metaData.createdAt).format('YYYY-MM-DD'),
+                flag: photoWork.flagged ? 1 : 0,
+                trashed: 0,
+                created_at: metaData.createdAt,
+                updated_at: null,
+                exposure_time: metaData.exposureTime,
+                iso: metaData.iso,
+                aperture: metaData.aperture,
+                focal_length: metaData.focalLength
+            }
+            await DB().insert('photos', photo)
+            if (profiler) profiler.addPoint('Stored photo to DB')
 
-                        const photo: PhotoType = {
-                            id: generatePhotoId(),
-                            title: file.name,
-                            master: originalImgPath,
-                            master_width: metaData.imgWidth,
-                            master_height: metaData.imgHeight,
-                            non_raw: null,   // Will be set further down for raw images
-                            extension: file.path.match(/\.(.+)$/i)[1],
-                            orientation: metaData.orientation,
-                            date: moment(metaData.createdAt).format('YYYY-MM-DD'),
-                            flag: photoWork.flagged ? 1 : 0,
-                            trashed: 0,
-                            created_at: metaData.createdAt,
-                            updated_at: null,
-                            exposure_time: metaData.exposureTime,
-                            iso: metaData.iso,
-                            aperture: metaData.aperture,
-                            focal_length: metaData.focalLength
-                        }
+            this.populateTags(photo, metaData.tags)
+            if (profiler) profiler.addPoint('Populated tags')
 
-                        return DB().insert('photos', photo)
-                            .then(() => photo)
-                    })
-                    .then(photo => {
-                        if (overallProfiler) overallProfiler.addPoint('Stored to DB')
-                        if (photo) {
-                            this.populateTags(photo, metaData.tags)
-                            if (overallProfiler) overallProfiler.addPoint('Populated tags')
-                        }
-                        return photo
-                    })
-            })
-
-        if (file.isRaw) {
-            overallPromise = overallPromise
-                .then(photo => {
-                    if (!photo) {
-                        return null
-                    }
-
-                    const nonRawImgPath = file.isRaw ? `${config.nonRawPath}/${photo.id}.${config.workExt}` : null
-
-                    let extractThumb: Promise<string>
-                    if (file.hasOwnProperty('imgPath')) {
-                        extractThumb = Promise.resolve(file.imgPath)
-                    } else {
-                        extractThumb = libraw.extractThumb(
-                            file.path,
-                            `${config.tmp}/${file.name}`
-                        )
-                    }
-
-                    return extractThumb
-                        .then(imgPath => {
-                            if (overallProfiler) overallProfiler.addPoint('Extracted non-raw image')
-                            return readFile(imgPath)
-                        })
-                        .then(img => {
-                            if (overallProfiler) overallProfiler.addPoint('Loaded extracted image')
-                            return sharp(img)
-                                .rotate()
-                                .withMetadata()
-                                .toFile(nonRawImgPath)
-                        })
-                        .then(outputInfo => {
-                            if (overallProfiler) overallProfiler.addPoint('Rotated extracted image')
-                            return DB().update<PhotoType>('photos', { non_raw: nonRawImgPath, master_width: outputInfo.width, master_height: outputInfo.height }, photo.id)
-                        })
-                        .then(() => { if (overallProfiler) { overallProfiler.addPoint('Updated non-raw image path in DB') }; return photo })
-                })
+            await this.onImportedStep()
+            if (profiler) { profiler.addPoint('Updated import progress') }
+        } catch (error) {
+            // TODO: Show error in UI
+            console.error('Importing photo failed', file, error)
+            if (profiler) { profiler.addPoint('Caught error') }
         }
-    
-        return overallPromise
-            .then(this.onImportedStep)
-            .then(() => {
-                if (overallProfiler) {
-                    overallProfiler.addPoint('Updated import progress')
-                    overallProfiler.logResult()
-                }
-            })
-            .catch(err => {
-                console.error('Importing photo failed', file, err)
-            })
+        if (profiler) {
+            profiler.logResult()
+        }
     }
 
     populateTags(photo, tags: string[]) {
