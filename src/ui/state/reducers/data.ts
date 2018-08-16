@@ -92,8 +92,8 @@ const dates = (state: DatesState = initialDatesState, action: Action): DatesStat
 
 type SectionsState = {
     readonly fetchState: FetchState
-    /** The total number of photos (when no filter is applied) */
-    readonly totalPhotoCount: number
+    /** The total number of photos (when no filter is applied). Is null before fetched for the first time. */
+    readonly totalPhotoCount: number | null
     /** The number of photos with the current filter applied */
     readonly photoCount: number
     readonly ids: PhotoSectionId[]
@@ -102,7 +102,7 @@ type SectionsState = {
 
 const initialSectionsState: SectionsState = {
     fetchState: FetchState.IDLE,
-    totalPhotoCount: 0,
+    totalPhotoCount: null,
     photoCount: 0,
     ids: [],
     data: {}

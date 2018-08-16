@@ -33,7 +33,7 @@ interface OwnProps {
 interface StateProps {
     isFetching: boolean
     photoCount: number
-    totalPhotoCount: number
+    totalPhotoCount: number | null
     sectionIds: PhotoSectionId[]
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId
@@ -179,7 +179,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         const sections = state.data.sections
         return {
             ...props,
-            isFetching: sections.fetchState === FetchState.FETCHING,
+            isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
             photoCount: sections.photoCount,
             totalPhotoCount: sections.totalPhotoCount,
             sectionIds: sections.ids,
