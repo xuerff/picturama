@@ -3,7 +3,7 @@ import { mat4 } from 'gl-matrix'
 import WebGLCanvas, { GraphicBuffer, Texture } from './WebGLCanvas'
 import { TransformationShader } from './Shaders'
 import { ExifOrientation } from '../../common/models/DataTypes'
-import { PhotoWork } from '../../common/models/Photo'
+import { PhotoWork, getTotalRotationTurns } from '../../common/models/Photo'
 import CancelablePromise from '../../common/util/CancelablePromise'
 import Profiler from '../../common/util/Profiler'
 
@@ -112,14 +112,7 @@ export default class PhotoCanvas {
 
         // ===== Calculate =====
 
-        let rotationTurns = 0
-        switch (exifOrientation) {
-            case ExifOrientation.Right:  rotationTurns = 1; break
-            case ExifOrientation.Bottom: rotationTurns = 2; break
-            case ExifOrientation.Left:   rotationTurns = 3; break
-        }
-        rotationTurns = (rotationTurns + (photoWork.rotationTurns || 0)) % 4
-
+        const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
         const textureWidth  = baseTexture.width
         const textureHeight = baseTexture.height
         const switchSides = rotationTurns % 2 === 1

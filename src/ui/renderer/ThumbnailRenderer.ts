@@ -1,4 +1,4 @@
-import { PhotoType, PhotoWork } from '../../common/models/Photo'
+import { PhotoType, PhotoWork, getTotalRotationTurns } from '../../common/models/Photo'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
@@ -37,11 +37,16 @@ export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: Photo
     const nonRawImgPath = getNonRawImgPath(photo)
     return canvas.createTextureFromSrc(nonRawImgPath, profiler)
         .then(texture => {
-            if (!photo.master_width || !photo.master_height) {
-                // Photo has no master size yet -> Store master size to DB
-                updatePhoto(photo, { master_width: texture.width, master_height: texture.height })
+            // Update photo size in DB
+            const rotationTurns = getTotalRotationTurns(photo.orientation, photoWork)
+            const switchSides = (rotationTurns % 2) === 1
+            const master_width = switchSides ? texture.height : texture.width
+            const master_height = switchSides ? texture.width : texture.height
+            if (master_width !== photo.master_width || photo.master_height !== master_height) {
+                updatePhoto(photo, { master_width, master_height })
             }
 
+            // Update thumbnail
             return queue.addJob({ nonRawImgPath, texture, photo, photoWork, profiler })
         })
 }
