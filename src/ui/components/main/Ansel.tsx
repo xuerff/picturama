@@ -95,13 +95,13 @@ class Ansel extends React.Component<Props, State> {
         }
 
         let container
-        if (props.importProgress) {
+        if (!props.settingsExist) {
+            container = <Settings className="Ansel-container" />
+        } else if (props.importProgress) {
             container =
                 <div className="Ansel-container">
                     <Progress progress={props.importProgress} />
                 </div>
-        } else if (!props.settingsExist) {
-            container = <Settings className="Ansel-container" />
         } else {
             container =
                 <Library
@@ -111,7 +111,7 @@ class Ansel extends React.Component<Props, State> {
         }
 
         return (
-            <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExist && state.showSidebar })}>
+            <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExist && !props.importProgress && state.showSidebar })}>
                 <Sidebar className="Ansel-sidebar" />
                 {container}
                 {mainView}
