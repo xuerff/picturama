@@ -16,7 +16,6 @@ import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './Ima
 
 const pagesToKeep = 4
 const pagesToPreload = 3
-const targetRowHeight = 320  // Default of 'justified-layout'
 const averageAspect = 3 / 2
 
 let prevSectionIds: PhotoSectionId[] = []
@@ -25,18 +24,19 @@ let prevSectionLayouts: GridSectionLayout[] = []
 let prevScrollTop = 0
 let prevViewportWidth = 0
 let prevViewportHeight = 0
+let prevGridRowHeight = -1
 
 let isFetchingSectionPhotos = false
 
 
 export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
-    scrollTop: number, viewportWidth: number, viewportHeight: number):
+    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
     GridSectionLayout[]
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
 
     let sectionLayouts: GridSectionLayout[] = []
-    const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth)
+    const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth) || (gridRowHeight !== prevGridRowHeight)
 
     let sectionIdsToProtect: { [index: string]: true }
     let sectionIdsToForget: { [index: string]: true } = null
@@ -80,16 +80,16 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
                     // Drop boxes
                     layout = { sectionTop, containerHeight: prevLayout.containerHeight }
                 } else if (viewportWidth === 0) {
-                    layout = { sectionTop, containerHeight: section.count * targetRowHeight }
+                    layout = { sectionTop, containerHeight: section.count * gridRowHeight }
                 } else {
                     // Estimate section height (assuming a normal landscape aspect ratio of 3:2)
-                    const unwrappedWidth = averageAspect * section.count * targetRowHeight
+                    const unwrappedWidth = averageAspect * section.count * gridRowHeight
                     const rows = Math.ceil(unwrappedWidth / viewportWidth)
-                    layout = { sectionTop, containerHeight: rows * targetRowHeight }
+                    layout = { sectionTop, containerHeight: rows * gridRowHeight }
                 }
             } else {
                 // Calculate boxes
-                layout = createLayoutForLoadedSection(section, sectionTop, viewportWidth)
+                layout = createLayoutForLoadedSection(section, sectionTop, viewportWidth, gridRowHeight)
             }
         }
 
@@ -186,12 +186,13 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
     prevScrollTop = scrollTop
     prevViewportWidth = viewportWidth
     prevViewportHeight = viewportHeight
+    prevGridRowHeight = gridRowHeight
 
     return sectionLayouts
 }
 
 
-export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: number, containerWidth: number): GridSectionLayout {
+export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: number, containerWidth: number, targetRowHeight: number): GridSectionLayout {
     const aspects = section.photoIds.map(photoId => {
         const photo = section.photoData[photoId]
         const { master_width, master_height } = photo
@@ -202,7 +203,7 @@ export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: 
         //   - `getLayoutForSections` will detect that the section changed and so it will get a ney layout using the correct master size
         return (master_width && master_height) ? (master_width / master_height) : averageAspect
     })
-    const layout = createLayout(aspects, { containerWidth })
+    const layout = createLayout(aspects, { containerWidth, targetRowHeight })
     layout.sectionTop = sectionTop
     layout.containerHeight = Math.round(layout.containerHeight)
     return layout

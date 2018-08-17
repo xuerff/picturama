@@ -1,15 +1,14 @@
 @import "../../less/variables.less";
 
-.LibraryBottomBar-content {
+.LibraryBottomBar {
     position: relative;
-    line-height: 48px;
-    margin: 0 25px;
 }
 
 .LibraryBottomBar-selection {
     background: @blue-grey-900;
     border-radius: 5px;
     padding: 4px 10px;
+    line-height: 48px;
 }
 
 .LibraryBottomBar-deselectAll:before {
@@ -17,7 +16,20 @@
     padding-right: 6px;
 }
 
-.LibraryBottomBar-total {
+.LibraryBottomBar-center {
     position: absolute;
-    left: 48%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.LibraryBottomBar-right {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translate(0, -50%);
+}
+
+.LibraryBottomBar-thumbSizeSlider {
+    //width: 150px;
 }

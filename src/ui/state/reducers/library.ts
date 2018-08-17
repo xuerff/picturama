@@ -1,8 +1,31 @@
 import { combineReducers } from 'redux'
 
 import { PhotoId, PhotoSectionId, PhotoFilter } from '../../../common/models/Photo'
+
+import { defaultGridRowHeight } from '../../UiConstants'
 import { Action } from '../ActionType'
-import { SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, EMPTY_TRASH } from '../actionTypes'
+import { SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, EMPTY_TRASH } from '../actionTypes'
+
+
+type DisplayState = {
+    /** The target row height of the grid. The grid won't hit this value exactly, as it depends on the layout. */
+    readonly gridRowHeight: number
+}
+
+const initialDisplayState: DisplayState = {
+    gridRowHeight: defaultGridRowHeight
+}
+
+const display = (state: DisplayState = initialDisplayState, action: Action): DisplayState => {
+    switch (action.type) {
+        case SET_GRID_ROW_HEIGHT:
+            return {
+                gridRowHeight: action.payload.gridRowHeight
+            }
+        default:
+            return state
+    }
+}
 
 
 const initialFilterState: PhotoFilter = {
@@ -58,11 +81,13 @@ const selection = (state: SelectionState = initialSelectionState, action: Action
 
 
 export type LibraryState = {
+    readonly display: DisplayState
     readonly filter: PhotoFilter
     readonly selection: SelectionState
 }
 
 export const library = combineReducers<LibraryState>({
+    display,
     filter,
     selection
 })

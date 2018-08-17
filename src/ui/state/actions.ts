@@ -5,7 +5,8 @@ import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionI
 import { TagType } from '../../common/models/Tag'
 
 import {
-    SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
+    SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, SET_GRID_ROW_HEIGHT,
+    SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_DATES, FETCH_TAGS, CREATE_TAGS,
@@ -16,6 +17,8 @@ import { ImportProgress } from './reducers/import'
 
 
 export const checkSettingsExistAction = createAsyncAction(SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE)<void, void, Error>()
+
+export const setGridRowHeightAction = (gridRowHeight: number) => action(SET_GRID_ROW_HEIGHT, { gridRowHeight })
 
 export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ sectionId: PhotoSectionId, photoIndex: number, photoId: string }, { photoDetail: PhotoDetail, photoWork: PhotoWork }, Error>()
 export const closeDetailAction = () => action(CLOSE_DETAIL)

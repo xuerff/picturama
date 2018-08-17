@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
 
@@ -12,7 +13,7 @@ import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc } from '../../controller/ImageProvider'
 import { getLayoutForSections, createThumbnail } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
-import { setSelectedPhotosAction, openExportAction } from '../../state/actions'
+import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
 import { keySymbols } from '../../UiConstants'
 import { FetchState } from '../../UITypes'
@@ -38,6 +39,7 @@ interface StateProps {
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId
     selectedPhotoIds: PhotoId[]
+    gridRowHeight: number
     showOnlyFlagged: boolean
     isShowingTrash: boolean
 }
@@ -48,6 +50,7 @@ interface DispatchProps {
     getLayoutForSections: LayoutForSectionsFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
@@ -137,6 +140,7 @@ export class Library extends React.Component<Props> {
                     sectionById={props.sectionById}
                     selectedSectionId={props.selectedSectionId}
                     selectedPhotoIds={props.selectedPhotoIds}
+                    gridRowHeight={props.gridRowHeight}
                     getLayoutForSections={props.getLayoutForSections}
                     getThumbnailSrc={props.getThumbnailSrc}
                     createThumbnail={props.createThumbnail}
@@ -166,7 +170,9 @@ export class Library extends React.Component<Props> {
                     className="Library-bottomBar"
                     highlightedCount={props.selectedPhotoIds.length}
                     photosCount={props.photoCount}
+                    gridRowHeight={props.gridRowHeight}
                     clearHighlight={this.clearHighlight}
+                    setGridRowHeight={props.setGridRowHeight}
                 />
             </div>
         );
@@ -186,6 +192,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             sectionById: sections.data,
             selectedSectionId: state.library.selection.sectionId, 
             selectedPhotoIds: state.library.selection.photoIds,
+            gridRowHeight: state.library.display.gridRowHeight,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
             isShowingTrash: state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash'
         }
@@ -196,9 +203,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         getLayoutForSections,
         getThumbnailSrc,
         createThumbnail,
-        setSelectedPhotos: (sectionId, photoIds) => dispatch(setSelectedPhotosAction(sectionId, photoIds)),
         setDetailPhotoById,
-        openExport: (sectionId, photoIds) => dispatch(openExportAction(sectionId, photoIds)),
         setPhotosFlagged,
         updatePhotoWork,
         toggleShowOnlyFlagged: () => {
@@ -207,7 +212,12 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         },
         startScanning: () => {
             ipcRenderer.send('start-scanning')
-        }
+        },
+        ...bindActionCreators({
+            setGridRowHeight: setGridRowHeightAction,
+            setSelectedPhotos: setSelectedPhotosAction,
+            openExport: openExportAction
+        }, dispatch)
     })
 )(Library)
 

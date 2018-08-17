@@ -6,6 +6,7 @@ import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models
 import CancelablePromise from '../../common/util/CancelablePromise';
 import { Library } from '../../ui/components/library/Library'
 
+import { defaultGridRowHeight } from '../../ui/UiConstants'
 import { GridSectionLayout } from '../../ui/UITypes'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
 import { createLayoutForLoadedSection } from '../../ui/controller/LibraryController'
@@ -31,6 +32,7 @@ const defaultProps = {
     } as PhotoSectionById,
     selectedSectionId: null,
     selectedPhotoIds: [],
+    gridRowHeight: defaultGridRowHeight,
     showOnlyFlagged: false,
     isShowingTrash: false,
 
@@ -38,7 +40,7 @@ const defaultProps = {
     fetchSections: action('fetchSections'),
     getLayoutForSections,
     getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
-    createThumbnail: (photo: PhotoType) => {
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
         if (thumbnailPath === 'dummy') {
             return new CancelablePromise<string>(() => {})
@@ -46,6 +48,7 @@ const defaultProps = {
             return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
         }
     },
+    setGridRowHeight: action('setGridRowHeight'),
     setSelectedPhotos: action('setSelectedPhotos'),
     setDetailPhotoById: action('setDetailPhotoById'),
     openExport: action('openExport'),
@@ -57,10 +60,16 @@ const defaultProps = {
 
 
 export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
-    scrollTop: number, viewportWidth: number, viewportHeight: number):
+    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
     GridSectionLayout[]
 {
-    return sectionIds.map(sectionId => createLayoutForLoadedSection(sectionById[sectionId], viewportWidth))
+    return sectionIds.map(sectionId => {
+        const section = sectionById[sectionId]
+        const layout = createLayoutForLoadedSection(section, scrollTop, viewportWidth, gridRowHeight)
+        layout.fromBoxIndex = 0
+        layout.toBoxIndex = section.count
+        return layout
+    })
 }
 
 
@@ -93,7 +102,7 @@ addSection('Library')
             />
         )
     })
-    .add('Fetching photos', context => (
+    .add('Fetching sections', context => (
         <Library
             {...defaultProps}
             isFetching={true}

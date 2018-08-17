@@ -16,7 +16,7 @@ import './Grid.less'
 
 
 export type LayoutForSectionsFunction = (
-    sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number)
+    sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number)
     => GridSectionLayout[]
 
 interface Props {
@@ -26,6 +26,7 @@ interface Props {
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId
     selectedPhotoIds: PhotoId[]
+    gridRowHeight: number
     getLayoutForSections: LayoutForSectionsFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
@@ -170,7 +171,7 @@ export default class Grid extends React.Component<Props, State> {
     render() {
         const props = this.props
         const state = this.state
-        const sectionLayouts = props.getLayoutForSections(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight)
+        const sectionLayouts = props.getLayoutForSections(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight, props.gridRowHeight)
 
         return (
             <ResizeSensor onResize={this.onResize}>

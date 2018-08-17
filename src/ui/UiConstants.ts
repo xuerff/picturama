@@ -11,3 +11,8 @@ export const keySymbols = {
     delete: '\u232B',
     ctrlOrMacCommand: isMac ? keySymbolMacCommand : 'Ctrl'
 }
+
+
+export const minGridRowHeight = 100
+export const maxGridRowHeight = 500
+export const defaultGridRowHeight = 200

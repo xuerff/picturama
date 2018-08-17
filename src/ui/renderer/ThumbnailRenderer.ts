@@ -3,10 +3,10 @@ import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
 
+import { defaultGridRowHeight } from '../UiConstants'
 import { getNonRawImgPath } from '../controller/ImageProvider'
 import { updatePhoto } from '../controller/PhotoController'
 import PhotoCanvas from './PhotoCanvas'
-import { Texture } from './WebGLCanvas'
 
 
 assertRendererProcess()
@@ -19,10 +19,9 @@ const queue = new SerialJobQueue(
     renderNextThumbnail)
 
 
-// Target row height of our overview (class Grid) is 320px.
 // Max width is relatively high in order to get most panorama images with full row height.
 const maxThumbnailWidth = 1024
-const maxThumbnailHeight = 320
+const maxThumbnailHeight = defaultGridRowHeight
 
 let canvas: PhotoCanvas | null = null
 
