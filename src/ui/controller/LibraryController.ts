@@ -30,7 +30,7 @@ let isFetchingSectionPhotos = false
 
 
 export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
-    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
+    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number, nailedSectionIndex: number | null):
     GridSectionLayout[]
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
@@ -38,24 +38,17 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
     let sectionLayouts: GridSectionLayout[] = []
     const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth) || (gridRowHeight !== prevGridRowHeight)
 
-    let sectionIdsToProtect: { [index: string]: true }
-    let sectionIdsToForget: { [index: string]: true } = null
-    let sectionIdToLoad: PhotoSectionId | null = null
-    let sectionIdToLoadDistance = Number.POSITIVE_INFINITY
+    let inDomMinY: number | null = null
+    let inDomMaxY: number | null = null
+    if (nailedSectionIndex === null) {
+        inDomMinY = scrollTop - pagesToPreload * viewportHeight
+        inDomMaxY = scrollTop + (pagesToPreload + 1) * viewportHeight
+    }
 
-    const isScrollingDown = (scrollTop >= prevScrollTop)
-    const keepMinY = scrollTop - pagesToKeep * viewportHeight
-    const keepMaxY = scrollTop + (pagesToKeep + 1) * viewportHeight
-    const preloadMinY = scrollTop - (isScrollingDown ? 0 : pagesToPreload) * viewportHeight
-    const preloadMaxY = scrollTop + ((isScrollingDown ? pagesToPreload : 0) + 1) * viewportHeight
-
-    const sectionCount = sectionIds.length
     let sectionTop = 0
-    for (let sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
+    for (let sectionIndex = 0, sectionCount = sectionIds.length; sectionIndex < sectionCount; sectionIndex++) {
         const sectionId = sectionIds[sectionIndex]
         const section = sectionById[sectionId]
-
-        // -- Update section layout --
 
         const usePlaceholder = !section.photoIds
         const prevLayout = (
@@ -93,9 +86,15 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
             }
         }
 
+        
+        if (sectionIndex === nailedSectionIndex) {
+            inDomMinY = sectionTop
+            inDomMaxY = sectionTop + viewportHeight
+        }
+
         const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
         if (layout.boxes) {
-            if (sectionBottom < keepMinY || sectionTop > keepMaxY) {
+            if (inDomMinY === null || sectionBottom < inDomMinY || sectionTop > inDomMaxY) {
                 // This section is fully invisible -> Keep the layout but add no photos to the DOM
                 layout.fromBoxIndex = null
                 layout.toBoxIndex = null
@@ -104,7 +103,7 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
                 layout.fromBoxIndex = 0
                 layout.toBoxIndex = section.count
 
-                if (sectionTop < keepMinY || sectionBottom > keepMaxY) {
+                if (sectionTop < inDomMinY || sectionBottom > inDomMaxY) {
                     // This section is party visible -> Go throw the boxes and find the correct boundaries
                     const boxes = layout.boxes
                     const boxCount = boxes.length
@@ -115,11 +114,11 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
                         const boxTop = sectionTop + sectionHeadHeight + box.top
                         const boxBottom = boxTop + box.height
                         if (searchingStart) {
-                            if (boxBottom >= keepMinY) {
+                            if (boxBottom >= inDomMinY) {
                                 layout.fromBoxIndex = boxIndex
                                 searchingStart = false
                             }
-                        } else if (boxTop > keepMaxY) {
+                        } else if (boxTop > inDomMaxY) {
                             layout.toBoxIndex = boxIndex
                             break
                         }
@@ -130,50 +129,12 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
 
         sectionLayouts.push(layout)
 
-        // -- Check whether we have to load or forget this section --
-
-        if (section.photoIds) {
-            const keepSection = sectionBottom > keepMinY && sectionTop < keepMaxY
-            if (!keepSection) {
-                if (!sectionIdsToProtect) {
-                    sectionIdsToProtect = getSectionIdsToProtect()
-                }
-
-                if (!sectionIdsToProtect[sectionId]) {
-                    if (!sectionIdsToForget) {
-                        sectionIdsToForget = {}
-                    }
-                    sectionIdsToForget[sectionId] = true
-                }
-            }
-        } else if (!isFetchingSectionPhotos) {
-            const loadSection = sectionBottom > preloadMinY && sectionTop < preloadMaxY
-            if (loadSection) {
-                let distanceToViewPort = 0
-                if (sectionBottom < scrollTop) {
-                    distanceToViewPort = scrollTop - sectionBottom
-                } else if (sectionTop > scrollTop + viewportHeight) {
-                    distanceToViewPort = sectionTop - (scrollTop + viewportHeight)
-                }
-
-                if (distanceToViewPort < sectionIdToLoadDistance) {
-                    sectionIdToLoad = sectionId
-                    sectionIdToLoadDistance = distanceToViewPort
-                }
-            }
-        }
-
-        // -- Prepare next iteration --
-
+        // Prepare next iteration
         sectionTop = sectionBottom
     }
 
-    if (sectionIdsToForget) {
-        setTimeout(() => store.dispatch(forgetSectionPhotosAction(sectionIdsToForget)))
-    }
-    if (sectionIdToLoad) {
-        fetchSectionPhotos(sectionIdToLoad)
-    }
+    const viewportTop = (nailedSectionIndex === null) ? scrollTop : sectionLayouts[nailedSectionIndex].sectionTop
+    forgetAndFetchSections(sectionIds, sectionById, viewportTop, viewportHeight, sectionLayouts)
 
     if (profiler) {
         profiler.addPoint('Calculated layout')
@@ -207,6 +168,69 @@ export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: 
     layout.sectionTop = sectionTop
     layout.containerHeight = Math.round(layout.containerHeight)
     return layout
+}
+
+
+/** Determines which sections we have to load or forget */
+function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
+    viewportTop: number, viewportHeight: number, sectionLayouts: GridSectionLayout[])
+{
+    let sectionIdsToProtect: { [index: string]: true }
+    let sectionIdsToForget: { [index: string]: true } = null
+    let sectionIdToLoad: PhotoSectionId | null = null
+    let sectionIdToLoadDistance = Number.POSITIVE_INFINITY
+
+    const isScrollingDown = (viewportTop >= prevScrollTop)
+    const keepMinY = viewportTop - pagesToKeep * viewportHeight
+    const keepMaxY = viewportTop + (pagesToKeep + 1) * viewportHeight
+    const preloadMinY = viewportTop - (isScrollingDown ? 0 : pagesToPreload) * viewportHeight
+    const preloadMaxY = viewportTop + ((isScrollingDown ? pagesToPreload : 0) + 1) * viewportHeight
+
+    for (let sectionIndex = 0, sectionCount = sectionIds.length; sectionIndex < sectionCount; sectionIndex++) {
+        const sectionId = sectionIds[sectionIndex]
+        const section = sectionById[sectionId]
+        const layout = sectionLayouts[sectionIndex]
+
+        const sectionTop = layout.sectionTop
+        const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
+        if (section.photoIds) {
+            const keepSection = sectionBottom > keepMinY && sectionTop < keepMaxY
+            if (!keepSection) {
+                if (!sectionIdsToProtect) {
+                    sectionIdsToProtect = getSectionIdsToProtect()
+                }
+
+                if (!sectionIdsToProtect[sectionId]) {
+                    if (!sectionIdsToForget) {
+                        sectionIdsToForget = {}
+                    }
+                    sectionIdsToForget[sectionId] = true
+                }
+            }
+        } else if (!isFetchingSectionPhotos) {
+            const loadSection = sectionBottom > preloadMinY && sectionTop < preloadMaxY
+            if (loadSection) {
+                let distanceToViewPort = 0
+                if (sectionBottom < viewportTop) {
+                    distanceToViewPort = viewportTop - sectionBottom
+                } else if (sectionTop > viewportTop + viewportHeight) {
+                    distanceToViewPort = sectionTop - (viewportTop + viewportHeight)
+                }
+
+                if (distanceToViewPort < sectionIdToLoadDistance) {
+                    sectionIdToLoad = sectionId
+                    sectionIdToLoadDistance = distanceToViewPort
+                }
+            }
+        }
+    }
+
+    if (sectionIdsToForget) {
+        setTimeout(() => store.dispatch(forgetSectionPhotosAction(sectionIdsToForget)))
+    }
+    if (sectionIdToLoad) {
+        fetchSectionPhotos(sectionIdToLoad)
+    }
 }
 
 
