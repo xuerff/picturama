@@ -57,11 +57,26 @@ export default class SerialJobQueue<Job, JobResult> {
             return
         }
 
+        let nextJobInfo: JobInfo<Job, JobResult> = null
         if (this.getJobPriority) {
-            this.jobQueue.sort((jobInfo1, jobInfo2) => this.getJobPriority(jobInfo2.job) - this.getJobPriority(jobInfo1.job))
+            let nextJobIndex = -1
+            let nextJobPrio: number
+            const jobCount = this.jobQueue.length
+            for (let jobIndex = 0; jobIndex < jobCount; jobIndex++) {
+                const jobInfo = this.jobQueue[jobIndex]
+                const prio = this.getJobPriority(jobInfo.job)
+                if (nextJobIndex === -1 || prio > nextJobPrio) {
+                    nextJobIndex = jobIndex
+                    nextJobPrio = prio
+                }
+            }
+            if (nextJobIndex !== -1) {
+                nextJobInfo = this.jobQueue.splice(nextJobIndex, 1)[0]
+            }
+        } else {
+            nextJobInfo = this.jobQueue.shift()
         }
 
-        const nextJobInfo = this.jobQueue.shift()
         if (!nextJobInfo) {
             return
         }
