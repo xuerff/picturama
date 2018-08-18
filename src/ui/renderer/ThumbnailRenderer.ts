@@ -3,7 +3,6 @@ import { assertRendererProcess } from '../../common/util/ElectronUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 import Profiler from '../../common/util/Profiler'
 
-import { defaultGridRowHeight } from '../UiConstants'
 import { getNonRawImgPath } from '../controller/ImageProvider'
 import { updatePhoto } from '../controller/PhotoController'
 import PhotoCanvas from './PhotoCanvas'
@@ -19,9 +18,10 @@ const queue = new SerialJobQueue(
     renderNextThumbnail)
 
 
+// Default row height of 'justified-layout' is 320px.
 // Max width is relatively high in order to get most panorama images with full row height.
 const maxThumbnailWidth = 1024
-const maxThumbnailHeight = defaultGridRowHeight
+const maxThumbnailHeight = 320
 
 let canvas: PhotoCanvas | null = null
 
