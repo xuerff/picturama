@@ -2,16 +2,17 @@ import React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
-import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models/Photo';
-import CancelablePromise from '../../common/util/CancelablePromise';
-import { Library } from '../../ui/components/library/Library'
+import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models/Photo'
+import CancelablePromise from '../../common/util/CancelablePromise'
 
 import { defaultGridRowHeight } from '../../ui/UiConstants'
 import { GridSectionLayout } from '../../ui/UITypes'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
-import { createLayoutForLoadedSection } from '../../ui/controller/LibraryController'
+import { sectionHeadHeight } from '../../ui/components/library/GridSection'
+import { Library } from '../../ui/components/library/Library'
+
 import { testPhoto, testUprightPhoto, testPanoramaPhoto } from '../util/MockData'
-import { createRandomDummyPhoto, createSection } from '../util/TestUtil'
+import { createRandomDummyPhoto, createSection, createLayoutForSection } from '../util/TestUtil'
 
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
@@ -63,11 +64,11 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
     scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
     GridSectionLayout[]
 {
+    let sectionTop = 0
     return sectionIds.map(sectionId => {
         const section = sectionById[sectionId]
-        const layout = createLayoutForLoadedSection(section, scrollTop, viewportWidth, gridRowHeight)
-        layout.fromBoxIndex = 0
-        layout.toBoxIndex = section.count
+        const layout = createLayoutForSection(section, sectionTop, viewportWidth, gridRowHeight)
+        sectionTop += sectionHeadHeight + layout.containerHeight
         return layout
     })
 }

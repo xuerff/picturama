@@ -2,14 +2,14 @@ import React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 import { testPhoto, testPanoramaPhoto, testUprightPhoto } from '../util/MockData'
-import { createSection, createRandomDummyPhoto } from '../util/TestUtil'
+import { createSection, createRandomDummyPhoto, createLayoutForSection } from '../util/TestUtil'
 
 import CancelablePromise from '../../common/util/CancelablePromise'
-import { PhotoType, PhotoSectionId, PhotoSection } from '../../common/models/Photo'
+import { PhotoType, PhotoSectionId } from '../../common/models/Photo'
 
+import { defaultGridRowHeight } from '../../ui/UiConstants'
 import GridSection from '../../ui/components/library/GridSection'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
-import { createLayoutForLoadedSection } from '../../ui/controller/LibraryController'
 
 
 const containerWidth = 800
@@ -18,7 +18,7 @@ const scrollBarWidth = 20
 const defaultSectionId: PhotoSectionId = '2018-08-15'
 const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
-const defaultLayout = createLayoutForLoadedSection(defaultSection, containerWidth - scrollBarWidth)
+const defaultLayout = createLayoutForSection(defaultSection, 0, containerWidth - scrollBarWidth, defaultGridRowHeight)
 
 
 const defaultProps = {
@@ -26,7 +26,7 @@ const defaultProps = {
     layout: defaultLayout,
     selectedPhotoIds: null,
     getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
-    createThumbnail: (photo: PhotoType) => {
+    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
         if (thumbnailPath === 'dummy') {
             return new CancelablePromise<string>(() => {})
@@ -59,7 +59,7 @@ addSection('GridSection')
         }
         photos[0] = { ...photos[0], id: photos[0] + '_dummy', master: 'dummy' }
         const section = createSection(defaultSectionId, photos)
-        const layout = createLayoutForLoadedSection(section, containerWidth - scrollBarWidth)
+        const layout = createLayoutForSection(section, 0, containerWidth - scrollBarWidth, defaultGridRowHeight)
 
         return (
             <GridSection
@@ -78,7 +78,7 @@ addSection('GridSection')
                     title: defaultSectionId,
                     count: 14
                 }}
-                layout={{ containerHeight: 550 }}
+                layout={{ sectionTop: 0, containerHeight: 550 }}
                 selectedPhotoIds={null}
             />
             <div style={{ backgroundColor: 'gray', padding: 5 }}>

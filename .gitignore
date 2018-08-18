@@ -11,6 +11,7 @@ tests-dist/
 dot-ansel*/
 build/
 ansel.json
+/*.patch
 
 npm-debug.log
 .DS_Store
