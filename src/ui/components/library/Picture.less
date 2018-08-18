@@ -18,6 +18,12 @@
 
 .Picture-thumbnail {
     pointer-events: none;  // Disable image dragging
+    opacity: 1;
+    transition: opacity 0.2s ease-in;
+
+    .Picture.isLoading & {
+        opacity: 0;
+    }
 }
 
 .Picture-spinner {

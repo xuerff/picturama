@@ -154,7 +154,7 @@ export default class Picture extends React.Component<Props, State> {
         return (
             <div
                 ref="picture"
-                className={classNames(props.className, 'Picture', { isHighlighted: this.props.isHighlighted })}
+                className={classNames(props.className, 'Picture', { isHighlighted: props.isHighlighted, isLoading: !state.isThumbnailLoaded })}
                 style={{
                     left:   Math.round(layoutBox.left),
                     top:    Math.round(layoutBox.top),
