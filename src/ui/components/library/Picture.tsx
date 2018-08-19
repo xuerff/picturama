@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
+import { Icon } from '@blueprintjs/core'
 
 import { PhotoId, PhotoType, PhotoSectionId } from '../../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
@@ -27,6 +28,7 @@ interface Props {
 interface State {
     thumbnailSrc: string | null
     isThumbnailLoaded: boolean
+    hasThumbnailError: boolean
 }
 
 export default class Picture extends React.Component<Props, State> {
@@ -39,7 +41,8 @@ export default class Picture extends React.Component<Props, State> {
 
         this.state = {
             thumbnailSrc: this.props.getThumbnailSrc(props.photo),
-            isThumbnailLoaded: false
+            isThumbnailLoaded: false,
+            hasThumbnailError: false
         }
 
         bindMany(this, 'onClick', 'onDoubleClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
@@ -58,7 +61,7 @@ export default class Picture extends React.Component<Props, State> {
                 this.createThumbnailPromise.cancel()
                 this.createThumbnailPromise = null
             }
-            this.setState({ thumbnailSrc: this.props.getThumbnailSrc(this.props.photo), isThumbnailLoaded: false })
+            this.setState({ thumbnailSrc: this.props.getThumbnailSrc(this.props.photo), isThumbnailLoaded: false, hasThumbnailError: false })
         }
 
         if (props.isHighlighted && props.isHighlighted !== prevProps.isHighlighted) {
@@ -98,6 +101,8 @@ export default class Picture extends React.Component<Props, State> {
     onThumbnailLoadError() {
         if (!this.createThumbnailPromise) {
             this.createThumbnail(false)
+        } else {
+            this.setState({ hasThumbnailError: true })
         }
     }
 
@@ -132,8 +137,8 @@ export default class Picture extends React.Component<Props, State> {
             })
             .catch(error => {
                 if (!isCancelError(error)) {
-                    // TODO: Show error in UI
                     console.error('Getting thumbnail failed', error)
+                    this.setState({ hasThumbnailError: true })
                 }
             })
     }
@@ -176,6 +181,12 @@ export default class Picture extends React.Component<Props, State> {
                 }
                 {showFlag &&
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
+                }
+                {state.hasThumbnailError &&
+                    <div className="Picture-error">
+                        <Icon icon="disable" iconSize={40}/>
+                        <div>Creating thumbnail failed.</div>
+                    </div>
                 }
             </div>
         )

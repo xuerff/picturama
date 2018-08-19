@@ -103,6 +103,23 @@ addSection('Library')
             />
         )
     })
+    .add('thumbnail error', context => {
+        let photos = [ ...defaultPhotos ]
+        const errorPhoto = createRandomDummyPhoto()
+        errorPhoto.master = 'error'
+        photos.splice(1, 0, errorPhoto)
+        const section = createSection(defaultSectionId, photos)
+
+        return (
+            <Library
+                {...defaultProps}
+                sectionIds={[ defaultSectionId ]}
+                sectionById={{
+                    [defaultSectionId]: section
+                } as PhotoSectionById}
+            />
+        )
+    })
     .add('Fetching sections', context => (
         <Library
             {...defaultProps}

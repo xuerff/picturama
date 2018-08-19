@@ -26,12 +26,20 @@
     }
 }
 
-.Picture-spinner {
+.Picture-spinner,
+.Picture-error {
     position: absolute;
     left: 50%;
     top: 50%;
 
     transform: translate(-50%, -50%);
+}
+.Picture-error {
+    text-align: center;
+
+    svg {
+        margin-bottom: 15px;
+    }
 }
 
 .Picture-flag {
