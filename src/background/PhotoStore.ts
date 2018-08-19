@@ -14,7 +14,7 @@ export async function fetchSections(filter: PhotoFilter): Promise<PhotoSection[]
 
 export async function fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<PhotoType[]> {
     const filterWhere = createWhereForFilter(filter)
-    const sql = `select * from photos where date = ? and ${filterWhere.sql} order by date desc`
+    const sql = `select * from photos where date = ? and ${filterWhere.sql} order by created_at asc`
     return await DB().query<PhotoType>(sql, sectionId, ...filterWhere.params)
 }
 
