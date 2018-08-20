@@ -37,6 +37,8 @@ const extractImg = new RegExp(
     'i'
 );
 
+const progressUIUpdateInterval = 200  // In ms
+
 interface FileInfo {
     path: string
     imgPath?: string
@@ -46,6 +48,7 @@ interface FileInfo {
 
 export default class Scanner {
     private progress: { processed: number, total: number, photosDir: string }
+    private lastProgressUIUpdateTime = 0
 
     constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
         this.progress = {
@@ -217,9 +220,13 @@ export default class Scanner {
     }
 
     onImportedStep() {
-        this.progress.processed++;
-        this.mainWindow.webContents.send('progress', this.progress);
-        return true;
+        this.progress.processed++
+
+        const now = Date.now()
+        if (now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
+            this.lastProgressUIUpdateTime = now
+            this.mainWindow.webContents.send('progress', this.progress)
+        }
     }
 
     photoExists(originalImgPath: string): Promise<boolean> {
@@ -251,6 +258,7 @@ export default class Scanner {
                 concurrency: config.concurrency
             })
             .then(result => {
+                this.mainWindow.webContents.send('progress', this.progress)
                 if (profiler) {
                     profiler.addPoint(`Scanned ${this.progress.total} images`)
                     profiler.logResult()
