@@ -143,6 +143,16 @@ export default class Picture extends React.Component<Props, State> {
             })
     }
 
+    renderThumbnailError() {
+        const isSmall = this.props.layoutBox.height < 150
+        return (
+            <div className={classNames('Picture-error', { isSmall })}>
+                <Icon icon="disable" iconSize={isSmall ? 20 : 40}/>
+                <div>Creating thumbnail failed.</div>
+            </div>
+        )
+    }
+
     render() {
         // Wanted behaviour:
         // - If the photo changes, the thumbnail should load fast, so no spinner should be shown.
@@ -183,10 +193,7 @@ export default class Picture extends React.Component<Props, State> {
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
                 }
                 {state.hasThumbnailError &&
-                    <div className="Picture-error">
-                        <Icon icon="disable" iconSize={40}/>
-                        <div>Creating thumbnail failed.</div>
-                    </div>
+                    this.renderThumbnailError()
                 }
             </div>
         )

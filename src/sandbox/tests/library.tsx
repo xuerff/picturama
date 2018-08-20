@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {addSection, action} from '../core/UiTester'
+import {addSection, action, TestContext} from '../core/UiTester'
 
 import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models/Photo'
 import CancelablePromise from '../../common/util/CancelablePromise'
@@ -33,7 +33,6 @@ const defaultProps = {
     } as PhotoSectionById,
     selectedSectionId: null,
     selectedPhotoIds: [],
-    gridRowHeight: defaultGridRowHeight,
     showOnlyFlagged: false,
     isShowingTrash: false,
 
@@ -49,7 +48,6 @@ const defaultProps = {
             return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
         }
     },
-    setGridRowHeight: action('setGridRowHeight'),
     setSelectedPhotos: action('setSelectedPhotos'),
     setDetailPhotoById: action('setDetailPhotoById'),
     openExport: action('openExport'),
@@ -79,16 +77,31 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
     }
 }
 
+let sharedGridRowHeight = defaultGridRowHeight
+    // Use the same gridRowHeight amoung all tests (so row height doesn't change when changing between tests)
+
+function createGridRowHeightProps(context: TestContext) {
+    return {
+        gridRowHeight: sharedGridRowHeight,
+        setGridRowHeight: (gridRowHeight: number) => {
+            sharedGridRowHeight = gridRowHeight
+            context.forceUpdate()
+        }
+    }
+}
+
 
 addSection('Library')
     .add('normal', context => (
         <Library
             {...defaultProps}
+            {...createGridRowHeightProps(context)}
         />
     ))
     .add('selection', context => (
         <Library
             {...defaultProps}
+            {...createGridRowHeightProps(context)}
             selectedPhotoIds={[ testPhoto.id ]}
         />
     ))
@@ -102,6 +115,7 @@ addSection('Library')
         return (
             <Library
                 {...defaultProps}
+                {...createGridRowHeightProps(context)}
                 sectionIds={[ defaultSectionId ]}
                 sectionById={{
                     [defaultSectionId]: section
@@ -119,6 +133,7 @@ addSection('Library')
         return (
             <Library
                 {...defaultProps}
+                {...createGridRowHeightProps(context)}
                 sectionIds={[ defaultSectionId ]}
                 sectionById={{
                     [defaultSectionId]: section
@@ -129,12 +144,14 @@ addSection('Library')
     .add('Fetching sections', context => (
         <Library
             {...defaultProps}
+            {...createGridRowHeightProps(context)}
             isFetching={true}
         />
     ))
     .add('Selection empty', context => (
         <Library
             {...defaultProps}
+            {...createGridRowHeightProps(context)}
             photoCount={0}
             sectionIds={[]}
             sectionById={{}}
@@ -143,6 +160,7 @@ addSection('Library')
     .add('No photos', context => (
         <Library
             {...defaultProps}
+            {...createGridRowHeightProps(context)}
             photoCount={0}
             totalPhotoCount={0}
             sectionIds={[]}

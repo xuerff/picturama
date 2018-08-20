@@ -8,9 +8,14 @@ import classNames from 'classnames'
 const sections: Section[] = []
 
 
+export interface TestContext {
+    state: any
+    forceUpdate: () => void
+}
+
 interface Test {
     title: string
-    renderTest: (context: any) => void
+    renderTest: (context: TestContext) => void
     path: string
     state: any
 }
