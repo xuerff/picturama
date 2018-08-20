@@ -11,7 +11,7 @@ import { bindMany } from '../../../common/util/LangUtil'
 
 import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc } from '../../controller/ImageProvider'
-import { getLayoutForSections, createThumbnail } from '../../controller/LibraryController'
+import { getGridLayout, createThumbnail } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
@@ -20,7 +20,7 @@ import { FetchState } from '../../UITypes'
 import store from '../../state/store'
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
-import Grid, { LayoutForSectionsFunction } from './Grid'
+import Grid, { GetGridLayoutFunction } from './Grid'
 
 import './Library.less'
 
@@ -47,7 +47,7 @@ interface StateProps {
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
-    getLayoutForSections: LayoutForSectionsFunction
+    getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     setGridRowHeight: (gridRowHeight: number) => void
@@ -141,7 +141,7 @@ export class Library extends React.Component<Props> {
                     selectedSectionId={props.selectedSectionId}
                     selectedPhotoIds={props.selectedPhotoIds}
                     gridRowHeight={props.gridRowHeight}
-                    getLayoutForSections={props.getLayoutForSections}
+                    getGridLayout={props.getGridLayout}
                     getThumbnailSrc={props.getThumbnailSrc}
                     createThumbnail={props.createThumbnail}
                     setSelectedPhotos={props.setSelectedPhotos}
@@ -200,7 +200,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     dispatch => ({
         fetchTotalPhotoCount,
         fetchSections,
-        getLayoutForSections,
+        getGridLayout,
         getThumbnailSrc,
         createThumbnail,
         setDetailPhotoById,

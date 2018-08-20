@@ -24,3 +24,11 @@ export interface GridSectionLayout {
     toBoxIndex?: number
     boxes?: JustifiedLayoutBox[]
 }
+
+export interface GridLayout {
+    /** The index of the first section to render (inclusive) */
+    fromSectionIndex: number
+    /** The index of the last section to render (exclusive) */
+    toSectionIndex: number
+    sectionLayouts: GridSectionLayout[]
+}

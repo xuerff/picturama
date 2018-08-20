@@ -9,16 +9,16 @@ import { bindMany, cloneArrayWithItemRemoved } from '../../../common/util/LangUt
 
 import keymapManager from '../../keymap-manager'
 import { isMac } from '../../UiConstants'
-import { GridSectionLayout } from '../../UITypes'
+import { GridSectionLayout, GridLayout } from '../../UITypes'
 import GridSection, { sectionHeadHeight } from './GridSection'
 
 import './Grid.less'
 
 
-export type LayoutForSectionsFunction = (
+export type GetGridLayoutFunction = (
     sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number,
     gridRowHeight: number, nailedSectionIndex: number | null)
-    => GridSectionLayout[]
+    => GridLayout
 
 interface Props {
     className?: any
@@ -28,7 +28,7 @@ interface Props {
     selectedSectionId: PhotoSectionId
     selectedPhotoIds: PhotoId[]
     gridRowHeight: number
-    getLayoutForSections: LayoutForSectionsFunction
+    getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
@@ -46,7 +46,7 @@ interface Snapshot {
 
 export default class Grid extends React.Component<Props, State, Snapshot> {
 
-    private sectionLayouts: GridSectionLayout[] | null = null
+    private gridLayout: GridLayout | null = null
     private nailedSectionIndex: number | null = null
     private releaseNailTimer: NodeJS.Timer | null = null
 
@@ -63,19 +63,19 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     componentWillMount() {
         this.addListeners()
 
-        this.sectionLayouts = this.getSectionLayouts(this.props, this.state)
+        this.gridLayout = this.getGridLayout(this.props, this.state)
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State, nextContext: any): boolean {
         const prevProps = this.props
         const prevState = this.state
-        const prevSectionLayouts = this.sectionLayouts
+        const prevGridLayout = this.gridLayout
 
         if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth) {
             // Sizes have changed
             // -> Nail the current section (Change the scroll position, so the same section is shown again)
-            if (this.nailedSectionIndex === null && prevSectionLayouts) {
-                this.nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevSectionLayouts)
+            if (this.nailedSectionIndex === null && prevGridLayout) {
+                this.nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevGridLayout.sectionLayouts)
             }
             clearTimeout(this.releaseNailTimer)
             this.releaseNailTimer = setTimeout(() => {
@@ -83,9 +83,9 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             }, 1000)
         }
 
-        this.sectionLayouts = this.getSectionLayouts(nextProps, nextState)
+        this.gridLayout = this.getGridLayout(nextProps, nextState)
 
-        return this.sectionLayouts !== prevSectionLayouts
+        return this.gridLayout !== prevGridLayout
             || nextProps.selectedSectionId !== prevProps.selectedSectionId
             || nextProps.selectedPhotoIds !== prevProps.selectedPhotoIds
     }
@@ -105,8 +105,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         this.removeListeners()
     }
 
-    getSectionLayouts(props: Props, state: State): GridSectionLayout[] {
-        return props.getLayoutForSections(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight,
+    getGridLayout(props: Props, state: State): GridLayout {
+        return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight,
             props.gridRowHeight, this.nailedSectionIndex)
     }
 
@@ -152,11 +152,11 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     scrollToNailedSection() {
-        if (this.nailedSectionIndex === null || !this.sectionLayouts) {
+        if (this.nailedSectionIndex === null || !this.gridLayout) {
             return
         }
 
-        const layout = this.sectionLayouts[this.nailedSectionIndex]
+        const layout = this.gridLayout.sectionLayouts[this.nailedSectionIndex]
         if (!layout) {
             return
         }
@@ -225,6 +225,46 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         keymapManager.unbind()
     }
 
+    renderVisibleSections() {
+        const props = this.props
+        const state = this.state
+        const gridLayout = this.gridLayout
+
+        let result = []
+        for (let sectionIndex = gridLayout.fromSectionIndex; sectionIndex < gridLayout.toSectionIndex; sectionIndex++) {
+            const sectionId = props.sectionIds[sectionIndex]
+            const layout = gridLayout.sectionLayouts[sectionIndex]
+            result.push(
+                <GridSection
+                    key={sectionId}
+                    className="Grid-section"
+                    style={{ top: layout.sectionTop, width: state.viewportWidth, height: sectionHeadHeight + layout.containerHeight }}
+                    section={props.sectionById[sectionId]}
+                    layout={layout}
+                    selectedPhotoIds={props.selectedPhotoIds}
+                    getThumbnailSrc={props.getThumbnailSrc}
+                    createThumbnail={props.createThumbnail}
+                    onPhotoClick={this.onPhotoClick}
+                    onPhotoDoubleClick={this.onPhotoDoubleClick}
+                />
+            )
+        }
+        return result
+    }
+
+    renderBottomSpacer() {
+        const props = this.props
+        const sectionCount = props.sectionIds.length
+        if (sectionCount === 0 || this.gridLayout.toSectionIndex >= sectionCount) {
+            // We don't need a spacer
+            return null
+        } else {
+            const lastLayout = this.gridLayout.sectionLayouts[sectionCount - 1]
+            const gridSpacerHeight = 1
+            return <div className="Grid-spacer" style={{ top: lastLayout.sectionTop + sectionHeadHeight + lastLayout.containerHeight - gridSpacerHeight }} />
+        }
+    }
+
     render() {
         const props = this.props
 
@@ -235,18 +275,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         return (
             <ResizeSensor onResize={this.onResize}>
                 <div ref="grid" className={classNames(props.className, 'Grid')} onScroll={this.onScroll}>
-                    {props.sectionIds.map((sectionId, sectionIndex) =>
-                        <GridSection
-                            key={sectionId}
-                            section={props.sectionById[sectionId]}
-                            layout={this.sectionLayouts[sectionIndex]}
-                            selectedPhotoIds={props.selectedPhotoIds}
-                            getThumbnailSrc={props.getThumbnailSrc}
-                            createThumbnail={props.createThumbnail}
-                            onPhotoClick={this.onPhotoClick}
-                            onPhotoDoubleClick={this.onPhotoDoubleClick}
-                        />
-                    )}
+                    {this.renderVisibleSections()}
+                    {this.renderBottomSpacer()}
                 </div>
             </ResizeSensor>
         )

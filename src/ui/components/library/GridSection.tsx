@@ -1,8 +1,8 @@
+import classNames from 'classnames'
 import React from 'react'
 
 import { PhotoId, PhotoType, PhotoSectionId, PhotoSection } from '../../../common/models/Photo'
 import CancelablePromise from '../../../common/util/CancelablePromise'
-import { bindMany } from '../../../common/util/LangUtil'
 
 import { GridSectionLayout } from '../../UITypes'
 import Picture from './Picture'
@@ -14,6 +14,8 @@ export const sectionHeadHeight = 60  // Keep in sync with `GridSection.less`
 
 
 interface Props {
+    className?: any
+    style?: any
     section: PhotoSection
     layout: GridSectionLayout
     selectedPhotoIds: PhotoId[] | null
@@ -56,7 +58,7 @@ export default class GridSection extends React.Component<Props, undefined> {
         const props = this.props
 
         return (
-            <div className="GridSection">
+            <div className={classNames(props.className, 'GridSection')} style={props.style}>
                 <div className="GridSection-head">{props.section.title}</div>
                 <div className="GridSection-body" style={{ height: props.layout.containerHeight }}>
                     {this.renderPictures()}

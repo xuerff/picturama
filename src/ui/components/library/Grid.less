@@ -1,4 +1,15 @@
 .Grid {
+    position: relative;
     overflow-x: hidden;  // Don't show vertical scrollbars during transition when hiding the sidebar
     overflow-y: auto;
+}
+
+.Grid-section,
+.Grid-spacer {
+    position: absolute;
+    left: 0;
+}
+.Grid-spacer {
+    width: 1px;
+    height: 1px;
 }
