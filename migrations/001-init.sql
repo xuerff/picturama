@@ -35,6 +35,7 @@ INSERT INTO photos_new (id, title, master, non_raw, extension, flag, created_at,
 DROP TABLE photos;
 ALTER TABLE photos_new RENAME TO photos;
 CREATE UNIQUE INDEX `photos_id_unique` on photos (`id`);
+CREATE INDEX `photos_date` on photos (`date`);
 PRAGMA foreign_key_check;
 PRAGMA foreign_keys=ON;
 
