@@ -7,7 +7,7 @@ import Profiler from '../../common/util/Profiler'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 
 import { fetchSectionPhotos as fetchSectionPhotosFromDb } from '../BackgroundClient'
-import { GridSectionLayout, GridLayout } from '../UITypes'
+import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from '../UITypes'
 import { sectionHeadHeight } from '../components/library/GridSection'
 import { forgetSectionPhotosAction, fetchSectionPhotosAction } from '../state/actions'
 import store from '../state/store'
@@ -17,6 +17,7 @@ import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './Ima
 const pagesToKeep = 4
 const pagesToPreload = 3
 const averageAspect = 3 / 2
+const boxSpacing = 10  // Default 'boxSpacing' of 'justified-layout'
 
 let prevSectionIds: PhotoSectionId[] = []
 let prevSectionById: PhotoSectionById = {}
@@ -80,15 +81,10 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
             // We have to update the layout
             if (usePlaceholder) {
                 if (prevLayout) {
-                    // Drop boxes
+                    // Section data was dropped -> Drop layout boxes as well
                     layout = { sectionTop, containerHeight: prevLayout.containerHeight }
-                } else if (viewportWidth === 0) {
-                    layout = { sectionTop, containerHeight: section.count * gridRowHeight }
                 } else {
-                    // Estimate section height (assuming a normal landscape aspect ratio of 3:2)
-                    const unwrappedWidth = averageAspect * section.count * gridRowHeight
-                    const rows = Math.ceil(unwrappedWidth / viewportWidth)
-                    layout = { sectionTop, containerHeight: rows * gridRowHeight }
+                    layout = { sectionTop, containerHeight: estimateContainerHeight(viewportWidth, gridRowHeight, section.count) }
                 }
             } else {
                 // Calculate boxes
@@ -110,35 +106,38 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
                 fromSectionIndex = sectionIndex
             }
 
-            if (layout.boxes) {
-                const prevFromBoxIndex = layout.fromBoxIndex
-                const prevToBoxIndex = layout.toBoxIndex
-                layout.fromBoxIndex = 0
-                layout.toBoxIndex = section.count
-                if (sectionTop < inDomMinY || sectionBottom > inDomMaxY) {
-                    // This section is party visible -> Go throw the boxes and find the correct boundaries
-                    const boxes = layout.boxes
-                    const boxCount = boxes.length
+            if (!layout.boxes) {
+                // Section is not loaded yet, but will be shown in DOM -> Create dummy boxes
+                layout.boxes = createDummyLayoutBoxes(viewportWidth, gridRowHeight, layout.containerHeight, section.count)
+            }
 
-                    let searchingStart = true
-                    for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
-                        const box = boxes[boxIndex]
-                        const boxTop = sectionTop + sectionHeadHeight + box.top
-                        const boxBottom = boxTop + box.height
-                        if (searchingStart) {
-                            if (boxBottom >= inDomMinY) {
-                                layout.fromBoxIndex = boxIndex
-                                searchingStart = false
-                            }
-                        } else if (boxTop > inDomMaxY) {
-                            layout.toBoxIndex = boxIndex
-                            break
+            const prevFromBoxIndex = layout.fromBoxIndex
+            const prevToBoxIndex = layout.toBoxIndex
+            layout.fromBoxIndex = 0
+            layout.toBoxIndex = section.count
+            if (sectionTop < inDomMinY || sectionBottom > inDomMaxY) {
+                // This section is party visible -> Go throw the boxes and find the correct boundaries
+                const boxes = layout.boxes
+                const boxCount = boxes.length
+
+                let searchingStart = true
+                for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
+                    const box = boxes[boxIndex]
+                    const boxTop = sectionTop + sectionHeadHeight + box.top
+                    const boxBottom = boxTop + box.height
+                    if (searchingStart) {
+                        if (boxBottom >= inDomMinY) {
+                            layout.fromBoxIndex = boxIndex
+                            searchingStart = false
                         }
+                    } else if (boxTop > inDomMaxY) {
+                        layout.toBoxIndex = boxIndex
+                        break
                     }
                 }
-                if (layout.fromBoxIndex !== prevFromBoxIndex || layout.toBoxIndex !== prevToBoxIndex) {
-                    sectionsChanged = true
-                }
+            }
+            if (layout.fromBoxIndex !== prevFromBoxIndex || layout.toBoxIndex !== prevToBoxIndex) {
+                sectionsChanged = true
             }
         } else { // isSectionVisible == false
             if (toSectionIndex === null && fromSectionIndex !== null) {
@@ -206,6 +205,46 @@ export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: 
     layout.sectionTop = sectionTop
     layout.containerHeight = Math.round(layout.containerHeight)
     return layout
+}
+
+
+export function estimateContainerHeight(viewportWidth: number, gridRowHeight: number, photoCount: number): number {
+    if (viewportWidth === 0) {
+        return boxSpacing + photoCount * (gridRowHeight + boxSpacing)
+    } else {
+        // Estimate section height (assuming a normal landscape aspect ratio of 3:2)
+        const unwrappedWidth = averageAspect * photoCount * gridRowHeight
+        const rows = Math.ceil(unwrappedWidth / viewportWidth)
+        return rows * gridRowHeight + (rows + 1) * boxSpacing
+    }
+}
+
+export function createDummyLayoutBoxes(viewportWidth: number, gridRowHeight: number, containerHeight: number, photoCount: number): JustifiedLayoutBox[] {
+    const rowCount = Math.round((containerHeight - boxSpacing) / (gridRowHeight + boxSpacing))   // Reverse `estimateContainerHeight`
+    let boxes: JustifiedLayoutBox[] = []
+    for (let row = 0; row < rowCount; row++) {
+        const lastBoxIndex = Math.ceil(photoCount * (row + 1) / rowCount)  // index is excluding
+        const colCount = lastBoxIndex - boxes.length
+        let boxWidth = (viewportWidth - (colCount + 1) * boxSpacing) / colCount
+        if (row === rowCount - 1) {
+            boxWidth = Math.min(boxWidth, averageAspect * gridRowHeight)
+        }
+        const aspectRatio = boxWidth / gridRowHeight
+    
+        for (let col = 0; col < colCount; col++) {
+            if (boxes.length >= photoCount) {
+                break
+            }
+            boxes.push({
+                aspectRatio,
+                left: col * boxWidth + (col + 1) * boxSpacing,
+                top: boxSpacing + row * (gridRowHeight + boxSpacing),
+                width: boxWidth,
+                height: gridRowHeight
+            })
+        }
+    }
+    return boxes
 }
 
 

@@ -29,27 +29,45 @@ export default class GridSection extends React.Component<Props, undefined> {
 
     renderPictures() {
         const props = this.props
-        if (!props.section.photoIds || !props.layout.boxes || props.layout.toBoxIndex === null) {
+        if (!props.layout.boxes || props.layout.toBoxIndex === null) {
             return
         }
 
         const toBoxIndex = props.layout.toBoxIndex
+        const photoIds = props.section.photoIds
         let elems = []
-        for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
-            const photoId = props.section.photoIds[photoIndex]
-            elems.push(
-                <Picture
-                    key={photoId}
-                    sectionId={props.section.id}
-                    photo={props.section.photoData[photoId]}
-                    layoutBox={props.layout.boxes[photoIndex]}
-                    isHighlighted={props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
-                    getThumbnailSrc={props.getThumbnailSrc}
-                    createThumbnail={props.createThumbnail}
-                    onPhotoClick={props.onPhotoClick}
-                    onPhotoDoubleClick={props.onPhotoDoubleClick}
-                />
-            )
+        if (photoIds) {
+            for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
+                const photoId = photoIds[photoIndex]
+                elems.push(
+                    <Picture
+                        key={photoId}
+                        sectionId={props.section.id}
+                        photo={props.section.photoData[photoId]}
+                        layoutBox={props.layout.boxes[photoIndex]}
+                        isHighlighted={props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
+                        getThumbnailSrc={props.getThumbnailSrc}
+                        createThumbnail={props.createThumbnail}
+                        onPhotoClick={props.onPhotoClick}
+                        onPhotoDoubleClick={props.onPhotoDoubleClick}
+                    />
+                )
+            }
+        } else {
+            for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
+                const layoutBox = props.layout.boxes[photoIndex]
+                elems.push(
+                    <div
+                        className="GridSection-dummyBox"
+                        style={{
+                            left:   Math.round(layoutBox.left),
+                            top:    Math.round(layoutBox.top),
+                            width:  Math.round(layoutBox.width),
+                            height: Math.round(layoutBox.height)
+                        }}
+                    />
+                )
+            }
         }
         return elems
     }

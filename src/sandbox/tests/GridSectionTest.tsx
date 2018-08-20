@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {addSection, action} from '../core/UiTester'
+import { addSection, action } from '../core/UiTester'
 import { testPhoto, testPanoramaPhoto, testUprightPhoto } from '../util/MockData'
 import { createSection, createRandomDummyPhoto, createLayoutForSection } from '../util/TestUtil'
 
@@ -10,15 +10,17 @@ import { PhotoType, PhotoSectionId } from '../../common/models/Photo'
 import { defaultGridRowHeight } from '../../ui/UiConstants'
 import GridSection from '../../ui/components/library/GridSection'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
+import { estimateContainerHeight, createDummyLayoutBoxes } from '../../ui/controller/LibraryController'
 
 
 const containerWidth = 800
 const scrollBarWidth = 20
+const viewportWidth = containerWidth - scrollBarWidth
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
 const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
-const defaultLayout = createLayoutForSection(defaultSection, 0, containerWidth - scrollBarWidth, defaultGridRowHeight)
+const defaultLayout = createLayoutForSection(defaultSection, 0, viewportWidth, defaultGridRowHeight)
 
 
 const defaultProps = {
@@ -59,7 +61,7 @@ addSection('GridSection')
         }
         photos[0] = { ...photos[0], id: photos[0] + '_dummy', master: 'dummy' }
         const section = createSection(defaultSectionId, photos)
-        const layout = createLayoutForSection(section, 0, containerWidth - scrollBarWidth, defaultGridRowHeight)
+        const layout = createLayoutForSection(section, 0, viewportWidth, defaultGridRowHeight)
 
         return (
             <GridSection
@@ -69,8 +71,10 @@ addSection('GridSection')
             />
         )
     })
-    .add('placeholder', context => (
-        <div>
+    .add('loading section data', context => {
+        const photoCount = 14
+        const containerHeight = estimateContainerHeight(viewportWidth, defaultGridRowHeight, photoCount)
+        return (
             <GridSection
                 {...defaultProps}
                 section={{
@@ -78,11 +82,17 @@ addSection('GridSection')
                     title: defaultSectionId,
                     count: 14
                 }}
-                layout={{ sectionTop: 0, containerHeight: 550 }}
+                layout={{
+                    sectionTop: 0,
+                    containerHeight,
+                    fromBoxIndex: 0,
+                    toBoxIndex: photoCount,
+                    boxes: createDummyLayoutBoxes(viewportWidth, defaultGridRowHeight, containerHeight, photoCount)
+                }}
                 selectedPhotoIds={null}
             />
-            <div style={{ backgroundColor: 'gray', padding: 5 }}>
-                Below section
-            </div>
-        </div>
-    ))
+        )
+    })
+
+
+    createDummyLayoutBoxes
