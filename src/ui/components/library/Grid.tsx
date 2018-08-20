@@ -36,6 +36,7 @@ interface Props {
 }
 
 interface State {
+    scrollTop: number
     viewportWidth: number
     viewportHeight: number
 }
@@ -45,8 +46,7 @@ interface Snapshot {
 
 export default class Grid extends React.Component<Props, State, Snapshot> {
 
-    private scrollTop = 0
-    private prevSectionLayouts: GridSectionLayout[] | null = null
+    private sectionLayouts: GridSectionLayout[] | null = null
     private nailedSectionIndex: number | null = null
     private releaseNailTimer: NodeJS.Timer | null = null
 
@@ -54,24 +54,28 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     constructor(props: Props) {
         super(props)
 
-        this.state = { viewportWidth: 0, viewportHeight: 0 }
+        this.state = { scrollTop: 0, viewportWidth: 0, viewportHeight: 0 }
 
         bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'pressedEnter', 'onResize', 'onScroll', 'scrollToNailedSection',
             'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown')
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.addListeners()
+
+        this.sectionLayouts = this.getSectionLayouts(this.props, this.state)
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State, nextContext: any): boolean {
-        const props = this.props
-        const state = this.state
-        if (nextProps.gridRowHeight !== props.gridRowHeight || nextState.viewportWidth !== state.viewportWidth) {
+        const prevProps = this.props
+        const prevState = this.state
+        const prevSectionLayouts = this.sectionLayouts
+
+        if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth) {
             // Sizes have changed
             // -> Nail the current section (Change the scroll position, so the same section is shown again)
-            if (this.nailedSectionIndex === null && this.prevSectionLayouts) {
-                this.nailedSectionIndex = getSectionIndexAtY(this.scrollTop, state.viewportHeight, this.prevSectionLayouts)
+            if (this.nailedSectionIndex === null && prevSectionLayouts) {
+                this.nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevSectionLayouts)
             }
             clearTimeout(this.releaseNailTimer)
             this.releaseNailTimer = setTimeout(() => {
@@ -79,7 +83,11 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             }, 1000)
         }
 
-        return true
+        this.sectionLayouts = this.getSectionLayouts(nextProps, nextState)
+
+        return this.sectionLayouts !== prevSectionLayouts
+            || nextProps.selectedSectionId !== prevProps.selectedSectionId
+            || nextProps.selectedPhotoIds !== prevProps.selectedPhotoIds
     }
 
     componentDidUpdate(prevProps: Props, prevState: State, snapshot: Snapshot) {
@@ -95,6 +103,11 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     componentWillUnmount() {
         this.removeListeners()
+    }
+
+    getSectionLayouts(props: Props, state: State): GridSectionLayout[] {
+        return props.getLayoutForSections(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight,
+            props.gridRowHeight, this.nailedSectionIndex)
     }
 
     onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
@@ -135,24 +148,21 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     onScroll(event: any) {
         const gridElem = findDOMNode(this.refs.grid) as HTMLElement
-        this.scrollTop = gridElem.scrollTop
-        if (this.nailedSectionIndex === null) {
-            this.forceUpdate()
-        }
+        this.setState({ scrollTop: gridElem.scrollTop })
     }
 
     scrollToNailedSection() {
-        if (this.nailedSectionIndex === null || !this.prevSectionLayouts) {
+        if (this.nailedSectionIndex === null || !this.sectionLayouts) {
             return
         }
 
-        const layout = this.prevSectionLayouts[this.nailedSectionIndex]
+        const layout = this.sectionLayouts[this.nailedSectionIndex]
         if (!layout) {
             return
         }
 
         const scrollTop = layout.sectionTop
-        if (scrollTop !== this.scrollTop) {
+        if (scrollTop !== this.state.scrollTop) {
             const gridElem = findDOMNode(this.refs.grid) as HTMLElement
             gridElem.scrollTop = scrollTop
         }
@@ -217,10 +227,6 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     render() {
         const props = this.props
-        const state = this.state
-        const sectionLayouts = props.getLayoutForSections(props.sectionIds, props.sectionById, this.scrollTop, state.viewportWidth, state.viewportHeight,
-            props.gridRowHeight, this.nailedSectionIndex)
-        this.prevSectionLayouts = sectionLayouts
 
         if (this.nailedSectionIndex !== null) {
             setTimeout(this.scrollToNailedSection)
@@ -233,7 +239,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                         <GridSection
                             key={sectionId}
                             section={props.sectionById[sectionId]}
-                            layout={sectionLayouts[sectionIndex]}
+                            layout={this.sectionLayouts[sectionIndex]}
                             selectedPhotoIds={props.selectedPhotoIds}
                             getThumbnailSrc={props.getThumbnailSrc}
                             createThumbnail={props.createThumbnail}

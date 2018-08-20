@@ -35,6 +35,7 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
 
+    let hadChange = false
     let sectionLayouts: GridSectionLayout[] = []
     const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth) || (gridRowHeight !== prevGridRowHeight)
 
@@ -67,6 +68,7 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
         }
 
         if (!layout) {
+            hadChange = true
             // We have to update the layout
             if (usePlaceholder) {
                 if (prevLayout) {
@@ -86,7 +88,7 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
             }
         }
 
-        
+
         if (sectionIndex === nailedSectionIndex) {
             inDomMinY = sectionTop
             inDomMaxY = sectionTop + viewportHeight
@@ -94,6 +96,8 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
 
         const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
         if (layout.boxes) {
+            const prevFromBoxIndex = layout.fromBoxIndex
+            const prevToBoxIndex = layout.toBoxIndex
             if (inDomMinY === null || sectionBottom < inDomMinY || sectionTop > inDomMaxY) {
                 // This section is fully invisible -> Keep the layout but add no photos to the DOM
                 layout.fromBoxIndex = null
@@ -125,6 +129,9 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
                     }
                 }
             }
+            if (layout.fromBoxIndex !== prevFromBoxIndex || layout.toBoxIndex !== prevToBoxIndex) {
+                hadChange = true
+            }
         }
 
         sectionLayouts.push(layout)
@@ -141,15 +148,17 @@ export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: 
         profiler.logResult()
     }
 
+    const nextSectionLayouts = hadChange ? sectionLayouts : prevSectionLayouts
+
     prevSectionIds = sectionIds
     prevSectionById = sectionById
-    prevSectionLayouts = sectionLayouts
+    prevSectionLayouts = nextSectionLayouts
     prevScrollTop = scrollTop
     prevViewportWidth = viewportWidth
     prevViewportHeight = viewportHeight
     prevGridRowHeight = gridRowHeight
 
-    return sectionLayouts
+    return nextSectionLayouts
 }
 
 
