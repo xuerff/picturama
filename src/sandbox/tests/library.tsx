@@ -6,7 +6,7 @@ import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models
 import CancelablePromise from '../../common/util/CancelablePromise'
 
 import { defaultGridRowHeight } from '../../ui/UiConstants'
-import { GridSectionLayout } from '../../ui/UITypes'
+import { GridLayout } from '../../ui/UITypes'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
 import { sectionHeadHeight } from '../../ui/components/library/GridSection'
 import { Library } from '../../ui/components/library/Library'
@@ -39,7 +39,7 @@ const defaultProps = {
 
     fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
     fetchSections: action('fetchSections'),
-    getLayoutForSections,
+    getGridLayout,
     getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
         const thumbnailPath = getNonRawImgPath(photo)
@@ -60,17 +60,23 @@ const defaultProps = {
 }
 
 
-export function getLayoutForSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
+export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
     scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
-    GridSectionLayout[]
+    GridLayout
 {
     let sectionTop = 0
-    return sectionIds.map(sectionId => {
+    const sectionLayouts = sectionIds.map(sectionId => {
         const section = sectionById[sectionId]
         const layout = createLayoutForSection(section, sectionTop, viewportWidth, gridRowHeight)
         sectionTop += sectionHeadHeight + layout.containerHeight
         return layout
     })
+
+    return {
+        fromSectionIndex: 0,
+        toSectionIndex: sectionIds.length,
+        sectionLayouts
+    }
 }
 
 
