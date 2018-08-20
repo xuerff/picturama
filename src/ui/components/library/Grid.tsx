@@ -99,6 +99,10 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                 this.removeListeners()
             }
         }
+
+        if (this.nailedSectionIndex !== null) {
+            this.scrollToNailedSection()
+        }
     }
 
     componentWillUnmount() {
@@ -267,11 +271,6 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     render() {
         const props = this.props
-
-        if (this.nailedSectionIndex !== null) {
-            setTimeout(this.scrollToNailedSection)
-        }
-
         return (
             <ResizeSensor onResize={this.onResize}>
                 <div ref="grid" className={classNames(props.className, 'Grid')} onScroll={this.onScroll}>
