@@ -58,6 +58,7 @@ export default class GridSection extends React.Component<Props, undefined> {
                 const layoutBox = props.layout.boxes[photoIndex]
                 elems.push(
                     <div
+                        key={photoIndex}
                         className="GridSection-dummyBox"
                         style={{
                             left:   Math.round(layoutBox.left),
