@@ -15,7 +15,7 @@ export interface MetaData {
     iso?:          number
     aperture?:     number
     focalLength?:  number
-    createdAt:     Date
+    createdAt?:    Date
     /** Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html */
     orientation:   ExifOrientation
     tags:          string[]
@@ -50,6 +50,7 @@ function readExifOfImage(imagePath) {
 
 function extractMetaDataFromExif(exifData): MetaData {
     const exifTags = exifData.tags
+    const rawDate = exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate
     let metaData = {
         imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
         imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
@@ -57,7 +58,7 @@ function extractMetaDataFromExif(exifData): MetaData {
         iso:          exifTags.ISO,
         aperture:     exifTags.FNumber,
         focalLength:  exifTags.FocalLength,
-        createdAt:    new Date((exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate) * 1000),
+        createdAt:    rawDate ? new Date(rawDate * 1000) : undefined,
         orientation:  exifTags.Orientation || 1,
             // Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html
         tags:         []

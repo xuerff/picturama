@@ -22,6 +22,7 @@ import { ExifOrientation } from '../common/models/DataTypes';
 
 
 const readFile = BluebirdPromise.promisify(fs.readFile)
+const fileStat = BluebirdPromise.promisify(fs.stat)
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
@@ -156,6 +157,12 @@ export default class Scanner {
                 switchSides = !switchSides
             }
 
+            let createdAt = metaData.createdAt
+            if (!createdAt) {
+                const stat = await fileStat(originalImgPath)
+                createdAt = stat.mtime
+            }
+
             const photo: PhotoType = {
                 id: photoId,
                 title: file.name,
@@ -165,10 +172,10 @@ export default class Scanner {
                 non_raw: nonRawImgPath,
                 extension: file.path.match(/\.(.+)$/i)[1],
                 orientation: metaData.orientation,
-                date: moment(metaData.createdAt).format('YYYY-MM-DD'),
+                date: moment(createdAt).format('YYYY-MM-DD'),
                 flag: photoWork.flagged ? 1 : 0,
                 trashed: 0,
-                created_at: metaData.createdAt,
+                created_at: createdAt,
                 updated_at: null,
                 exposure_time: metaData.exposureTime,
                 iso: metaData.iso,
