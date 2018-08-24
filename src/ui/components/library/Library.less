@@ -1,19 +1,49 @@
 @import "../../less/variables.less";
 
+// --- Layout ---
+
 .Library {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    background: @blue-grey-100;
-}
-.Library-topBar, .Library-bottomBar {
-    flex: 0 0 auto;
-}
-
-.Library-body {
     position: relative;
-    flex: 1 1 100%;
+}
+.Library-topBar,
+.Library-bottomBar,
+.Library-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    transition: right @transition-time ease-out;
+
+    .Library.hasRightSidebar & {
+        right: @sidebarWidth;
+    }
+}
+.Library-topBar {
+    top: 0;
+}
+.Library-bottomBar {
+    bottom: 0
+}
+.Library-body {
+    top: @toolbarHeight;
+    bottom: @toolbarHeight;
+}
+.Library-rightSidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -@sidebarWidth;
+    width: @sidebarWidth;
+    transition: right @transition-time ease-out;
+
+    .Library.hasRightSidebar & {
+        right: 0;
+    }
+}
+
+// --- Styling ---
+
+.Library {
+    background: @blue-grey-100;
 }
 
 .Library-grid {

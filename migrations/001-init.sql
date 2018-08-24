@@ -21,6 +21,7 @@ CREATE TABLE photos_new (
     `created_at` datetime,
     `updated_at` datetime,
     `orientation` integer NOT NULL,
+    `camera` text,
     `exposure_time` float,
     `iso` integer,
     `focal_length` integer,

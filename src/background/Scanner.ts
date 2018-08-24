@@ -180,6 +180,7 @@ export default class Scanner {
                 trashed: 0,
                 created_at: createdAt,
                 updated_at: null,
+                camera: metaData.camera,
                 exposure_time: metaData.exposureTime,
                 iso: metaData.iso,
                 aperture: metaData.aperture,

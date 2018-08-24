@@ -1,0 +1,55 @@
+@import "../../less/variables.less";
+
+@paddingX: 20px;
+
+.PhotoInfo {
+    display: flex;
+    flex-direction: column;
+    background-color: @blue-grey-900;
+}
+
+.PhotoInfo-topBar {
+    flex: 0 0 auto;
+    padding-left: @paddingX - 1px;
+    border-left: 1px solid @blue-grey-900;
+}
+
+.PhotoInfo-title {
+    font-size: 22px;
+}
+
+.PhotoInfo-infoRow {
+    display: flex;
+    align-items: center;
+
+    margin-top: 24px;
+    padding: 0 @paddingX;
+
+    h1 {
+        font-size: inherit;
+        margin: 0 0 5px 0;
+    }
+}
+.PhotoInfo-infoIcon {
+    flex: 0 0 auto;
+    margin-right: @paddingX;
+}
+.PhotoInfo-infoBody {
+    flex: 1 1 100%;
+}
+
+.PhotoInfo-minorInfo {
+    font-size: 14px;
+    font-weight: 100;
+    opacity: 0.8;
+
+    &.hasColumns {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        > div {
+            flex: 0 0 auto;
+        }
+    }
+}

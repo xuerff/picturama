@@ -2,15 +2,14 @@ import { ipcRenderer, remote, Menu as MenuType } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
-import { findDOMNode } from 'react-dom'
-import { Button, ButtonGroup, Spinner } from '@blueprintjs/core'
+import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
 import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
 import AvailableEditors from '../../available-editors'
 
 import PhotoPane from './PhotoPane'
-import PictureInfo from './PictureInfo'
+import PhotoInfo from '../info/PhotoInfo'
 import FaIcon from '../widget/icon/FaIcon'
 import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
 import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
@@ -75,6 +74,7 @@ interface State {
     loading: boolean,
     canvasWidth?: number
     canvasHeight?: number
+    isShowingInfo: boolean
 }
 
 export class PictureDetail extends React.Component<Props, State> {
@@ -85,10 +85,10 @@ export class PictureDetail extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { bound: false, loading: true }
+        this.state = { bound: false, loading: true, isShowingInfo: false }
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
-            'toggleDiff', 'moveToTrash', 'addEditorMenu', 'updateCanvasSize', 'rotateLeft', 'rotateRight')
+            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onBodyResize', 'rotateLeft', 'rotateRight')
     }
 
     componentDidMount() {
@@ -119,8 +119,6 @@ export class PictureDetail extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        this.updateCanvasSize()
-
         if (this.props.isActive !== prevProps.isActive) {
             if (this.props.isActive) {
                 this.bindEventListeners()
@@ -139,7 +137,6 @@ export class PictureDetail extends React.Component<Props, State> {
     bindEventListeners() {
         this.setState({ bound: true })
 
-        window.addEventListener('resize', this.updateCanvasSize)
         document.addEventListener('contextmenu', this.contextMenu)
 
         ipcRenderer.send('toggleAddTagMenu', true)
@@ -168,7 +165,6 @@ export class PictureDetail extends React.Component<Props, State> {
     unbindEventListeners() {
         this.setState({ bound: false })
 
-        window.removeEventListener('resize', this.updateCanvasSize)
         document.removeEventListener('contextmenu', this.contextMenu)
 
         ipcRenderer.send('toggleAddTagMenu', false)
@@ -229,6 +225,10 @@ export class PictureDetail extends React.Component<Props, State> {
         }
     }
 
+    toggleShowInfo() {
+        this.setState({ isShowingInfo: !this.state.isShowingInfo })
+    }
+
     rotateLeft() {
         this.rotate(-1)
     }
@@ -247,12 +247,12 @@ export class PictureDetail extends React.Component<Props, State> {
         }
     }
 
-    updateCanvasSize() {
+    onBodyResize(entries: IResizeEntry[]) {
         const state = this.state
 
-        const bodyElem = findDOMNode(this.refs.body) as HTMLElement
-        const canvasWidth  = Math.round(bodyElem.clientWidth  * 0.9)
-        const canvasHeight = Math.round(bodyElem.clientHeight * 0.9)
+        const contentRect = entries[0].contentRect
+        const canvasWidth  = Math.round(contentRect.width  * 0.9)
+        const canvasHeight = Math.round(contentRect.height * 0.9)
 
         if (state.canvasWidth !== canvasWidth || state.canvasHeight !== canvasHeight) {
             this.setState({ canvasWidth, canvasHeight })
@@ -264,7 +264,11 @@ export class PictureDetail extends React.Component<Props, State> {
         const state = this.state
 
         return (
-            <div className={classNames(props.className, "PictureDetail")} style={props.style} ref="detail">
+            <div
+                ref="detail"
+                className={classNames(props.className, 'PictureDetail', { hasRightSidebar: state.isShowingInfo })}
+                style={props.style}
+            >
                 <Toolbar className="PictureDetail-topBar">
                     <Button onClick={props.closeDetail}>
                         <FaIcon name="chevron-left"/>
@@ -294,31 +298,40 @@ export class PictureDetail extends React.Component<Props, State> {
                         >
                             <FaIcon name="flag" />
                         </Button>
+                        <Button
+                            icon="info-sign"
+                            title={state.isShowingInfo ? "Hide photo info" : "Show photo info"}
+                            active={state.isShowingInfo}
+                            onClick={this.toggleShowInfo}
+                        />
                     </span>
                 </Toolbar>
 
-                <div className="PictureDetail-body" ref="body">
-                    <PhotoPane
-                        className="PictureDetail-image"
-                        width={state.canvasWidth}
-                        height={state.canvasHeight}
-                        src={getNonRawImgPath(props.photo)}
-                        srcPrev={props.photoPrev && getNonRawImgPath(props.photoPrev)}
-                        srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}
-                        orientation={props.photo.orientation}
-                        photoWork={props.photoWork}
-                        setLoading={this.setLoading}
-                    />
-                </div>
+                <ResizeSensor onResize={this.onBodyResize}>
+                    <div className="PictureDetail-body">
+                        <PhotoPane
+                            className="PictureDetail-image"
+                            width={state.canvasWidth}
+                            height={state.canvasHeight}
+                            src={getNonRawImgPath(props.photo)}
+                            srcPrev={props.photoPrev && getNonRawImgPath(props.photoPrev)}
+                            srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}
+                            orientation={props.photo.orientation}
+                            photoWork={props.photoWork}
+                            setLoading={this.setLoading}
+                        />
+                        {state.loading &&
+                            <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
+                        }
+                    </div>
+                </ResizeSensor>
 
-                <PictureInfo
-                    className="PictureDetail-infoBar"
-                    photo={props.photo}
-                    photoDetail={props.photoDetail}
+                <PhotoInfo
+                    className="PictureDetail-rightSidebar"
+                    isActive={state.isShowingInfo}
+                    photo={state.isShowingInfo && props.photo}
+                    closeInfo={this.toggleShowInfo}                
                 />
-                {state.loading &&
-                    <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
-                }
             </div>
         );
     }

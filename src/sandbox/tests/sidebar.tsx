@@ -6,7 +6,7 @@ import { Sidebar } from '../../ui/components/sidebar/Sidebar'
 
 
 const defaultProps = {
-    style: { width: '285px', height: '100%' },
+    style: { width: '300px', height: '100%' },
 
     dates: {
         years: [

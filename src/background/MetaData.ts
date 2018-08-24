@@ -11,6 +11,7 @@ const fileStat = Promise.promisify(fs.stat)
 export interface MetaData {
     imgWidth?:     number
     imgHeight?:    number
+    camera?:       string
     exposureTime?: number
     iso?:          number
     aperture?:     number
@@ -51,9 +52,19 @@ function readExifOfImage(imagePath) {
 function extractMetaDataFromExif(exifData): MetaData {
     const exifTags = exifData.tags
     const rawDate = exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate
-    let metaData = {
+
+    // Examples:
+    //   - Make = 'Canon', Model = 'Canon EOS 30D'
+    //   - Make = 'SONY', Model = 'DSC-N2'
+    let camera: string = exifTags.Model
+    if (camera && exifTags.Make && camera.indexOf(exifTags.Make) !== 0) {
+        camera = `${exifTags.Make} ${camera}`
+    }
+
+    const metaData: MetaData = {
         imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
         imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
+        camera:       (camera.length === 0) ? null : camera,
         exposureTime: exifTags.ExposureTime,
         iso:          exifTags.ISO,
         aperture:     exifTags.FNumber,
@@ -62,11 +73,11 @@ function extractMetaDataFromExif(exifData): MetaData {
         orientation:  exifTags.Orientation || 1,
             // Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html
         tags:         []
-    };
+    }
 
     // TODO: Translate from `exiv2` result into `exif-parser` result
     //if (exData.hasOwnProperty('Xmp.dc.subject'))
     //  metaData.tags = exData['Xmp.dc.subject'].split(', ');
 
-    return metaData;
-};
+    return metaData
+}

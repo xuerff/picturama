@@ -1,14 +1,45 @@
 @import "../../less/variables.less";
 
-.PictureDetail {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+// --- Layout ---
 
-    background: @blue-grey-100;
+.PictureDetail {
+    position: relative;
 }
-.PictureDetail-topBar, .PictureDetail-infoBar {
-    flex: 0 0 auto;
+.PictureDetail-topBar,
+.PictureDetail-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    transition: right @transition-time ease-out;
+
+    .PictureDetail.hasRightSidebar & {
+        right: @sidebarWidth;
+    }
+}
+.PictureDetail-topBar {
+    top: 0;
+}
+.PictureDetail-body {
+    top: @toolbarHeight;
+    bottom: 0;
+}
+.PictureDetail-rightSidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -@sidebarWidth;
+    width: @sidebarWidth;
+    transition: right @transition-time ease-out;
+
+    .PictureDetail.hasRightSidebar & {
+        right: 0;
+    }
+}
+
+// --- Styling ---
+
+.PictureDetail {
+    background: @blue-grey-100;
 }
 
 .PictureDetail-toggleButton.isActive {
@@ -16,8 +47,6 @@
 }
 
 .PictureDetail-body {
-    position: relative;
-    height: 100%;
     overflow: hidden;
 }
 

@@ -22,6 +22,7 @@ interface Props {
     className?: any
     showOnlyFlagged: boolean
     isShowingTrash: boolean
+    isShowingInfo: boolean
     photosCount: number
     selectedSection: PhotoSection | null
     selectedPhotoIds: PhotoId[]
@@ -29,6 +30,7 @@ interface Props {
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     toggleShowOnlyFlagged: () => void
+    toggleShowInfo: () => void
 }
 
 export default class LibraryTopBar extends React.Component<Props, undefined> {
@@ -112,6 +114,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                 </Button>
                 <Button
                     className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
+                    active={props.showOnlyFlagged}
                     onClick={this.props.toggleShowOnlyFlagged}
                     title={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
                 >
@@ -129,12 +132,20 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                     </ButtonGroup>
                     <Button
                         className={classNames('LibraryTopBar-toggleButton', { isActive: selectedAreFlagged })}
+                        active={selectedAreFlagged}
                         disabled={!hasSelection}
                         onClick={this.toggleFlagged}
                         title={selectedAreFlagged ? 'Remove flag' : 'Flag'}
                     >
                         <FaIcon name="flag" />
                     </Button>
+                    <Button
+                        icon="info-sign"
+                        title={props.isShowingInfo ? "Hide photo info" : "Show photo info"}
+                        active={props.isShowingInfo}
+                        disabled={!hasSelection && !props.isShowingInfo}
+                        onClick={this.props.toggleShowInfo}
+                    />
                     <Button disabled={!hasSelection} onClick={this.props.openExport} title="Export">
                         <MdSaveAlt/>
                     </Button>

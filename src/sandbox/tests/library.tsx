@@ -102,6 +102,7 @@ addSection('Library')
         <Library
             {...defaultProps}
             {...createGridRowHeightProps(context)}
+            selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testPhoto.id ]}
         />
     ))

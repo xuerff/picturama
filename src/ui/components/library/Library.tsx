@@ -18,6 +18,7 @@ import { AppState } from '../../state/reducers'
 import { keySymbols } from '../../UiConstants'
 import { FetchState } from '../../UITypes'
 import store from '../../state/store'
+import PhotoInfo from '../info/PhotoInfo'
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid, { GetGridLayoutFunction } from './Grid'
@@ -63,12 +64,17 @@ interface DispatchProps {
 interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
-export class Library extends React.Component<Props> {
+interface State {
+    isShowingInfo: boolean
+}
+
+export class Library extends React.Component<Props, State> {
 
     constructor(props: Props) {
-        super(props);
+        super(props)
+        this.state = { isShowingInfo: false }
 
-        bindMany(this, 'openExport', 'clearHighlight')
+        bindMany(this, 'openExport', 'clearHighlight', 'toggleShowInfo')
     }
 
     componentDidUpdate(prevProps: Props, prevState) {
@@ -101,11 +107,19 @@ export class Library extends React.Component<Props> {
         props.setSelectedPhotos(props.selectedSectionId, [])
     }
 
+    toggleShowInfo() {
+        this.setState({ isShowingInfo: !this.state.isShowingInfo })
+    }
+
     render() {
         const props = this.props
+        const state = this.state
 
-        let currentView;
+        const photoForInfo = (state.isShowingInfo && props.selectedPhotoIds.length !== 0)
+            ? props.sectionById[props.selectedSectionId].photoData[props.selectedPhotoIds[0]]
+            : null
 
+        let currentView
         if (props.isFetching) {
             currentView = <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
         } else if (props.totalPhotoCount === 0) {
@@ -150,7 +164,11 @@ export class Library extends React.Component<Props> {
         }
 
         return (
-            <div ref="library" className={classNames(props.className, 'Library')} style={props.style}>
+            <div
+                ref="library"
+                className={classNames(props.className, 'Library', { hasRightSidebar: state.isShowingInfo })}
+                style={props.style}
+            >
                 <LibraryTopBar
                     className="Library-topBar"
                     photosCount={props.photoCount}
@@ -158,10 +176,12 @@ export class Library extends React.Component<Props> {
                     selectedPhotoIds={props.selectedPhotoIds}
                     showOnlyFlagged={props.showOnlyFlagged}
                     isShowingTrash={props.isShowingTrash}
+                    isShowingInfo={state.isShowingInfo}
                     openExport={this.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
                     toggleShowOnlyFlagged={props.toggleShowOnlyFlagged}
+                    toggleShowInfo={this.toggleShowInfo}
                 />
                 <div className="Library-body">
                     {currentView}
@@ -173,6 +193,12 @@ export class Library extends React.Component<Props> {
                     gridRowHeight={props.gridRowHeight}
                     clearHighlight={this.clearHighlight}
                     setGridRowHeight={props.setGridRowHeight}
+                />
+                <PhotoInfo
+                    className="Library-rightSidebar"
+                    isActive={state.isShowingInfo}
+                    photo={photoForInfo}
+                    closeInfo={this.toggleShowInfo}                
                 />
             </div>
         );
