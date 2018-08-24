@@ -109,11 +109,12 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         const selectedAreFlagged = this.getSelectedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
-                <Button className="LibraryTopBar-showSidebar" onClick={this.showSidebar} title="Show sidebar [tab]">
+                <Button className="LibraryTopBar-showSidebar" minimal={true} onClick={this.showSidebar} title="Show sidebar [tab]">
                     <FaIcon name="bars" />
                 </Button>
                 <Button
                     className={classNames('LibraryTopBar-toggleButton', { isActive: props.showOnlyFlagged })}
+                    minimal={true}
                     active={props.showOnlyFlagged}
                     onClick={this.props.toggleShowOnlyFlagged}
                     title={ props.showOnlyFlagged ? 'Show all' : 'Show only flagged' }
@@ -123,15 +124,16 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
 
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
+                        <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
                             <MdRotateLeftIcon/>
                         </Button>
-                        <Button disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
+                        <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
                             <MdRotateRightIcon/>
                         </Button>
                     </ButtonGroup>
                     <Button
                         className={classNames('LibraryTopBar-toggleButton', { isActive: selectedAreFlagged })}
+                        minimal={true}
                         active={selectedAreFlagged}
                         disabled={!hasSelection}
                         onClick={this.toggleFlagged}
@@ -140,17 +142,18 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                         <FaIcon name="flag" />
                     </Button>
                     <Button
+                        minimal={true}
                         icon="info-sign"
                         title={props.isShowingInfo ? "Hide photo info" : "Show photo info"}
                         active={props.isShowingInfo}
                         disabled={!hasSelection && !props.isShowingInfo}
                         onClick={this.props.toggleShowInfo}
                     />
-                    <Button disabled={!hasSelection} onClick={this.props.openExport} title="Export">
+                    <Button minimal={true} disabled={!hasSelection} onClick={this.props.openExport} title="Export">
                         <MdSaveAlt/>
                     </Button>
                     {this.props.isShowingTrash &&
-                        <Button disabled={props.photosCount === 0} onClick={this.deleteModal}>
+                        <Button minimal={true} disabled={props.photosCount === 0} onClick={this.deleteModal}>
                             <FaIcon name="trash" />
                         </Button>
                     }

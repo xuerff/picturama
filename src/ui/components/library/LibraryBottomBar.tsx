@@ -21,7 +21,7 @@ export default class LibraryBottomBar extends React.Component<Props, undefined> 
     render() {
         const props = this.props
         return (
-            <Toolbar className={classNames(props.className, 'LibraryBottomBar')}>
+            <Toolbar className={classNames(props.className, 'LibraryBottomBar')} isTopBar={false}>
                 <span className="LibraryBottomBar-selection">
                     <span>{props.highlightedCount} selected</span>
                     {props.highlightedCount > 0 &&

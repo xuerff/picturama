@@ -269,36 +269,38 @@ export class PictureDetail extends React.Component<Props, State> {
                 className={classNames(props.className, 'PictureDetail', { hasRightSidebar: state.isShowingInfo })}
                 style={props.style}
             >
-                <Toolbar className="PictureDetail-topBar">
+                <Toolbar className="PictureDetail-topBar" isLeft={true}>
                     <Button onClick={props.closeDetail}>
                         <FaIcon name="chevron-left"/>
                         <span>Back to library</span>
                     </Button>
                     <ButtonGroup>
-                        <Button disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title="Previous image [left]">
+                        <Button minimal={true} disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title="Previous image [left]">
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button disabled={props.isLast} onClick={props.setNextDetailPhoto} title="Next image [right]">
+                        <Button minimal={true} disabled={props.isLast} onClick={props.setNextDetailPhoto} title="Next image [right]">
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
                     <span className="pull-right">
                         <ButtonGroup>
-                            <Button onClick={this.rotateLeft} title="Rotate left">
+                            <Button minimal={true} onClick={this.rotateLeft} title="Rotate left">
                                 <MdRotateLeftIcon/>
                             </Button>
-                            <Button onClick={this.rotateRight} title="Rotate right">
+                            <Button minimal={true} onClick={this.rotateRight} title="Rotate right">
                                 <MdRotateRightIcon/>
                             </Button>
                         </ButtonGroup>
                         <Button
                             className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
+                            minimal={true}
                             onClick={props.toggleFlag}
                             title={props.photo.flag ? 'Remove flag' : 'Flag'}
                         >
                             <FaIcon name="flag" />
                         </Button>
                         <Button
+                            minimal={true}
                             icon="info-sign"
                             title={state.isShowingInfo ? "Hide photo info" : "Show photo info"}
                             active={state.isShowingInfo}

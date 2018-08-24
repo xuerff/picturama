@@ -59,6 +59,8 @@ app.on('ready', () => {
         width: 1356,
         height: 768,
         title: 'Ansel',
+        titleBarStyle: 'hiddenInset',
+        backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
             experimentalFeatures: true,
             blinkFeatures: 'CSSGridLayout'

@@ -116,7 +116,7 @@ export class Sidebar extends React.Component<Props> {
 
         return (
             <div id="sidebar" className={props.className} style={props.style}>
-                <Toolbar className="Sidebar-topBar"><Logo /> Library</Toolbar>
+                <Toolbar className="Sidebar-topBar" />
 
                 <div className="sidebar-content">
                     <button

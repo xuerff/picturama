@@ -9,24 +9,8 @@
               0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 
   div.sidebar-content {
-    height: ~"calc(100% - 48px)";
+    height: ~"calc(100% - @{toolbarHeight})";
     overflow-y: auto;
-  }
-
-  .Sidebar-topBar {
-    position: relative;
-    padding: 5px 10px 5px 55px;
-    margin: 0;
-    font-family: 'Roboto Mono';
-    font-size: 2em;
-    font-weight: 400;
-
-    svg.logo {
-      height: 38px;
-      position: absolute;
-      left: 10px;
-      top: 5px;
-    }
   }
 
   h3 {

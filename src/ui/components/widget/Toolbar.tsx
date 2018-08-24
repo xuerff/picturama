@@ -9,13 +9,24 @@ interface Props {
     className?: any
     style?: any
     children?: any
+    isTopBar?: boolean
+    isLeft?: boolean
 }
 
 class Toolbar extends React.Component<Props, undefined> {
+    static defaultProps: Partial<Props> = {
+        isTopBar: true,
+        isLeft: false
+    }
+
     render() {
         const props = this.props
         return (
-            <div id={props.id} className={classNames(props.className, "Toolbar bp3-dark")} style={props.style}>
+            <div
+                id={props.id}
+                className={classNames(props.className, 'Toolbar bp3-dark', { isTopBar: props.isTopBar, isLeft: props.isLeft })}
+                style={props.style}
+            >
                 {props.children}
             </div>
         )
