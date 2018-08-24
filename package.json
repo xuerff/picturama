@@ -19,8 +19,8 @@
     "todo-build-no-bump": "./scripts/build.sh",
     "start": "npm run build && npm run start-no-build",
     "clean": "rm -rf .cache dist",
-    "watch": "parcel --target=electron src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.js",
-    "build": "parcel build --target=electron --public-url '.' src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.js",
+    "watch": "parcel --target=electron src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.ts",
+    "build": "parcel build --target=electron --public-url '.' src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.ts",
     "start-no-build": "ANSEL_DEV_MODE=true electron ."
   },
   "author": "Loïc Nogues <nogues.loic@gmail.com>",

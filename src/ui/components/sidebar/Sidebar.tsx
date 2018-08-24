@@ -26,7 +26,7 @@ if (fs.existsSync(config.settings))
     settings = require(config.settings)
 
 const defaultMenuSettings = [ 'dates', 'tags' ]
-// Don't show 'devices', since USB detection is deactivated in `src/background/entry.js`
+// Don't show 'devices', since USB detection is deactivated in `src/background/entry.ts`
 
 
 
