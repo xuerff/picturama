@@ -78,6 +78,10 @@ class Ansel extends React.Component<Props, State> {
         const props = this.props
         const state = this.state
 
+        if (props.modal == 'splash') {
+            return null
+        }
+
         let modalView
         if (props.showExport) {
             modalView = <Export />

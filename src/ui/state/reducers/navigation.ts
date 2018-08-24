@@ -1,5 +1,5 @@
 import { Action } from '../ActionType'
-import { SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, FETCH_SECTIONS_SUCCESS, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR } from '../actionTypes'
+import { SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR } from '../actionTypes'
 
 
 export type ModalState = 'splash' | 'settings' | 'tags' | null
@@ -18,22 +18,13 @@ export const navigation = (state: NavigationState = initialNavigationState, acti
     switch (action.type) {
         case SETTINGS_EXISTS_SUCCESS:
             return {
-                ...state,
-                settingsExist: true
+                settingsExist: true,
+                modal: (state.modal == 'splash') ? null : state.modal
             }
         case SETTINGS_EXISTS_FAILURE:
             return {
                 settingsExist: false,
                 modal: 'settings'
-            }
-        case FETCH_SECTIONS_SUCCESS:
-            if (state.modal == 'splash') {
-                return {
-                    ...state,
-                    modal: null
-                }
-            } else {
-                return state
             }
         case OPEN_TAGS_EDITOR:
             return {
