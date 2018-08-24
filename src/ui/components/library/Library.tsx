@@ -215,7 +215,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             photoCount: sections.photoCount,
             totalPhotoCount: sections.totalPhotoCount,
             sectionIds: sections.ids,
-            sectionById: sections.data,
+            sectionById: sections.byId,
             selectedSectionId: state.library.selection.sectionId, 
             selectedPhotoIds: state.library.selection.photoIds,
             gridRowHeight: state.library.display.gridRowHeight,

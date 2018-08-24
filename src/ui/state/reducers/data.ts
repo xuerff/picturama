@@ -97,7 +97,7 @@ type SectionsState = {
     /** The number of photos with the current filter applied */
     readonly photoCount: number
     readonly ids: PhotoSectionId[]
-    readonly data: PhotoSectionById
+    readonly byId: PhotoSectionById
 }
 
 const initialSectionsState: SectionsState = {
@@ -105,7 +105,7 @@ const initialSectionsState: SectionsState = {
     totalPhotoCount: null,
     photoCount: 0,
     ids: [],
-    data: {}
+    byId: {}
 }
 
 const sections = (state: SectionsState = initialSectionsState, action: Action): SectionsState => {
@@ -123,11 +123,11 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
         case FETCH_SECTIONS_SUCCESS: {
             let photoCount = 0
             let ids = []
-            let data = {}
+            let byId = {}
             for (const section of action.payload.sections) {
                 photoCount += section.count
                 ids.push(section.id)
-                data[section.id] = section
+                byId[section.id] = section
             }
 
             return {
@@ -135,7 +135,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                 fetchState: FetchState.IDLE,
                 photoCount,
                 ids,
-                data
+                byId
             }
         }
         case FETCH_SECTIONS_FAILURE:
@@ -145,7 +145,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
             }
         case FETCH_SECTION_PHOTOS: {
             const sectionId = action.payload.sectionId
-            const prevSection = state.data[sectionId]
+            const prevSection = state.byId[sectionId]
             if (prevSection) {
                 let photoIds = []
                 let photoData = {}
@@ -156,8 +156,8 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
 
                 return {
                     ...state,
-                    data: {
-                        ...state.data,
+                    byId: {
+                        ...state.byId,
                         [sectionId]: {
                             ...prevSection,
                             count: photoIds.length,  // Should be correct already, but we set it just in case
@@ -172,10 +172,10 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
         }
         case FORGET_SECTION_PHOTOS: {
             const sectionIdsToForget = action.payload.sectionIds
-            let newSectionData = {}
+            let newSectionById = {}
             for (const sectionId of state.ids) {
-                const prevSection = state.data[sectionId]
-                newSectionData[sectionId] = sectionIdsToForget[sectionId] ?
+                const prevSection = state.byId[sectionId]
+                newSectionById[sectionId] = sectionIdsToForget[sectionId] ?
                     {
                         id: prevSection.id,
                         title: prevSection.title,
@@ -186,14 +186,14 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
 
             return {
                 ...state,
-                data: newSectionData
+                byId: newSectionById
             }
         }
         case CHANGE_PHOTOS: {
             const updatedPhotos = action.payload.photos
-            let newSectionData = {}
+            let newSectionById = {}
             for (const sectionId of state.ids) {
-                const section = state.data[sectionId]
+                const section = state.byId[sectionId]
                 let newSection: PhotoSection
 
                 const photoData = section.photoData
@@ -210,12 +210,12 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                     }
                 }
 
-                newSectionData[sectionId] = newSection || section
+                newSectionById[sectionId] = newSection || section
             }
 
             return {
                 ...state,
-                data: newSectionData
+                byId: newSectionById
             }
         }
         case EMPTY_TRASH:
@@ -223,7 +223,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                 ...state,
                 photoCount: 0,
                 ids: [],
-                data: {}
+                byId: {}
             }
         default:
             return state

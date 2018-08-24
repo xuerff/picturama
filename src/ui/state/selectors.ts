@@ -14,5 +14,5 @@ export function getPhotoById(sectionId: PhotoSectionId, photoId: string): PhotoT
 }
 
 export function getSectionById(sectionId: PhotoSectionId): PhotoSection | null {
-    return store.getState().data.sections.data[sectionId]
+    return store.getState().data.sections.byId[sectionId]
 }
