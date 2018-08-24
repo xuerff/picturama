@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import config from '../../../common/config'
 import { PhotoFilter } from '../../../common/models/Photo'
-import { TagId, TagType } from '../../../common/models/Tag'
+import { TagId, TagType, TagById } from '../../../common/models/Tag'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import { setLibraryFilter } from '../../controller/PhotoController'
@@ -38,7 +38,8 @@ interface OwnProps {
 interface StateProps {
     dates: { readonly years: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }[] }
     currentDate: string
-    tags: TagType[]
+    tagIds: TagId[]
+    tagById: TagById
     currentTagId: TagId
     devices: { readonly name: string }[]
 }
@@ -103,7 +104,8 @@ export class Sidebar extends React.Component<Props> {
                 menus.push(
                     <Tags
                         key={key}
-                        tags={props.tags}
+                        tagIds={props.tagIds}
+                        tagById={props.tagById}
                         currentTagId={props.currentTagId}
                         fetchTags={props.fetchTags}
                         onTagSelected={this.onTagSelected}
@@ -159,7 +161,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             ...props,
             dates: state.data.dates,
             currentDate: (mainFilter && mainFilter.type === 'date') ? mainFilter.date : null,
-            tags: state.data.tags,
+            tagIds: state.data.tags.ids,
+            tagById: state.data.tags.byId,
             currentTagId: (mainFilter && mainFilter.type === 'tag') ? mainFilter.tagId : null,
             devices: state.data.devices
         }

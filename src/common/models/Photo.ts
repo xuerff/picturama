@@ -53,7 +53,7 @@ export interface PhotoType {
 
 export interface PhotoDetail {
     versions: VersionType[],
-    tags: TagType[]
+    tagIds: TagId[]
 }
 
 export interface PhotoWork {

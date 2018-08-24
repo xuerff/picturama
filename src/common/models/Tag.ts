@@ -14,6 +14,7 @@ export interface TagType {
     created_at: number
     updated_at: number | null
 }
+export type TagById = { [index: number]: TagType }
 
 export default anselBookshelf.Model.extend({
     tableName: 'tags',

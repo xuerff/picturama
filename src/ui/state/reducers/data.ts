@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 
 import { Device } from '../../../common/models/DataTypes'
-import { TagType } from '../../../common/models/Tag'
+import { TagType, TagId, TagById } from '../../../common/models/Tag'
 import { PhotoSection, PhotoSectionId, PhotoById, PhotoSectionById } from '../../../common/models/Photo'
 import { cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
 
@@ -13,30 +13,27 @@ import {
 import { FetchState } from '../../UITypes'
 
 
-type TagsState = TagType[]
+type TagsState = {
+    readonly ids: TagId[]
+    readonly byId: TagById
+}
 
-const tags = (state: TagsState = [], action: Action): TagsState => {
+const initialTagsState: TagsState = {
+    ids: [],
+    byId: {}
+}
+
+const tags = (state: TagsState = initialTagsState, action: Action): TagsState => {
     switch (action.type) {
         case FETCH_TAGS:
-            return [ ...action.payload.tags ]
         case CREATE_TAGS: {
-            const prevTags = state
-            let nextTags = [ ...prevTags ]
-            for (const newTag of action.payload.tags) {
-                let exists = false
-                for (const prevTag of prevTags) {
-                    if (newTag.slug === prevTag.slug) {
-                        exists = true
-                        break
-                    }
-                }
-
-                if (!exists) {
-                    nextTags.push(newTag)
-                }
+            let ids: TagId[] = []
+            let byId: TagById = {}
+            for (const tag of action.payload.tags) {
+                ids.push(tag.id)
+                byId[tag.id] = tag
             }
-
-            return nextTags
+            return { ids, byId }
         }
         default:
             return state

@@ -1,12 +1,13 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { TagId, TagType } from '../../../common/models/Tag'
+import { TagId, TagType, TagById } from '../../../common/models/Tag'
 import TagButton from './TagButton'
 
 
 interface Props {
-    tags: TagType[]
+    tagIds: TagId[]
+    tagById: TagById
     currentTagId: TagId
     fetchTags: () => void
     onTagSelected: (tag: TagType) => void
@@ -24,11 +25,11 @@ export default class Tags extends React.Component<Props> {
             <div className="tags">
                 <h3><i className="fa fa-tags"></i> Tags</h3>
                 <ul>
-                    {props.tags.map(tag =>
+                    {props.tagIds.map(tagId =>
                         <TagButton
-                            key={tag.id}
-                            className={classNames({ active: tag.id === props.currentTagId })}
-                            tag={tag}
+                            key={tagId}
+                            className={classNames({ active: tagId === props.currentTagId })}
+                            tag={props.tagById[tagId]}
                             onTagSelected={props.onTagSelected}
                         />
                     )}
