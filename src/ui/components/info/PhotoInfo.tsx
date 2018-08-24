@@ -1,11 +1,13 @@
 import fs from 'fs'
+import { clipboard, shell } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
-import { Button, Icon, NonIdealState } from '@blueprintjs/core'
+import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 
 import { PhotoType } from '../../../common/models/Photo'
+import { bindMany } from '../../../common/util/LangUtil'
 
 import Toolbar from '../widget/Toolbar'
 
@@ -32,6 +34,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
+        bindMany(this, 'showPhotoInFolder', 'copyPhotoPath')
         this.state = { masterFileSize: null }
         this.updateMasterFileSize(props)
     }
@@ -49,6 +52,14 @@ export default class PhotoInfo extends React.Component<Props, State> {
             const stat = await fsStat(props.photo.master)
             this.setState({ masterFileSize: stat.size })
         }
+    }
+
+    showPhotoInFolder() {
+        shell.showItemInFolder(this.props.photo.master)
+    }
+
+    copyPhotoPath() {
+        clipboard.writeText(this.props.photo.master)
     }
 
     render() {
@@ -77,7 +88,18 @@ export default class PhotoInfo extends React.Component<Props, State> {
                     <div className="PhotoInfo-infoRow">
                         <Icon className="PhotoInfo-infoIcon" icon="media" iconSize={infoIconSize} />
                         <div className="PhotoInfo-infoBody">
-                            <h1>{photoMasterSplits[photoMasterSplits.length - 1]}</h1>
+                            <h1 className="PhotoInfo-infoTitle hasColumns">
+                                <div className="PhotoInfo-shrinkable" title={photo.master}>
+                                    {photoMasterSplits[photoMasterSplits.length - 1]}
+                                </div>
+                                <Popover position={Position.BOTTOM_RIGHT}>
+                                    <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />
+                                    <Menu>
+                                        <MenuItem text="Show photo in folder" onClick={this.showPhotoInFolder} />
+                                        <MenuItem text="Copy path" onClick={this.copyPhotoPath} />
+                                    </Menu>
+                                </Popover>
+                            </h1>
                             <div className="PhotoInfo-minorInfo hasColumns">
                                 <div>{formatImageMegaPixel(photo.master_width, photo.master_height)}</div>
                                 <div>{`${photo.master_width} \u00d7 ${photo.master_height}`}</div>

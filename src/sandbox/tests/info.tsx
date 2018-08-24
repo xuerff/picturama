@@ -37,3 +37,9 @@ addSection('PhotoInfo')
             isActive={false}
         />
     ))
+    .add('filename overflow', context => (
+        <PhotoInfo
+            {...defaultProps}
+            photo={{ ...testPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
+        />
+    ))
