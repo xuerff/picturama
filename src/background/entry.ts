@@ -15,30 +15,9 @@ import { init as initForegroundClient } from './ForegroundClient'
 initSourceMapSupport()
 initPrettyError()
 
-const initLibrary = (mainWindow: BrowserWindow) => {
-    const knex = require('knex')(config.knex)
-    const Library = require('./Library').default
-
-    knex.migrate.latest().finally(() => {
-        DB({
-            path: config.knex.connection.filename,
-            migrate: {
-                force: false,
-                migrationsPath: config.knex.migrations.directory
-            }
-        })
-        .connection()
-        .catch(error => console.error('Initializing database failed', error))
-
-        let library = new Library(mainWindow)
-        let watcher = new Watch(mainWindow)
-
-        new MainMenu(mainWindow, library)
-        watcher.watch()
-    })
-}
-
+let initDbPromise: Promise<void> | null = null
 let mainWindow: BrowserWindow | null = null
+
 
 if (!fs.existsSync(config.dotAnsel))
     fs.mkdirSync(config.dotAnsel)
@@ -75,18 +54,6 @@ app.on('ready', () => {
     initBackgroundService(mainWindow)
     initForegroundClient(mainWindow)
 
-    if (fs.existsSync(config.settings))
-        initLibrary(mainWindow)
-    else {
-        const knex = require('knex')(config.knex)
-
-        if (!fs.existsSync(config.dbFile)) {
-            knex.migrate.latest().finally(() =>
-                knex.destroy() // works
-            )
-        }
-    }
-
     //let usb = new Usb()
     //
     //usb.scan((err, drives) => {
@@ -100,7 +67,12 @@ app.on('ready', () => {
     //    mainWindow.webContents.send('remove-device', drive)
     //})
 
-    ipcMain.on('settings-created', () => initLibrary(mainWindow))
+    if (fs.existsSync(config.settings)) {
+        initLibrary(mainWindow)
+    } else {
+        initDb()
+        ipcMain.on('settings-created', () => initLibrary(mainWindow))
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -110,3 +82,38 @@ app.on('ready', () => {
         mainWindow = null
     })
 })
+
+
+function initDb(): Promise<void> {
+    if (!initDbPromise) {
+        const knex = require('knex')(config.knex)
+
+        initDbPromise = knex.migrate.latest()
+            .then(() =>
+                DB({
+                    path: config.knex.connection.filename,
+                    migrate: {
+                        force: false,
+                        migrationsPath: config.knex.migrations.directory
+                    }
+                })
+                .connection()
+            )
+            .catch(error => console.error('Initializing database failed', error))
+    }
+
+    return initDbPromise
+}
+
+
+async function initLibrary(mainWindow: BrowserWindow) {
+    const Library = require('./Library').default
+
+    await initDb()
+
+    let library = new Library(mainWindow)
+    let watcher = new Watch(mainWindow)
+
+    new MainMenu(mainWindow, library)
+    watcher.watch()
+}
