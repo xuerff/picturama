@@ -49,16 +49,30 @@ function readExifOfImage(imagePath) {
 }
 
 
+const simplifiedBrandNames = {
+    'NIKON CORPORATION': 'Nikon',
+    'OLYMPUS IMAGING CORP.': 'Olympus'
+}
+
 function extractMetaDataFromExif(exifData): MetaData {
     const exifTags = exifData.tags
     const rawDate = exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate
 
     // Examples:
-    //   - Make = 'Canon', Model = 'Canon EOS 30D'
-    //   - Make = 'SONY', Model = 'DSC-N2'
-    let camera: string = exifTags.Model
-    if (camera && exifTags.Make && camera.indexOf(exifTags.Make) !== 0) {
-        camera = `${exifTags.Make} ${camera}`
+    //   - Make = 'Canon', Model = 'Canon EOS 30D'  ->  'Canon EOS 30D'
+    //   - Make = 'SONY', Model = 'DSC-N2'  ->  'SONY DSC-N2'
+    //   - Make = 'NIKON CORPORATION', Model = 'NIKON D7200'  ->  'Nikon D7200'
+    //   - Make = 'OLYMPUS IMAGING CORP.', Model = 'E-M10'  ->  'Olympus E-M10'
+    var cameraBrand: string | null = exifTags.Make
+    var cameraModel: string | null = exifTags.Model
+    var camera: string = cameraModel
+    if (cameraBrand && cameraModel) {
+        cameraBrand = simplifiedBrandNames[cameraBrand] || cameraBrand
+        if (cameraModel.toLowerCase().indexOf(cameraBrand.toLowerCase()) === 0) {
+            cameraModel = cameraModel.substring(cameraBrand.length).trimLeft()
+        }
+
+        camera = `${cameraBrand} ${cameraModel}`
     }
 
     const metaData: MetaData = {
