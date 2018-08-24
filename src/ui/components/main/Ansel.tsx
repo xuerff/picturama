@@ -105,13 +105,13 @@ class Ansel extends React.Component<Props, State> {
         } else {
             container =
                 <Library
-                    className="Ansel-container"
+                    className="Ansel-container isUsingSidebar"
                     isActive={!mainView && !modalView}
                 />
         }
 
         return (
-            <div id="ansel" className={classNames('Ansel', { hasSidebar: props.settingsExist && !props.importProgress && state.showSidebar })}>
+            <div id="ansel" className={classNames('Ansel', { hasSidebar: state.showSidebar })}>
                 <Sidebar className="Ansel-sidebar" />
                 {container}
                 {mainView}

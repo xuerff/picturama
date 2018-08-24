@@ -18,15 +18,19 @@
     }
 }
 .Ansel-container {
-    z-index: 1;
+    z-index: 3;  // Show above sidebar
 
     left: 0;
     right: 0;
 
     background: @blue-grey-100;
 
-    .Ansel.hasSidebar & {
-        left: @sidebarWidth;
+    &.isUsingSidebar {
+        z-index: 1;  // Show below sidebar (because of its shadow)
+
+        .Ansel.hasSidebar & {
+            left: @sidebarWidth;
+        }
     }
 }
 

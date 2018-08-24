@@ -1,11 +1,21 @@
 @import "../../less/variables.less";
 
-.LibraryTopBar-showSidebar {
-    margin-left: 0;
-    transition: margin-left @transition-time ease-out;
+@paddingX: 4px;
 
-    .Ansel.hasSidebar & { 
-        margin-left: -(8px + 32px);  // Padding + button width
+.LibraryTopBar {
+    padding-left: @nativeTitleBarControlsWidth;
+    transition: padding-left @transition-time ease-out;
+
+    .Ansel.hasSidebar & {
+        padding-left: @paddingX;
+    }
+}
+
+.LibraryTopBar-showSidebar {
+    display: block;
+
+    .Ansel.hasSidebar & {
+        display: none;
     }
 }
 
