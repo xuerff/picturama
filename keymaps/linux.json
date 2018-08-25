@@ -3,14 +3,14 @@
     "tab": "core:toggleSidebar",
     "escape": "core:cancel"
   },
-  ".grid": {
+  ".Grid": {
     "up": "grid:up",
     "down": "grid:down",
     "left": "grid:left",
     "right": "grid:right",
     "enter": "grid:enter"
   },
-  ".PictureDetail": {
+  ".PictureDetail-body": {
     "y": "detail:diff",
     "p": "detail:flag",
     "delete": "detail:moveToTrash",
