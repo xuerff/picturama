@@ -2,7 +2,10 @@ import { PhotoId, PhotoWork, PhotoDetail, PhotoSectionId } from '../../../common
 
 import { FetchState } from '../../UITypes'
 import { Action } from '../ActionType'
-import { SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK, FETCH_SECTIONS_SUCCESS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH } from '../actionTypes'
+import {
+    SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK,
+    FETCH_SECTIONS_SUCCESS, SET_PHOTO_TAGS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH
+} from '../actionTypes'
 
 
 export type DetailState = {
@@ -50,6 +53,21 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                     ...state.currentPhoto,
                     fetchState: FetchState.FAILURE
                 }
+            }
+        case SET_PHOTO_TAGS:
+            if (state && state.currentPhoto.photoId === action.payload.photoId && state.currentPhoto.photoDetail) {
+                return {
+                    ...state,
+                    currentPhoto: {
+                        ...state.currentPhoto,
+                        photoDetail: {
+                            ...state.currentPhoto.photoDetail,
+                            tags: action.payload.tags
+                        }
+                    }
+                }
+            } else {
+                return state
             }
         case CHANGE_PHOTOWORK:
             if (state && state.currentPhoto.photoId === action.payload.photoId) {

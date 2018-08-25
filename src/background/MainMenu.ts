@@ -33,13 +33,11 @@ class MainMenu {
 
         this.render = this.render.bind(this)
         this.scan = this.scan.bind(this)
-        this.scanForTags = this.scanForTags.bind(this)
         this.close = this.close.bind(this)
         this.reload = this.reload.bind(this)
         this.fullscreen = this.fullscreen.bind(this)
         this.toggleDevTools = this.toggleDevTools.bind(this)
         this.toggleSandbox = this.toggleSandbox.bind(this)
-        this.addTags = this.addTags.bind(this)
         this.export = this.export.bind(this)
         this.fixMissingVersions = this.fixMissingVersions.bind(this)
 
@@ -58,10 +56,6 @@ class MainMenu {
             }
         })
 
-        ipcMain.on('toggleAddTagMenu', (e, state) => {
-            this.menu.getMenuItemById('addTags').enabled = state
-        })
-
         ipcMain.on('toggleExportMenu', (e, state) => {
             this.menu.getMenuItemById('export').enabled = state
         })
@@ -71,10 +65,6 @@ class MainMenu {
 
     scan() {
         this.library.scan()
-    }
-
-    scanForTags() {
-        this.library.scanForTags()
     }
 
     close() {
@@ -112,10 +102,6 @@ class MainMenu {
             this.sandboxWindow.loadURL('file://' + __dirname + '/../../static/sandbox.html')
             this.sandboxWindow.webContents.toggleDevTools()
         }
-    }
-
-    addTags() {
-        this.mainWindow.webContents.send('addTagClicked', true)
     }
 
     export() {

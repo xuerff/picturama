@@ -8,7 +8,7 @@ import { cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
 import { Action } from '../ActionType'
 import {
     FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, CHANGE_PHOTOS, EMPTY_TRASH,
-    FETCH_DATES, FETCH_TAGS, CREATE_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
+    FETCH_DATES, FETCH_TAGS, SET_PHOTO_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
 } from '../actionTypes'
 import { FetchState } from '../../UITypes'
 
@@ -25,8 +25,7 @@ const initialTagsState: TagsState = {
 
 const tags = (state: TagsState = initialTagsState, action: Action): TagsState => {
     switch (action.type) {
-        case FETCH_TAGS:
-        case CREATE_TAGS: {
+        case FETCH_TAGS: {
             let ids: TagId[] = []
             let byId: TagById = {}
             for (const tag of action.payload.tags) {

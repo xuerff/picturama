@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId } from '../common/models/Photo'
+import { TagType } from '../common/models/Tag'
 import { assertRendererProcess } from '../common/util/ElectronUtil'
 
 
@@ -36,7 +37,7 @@ export function init() {
 }
 
 
-async function callOnBackground(action: string, params: any): Promise<any> {
+async function callOnBackground(action: string, params: any = null): Promise<any> {
     const callId = nextCallId++
 
     return new Promise<any>((resolve, reject) => {
@@ -72,4 +73,12 @@ export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): P
 
 export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
     return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
+}
+
+export function fetchTags(): Promise<TagType[]> {
+    return callOnBackground('fetchTags')
+}
+
+export function setPhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+    return callOnBackground('setPhotoTags', { photoId, photoTags })
 }

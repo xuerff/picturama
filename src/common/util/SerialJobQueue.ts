@@ -51,6 +51,9 @@ export default class SerialJobQueue<Job, JobResult> {
         return jobInfo.promise
     }
 
+    getQueueLength() {
+        return this.jobQueue.length
+    }
 
     private checkQueue() {
         if (this.isJobRunning) {

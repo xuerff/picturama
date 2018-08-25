@@ -47,21 +47,6 @@
       ]
     },
     {
-      "label": "Tags",
-      "submenu": [{
-        "id": "addTags",
-        "label": "Add tags",
-        "accelerator": "Cmd+T",
-        "enabled": false,
-        "click": "addTags"
-      },
-      {
-        "label": "Scan for tags",
-        "accelerator": "Shift+Cmd+T",
-        "click": "scanForTags"
-      }]
-    },
-    {
       "label": "Developer",
       "submenu": [
         {

@@ -1,8 +1,7 @@
 import DB from 'sqlite3-helper'
 
-import { PhotoId, PhotoType, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId } from '../common/models/Photo'
-import { TagType } from '../common/models/Tag'
-import { VersionType } from '../common/models/Version'
+import { PhotoId, PhotoType, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId } from '../../common/models/Photo'
+import { VersionType } from '../../common/models/Version'
 
 
 export async function fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
@@ -45,7 +44,7 @@ function createWhereForFilter(filter: PhotoFilter): { sql: string, params: any[]
 
 export async function fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
     const [ tags, versions ] = await Promise.all([
-        DB().query<TagType>('select * from tags where id in (select tag_id from photos_tags where photo_id = ?) order by slug', photoId),
+        DB().queryColumn<string>('title', 'select title from tags where id in (select tag_id from photos_tags where photo_id = ?) order by slug', photoId),
         DB().query<VersionType>('select * from versions where photo_id = ? order by version', photoId)
     ])
 

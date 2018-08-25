@@ -53,7 +53,8 @@ export interface PhotoType {
 
 export interface PhotoDetail {
     versions: VersionType[],
-    tagIds: TagId[]
+    /** The tags attached to this photo. This may also contain new tags which don't exist in DB yet. */
+    tags: string[]
 }
 
 export interface PhotoWork {

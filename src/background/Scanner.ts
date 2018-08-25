@@ -6,19 +6,18 @@ import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper'
 
-import config from '../common/config';
-import { readMetadataOfImage } from './MetaData'
-
-import walker from './lib/walker';
-import matches from './lib/matches';
-
+import config from '../common/config'
+import { profileScanner } from '../common/LogConstants'
+import { ExifOrientation } from '../common/models/DataTypes'
 import { PhotoType, generatePhotoId } from '../common/models/Photo'
 import Tag from '../common/models/Tag'
 import { bindMany } from '../common/util/LangUtil'
-import { fetchPhotoWork } from './PhotoWorkStore'
-import { profileScanner } from '../common/LogConstants'
 import Profiler from '../common/util/Profiler'
-import { ExifOrientation } from '../common/models/DataTypes';
+
+import matches from './lib/matches'
+import walker from './lib/walker'
+import { fetchPhotoWork } from './store/PhotoWorkStore'
+import { readMetadataOfImage } from './MetaData'
 
 
 const readFile = BluebirdPromise.promisify(fs.readFile)

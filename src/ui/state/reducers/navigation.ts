@@ -1,8 +1,8 @@
 import { Action } from '../ActionType'
-import { SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, OPEN_TAGS_EDITOR, CLOSE_TAGS_EDITOR } from '../actionTypes'
+import { SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE } from '../actionTypes'
 
 
-export type ModalState = 'splash' | 'settings' | 'tags' | null
+export type ModalState = 'splash' | 'settings' | null
 
 export type NavigationState = {
     settingsExist: boolean
@@ -25,16 +25,6 @@ export const navigation = (state: NavigationState = initialNavigationState, acti
             return {
                 settingsExist: false,
                 modal: 'settings'
-            }
-        case OPEN_TAGS_EDITOR:
-            return {
-                ...state,
-                modal: 'tags'
-            }
-        case CLOSE_TAGS_EDITOR:
-            return {
-                ...state,
-                modal: null
             }
         default:
             return state

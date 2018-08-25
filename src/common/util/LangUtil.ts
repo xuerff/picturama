@@ -47,3 +47,10 @@ export function cloneArrayWithItemRemoved<T, K extends keyof T>(array: T[], item
         ]
     }
 }
+
+
+export function slug(text: string): string {
+    return text.toLowerCase()
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-')
+}

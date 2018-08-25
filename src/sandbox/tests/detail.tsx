@@ -11,6 +11,7 @@ const defaultProps = {
     isActive: true,
     sectionId: 'dummy',
     photo: testPhoto,
+    tags: [],
     isFirst: true,
     isLast: false,
 
@@ -18,9 +19,9 @@ const defaultProps = {
     setNextDetailPhoto: action('setNextDetailPhoto'),
     updatePhotoWork: action('updatePhotoWork'),
     toggleFlag: action('toggleFlag'),
+    setPhotoTags: action('setPhotoTags'),
     movePhotosToTrash: action('movePhotosToTrash'),
     openExport: action('openExport'),
-    openTagsEditor: action('openTagsEditor'),
     openDiff: action('openDiff'),
     closeDetail: action('closeDetail'),
 }

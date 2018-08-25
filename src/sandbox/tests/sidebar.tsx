@@ -2,8 +2,13 @@ import React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
+import { TagId, TagById } from '../../common/models/Tag'
+import { slug } from '../../common/util/LangUtil'
+
 import { Sidebar } from '../../ui/components/sidebar/Sidebar'
 
+
+const [ defaultTagIds, defaultTagById ] = createTestTags('Bla', 'Test')
 
 const defaultProps = {
     style: { width: '300px', height: '100%' },
@@ -60,22 +65,8 @@ const defaultProps = {
         ]
     },
     currentDate: '2018-07-06',
-    tags: [
-        {
-            id: 2,
-            title: 'Bla',
-            slug: 'bla',
-            created_at: null,
-            updated_at: null
-        },
-        {
-            id: 1,
-            title: 'Test',
-            slug: 'test',
-            created_at: null,
-            updated_at: null
-        }
-    ],
+    tagIds: defaultTagIds,
+    tagById: defaultTagById,
     currentTagId: null,
     devices: [],
 
@@ -91,3 +82,22 @@ addSection('Sidebar')
             {...defaultProps}
         />
     ))
+
+
+function createTestTags(... tagNames: string[]): [ TagId[], TagById ] {
+    var nextTagId = 1
+    var ids: TagId[] = []
+    var byId: TagById = {}
+    for (const tagName of tagNames) {
+        const tag = {
+            id: nextTagId++,
+            title: tagName,
+            slug: slug(tagName),
+            created_at: Date.now(),
+            updated_at: null
+        }
+        ids.push(tag.id)
+        byId[tag.id] = tag
+    }
+    return [ ids, byId ]
+}

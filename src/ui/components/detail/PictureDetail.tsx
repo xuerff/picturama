@@ -17,10 +17,11 @@ import Toolbar from '../widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../controller/DetailController'
 import { getNonRawImgPath } from '../../controller/ImageProvider'
 import { updatePhotoWork, movePhotosToTrash } from '../../controller/PhotoController'
+import { setPhotoTags } from '../../controller/PhotoTagController'
 import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
-import { openExportAction, openTagsEditorAction, openDiffAction } from '../../state/actions'
+import { openExportAction, openDiffAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
-import { getPhotoById, getPhotoByIndex, getSectionById } from '../../state/selectors'
+import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from '../../state/selectors'
 import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
@@ -50,6 +51,7 @@ interface StateProps {
     photoNext?: PhotoType
     photoDetail?: PhotoDetail
     photoWork?: PhotoWork
+    tags: string[]
     isFirst: boolean
     isLast: boolean
 }
@@ -59,9 +61,9 @@ interface DispatchProps {
     setNextDetailPhoto: () => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleFlag: () => void
+    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
     movePhotosToTrash: (photos: PhotoType[]) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
-    openTagsEditor: () => void
     openDiff: () => void
     closeDetail: () => void
 }
@@ -93,11 +95,6 @@ export class PictureDetail extends React.Component<Props, State> {
 
     componentDidMount() {
         this.menu = new remote.Menu();
-
-        this.menu.append(new MenuItem({
-            label: 'Add tag',
-            click: this.props.openTagsEditor
-        }));
 
         this.menu.append(new MenuItem({
             label: 'Export',
@@ -139,10 +136,7 @@ export class PictureDetail extends React.Component<Props, State> {
 
         document.addEventListener('contextmenu', this.contextMenu)
 
-        ipcRenderer.send('toggleAddTagMenu', true)
         ipcRenderer.send('toggleExportMenu', true)
-
-        ipcRenderer.on('addTagClicked', this.props.openTagsEditor)
 
         window.addEventListener('core:cancel', this.props.closeDetail)
         window.addEventListener('detail:diff', this.toggleDiff);
@@ -167,10 +161,7 @@ export class PictureDetail extends React.Component<Props, State> {
 
         document.removeEventListener('contextmenu', this.contextMenu)
 
-        ipcRenderer.send('toggleAddTagMenu', false)
         ipcRenderer.send('toggleExportMenu', false)
-
-        ipcRenderer.removeListener('addTagClicked', this.props.openTagsEditor)
 
         window.removeEventListener('core:cancel', this.props.closeDetail)
         window.removeEventListener('detail:diff', this.toggleDiff);
@@ -332,12 +323,16 @@ export class PictureDetail extends React.Component<Props, State> {
                     className="PictureDetail-rightSidebar"
                     isActive={state.isShowingInfo}
                     photo={state.isShowingInfo && props.photo}
-                    closeInfo={this.toggleShowInfo}                
+                    photoDetail={state.isShowingInfo && props.photoDetail}
+                    tags={props.tags}
+                    closeInfo={this.toggleShowInfo}
+                    setPhotoTags={props.setPhotoTags}
                 />
             </div>
         );
     }
 }
+
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
@@ -351,6 +346,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             photoNext: getPhotoByIndex(sectionId, currentPhoto.photoIndex + 1),
             photoDetail: currentPhoto.photoDetail,
             photoWork: currentPhoto.photoWork,
+            tags: getTagTitles(),
             isFirst: currentPhoto.photoIndex === 0,
             isLast: currentPhoto.photoIndex === getSectionById(sectionId).photoIds.length - 1
         }
@@ -360,9 +356,9 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setNextDetailPhoto,
         updatePhotoWork,
         toggleFlag: toggleDetailPhotoFlag,
+        setPhotoTags,
         movePhotosToTrash,
         openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => dispatch(openExportAction(sectionId, photoIds)),
-        openTagsEditor: () => dispatch(openTagsEditorAction()),
         openDiff: () => dispatch(openDiffAction()),
         closeDetail: () => setDetailPhotoByIndex(null, null)
     })

@@ -6,12 +6,15 @@ import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 
-import { PhotoType } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoSectionId, PhotoDetail } from '../../../common/models/Photo'
+import { TagId, TagById } from '../../../common/models/Tag'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import Toolbar from '../widget/Toolbar'
+import TagEditor from './TagEditor'
 
 import './PhotoInfo.less'
+import FaIcon from '../widget/icon/FaIcon';
 
 const fsStat = BluebirdPromise.promisify(fs.stat)
 
@@ -23,7 +26,10 @@ interface Props {
     className?: any
     isActive: boolean
     photo: PhotoType | null
+    photoDetail: PhotoDetail | null
+    tags: string[]
     closeInfo: () => void
+    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
 }
 
 interface State {
@@ -131,6 +137,16 @@ export default class PhotoInfo extends React.Component<Props, State> {
                             </div>
                         </div>
                     }
+                    <div className="PhotoInfo-infoRow">
+                        <FaIcon className="PhotoInfo-infoIcon" name="tags" style={{ fontSize: infoIconSize }} />
+                        <TagEditor
+                            className="PhotoInfo-tagEditor PhotoInfo-infoBody"
+                            photo={props.photo}
+                            photoDetail={props.photoDetail}
+                            tags={props.tags}
+                            setPhotoTags={props.setPhotoTags}
+                        />
+                    </div>
                 </>
             )
         } else {

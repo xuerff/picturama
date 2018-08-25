@@ -13,8 +13,10 @@ import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc } from '../../controller/ImageProvider'
 import { getGridLayout, createThumbnail } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
+import { setPhotoTags } from '../../controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
+import { getTagTitles } from '../../state/selectors'
 import { keySymbols } from '../../UiConstants'
 import { FetchState } from '../../UITypes'
 import store from '../../state/store'
@@ -40,6 +42,7 @@ interface StateProps {
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId
     selectedPhotoIds: PhotoId[]
+    tags: string[]
     gridRowHeight: number
     showOnlyFlagged: boolean
     isShowingTrash: boolean
@@ -56,6 +59,7 @@ interface DispatchProps {
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
+    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleShowOnlyFlagged: () => void
     startScanning: () => void
@@ -198,7 +202,10 @@ export class Library extends React.Component<Props, State> {
                     className="Library-rightSidebar"
                     isActive={state.isShowingInfo}
                     photo={photoForInfo}
-                    closeInfo={this.toggleShowInfo}                
+                    photoDetail={null /* TODO */ }
+                    tags={props.tags}
+                    closeInfo={this.toggleShowInfo}
+                    setPhotoTags={props.setPhotoTags}
                 />
             </div>
         );
@@ -218,6 +225,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             sectionById: sections.byId,
             selectedSectionId: state.library.selection.sectionId, 
             selectedPhotoIds: state.library.selection.photoIds,
+            tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
             isShowingTrash: state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash'
@@ -231,6 +239,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         createThumbnail,
         setDetailPhotoById,
         setPhotosFlagged,
+        setPhotoTags,
         updatePhotoWork,
         toggleShowOnlyFlagged: () => {
             const oldFilter = store.getState().library.filter

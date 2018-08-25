@@ -11,7 +11,6 @@ import './tests/import'
 import './tests/export'
 import './tests/GridSectionTest'
 import './tests/PhotoPaneTest'
-import './tests/TagEditorTest'
 
 import "./entry.less"
 

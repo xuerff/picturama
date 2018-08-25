@@ -1,4 +1,4 @@
-import slug from '../lib/slug'
+import { slug } from '../util/LangUtil'
 
 import anselBookshelf from './ansel-bookshelf'
 

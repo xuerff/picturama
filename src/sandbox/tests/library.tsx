@@ -33,6 +33,7 @@ const defaultProps = {
     } as PhotoSectionById,
     selectedSectionId: null,
     selectedPhotoIds: [],
+    tags: [],
     showOnlyFlagged: false,
     isShowingTrash: false,
 
@@ -52,6 +53,7 @@ const defaultProps = {
     setDetailPhotoById: action('setDetailPhotoById'),
     openExport: action('openExport'),
     setPhotosFlagged: action('setPhotosFlagged'),
+    setPhotoTags: action('setPhotoTags'),
     updatePhotoWork: action('updatePhotoWork'),
     toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
     startScanning: action('startScanning'),
