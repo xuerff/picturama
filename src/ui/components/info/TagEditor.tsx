@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { MenuItem } from '@blueprintjs/core'
+import { MenuItem, Spinner } from '@blueprintjs/core'
 import { MultiSelect, IItemRendererProps } from "@blueprintjs/select"
 
 import { PhotoId, PhotoType, PhotoSectionId, PhotoDetail } from '../../../common/models/Photo'
@@ -173,13 +173,15 @@ export default class TagEditor extends React.Component<Props, State> {
     render() {
         const props = this.props
         const state = this.state
+        const isLoading = !props.photo || !props.photoDetail
         return (
             <StringMultiSelect
                 className={classNames(props.className, 'TagEditor')}
                 tagInputProps={{
-                    disabled: !props.photo || !props.photoDetail,
+                    disabled: isLoading,
                     onRemove: this.onItemRemove,
-                    placeholder: 'Add tags...'
+                    leftIcon: isLoading ? <Spinner size={24}/> : null,
+                    placeholder: isLoading ? null : 'Add tags...'
                 }}
                 popoverProps={{ minimal: true }}
                 activeItem={state.activeTag}

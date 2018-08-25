@@ -2,15 +2,12 @@ import React from 'react'
 
 import {addSection, action, TestContext} from '../core/UiTester'
 
-import { PhotoSectionId, PhotoDetail, PhotoId } from '../../common/models/Photo'
-import { TagType, TagById, TagId } from '../../common/models/Tag'
-import { slug } from '../../common/util/LangUtil'
+import { PhotoDetail, PhotoId } from '../../common/models/Photo'
 
 import PhotoInfo from '../../ui/components/info/PhotoInfo'
 import { testPhoto } from '../util/MockData'
 
 
-const defaultSectionId: PhotoSectionId = '2018-08-15'
 const baseUrl = 'dist'
 const defaultTags = [ 'Holiday', 'Family', 'Cool stuff' ]
 
@@ -49,6 +46,27 @@ addSection('PhotoInfo')
             {...createGridRowHeightProps(context)}
         />
     ))
+    .add('filename overflow', context => (
+        <PhotoInfo
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            photo={{ ...testPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
+        />
+    ))
+    .add('no tags', context => (
+        <PhotoInfo
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            photoDetail={{ versions: [], tags: [] }}
+        />
+    ))
+    .add('loading tags', context => (
+        <PhotoInfo
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            photoDetail={null}
+        />
+    ))
     .add('no photo', context => (
         <PhotoInfo
             {...defaultProps}
@@ -61,12 +79,5 @@ addSection('PhotoInfo')
             {...defaultProps}
             {...createGridRowHeightProps(context)}
             isActive={false}
-        />
-    ))
-    .add('filename overflow', context => (
-        <PhotoInfo
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
-            photo={{ ...testPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
         />
     ))
