@@ -6,15 +6,14 @@ import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 
-import { PhotoId, PhotoType, PhotoSectionId, PhotoDetail } from '../../../common/models/Photo'
-import { TagId, TagById } from '../../../common/models/Tag'
+import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import Toolbar from '../widget/Toolbar'
+import FaIcon from '../widget/icon/FaIcon'
 import TagEditor from './TagEditor'
 
 import './PhotoInfo.less'
-import FaIcon from '../widget/icon/FaIcon';
 
 const fsStat = BluebirdPromise.promisify(fs.stat)
 
@@ -29,7 +28,7 @@ interface Props {
     photoDetail: PhotoDetail | null
     tags: string[]
     closeInfo: () => void
-    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
+    setPhotoTags: (photo: PhotoType, tags: string[]) => void
 }
 
 interface State {

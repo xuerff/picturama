@@ -60,19 +60,14 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
         fetchPhotoWork(photoPath)
             .then(photoWork => {
-                const photoWorkCopyBefore = cloneDeep(photoWork)
+                const photoWorkBefore = { ...photoWork }
                 for (const up of pendingUpdate.updates) {
                     up(photoWork)
                 }
                 delete pendingUpdates[photoPath]
 
-                // Ignore changes on flagged
-                if (photoWork.flagged) {
-                    photoWorkCopyBefore.flagged = true
-                } else {
-                    delete photoWorkCopyBefore.flagged
-                }
-                const thumbnailNeedsUpdate = !isDeepEqual(photoWorkCopyBefore, photoWork)
+                // Ignore changes on meta data (like flagged or tags)
+                const thumbnailNeedsUpdate = photoWork.rotationTurns !== photoWorkBefore.rotationTurns
 
                 // We do all in parallel:
                 //   - Show the new effects in UI

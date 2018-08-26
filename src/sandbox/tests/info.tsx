@@ -1,8 +1,8 @@
 import React from 'react'
 
-import {addSection, action, TestContext} from '../core/UiTester'
+import { addSection, action, TestContext } from '../core/UiTester'
 
-import { PhotoDetail, PhotoId } from '../../common/models/Photo'
+import { PhotoType, PhotoDetail } from '../../common/models/Photo'
 
 import PhotoInfo from '../../ui/components/info/PhotoInfo'
 import { testPhoto } from '../util/MockData'
@@ -28,7 +28,7 @@ let sharedPhotoDetail: PhotoDetail = {
 function createGridRowHeightProps(context: TestContext) {
     return {
         photoDetail: sharedPhotoDetail,
-        setPhotoTags: (photoId: PhotoId, tags: string[]) => {
+        setPhotoTags: (photo: PhotoType, tags: string[]) => {
             sharedPhotoDetail = {
                 versions: sharedPhotoDetail.versions,
                 tags

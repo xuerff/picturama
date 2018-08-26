@@ -59,7 +59,7 @@ interface DispatchProps {
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
-    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
+    setPhotoTags: (photo: PhotoType, tags: string[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleShowOnlyFlagged: () => void
     startScanning: () => void

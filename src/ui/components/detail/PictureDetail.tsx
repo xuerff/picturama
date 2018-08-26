@@ -61,7 +61,7 @@ interface DispatchProps {
     setNextDetailPhoto: () => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     toggleFlag: () => void
-    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
+    setPhotoTags: (photo: PhotoType, tags: string[]) => void
     movePhotosToTrash: (photos: PhotoType[]) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     openDiff: () => void

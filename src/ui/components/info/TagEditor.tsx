@@ -3,7 +3,7 @@ import React from 'react'
 import { MenuItem, Spinner } from '@blueprintjs/core'
 import { MultiSelect, IItemRendererProps } from "@blueprintjs/select"
 
-import { PhotoId, PhotoType, PhotoSectionId, PhotoDetail } from '../../../common/models/Photo'
+import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
 import { bindMany, slug } from '../../../common/util/LangUtil'
 
 
@@ -14,7 +14,7 @@ interface Props {
     photo: PhotoType | null
     photoDetail: PhotoDetail | null
     tags: string[]
-    setPhotoTags: (photoId: PhotoId, tags: string[]) => void
+    setPhotoTags: (photo: PhotoType, tags: string[]) => void
 }
 
 interface State {
@@ -136,7 +136,7 @@ export default class TagEditor extends React.Component<Props, State> {
         }
 
         var selectedTags = [ ...photoDetail.tags, tag ]
-        props.setPhotoTags(props.photo.id, selectedTags)
+        props.setPhotoTags(props.photo, selectedTags)
 
         this.onQueryChange('')
     }
@@ -150,7 +150,7 @@ export default class TagEditor extends React.Component<Props, State> {
 
         var selectedTagIds = [ ...photoDetail.tags ]
         selectedTagIds.splice(index, 1)
-        props.setPhotoTags(props.photo.id, selectedTagIds)
+        props.setPhotoTags(props.photo, selectedTagIds)
     }
 
     renderTag(tag: string): string {

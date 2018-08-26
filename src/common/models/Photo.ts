@@ -60,6 +60,7 @@ export interface PhotoDetail {
 export interface PhotoWork {
     rotationTurns?: 1 | 2 | 3
     flagged?: true
+    tags?: string[]
 }
 
 export type PhotoSectionId = string
