@@ -1,5 +1,6 @@
 import { PhotoType } from '../../common/models/Photo'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
+import { slug } from '../../common/util/LangUtil'
 
 import { fetchTagsAction, setPhotoTagsAction } from '../state/actions'
 import store from '../state/store'
@@ -18,6 +19,8 @@ export function fetchTags() {
 
 
 export async function setPhotoTags(photo: PhotoType, tags: string[]) {
+    tags.sort((tag1, tag2) => slug(tag1) < slug(tag2) ? -1 : 1)
+
     store.dispatch(setPhotoTagsAction(photo.id, tags))
 
     const updatedTags = await setPhotoTagsInDb(photo.id, tags)
