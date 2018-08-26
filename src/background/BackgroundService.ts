@@ -3,7 +3,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 import { assertMainProcess } from '../common/util/ElectronUtil'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from './store/PhotoWorkStore'
 import { fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from './store/PhotoStore'
-import { fetchTags, setPhotoTags } from './store/TagStore'
+import { fetchTags, storePhotoTags } from './store/TagStore'
 
 
 assertMainProcess()
@@ -44,8 +44,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return storeThumbnail(params.thumbnailPath, params.thumbnailData)
     } else if (action === 'fetchTags') {
         return fetchTags()
-    } else if (action === 'setPhotoTags') {
-        return setPhotoTags(params.photoId, params.photoTags)
+    } else if (action === 'storePhotoTags') {
+        return storePhotoTags(params.photoId, params.photoTags)
     } else {
         throw new Error('Unknown background action: ' + action)
     }

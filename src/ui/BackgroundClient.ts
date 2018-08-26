@@ -79,6 +79,6 @@ export function fetchTags(): Promise<TagType[]> {
     return callOnBackground('fetchTags')
 }
 
-export function setPhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
-    return callOnBackground('setPhotoTags', { photoId, photoTags })
+export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+    return callOnBackground('storePhotoTags', { photoId, photoTags })
 }

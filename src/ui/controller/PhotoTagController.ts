@@ -4,7 +4,7 @@ import { slug } from '../../common/util/LangUtil'
 
 import { fetchTagsAction, setPhotoTagsAction } from '../state/actions'
 import store from '../state/store'
-import { fetchTags as fetchTagsFromDb, setPhotoTags as setPhotoTagsInDb } from '../BackgroundClient'
+import { fetchTags as fetchTagsFromDb, storePhotoTags } from '../BackgroundClient'
 import { updatePhotoWork } from './PhotoController'
 
 
@@ -23,7 +23,7 @@ export async function setPhotoTags(photo: PhotoType, tags: string[]) {
 
     store.dispatch(setPhotoTagsAction(photo.id, tags))
 
-    const updatedTags = await setPhotoTagsInDb(photo.id, tags)
+    const updatedTags = await storePhotoTags(photo.id, tags)
 
     if (updatedTags) {
         store.dispatch(fetchTagsAction(updatedTags))

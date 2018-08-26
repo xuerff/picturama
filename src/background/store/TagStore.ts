@@ -4,14 +4,15 @@ import { PhotoId } from '../../common/models/Photo'
 import { TagType, TagId } from '../../common/models/Tag'
 import { slug } from '../../common/util/LangUtil'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
-import { toSqlStringCsv } from '../util/DbUtil';
+
+import { toSqlStringCsv } from '../util/DbUtil'
 
 
-type SetPhotoTagsJob = { photoId: PhotoId, photoTags: string[] }
+type StorePhotoTagsJob = { photoId: PhotoId, photoTags: string[] }
 
-const setPhotoTagsQueue = new SerialJobQueue(
+const storePhotoTagsQueue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.photoId === existingJob.photoId) ? newJob : null,
-    processNextSetPhotoTags)
+    processNextStorePhotoTags)
 
 let tagsHaveChanged = false
 
@@ -21,12 +22,12 @@ export function fetchTags(): Promise<TagType[]> {
 }
 
 
-export function setPhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
-    return setPhotoTagsQueue.addJob({ photoId, photoTags })
+export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+    return storePhotoTagsQueue.addJob({ photoId, photoTags })
 }
 
 
-async function processNextSetPhotoTags(job: SetPhotoTagsJob): Promise<TagType[] | null> {
+async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<TagType[] | null> {
     const { photoId, photoTags } = job
     const photoTagsSlugged = photoTags.map(tag => slug(tag))
     let updatedTags: TagType[] | null = null
@@ -59,7 +60,7 @@ async function processNextSetPhotoTags(job: SetPhotoTagsJob): Promise<TagType[] 
             await DB().insert('photos_tags', photoTagMappings)
         }
 
-        if (setPhotoTagsQueue.getQueueLength() === 0) {
+        if (storePhotoTagsQueue.getQueueLength() === 0) {
             // Clean up obsolete tags
             const deletedCount = (await DB().run('delete from tags where id not in (select tag_id from photos_tags group by tag_id)')).changes
             if (deletedCount !== 0) {
