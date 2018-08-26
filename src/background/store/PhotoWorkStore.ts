@@ -2,6 +2,7 @@ import { dirname, basename } from 'path'
 import fs from 'fs'
 import readline from 'readline'
 import { promisify } from 'bluebird'
+import stringify from 'json-stringify-pretty-compact'
 
 import { PhotoWork } from '../../common/models/Photo'
 import { rotate } from '../../common/util/EffectsUtil'
@@ -161,7 +162,7 @@ class DirectoryWork {
                         console.log('Removed empty ' + directoryWorkFile)
                     }
                 } else {
-                    const json = JSON.stringify(anselData, null, 2)
+                    const json = stringify(anselData)
                     await writeFile(directoryWorkFile, json)
                     console.log('Stored ' + directoryWorkFile)
                 }
