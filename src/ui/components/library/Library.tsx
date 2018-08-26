@@ -5,13 +5,13 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById } from '../../../common/models/Photo'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from '../../../common/models/Photo'
 import CancelablePromise from '../../../common/util/CancelablePromise'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc } from '../../controller/ImageProvider'
-import { getGridLayout, createThumbnail } from '../../controller/LibraryController'
+import { getGridLayout, setInfoPhoto, createThumbnail } from '../../controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
 import { setPhotoTags } from '../../controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
@@ -42,6 +42,8 @@ interface StateProps {
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId
     selectedPhotoIds: PhotoId[]
+    infoPhoto: PhotoType | null
+    infoPhotoDetail: PhotoDetail | null
     tags: string[]
     gridRowHeight: number
     showOnlyFlagged: boolean
@@ -57,6 +59,7 @@ interface DispatchProps {
     setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
+    setInfoPhoto: (sectionId: PhotoSectionId | null, photoId: PhotoId | null) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     setPhotoTags: (photo: PhotoType, tags: string[]) => void
@@ -115,13 +118,24 @@ export class Library extends React.Component<Props, State> {
         this.setState({ isShowingInfo: !this.state.isShowingInfo })
     }
 
+    updateInfoPhoto() {
+        const props = this.props
+        const state = this.state
+
+        const infoPhotoId = (state.isShowingInfo && props.selectedPhotoIds.length !== 0)
+            ? props.selectedPhotoIds[0]
+            : null
+        const propsInfoPhotoId = props.infoPhoto ? props.infoPhoto.id : null
+        if (propsInfoPhotoId !== infoPhotoId) {
+            props.setInfoPhoto(props.selectedSectionId, infoPhotoId)
+        }
+    }
+
     render() {
         const props = this.props
         const state = this.state
 
-        const photoForInfo = (state.isShowingInfo && props.selectedPhotoIds.length !== 0)
-            ? props.sectionById[props.selectedSectionId].photoData[props.selectedPhotoIds[0]]
-            : null
+        this.updateInfoPhoto()
 
         let currentView
         if (props.isFetching) {
@@ -201,8 +215,8 @@ export class Library extends React.Component<Props, State> {
                 <PhotoInfo
                     className="Library-rightSidebar"
                     isActive={state.isShowingInfo}
-                    photo={photoForInfo}
-                    photoDetail={null /* TODO */ }
+                    photo={props.infoPhoto}
+                    photoDetail={props.infoPhotoDetail}
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
                     setPhotoTags={props.setPhotoTags}
@@ -216,6 +230,7 @@ export class Library extends React.Component<Props, State> {
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         const sections = state.data.sections
+        const libraryInfo = state.library.info
         return {
             ...props,
             isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
@@ -223,8 +238,10 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             totalPhotoCount: sections.totalPhotoCount,
             sectionIds: sections.ids,
             sectionById: sections.byId,
-            selectedSectionId: state.library.selection.sectionId, 
+            selectedSectionId: state.library.selection.sectionId,
             selectedPhotoIds: state.library.selection.photoIds,
+            infoPhoto: libraryInfo ? sections.byId[libraryInfo.sectionId].photoData[libraryInfo.photoId] : null,
+            infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
@@ -238,6 +255,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         getThumbnailSrc,
         createThumbnail,
         setDetailPhotoById,
+        setInfoPhoto,
         setPhotosFlagged,
         setPhotoTags,
         updatePhotoWork,

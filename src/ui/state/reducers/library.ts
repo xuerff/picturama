@@ -1,10 +1,13 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoSectionId, PhotoFilter } from '../../../common/models/Photo'
+import { PhotoId, PhotoSectionId, PhotoFilter, PhotoDetail } from '../../../common/models/Photo'
 
 import { defaultGridRowHeight } from '../../UiConstants'
 import { Action } from '../ActionType'
-import { SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, EMPTY_TRASH } from '../actionTypes'
+import {
+    SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
+    SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_PHOTO_TAGS, EMPTY_TRASH
+} from '../actionTypes'
 
 
 type DisplayState = {
@@ -80,14 +83,59 @@ const selection = (state: SelectionState = initialSelectionState, action: Action
 }
 
 
+type InfoState = {
+    readonly sectionId: PhotoSectionId
+    readonly photoId: PhotoId
+    /** Is `null` while loading */
+    readonly photoDetail: PhotoDetail | null
+} | null
+
+const info = (state: InfoState = null, action: Action): InfoState => {
+    switch (action.type) {
+        case SET_LIBRARY_INFO_PHOTO_REQUEST:
+            if (action.payload.photoId) {
+                return {
+                    sectionId: action.payload.sectionId,
+                    photoId: action.payload.photoId,
+                    photoDetail: null
+                }
+            } else {
+                return null
+            }
+        case SET_LIBRARY_INFO_PHOTO_SUCCESS:
+            return {
+                ...state,
+                photoDetail: action.payload.photoDetail
+            }
+        case SET_PHOTO_TAGS:
+            if (state && state.photoId === action.payload.photoId && state.photoDetail) {
+                return {
+                    ...state,
+                    photoDetail: {
+                        ...state.photoDetail,
+                        tags: action.payload.tags
+                    }
+                }
+            }
+        case FETCH_SECTIONS_SUCCESS:
+        case FETCH_SECTIONS_FAILURE:
+            return null
+        default:
+            return state
+    }
+}
+
+
 export type LibraryState = {
     readonly display: DisplayState
     readonly filter: PhotoFilter
     readonly selection: SelectionState
+    readonly info: InfoState
 }
 
 export const library = combineReducers<LibraryState>({
     display,
     filter,
-    selection
+    selection,
+    info
 })

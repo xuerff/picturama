@@ -1,15 +1,15 @@
 import createLayout from 'justified-layout'
 
 import { profileLibraryLayout, profileThumbnailRenderer } from '../../common/LogConstants'
-import { PhotoSectionId, PhotoSectionById, PhotoSection, PhotoType } from '../../common/models/Photo'
+import { PhotoSectionId, PhotoSectionById, PhotoSection, PhotoType, PhotoId } from '../../common/models/Photo'
 import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
 import Profiler from '../../common/util/Profiler'
 import SerialJobQueue from '../../common/util/SerialJobQueue'
 
-import { fetchSectionPhotos as fetchSectionPhotosFromDb } from '../BackgroundClient'
+import { fetchSectionPhotos as fetchSectionPhotosFromDb, fetchPhotoDetail } from '../BackgroundClient'
 import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from '../UITypes'
 import { sectionHeadHeight } from '../components/library/GridSection'
-import { forgetSectionPhotosAction, fetchSectionPhotosAction } from '../state/actions'
+import { forgetSectionPhotosAction, fetchSectionPhotosAction, setLibraryInfoPhotoAction } from '../state/actions'
 import store from '../state/store'
 import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './ImageProvider'
 
@@ -320,6 +320,10 @@ function getSectionIdsToProtect(): { [index: string]: true } {
         sectionsToProtect[selectedSectionId] = true
     }
 
+    if (state.library.info) {
+        sectionsToProtect[state.library.info.sectionId] = true
+    }
+
     if (state.detail) {
         sectionsToProtect[state.detail.currentPhoto.sectionId] = true
     }
@@ -352,6 +356,28 @@ function fetchSectionPhotos(sectionId: PhotoSectionId) {
         })
 }
 
+
+let runningInfoPhotoDetailPromise: CancelablePromise<void> | null = null
+
+export function setInfoPhoto(sectionId: PhotoSectionId | null, photoId: PhotoId | null) {
+    store.dispatch(setLibraryInfoPhotoAction.request({ sectionId, photoId }))
+    if (runningInfoPhotoDetailPromise) {
+        runningInfoPhotoDetailPromise.cancel()
+        runningInfoPhotoDetailPromise = null
+    }
+
+    if (photoId) {
+        runningInfoPhotoDetailPromise = new CancelablePromise(fetchPhotoDetail(photoId))
+            .then(photoDetail => store.dispatch(setLibraryInfoPhotoAction.success({ photoDetail })))
+            .catch(error => {
+                if (!isCancelError(error)) {
+                    store.dispatch(setLibraryInfoPhotoAction.failure(error))
+                    // TODO: Show error in UI
+                    console.error('Fetching photo detail failed', error)
+                }
+            })
+    }
+}
 
 
 type CreateThumbnailJob = { isCancelled: boolean, sectionId: PhotoSectionId, photo: PhotoType, profiler: Profiler }

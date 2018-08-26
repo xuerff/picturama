@@ -2,7 +2,7 @@ import React from 'react'
 
 import {addSection, action, TestContext} from '../core/UiTester'
 
-import { PhotoType, PhotoSectionById, PhotoSectionId } from '../../common/models/Photo'
+import { PhotoType, PhotoSectionById, PhotoSectionId, PhotoId, PhotoDetail } from '../../common/models/Photo'
 import CancelablePromise from '../../common/util/CancelablePromise'
 
 import { defaultGridRowHeight } from '../../ui/UiConstants'
@@ -33,6 +33,8 @@ const defaultProps = {
     } as PhotoSectionById,
     selectedSectionId: null,
     selectedPhotoIds: [],
+    infoPhoto: null,
+    infoPhotoDetail: null,
     tags: [],
     showOnlyFlagged: false,
     isShowingTrash: false,
@@ -51,6 +53,7 @@ const defaultProps = {
     },
     setSelectedPhotos: action('setSelectedPhotos'),
     setDetailPhotoById: action('setDetailPhotoById'),
+    setInfoPhoto: action('setInfoPhoto'),
     openExport: action('openExport'),
     setPhotosFlagged: action('setPhotosFlagged'),
     setPhotoTags: action('setPhotoTags'),
@@ -106,6 +109,8 @@ addSection('Library')
             {...createGridRowHeightProps(context)}
             selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testPhoto.id ]}
+            infoPhoto={testPhoto}
+            infoPhotoDetail={{ versions:[], tags: [] }}
         />
     ))
     .add('creating thumbnails', context => {
