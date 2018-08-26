@@ -15,6 +15,7 @@ const storePhotoTagsQueue = new SerialJobQueue(
     processNextStorePhotoTags)
 
 let tagsHaveChanged = false
+let tagsHaveBeenRemoved = false
 
 
 export function fetchTags(): Promise<TagType[]> {
@@ -55,16 +56,22 @@ async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<TagTyp
             photoTagMappings.push({ photo_id: photoId, tag_id: tagId })
         }
 
-        await DB().query('delete from photos_tags where photo_id = ?', photoId)
+        const deletedCount = (await DB().run('delete from photos_tags where photo_id = ?', photoId)).changes
+        if (deletedCount != 0) {
+            tagsHaveBeenRemoved = true
+        }
         if (photoTagMappings.length > 0) {
             await DB().insert('photos_tags', photoTagMappings)
         }
 
         if (storePhotoTagsQueue.getQueueLength() === 0) {
             // Clean up obsolete tags
-            const deletedCount = (await DB().run('delete from tags where id not in (select tag_id from photos_tags group by tag_id)')).changes
-            if (deletedCount !== 0) {
-                tagsHaveChanged = true
+            if (tagsHaveBeenRemoved) {
+                tagsHaveBeenRemoved = false
+                const deletedCount = (await DB().run('delete from tags where id not in (select tag_id from photos_tags group by tag_id)')).changes
+                if (deletedCount !== 0) {
+                    tagsHaveChanged = true
+                }
             }
 
             if (tagsHaveChanged) {

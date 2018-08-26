@@ -10,13 +10,13 @@ import config from '../common/config'
 import { profileScanner } from '../common/LogConstants'
 import { ExifOrientation } from '../common/models/DataTypes'
 import { PhotoType, generatePhotoId } from '../common/models/Photo'
-import Tag from '../common/models/Tag'
 import { bindMany } from '../common/util/LangUtil'
 import Profiler from '../common/util/Profiler'
 
 import matches from './lib/matches'
 import walker from './lib/walker'
 import { fetchPhotoWork } from './store/PhotoWorkStore'
+import { storePhotoTags } from './store/TagStore'
 import { readMetadataOfImage } from './MetaData'
 
 
@@ -56,7 +56,7 @@ export default class Scanner {
             photosDir: path
         };
 
-        bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'onImportedStep', 'filterStoredPhoto', 'populateTags', 'walk')
+        bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'onImportedStep', 'filterStoredPhoto', 'walk')
     }
 
     prepare(filePaths: string[]): FileInfo[] {
@@ -188,8 +188,11 @@ export default class Scanner {
             await DB().insert('photos', photo)
             if (profiler) profiler.addPoint('Stored photo to DB')
 
-            this.populateTags(photo, metaData.tags)
-            if (profiler) profiler.addPoint('Populated tags')
+            const tags = photoWork.tags || metaData.tags
+            if (tags && tags.length) {
+                await storePhotoTags(photoId, tags)
+                if (profiler) profiler.addPoint(`Added ${tags.length} tags`)
+            }
 
             await this.onImportedStep()
             if (profiler) { profiler.addPoint('Updated import progress') }
@@ -201,22 +204,6 @@ export default class Scanner {
         if (profiler) {
             profiler.logResult()
         }
-    }
-
-    populateTags(photo, tags: string[]) {
-        if (tags.length > 0) {
-            return BluebirdPromise.each(tags, tagName =>
-                new Tag({ title: tagName })
-                    .fetch()
-                    .then(tag =>
-                        tag ? tag : new Tag({ title: tagName }).save()
-                    )
-                    .then(tag => tag.photos().attach(photo))
-            )
-            .then(() => photo);
-        }
-
-        return photo;
     }
 
     onImportedStep() {
