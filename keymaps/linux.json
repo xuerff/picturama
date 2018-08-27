@@ -12,7 +12,6 @@
   },
   ".PictureDetail-body": {
     "y": "detail:diff",
-    "p": "detail:flag",
     "delete": "detail:moveToTrash",
     "left": "detail:moveLeft",
     "right": "detail:moveRight"

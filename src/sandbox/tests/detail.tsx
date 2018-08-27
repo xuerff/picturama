@@ -2,6 +2,8 @@ import React from 'react'
 
 import {addSection, action} from '../core/UiTester'
 
+import { PhotoDetail } from '../../common/models/Photo'
+
 import { PictureDetail } from '../../ui/components/detail/PictureDetail'
 import { testPhoto } from '../util/MockData'
 
@@ -11,14 +13,15 @@ const defaultProps = {
     isActive: true,
     sectionId: 'dummy',
     photo: testPhoto,
+    photoWork: {},
+    photoDetail: { versions: [], tags: [] },
     tags: [],
     isFirst: true,
     isLast: false,
-
     setPreviousDetailPhoto: action('setPreviousDetailPhoto'),
     setNextDetailPhoto: action('setNextDetailPhoto'),
     updatePhotoWork: action('updatePhotoWork'),
-    toggleFlag: action('toggleFlag'),
+    setPhotosFlagged: action('setPhotosFlagged'),
     setPhotoTags: action('setPhotoTags'),
     movePhotosToTrash: action('movePhotosToTrash'),
     openExport: action('openExport'),
@@ -32,11 +35,11 @@ addSection('Detail')
         <PictureDetail
             {...defaultProps}
             photoWork={null}
+            photoDetail={null}
         />
     ))
     .add('done', context => (
         <PictureDetail
             {...defaultProps}
-            photoWork={{}}
         />
     ))

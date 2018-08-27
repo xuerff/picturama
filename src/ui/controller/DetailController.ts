@@ -78,12 +78,3 @@ export function setNextDetailPhoto() {
         }
     }
 }
-
-export function toggleDetailPhotoFlag() {
-    const state = store.getState()
-    if (state.detail) {
-        const currentPhoto = state.detail.currentPhoto
-        const detailPhoto = getPhotoById(currentPhoto.sectionId, currentPhoto.photoId)
-        setPhotosFlagged([ detailPhoto ], !detailPhoto.flag)
-    }
-}

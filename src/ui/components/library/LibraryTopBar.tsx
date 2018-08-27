@@ -1,16 +1,13 @@
 import { remote, ipcRenderer } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
-import { Button, ButtonGroup } from '@blueprintjs/core'
+import { Button } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSection } from '../../../common/models/Photo'
-import { rotate } from '../../../common/util/EffectsUtil'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import FaIcon from '../widget/icon/FaIcon'
-import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
-import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
-import MdSaveAlt from '../widget/icon/MdSaveAlt'
+import PhotoActionButtons from '../widget/PhotoActionButtons'
 import Toolbar from '../widget/Toolbar'
 
 import './LibraryTopBar.less'
@@ -20,13 +17,13 @@ const dialog = remote.dialog;
 
 interface Props {
     className?: any
-    showOnlyFlagged: boolean
+    selectedSectionId: PhotoSectionId,
+    selectedPhotos: PhotoType[]
     isShowingTrash: boolean
     isShowingInfo: boolean
     photosCount: number
-    selectedSection: PhotoSection | null
-    selectedPhotoIds: PhotoId[]
-    openExport: () => void
+    showOnlyFlagged: boolean
+    openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     toggleShowOnlyFlagged: () => void
@@ -38,14 +35,14 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
     constructor(props: Props) {
         super(props)
 
-        bindMany(this, 'showSidebar', 'deleteModal', 'rotateLeft', 'rotateRight', 'toggleFlagged')
+        bindMany(this, 'showSidebar', 'emptyTrashModal')
     }
 
     showSidebar() {
         window.dispatchEvent(new Event('core:toggleSidebar'))
     }
 
-    deleteModal() {
+    emptyTrashModal() {
         dialog.showMessageBox({
             type: 'question',
             message: 'Are you sure you want to empty the trash?',
@@ -57,56 +54,8 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
         })
     }
 
-    rotateLeft() {
-        this.rotate(-1)
-    }
-
-    rotateRight() {
-        this.rotate(1)
-    }
-
-    rotate(turns: number) {
-        const props = this.props
-        for (const photoId of props.selectedPhotoIds) {
-            const photo = props.selectedSection.photoData[photoId]
-            props.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
-        }
-    }
-
-    toggleFlagged() {
-        const props = this.props
-        const newFlagged = !this.getSelectedAreFlagged()
-
-        let photosToChange = []
-        for (const photoId of props.selectedPhotoIds) {
-            const photo = props.selectedSection.photoData[photoId]
-            if (!!photo.flag !== newFlagged) {
-                photosToChange.push(photo)
-            }
-        }
-
-        this.props.setPhotosFlagged(photosToChange, newFlagged)
-    }
-
-    getSelectedAreFlagged() {
-        const props = this.props
-        if (!props.selectedSection || props.selectedPhotoIds.length === 0) {
-            return false
-        } else {
-            for (const photoId of props.selectedPhotoIds) {
-                const photo = props.selectedSection.photoData[photoId]
-                if (!photo.flag) {
-                    return false
-                }
-            }
-            return true
-        }
-    }
-
     render() {
         const props = this.props
-        const hasSelection = props.selectedPhotoIds.length > 0
-        const selectedAreFlagged = this.getSelectedAreFlagged()
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
                 <Button className="LibraryTopBar-showSidebar" minimal={true} onClick={this.showSidebar} title="Show sidebar [tab]">
@@ -123,37 +72,18 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                 </Button>
 
                 <div className="pull-right">
-                    <ButtonGroup>
-                        <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
-                            <MdRotateLeftIcon/>
-                        </Button>
-                        <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
-                            <MdRotateRightIcon/>
-                        </Button>
-                    </ButtonGroup>
-                    <Button
-                        className={classNames('LibraryTopBar-toggleButton', { isActive: selectedAreFlagged })}
-                        minimal={true}
-                        active={selectedAreFlagged}
-                        disabled={!hasSelection}
-                        onClick={this.toggleFlagged}
-                        title={selectedAreFlagged ? 'Remove flag' : 'Flag'}
-                    >
-                        <FaIcon name="flag" />
-                    </Button>
-                    <Button
-                        minimal={true}
-                        icon="info-sign"
-                        title={props.isShowingInfo ? "Hide photo info" : "Show photo info"}
-                        active={props.isShowingInfo}
-                        disabled={!hasSelection && !props.isShowingInfo}
-                        onClick={this.props.toggleShowInfo}
+                    <PhotoActionButtons
+                        selectedSectionId={props.selectedSectionId}
+                        selectedPhotos={props.selectedPhotos}
+                        isShowingTrash={props.isShowingTrash}
+                        isShowingInfo={props.isShowingInfo}
+                        openExport={props.openExport}
+                        updatePhotoWork={props.updatePhotoWork}
+                        setPhotosFlagged={props.setPhotosFlagged}
+                        toggleShowInfo={props.toggleShowInfo}
                     />
-                    <Button minimal={true} disabled={!hasSelection} onClick={this.props.openExport} title="Export">
-                        <MdSaveAlt/>
-                    </Button>
                     {this.props.isShowingTrash &&
-                        <Button minimal={true} disabled={props.photosCount === 0} onClick={this.deleteModal}>
+                        <Button minimal={true} disabled={props.photosCount === 0} onClick={this.emptyTrashModal}>
                             <FaIcon name="trash" />
                         </Button>
                     }

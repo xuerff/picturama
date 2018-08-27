@@ -11,18 +11,16 @@ import AvailableEditors from '../../available-editors'
 import PhotoPane from './PhotoPane'
 import PhotoInfo from '../info/PhotoInfo'
 import FaIcon from '../widget/icon/FaIcon'
-import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
-import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
+import PhotoActionButtons from '../widget/PhotoActionButtons'
 import Toolbar from '../widget/Toolbar'
-import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto, toggleDetailPhotoFlag } from '../../controller/DetailController'
+import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from '../../controller/DetailController'
 import { getNonRawImgPath } from '../../controller/ImageProvider'
-import { updatePhotoWork, movePhotosToTrash } from '../../controller/PhotoController'
+import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged } from '../../controller/PhotoController'
 import { setPhotoTags } from '../../controller/PhotoTagController'
 import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { openExportAction, openDiffAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
 import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from '../../state/selectors'
-import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
 import './PictureDetail.less'
@@ -60,7 +58,7 @@ interface DispatchProps {
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
-    toggleFlag: () => void
+    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     setPhotoTags: (photo: PhotoType, tags: string[]) => void
     movePhotosToTrash: (photos: PhotoType[]) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
@@ -90,7 +88,7 @@ export class PictureDetail extends React.Component<Props, State> {
         this.state = { bound: false, loading: true, isShowingInfo: false }
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
-            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onBodyResize', 'rotateLeft', 'rotateRight')
+            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onBodyResize')
     }
 
     componentDidMount() {
@@ -140,7 +138,6 @@ export class PictureDetail extends React.Component<Props, State> {
 
         window.addEventListener('core:cancel', this.props.closeDetail)
         window.addEventListener('detail:diff', this.toggleDiff);
-        window.addEventListener('detail:flag', this.props.toggleFlag);
         window.addEventListener('detail:moveToTrash', this.moveToTrash);
 
         window.addEventListener(
@@ -165,7 +162,6 @@ export class PictureDetail extends React.Component<Props, State> {
 
         window.removeEventListener('core:cancel', this.props.closeDetail)
         window.removeEventListener('detail:diff', this.toggleDiff);
-        window.removeEventListener('detail:flag', this.props.toggleFlag);
         window.removeEventListener('detail:moveToTrash', this.moveToTrash);
 
         window.removeEventListener(
@@ -220,18 +216,6 @@ export class PictureDetail extends React.Component<Props, State> {
         this.setState({ isShowingInfo: !this.state.isShowingInfo })
     }
 
-    rotateLeft() {
-        this.rotate(-1)
-    }
-
-    rotateRight() {
-        this.rotate(1)
-    }
-
-    rotate(turns: number) {
-        this.props.updatePhotoWork(this.props.photo, photoWorks => rotate(photoWorks, turns))
-    }
-
     setLoading(loading: boolean) {
         if (loading !== this.state.loading) {
             this.setState({ loading })
@@ -274,28 +258,15 @@ export class PictureDetail extends React.Component<Props, State> {
                         </Button>
                     </ButtonGroup>
                     <span className="pull-right">
-                        <ButtonGroup>
-                            <Button minimal={true} onClick={this.rotateLeft} title="Rotate left">
-                                <MdRotateLeftIcon/>
-                            </Button>
-                            <Button minimal={true} onClick={this.rotateRight} title="Rotate right">
-                                <MdRotateRightIcon/>
-                            </Button>
-                        </ButtonGroup>
-                        <Button
-                            className={classNames('PictureDetail-toggleButton', { isActive: !!props.photo.flag })}
-                            minimal={true}
-                            onClick={props.toggleFlag}
-                            title={props.photo.flag ? 'Remove flag' : 'Flag'}
-                        >
-                            <FaIcon name="flag" />
-                        </Button>
-                        <Button
-                            minimal={true}
-                            icon="info-sign"
-                            title={state.isShowingInfo ? "Hide photo info" : "Show photo info"}
-                            active={state.isShowingInfo}
-                            onClick={this.toggleShowInfo}
+                        <PhotoActionButtons
+                            selectedSectionId={props.sectionId}
+                            selectedPhotos={[ props.photo ]}
+                            isShowingTrash={!!props.photo.trashed}
+                            isShowingInfo={state.isShowingInfo}
+                            openExport={props.openExport}
+                            updatePhotoWork={props.updatePhotoWork}
+                            setPhotosFlagged={props.setPhotosFlagged}
+                            toggleShowInfo={this.toggleShowInfo}
                         />
                     </span>
                 </Toolbar>
@@ -355,7 +326,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setPreviousDetailPhoto,
         setNextDetailPhoto,
         updatePhotoWork,
-        toggleFlag: toggleDetailPhotoFlag,
+        setPhotosFlagged,
         setPhotoTags,
         movePhotosToTrash,
         openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => dispatch(openExportAction(sectionId, photoIds)),

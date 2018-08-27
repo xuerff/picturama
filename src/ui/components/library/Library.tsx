@@ -189,13 +189,13 @@ export class Library extends React.Component<Props, State> {
             >
                 <LibraryTopBar
                     className="Library-topBar"
-                    photosCount={props.photoCount}
-                    selectedSection={props.sectionById[props.selectedSectionId]}
-                    selectedPhotoIds={props.selectedPhotoIds}
-                    showOnlyFlagged={props.showOnlyFlagged}
+                    selectedSectionId={props.selectedSectionId}
+                    selectedPhotos={props.selectedPhotoIds.map(photoId => props.sectionById[props.selectedSectionId].photoData[photoId])}
                     isShowingTrash={props.isShowingTrash}
                     isShowingInfo={state.isShowingInfo}
-                    openExport={this.openExport}
+                    photosCount={props.photoCount}
+                    showOnlyFlagged={props.showOnlyFlagged}
+                    openExport={props.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
                     toggleShowOnlyFlagged={props.toggleShowOnlyFlagged}

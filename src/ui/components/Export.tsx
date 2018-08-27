@@ -212,7 +212,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             photoIds: state.export.photoIds,
-            photos: state.data.sections[state.export.sectionId].photoData
+            photos: state.data.sections.byId[state.export.sectionId].photoData
         }
     },
     {
