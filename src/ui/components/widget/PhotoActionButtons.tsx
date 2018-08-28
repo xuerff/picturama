@@ -1,14 +1,14 @@
 import classNames from 'classnames'
 import React from 'react'
+import { MdRotateLeft, MdRotateRight } from 'react-icons/md'
 import { Button, ButtonGroup } from '@blueprintjs/core'
 
 import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
-import FaIcon from '../widget/icon/FaIcon'
-import MdRotateLeftIcon from '../widget/icon/MdRotateLeftIcon'
-import MdRotateRightIcon from '../widget/icon/MdRotateRightIcon'
+import FaIcon from './icon/FaIcon'
+import { SVG_ICON_CLASS } from './icon/SvgIcon'
 
 import './PhotoActionButtons.less'
 
@@ -89,10 +89,10 @@ export default class PhotoActionButtons extends React.Component<Props> {
             <>
                 <ButtonGroup>
                     <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
-                        <MdRotateLeftIcon/>
+                        <MdRotateLeft className={SVG_ICON_CLASS}/>
                     </Button>
                     <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
-                        <MdRotateRightIcon/>
+                        <MdRotateRight className={SVG_ICON_CLASS}/>
                     </Button>
                 </ButtonGroup>
                 <Button
