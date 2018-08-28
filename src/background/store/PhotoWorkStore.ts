@@ -334,6 +334,11 @@ export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): P
 }
 
 
+export async function removePhotoWork(photoPath: string): Promise<void> {
+    await storePhotoWork(photoPath, {})
+}
+
+
 const storeThumbnailQueue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.thumbnailPath === existingJob.thumbnailPath) ? newJob : null,
     processNextStoreThumbnail)

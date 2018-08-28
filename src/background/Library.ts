@@ -1,14 +1,19 @@
+import fs from 'fs'
 import { ipcMain, shell, BrowserWindow } from 'electron'
+import DB from 'sqlite3-helper'
 import moment from 'moment'
 import notifier from 'node-notifier'
-import fs from 'fs'
-import Promise from 'bluebird'
+import { promisify } from 'bluebird'
 
-import Scanner from './Scanner'
 import config from '../common/config'
-
-import Photo, { getThumbnailPath } from '../common/models/Photo'
+import { getThumbnailPath, PhotoId } from '../common/models/Photo'
 import Version from '../common/models/Version'
+
+import { removePhotoWork } from './store/PhotoWorkStore'
+import { toSqlStringCsv } from './util/DbUtil'
+import Scanner from './Scanner'
+
+const unlink = promisify<void, string | Buffer>(fs.unlink)
 
 
 class Library {
@@ -79,30 +84,29 @@ class Library {
     }
 
     emptyTrash() {
-        new Photo()
-            .where({ trashed: 1 })
-            .fetchAll({ withRelated: [ 'versions', 'tags' ] })
-            .then(photos => photos.toJSON())
-            .map(photo =>
-                Promise.each(
-                    [ photo.master, photo.non_raw, getThumbnailPath(photo.id) ],
-                    imgPath => {
-                        if (imgPath) {
-                            shell.moveItemToTrash(imgPath)
-                        }
-                    }
-                )
-                .then(() => new Photo({ id: photo.id })
-                    .destroy()
-                )
-                .then(() => photo)
-            )
-            .then(photos => {
-                this.mainWindow.webContents.send(
-                    'photos-trashed',
-                    photos.map(photo => photo.id)
-                )
-            })
+        (async () => {
+            const photosToDelete = await DB().query<{ id: PhotoId, master: string, non_raw: string }>('select id, master, non_raw from photos where trashed = 1')
+            for (const photo of photosToDelete) {
+                await Promise.all([
+                    shell.moveItemToTrash(photo.master),
+                    unlink(photo.non_raw),
+                    unlink(getThumbnailPath(photo.id)),
+                    removePhotoWork(photo.master)
+                ])
+            }
+
+            const photoIds = photosToDelete.map(photo => photo.id)
+            const photoIdsCsv = toSqlStringCsv(photoIds)
+            await DB().run(`delete from versions where photo_id in (${photoIdsCsv})`)
+            await DB().run(`delete from photos_tags where photo_id in (${photoIdsCsv})`)
+            await DB().run(`delete from photos where id in (${photoIdsCsv})`)
+
+            this.mainWindow.webContents.send('photos-trashed', photoIds)
+        })()
+        .catch(error => {
+            // TODO: Show error in UI
+            console.error('Emptying trash failed', error)
+        })
     }
 
     scan() {

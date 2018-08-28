@@ -6,7 +6,7 @@ import { defaultGridRowHeight } from '../../UiConstants'
 import { Action } from '../ActionType'
 import {
     SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
-    SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_PHOTO_TAGS, EMPTY_TRASH
+    CHANGE_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_PHOTO_TAGS, EMPTY_TRASH
 } from '../actionTypes'
 
 
@@ -65,6 +65,17 @@ const selection = (state: SelectionState = initialSelectionState, action: Action
         case FETCH_SECTIONS_SUCCESS:
         case FETCH_SECTIONS_FAILURE:
             return initialSelectionState
+        case CHANGE_PHOTOS: {
+            const removeUpdatedPhotos = action.payload.update.trashed !== undefined
+            if (removeUpdatedPhotos) {
+                return {
+                    sectionId: null,
+                    photoIds: []
+                }
+            } else {
+                return state
+            }
+        }
         case EMPTY_TRASH: {
             const trashedPhotoIds = action.payload.trashedPhotoIds
             return {

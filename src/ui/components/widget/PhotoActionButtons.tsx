@@ -1,14 +1,16 @@
 import classNames from 'classnames'
 import React from 'react'
 import { MdRotateLeft, MdRotateRight } from 'react-icons/md'
-import { Button, ButtonGroup } from '@blueprintjs/core'
+import { Button, ButtonGroup, Classes } from '@blueprintjs/core'
 
 import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { rotate } from '../../../common/util/EffectsUtil'
 import { bindMany } from '../../../common/util/LangUtil'
 
+import toaster from '../../Toaster'
 import FaIcon from './icon/FaIcon'
 import { SVG_ICON_CLASS } from './icon/SvgIcon'
+import MdRestoreFromTrash from './icon/MdRestoreFromTrash'
 
 import './PhotoActionButtons.less'
 
@@ -21,6 +23,8 @@ interface Props {
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
+    movePhotosToTrash: (photos: PhotoType[]) => void
+    restorePhotosFromTrash: (photos: PhotoType[]) => void
     toggleShowInfo: () => void
 }
 
@@ -29,7 +33,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
     constructor(props: Props) {
         super(props)
 
-        bindMany(this, 'rotateLeft', 'rotateRight', 'toggleFlagged', 'openExport')
+        bindMany(this, 'rotateLeft', 'rotateRight', 'toggleFlagged', 'moveToTrash', 'restoreFromTrash', 'openExport')
     }
 
     rotateLeft() {
@@ -75,6 +79,26 @@ export default class PhotoActionButtons extends React.Component<Props> {
         }
     }
 
+    moveToTrash() {
+        const selectedPhotos = this.props.selectedPhotos
+        this.props.movePhotosToTrash(selectedPhotos)
+        toaster.show({
+            icon: 'tick',
+            message: selectedPhotos.length === 1 ? 'Moved photo to trash' : `Moved ${selectedPhotos.length} photos to trash`,
+            intent: 'success'
+        })
+    }
+
+    restoreFromTrash() {
+        const selectedPhotos = this.props.selectedPhotos
+        this.props.restorePhotosFromTrash(selectedPhotos)
+        toaster.show({
+            icon: 'tick',
+            message: selectedPhotos.length === 1 ? 'Restored photo from trash' : `Restored ${selectedPhotos.length} photos from trash`,
+            intent: 'success'
+        })
+    }
+
     openExport() {
         const props = this.props
         const selectedPhotoIds = props.selectedPhotos.map(photo => photo.id)
@@ -105,6 +129,20 @@ export default class PhotoActionButtons extends React.Component<Props> {
                 >
                     <FaIcon name="flag" />
                 </Button>
+                {!props.isShowingTrash &&
+                    <Button minimal={true} icon="trash" disabled={!hasSelection} onClick={this.moveToTrash} title="Move photo to trash"/>
+                }
+                {props.isShowingTrash &&
+                    <Button
+                        disabled={!hasSelection}
+                        intent={hasSelection ? 'success' : null}
+                        title="Restore photo from trash"
+                        onClick={this.restoreFromTrash}
+                    >
+                        <MdRestoreFromTrash/>
+                        <span className={Classes.BUTTON_TEXT}>Restore</span>
+                    </Button>
+                }
                 <Button
                     minimal={true}
                     icon="info-sign"

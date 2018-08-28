@@ -187,6 +187,13 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
         }
         case CHANGE_PHOTOS: {
             const updatedPhotos = action.payload.photos
+            const removeUpdatedPhotos = action.payload.update.trashed !== undefined
+                // The trashed state has changed. So either a photos were moved to trash or they were recovered from trash
+                // In both cases the photos should be removed from the currently shown photos
+
+            let totalPhotoCount = state.totalPhotoCount
+            let photoCount = state.photoCount
+            let newSectionIds = []
             let newSectionById = {}
             for (const sectionId of state.ids) {
                 const section = state.byId[sectionId]
@@ -196,21 +203,40 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                 if (photoData) {
                     let newPhotoData: PhotoById
                     for (const updatedPhoto of updatedPhotos) {
-                        if (photoData[updatedPhoto.id]) {
+                        const prevPhoto = photoData[updatedPhoto.id]
+                        if (prevPhoto) {
                             if (!newPhotoData) {
                                 newPhotoData = { ...photoData }
                                 newSection = { ...section, photoData: newPhotoData }
                             }
-                            newPhotoData[updatedPhoto.id] = updatedPhoto
+                            if (removeUpdatedPhotos) {
+                                const prevPhotoIndex = newSection.photoIds.indexOf(prevPhoto.id)
+                                if (prevPhotoIndex !== -1) {
+                                    newSection.photoIds.splice(prevPhotoIndex, 1)
+                                }
+                                if (action.payload.update.trashed) {
+                                    totalPhotoCount--
+                                }
+                                newSection.count--
+                                photoCount--
+                            } else {
+                                newPhotoData[updatedPhoto.id] = updatedPhoto
+                            }
                         }
                     }
                 }
 
-                newSectionById[sectionId] = newSection || section
+                if (!newSection || newSection.photoIds.length !== 0) {
+                    newSectionIds.push(sectionId)
+                    newSectionById[sectionId] = newSection || section
+                }
             }
 
             return {
                 ...state,
+                totalPhotoCount,
+                photoCount,
+                ids: newSectionIds,
                 byId: newSectionById
             }
         }

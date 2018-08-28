@@ -12,7 +12,7 @@ import { bindMany } from '../../../common/util/LangUtil'
 import { setDetailPhotoById } from '../../controller/DetailController'
 import { getThumbnailSrc } from '../../controller/ImageProvider'
 import { getGridLayout, setInfoPhoto, createThumbnail } from '../../controller/LibraryController'
-import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged } from '../../controller/PhotoController'
+import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from '../../controller/PhotoController'
 import { setPhotoTags } from '../../controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
 import { AppState } from '../../state/reducers'
@@ -64,6 +64,8 @@ interface DispatchProps {
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     setPhotoTags: (photo: PhotoType, tags: string[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
+    movePhotosToTrash: (photos: PhotoType[]) => void
+    restorePhotosFromTrash: (photos: PhotoType[]) => void
     toggleShowOnlyFlagged: () => void
     startScanning: () => void
 }
@@ -157,12 +159,21 @@ export class Library extends React.Component<Props, State> {
                     action={action}
                 />
         } else if (props.photoCount === 0) {
-            currentView =
-                <NonIdealState
-                    icon="zoom-out"
-                    title="No photos found"
-                    description="Your current selection doesn't match any photo. Please change your selection on the left."
-                />
+            if (props.isShowingTrash) {
+                currentView =
+                    <NonIdealState
+                        icon="tick"
+                        title="Trash is empty"
+                        description="The trash is empty. Please change your selection on the left."
+                    />
+            } else {
+                currentView =
+                    <NonIdealState
+                        icon="zoom-out"
+                        title="No photos found"
+                        description="Your current selection doesn't match any photo. Please change your selection on the left."
+                    />
+            }
         } else {
             currentView =
                 <Grid
@@ -198,6 +209,8 @@ export class Library extends React.Component<Props, State> {
                     openExport={props.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
+                    movePhotosToTrash={props.movePhotosToTrash}
+                    restorePhotosFromTrash={props.restorePhotosFromTrash}
                     toggleShowOnlyFlagged={props.toggleShowOnlyFlagged}
                     toggleShowInfo={this.toggleShowInfo}
                 />
@@ -259,6 +272,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setPhotosFlagged,
         setPhotoTags,
         updatePhotoWork,
+        movePhotosToTrash,
+        restorePhotosFromTrash,
         toggleShowOnlyFlagged: () => {
             const oldFilter = store.getState().library.filter
             setLibraryFilter({ ...oldFilter, showOnlyFlagged: !oldFilter.showOnlyFlagged })

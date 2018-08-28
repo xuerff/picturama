@@ -86,8 +86,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
         case CLOSE_DETAIL:
             return null
         case CHANGE_PHOTOS: {
-            const changedPhoto = action.payload.photos[0]
-            if (state && changedPhoto && changedPhoto.trashed) {
+            if (state && action.payload.update.trashed !== undefined) {
                 return null
             } else {
                 return state

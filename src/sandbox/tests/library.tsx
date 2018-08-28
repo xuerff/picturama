@@ -58,6 +58,8 @@ const defaultProps = {
     setPhotosFlagged: action('setPhotosFlagged'),
     setPhotoTags: action('setPhotoTags'),
     updatePhotoWork: action('updatePhotoWork'),
+    movePhotosToTrash: action('movePhotosToTrash'),
+    restorePhotosFromTrash: action('restorePhotosFromTrash'),
     toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
     startScanning: action('startScanning'),
 }
@@ -113,7 +115,7 @@ addSection('Library')
             infoPhotoDetail={{ versions:[], tags: [] }}
         />
     ))
-    .add('creating thumbnails', context => {
+     .add('creating thumbnails', context => {
         let photos = [ ...defaultPhotos ]
         for (let i = 0; i < 100; i++) {
             photos.push(createRandomDummyPhoto())
@@ -171,6 +173,27 @@ addSection('Library')
             {...createGridRowHeightProps(context)}
             photoCount={0}
             totalPhotoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
+        />
+    ))
+    .add('Trash with selection', context => (
+        <Library
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            isShowingTrash={true}
+            selectedSectionId={defaultSectionId}
+            selectedPhotoIds={[ testPhoto.id ]}
+            infoPhoto={testPhoto}
+            infoPhotoDetail={{ versions:[], tags: [] }}
+        />
+    ))
+    .add('Trash - no photos', context => (
+        <Library
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            isShowingTrash={true}
+            photoCount={0}
             sectionIds={[]}
             sectionById={{}}
         />

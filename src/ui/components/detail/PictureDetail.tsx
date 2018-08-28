@@ -15,7 +15,7 @@ import PhotoActionButtons from '../widget/PhotoActionButtons'
 import Toolbar from '../widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from '../../controller/DetailController'
 import { getNonRawImgPath } from '../../controller/ImageProvider'
-import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged } from '../../controller/PhotoController'
+import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from '../../controller/PhotoController'
 import { setPhotoTags } from '../../controller/PhotoTagController'
 import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
 import { openExportAction, openDiffAction } from '../../state/actions'
@@ -29,12 +29,6 @@ const { MenuItem } = remote;
 
 
 const availableEditors = new AvailableEditors();
-
-let rotation = {};
-
-rotation[1] = '';
-rotation[0] = 'minus-ninety';
-
 
 interface OwnProps {
     style?: any
@@ -61,6 +55,7 @@ interface DispatchProps {
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
     setPhotoTags: (photo: PhotoType, tags: string[]) => void
     movePhotosToTrash: (photos: PhotoType[]) => void
+    restorePhotosFromTrash: (photos: PhotoType[]) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     openDiff: () => void
     closeDetail: () => void
@@ -266,6 +261,8 @@ export class PictureDetail extends React.Component<Props, State> {
                             openExport={props.openExport}
                             updatePhotoWork={props.updatePhotoWork}
                             setPhotosFlagged={props.setPhotosFlagged}
+                            movePhotosToTrash={props.movePhotosToTrash}
+                            restorePhotosFromTrash={props.restorePhotosFromTrash}
                             toggleShowInfo={this.toggleShowInfo}
                         />
                     </span>
@@ -329,6 +326,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setPhotosFlagged,
         setPhotoTags,
         movePhotosToTrash,
+        restorePhotosFromTrash,
         openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => dispatch(openExportAction(sectionId, photoIds)),
         openDiff: () => dispatch(openDiffAction()),
         closeDetail: () => setDetailPhotoByIndex(null, null)

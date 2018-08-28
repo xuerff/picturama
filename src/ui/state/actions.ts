@@ -31,7 +31,7 @@ export const fetchSectionsAction = createAsyncAction(FETCH_SECTIONS_REQUEST, FET
 export const fetchSectionPhotosAction = (sectionId: PhotoSectionId, photos: PhotoType[]) => action(FETCH_SECTION_PHOTOS, { sectionId, photos })
 export const forgetSectionPhotosAction = (sectionIds: { [index: string]: true }) => action(FORGET_SECTION_PHOTOS, { sectionIds })
 export const changePhotoWorkAction = (photoId: PhotoId, photoWork: PhotoWork) => action(CHANGE_PHOTOWORK, { photoId, photoWork })
-export const changePhotosAction = (photos: PhotoType[]) => action(CHANGE_PHOTOS, { photos })
+export const changePhotosAction = (photos: PhotoType[], update: Partial<PhotoType>) => action(CHANGE_PHOTOS, { photos, update })
 export const emptyTrashAction = (trashedPhotoIds: PhotoId[]) => action(EMPTY_TRASH, { trashedPhotoIds })
 
 export const startImportAction = () => action(START_IMPORT)
