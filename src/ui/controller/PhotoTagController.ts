@@ -29,5 +29,11 @@ export async function setPhotoTags(photo: PhotoType, tags: string[]) {
         store.dispatch(fetchTagsAction(updatedTags))
     }
 
-    updatePhotoWork(photo, photoWork => photoWork.tags = tags)
+    updatePhotoWork(photo, photoWork => {
+        if (!tags.length) {
+            delete photoWork.tags
+        } else {
+            photoWork.tags = tags
+        }
+    })
 }
