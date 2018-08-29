@@ -4,7 +4,7 @@ import libraw from 'libraw'
 import fs from 'fs'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
-import DB from 'sqlite3-helper'
+import DB from 'sqlite3-helper/no-generators'
 
 import config from '../common/config'
 import { profileScanner } from '../common/LogConstants'

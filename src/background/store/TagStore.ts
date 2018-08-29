@@ -1,4 +1,4 @@
-import DB from 'sqlite3-helper'
+import DB from 'sqlite3-helper/no-generators'
 
 import { PhotoId } from '../../common/models/Photo'
 import { TagType, TagId } from '../../common/models/Tag'

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { ipcMain, shell, BrowserWindow } from 'electron'
-import DB from 'sqlite3-helper'
+import DB from 'sqlite3-helper/no-generators'
 import moment from 'moment'
 import notifier from 'node-notifier'
 import { promisify } from 'bluebird'

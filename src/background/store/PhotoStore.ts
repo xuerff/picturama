@@ -1,4 +1,4 @@
-import DB from 'sqlite3-helper'
+import DB from 'sqlite3-helper/no-generators'
 
 import { PhotoId, PhotoType, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId } from '../../common/models/Photo'
 import { VersionType } from '../../common/models/Version'
