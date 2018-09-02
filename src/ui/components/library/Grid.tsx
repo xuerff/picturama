@@ -238,6 +238,12 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         for (let sectionIndex = gridLayout.fromSectionIndex; sectionIndex < gridLayout.toSectionIndex; sectionIndex++) {
             const sectionId = props.sectionIds[sectionIndex]
             const layout = gridLayout.sectionLayouts[sectionIndex]
+            if (!layout) {
+                // This should not happen, but in some rare cases it might happen (had it on 2018-09-02 after empty trash)
+                // TODO: Show error in UI
+                console.warn(`Expected to have a layout for section #${sectionIndex} (${sectionId})`)
+                continue
+            }
             result.push(
                 <GridSection
                     key={sectionId}
