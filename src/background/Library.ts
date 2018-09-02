@@ -89,8 +89,8 @@ class Library {
             for (const photo of photosToDelete) {
                 await Promise.all([
                     shell.moveItemToTrash(photo.master),
-                    unlink(photo.non_raw),
-                    unlink(getThumbnailPath(photo.id)),
+                    unlinkIfExists(photo.non_raw),
+                    unlinkIfExists(getThumbnailPath(photo.id)),
                     removePhotoWork(photo.master)
                 ])
             }
@@ -143,3 +143,14 @@ class Library {
 }
 
 export default Library
+
+
+async function exists(path: string | Buffer): Promise<boolean> {
+    return new Promise<boolean>(resolve => fs.exists(path, resolve))
+}
+
+async function unlinkIfExists(filePath: string): Promise<void> {
+    if (filePath && await exists(filePath)) {
+        await unlink(filePath)
+    }
+}
