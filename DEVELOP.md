@@ -15,6 +15,11 @@ Directory structure
 Build from sources
 ------------------
 
+Prerequirements:
+
+  - Mac OS: Install Xcode and start it once. You can close Xcode after the "required components" have been installed.
+
+
 ```bash
 npm i
 npm start

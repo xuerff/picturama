@@ -42,7 +42,7 @@ app.on('ready', () => {
         backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
             experimentalFeatures: true,
-            blinkFeatures: 'CSSGridLayout'
+            nodeIntegration: true,
         }
     })
 

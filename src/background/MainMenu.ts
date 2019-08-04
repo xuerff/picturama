@@ -95,7 +95,7 @@ class MainMenu {
                 title: 'UI Sandbox',
                 webPreferences: {
                     experimentalFeatures: true,
-                    blinkFeatures: 'CSSGridLayout'
+                    nodeIntegration: true,
                 }
             })
             this.sandboxWindow.maximize()
