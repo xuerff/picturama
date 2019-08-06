@@ -1,13 +1,13 @@
 {
   "name": "ansel",
   "productName": "Ansel",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "",
-  "main": "dist/background/entry.js",
+  "main": "dist/background.js",
   "engineStrict": true,
   "engines": {
-    "node": ">=6.10.0",
-    "npm": ">=3.10.8"
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/electron-rebuild",
@@ -18,12 +18,13 @@
     "todo-postbuild": "./scripts/build-deb.sh",
     "todo-build-no-bump": "./scripts/build.sh",
     "start": "npm run build && npm run start-no-build",
-    "clean": "rm -rf .cache dist",
-    "watch": "parcel --target=electron src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.ts",
-    "build": "parcel build --target=electron --public-url '.' src/background/entry.ts src/sandbox/entry.tsx src/ui/entry.ts",
+    "clean": "rm -rf dist",
+    "watch": "NODE_ENV=development webpack -w",
+    "build": "NODE_ENV=development webpack",
+    "build-production": "NODE_ENV=production webpack",
     "start-no-build": "ANSEL_DEV_MODE=true electron ."
   },
-  "author": "Loïc Nogues <nogues.loic@gmail.com>",
+  "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
   "license": "MIT",
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",
@@ -67,7 +68,7 @@
     "shortid": "^2.2.14",
     "source-map-support": "^0.5.13",
     "sqlite3": "4.0.9",
-    "sqlite3-helper": "^1.2.0",
+    "sqlite3-helper": "git+https://github.com/ansel-app/sqlite3-helper.git#af477f3",
     "typesafe-actions": "^4.4.2",
     "walk": "^2.3.14"
   },
@@ -83,24 +84,35 @@
     "@types/shortid": "^0.0.29",
     "@types/sqlite3": "^3.1.5",
     "asar": "2.0.1",
+    "awesome-typescript-loader": "^5.2.1",
     "chai": "^4.2.0",
+    "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.1.0",
     "devtron": "^1.4.0",
     "electron": "5.0.8",
     "electron-mocha": "^8.1.1",
     "electron-packager": "14.0.4",
     "electron-rebuild": "1.8.5",
     "enzyme": "3.10.0",
+    "file-loader": "^4.1.0",
     "jsdom": "^15.1.1",
     "less": "^3.9.0",
+    "less-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^0.8.0",
     "mocha": "^6.2.0",
     "mocha-jsdom": "^2.0.0",
     "node-gyp": "^5.0.3",
-    "parcel-bundler": "^1.12.3",
     "react-addons-test-utils": "^15.6.2",
     "redux-logger": "3.0.6",
-    "rimraf": "^2.6.3",
     "spectron": "^7.0.0",
-    "typescript": "^3.5.3"
+    "style-loader": "^0.23.1",
+    "typescript": "^3.5.3",
+    "url-loader": "^2.1.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2",
+    "webpack-fix-default-import-plugin": "^1.0.3",
+    "webpack-node-externals": "^1.7.2"
   },
   "repository": "https://github.com/ansel-app/ansel.git"
 }

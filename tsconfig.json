@@ -3,6 +3,7 @@
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "sourceMap": true,
         "jsx": "react",
         "allowJs": true,
@@ -15,6 +16,7 @@
         "suppressImplicitAnyIndexErrors": true
     },
     "exclude": [
+        "dist",
         "node_modules"
     ]
 }

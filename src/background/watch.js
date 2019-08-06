@@ -1,3 +1,4 @@
+import fs from 'fs'
 import chokidar from 'chokidar'
 
 import Version from '../common/models/Version'
@@ -8,7 +9,7 @@ const allowed = config.watchedFormats;
 
 export default class Watch {
   constructor(mainWindow) {
-    let settings = require(config.settings);
+    let settings = JSON.parse(fs.readFileSync(config.settings))
 
     this.mainWindow = mainWindow;
     this.versionsPath = settings.directories.versions;

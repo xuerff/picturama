@@ -6,10 +6,10 @@ import { init as initBackgroundClient } from './BackgroundClient'
 import { init as initForegroundService } from './ForegroundService'
 import { checkSettingsExist } from './controller/SettingsController'
 
-import './entry.css'
+import './entry.less'
 import './less/index.less'
 
-const pkgs = require('../../package.json')
+import pkgs from '../../package.json'
 
 
 if (process.env.ANSEL_DEV_MODE) {

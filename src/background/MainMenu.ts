@@ -1,8 +1,9 @@
+import fs from 'fs'
 import { ipcMain, Menu, MenuItemConstructorOptions, BrowserWindow } from 'electron'
 
 import config from '../common/config'
 import Library from './Library';
-const npmPackage = require('../../package.json')
+import npmPackage from '../../package.json'
 
 
 type MenuSpec = {
@@ -16,7 +17,7 @@ type MenuSpec = {
     }[]
 }
 
-const template = require(config.menuPath) as any as { menu: MenuSpec[] }
+const template = JSON.parse(fs.readFileSync(config.menuPath)) as { menu: MenuSpec[] }
 
 class MainMenu {
 
@@ -99,7 +100,7 @@ class MainMenu {
                 }
             })
             this.sandboxWindow.maximize()
-            this.sandboxWindow.loadURL('file://' + __dirname + '/../../static/sandbox.html')
+            this.sandboxWindow.loadURL('file://' + __dirname + '/sandbox.html')
             this.sandboxWindow.webContents.toggleDevTools()
         }
     }

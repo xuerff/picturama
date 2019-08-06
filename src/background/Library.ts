@@ -31,7 +31,7 @@ class Library {
         this.fixMissingVersions = this.fixMissingVersions.bind(this)
 
         if (fs.existsSync(config.settings)) {
-            let settings = require(config.settings) as any
+            let settings = JSON.parse(fs.readFileSync(config.settings)) as any
 
             this.path = settings.directories.photos
             this.versionsPath = settings.directories.versions

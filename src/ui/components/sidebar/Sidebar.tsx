@@ -22,8 +22,9 @@ import './Sidebar.less'
 
 let settings
 
-if (fs.existsSync(config.settings))
-    settings = require(config.settings)
+if (fs.existsSync(config.settings)) {
+    settings = JSON.parse(fs.readFileSync(config.settings))
+}
 
 const defaultMenuSettings = [ 'dates', 'tags' ]
 // Don't show 'devices', since USB detection is deactivated in `src/background/entry.ts`

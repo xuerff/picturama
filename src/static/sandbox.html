@@ -8,17 +8,14 @@
     <title>UI Tester</title>
 
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" href="../src/ui/less/fonts.css">
-    <link rel="stylesheet" href="../dist/ui/entry.css">
-    <link rel="stylesheet" href="../dist/sandbox/entry.css">
+    <link rel="stylesheet" href="sandbox.css">
 </head>
 <body>
 
     <div id="root"></div>
 
+    <script src="sandbox.js"></script>
     <script>
-        const Sandbox = require('../dist/sandbox/entry.js')
         Sandbox.start(document.getElementById('root'))
     </script>
 </body>

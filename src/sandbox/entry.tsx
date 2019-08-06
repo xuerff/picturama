@@ -12,11 +12,15 @@ import './tests/export'
 import './tests/GridSectionTest'
 import './tests/PhotoPaneTest'
 
-import "./entry.less"
+import '../ui/entry.less'
+import '../ui/less/index.less'
+import './entry.less'
 
 
-export function start(elem) {
-  render(
-    <UiTester/>,
-    elem)
+window['Sandbox'] = {
+    start(elem: HTMLElement) {
+        render(
+            <UiTester/>,
+            elem)
+    }
 }

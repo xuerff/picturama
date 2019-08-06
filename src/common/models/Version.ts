@@ -1,5 +1,5 @@
 import anselBookshelf from './ansel-bookshelf'
-import fs from 'fs.extra/fs.extra'
+import { copy as fsCopy } from 'fs.extra'
 import Promise from 'bluebird'
 import sharp from 'sharp'
 import libraw from 'libraw'
@@ -10,7 +10,7 @@ import Photo from './Photo'
 import { BookshelfClass } from './DataTypes'
 
 
-const copy = Promise.promisify(fs.copy) as ((fromPath: string, toPath: string) => Promise<void>)
+const copy = Promise.promisify(fsCopy) as ((fromPath: string, toPath: string) => Promise<void>)
 
 export type VersionId = number
 export interface VersionType {
@@ -71,7 +71,7 @@ const Version = anselBookshelf.Model.extend({
 
         return sharp(data.input)
             .resize(250, 250)
-            .max()
+            ['max']()
             .toFile(thumbPathName)
             .then(() => Version.where({ photo_id: data[2], version: data[3] })
                     .fetch()

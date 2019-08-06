@@ -49,7 +49,7 @@ app.on('ready', () => {
     if (workAreaSize.width <= 1366 && workAreaSize.height <= 768)
         mainWindow.maximize()
 
-    mainWindow.loadURL('file://' + __dirname + '/../../static/index.html')
+    mainWindow.loadURL('file://' + __dirname + '/ui.html')
     mainWindow.setTitle('Ansel')
     initBackgroundService(mainWindow)
     initForegroundClient(mainWindow)
