@@ -75,7 +75,6 @@ export default class PhotoPane extends React.Component<Props, State> {
     updateCanvas(prevProps: Partial<Props>) {
         const props = this.props
         const canvas = this.canvas
-        const texturesWithError = this.texturesWithError
 
         if (props.src !== prevProps.src || props.srcNext !== prevProps.srcNext || props.srcPrev !== prevProps.srcPrev) {
             this.texturesWithError = {}
@@ -106,7 +105,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         }
 
         if (props.width !== prevProps.width || props.height !== prevProps.height) {
-            canvas.setMaxSize(props.width, props.height)
+            canvas.setSize({ width: props.width, height: props.height })
             canvasChanged = true
         }
 

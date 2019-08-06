@@ -67,8 +67,8 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 interface State {
     bound: boolean,
     loading: boolean,
-    canvasWidth?: number
-    canvasHeight?: number
+    bodyWidth?: number
+    bodyHeight?: number
     isShowingInfo: boolean
 }
 
@@ -221,11 +221,11 @@ export class PictureDetail extends React.Component<Props, State> {
         const state = this.state
 
         const contentRect = entries[0].contentRect
-        const canvasWidth  = Math.round(contentRect.width  * 0.9)
-        const canvasHeight = Math.round(contentRect.height * 0.9)
+        const bodyWidth  = contentRect.width
+        const bodyHeight = contentRect.height
 
-        if (state.canvasWidth !== canvasWidth || state.canvasHeight !== canvasHeight) {
-            this.setState({ canvasWidth, canvasHeight })
+        if (state.bodyWidth !== bodyWidth || state.bodyHeight !== bodyHeight) {
+            this.setState({ bodyWidth, bodyHeight })
         }
     }
 
@@ -269,11 +269,11 @@ export class PictureDetail extends React.Component<Props, State> {
                 </Toolbar>
 
                 <ResizeSensor onResize={this.onBodyResize}>
-                    <div className="PictureDetail-body">
+                    <div className="PictureDetail-body bp3-dark">
                         <PhotoPane
                             className="PictureDetail-image"
-                            width={state.canvasWidth}
-                            height={state.canvasHeight}
+                            width={state.bodyWidth}
+                            height={state.bodyHeight}
                             src={getNonRawImgPath(props.photo)}
                             srcPrev={props.photoPrev && getNonRawImgPath(props.photoPrev)}
                             srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}

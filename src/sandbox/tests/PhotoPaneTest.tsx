@@ -6,7 +6,7 @@ import PhotoPane from '../../ui/components/detail/PhotoPane'
 import { ExifOrientation } from '../../common/models/DataTypes'
 
 const defaultProps = {
-    style:  { backgroundColor: '#888' },
+    style:  { backgroundColor: 'red' },
     width:  800,
     height: 600,
     src: '../specs/photos/IMG_9700.JPG',

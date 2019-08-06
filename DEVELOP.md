@@ -37,14 +37,14 @@ npm i
 UI sandbox
 ----------
 
-1. Run Ansel:
-    ```bash
-    npm start
-    ```
-
-2. Run watch build (in extra console):
+1. Run watch build:
     ```bash
     npm run watch
+    ```
+
+2. Run Ansel (in extra console):
+    ```bash
+    npm run start-no-build
     ```
 
 3. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)

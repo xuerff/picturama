@@ -38,7 +38,8 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
 
     if (canvas === null) {
         canvas = new PhotoCanvas()
-            .setMaxSize(maxThumbnailWidth, maxThumbnailHeight)
+            .setSize({ width: maxThumbnailWidth, height: maxThumbnailHeight })
+            .setPhotoPosition('adjust-canvas')
         if (profiler) profiler.addPoint('Created canvas')
     }
 
