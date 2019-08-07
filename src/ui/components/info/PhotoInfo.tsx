@@ -41,7 +41,10 @@ export default class PhotoInfo extends React.Component<Props, State> {
         super(props)
         bindMany(this, 'showPhotoInFolder', 'copyPhotoPath')
         this.state = { masterFileSize: null }
-        this.updateMasterFileSize(props)
+    }
+
+    componentDidMount() {
+        this.updateMasterFileSize(this.props)
     }
 
     componentWillReceiveProps(nextProps: Props) {
