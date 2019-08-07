@@ -23,7 +23,7 @@ export function cloneDeep<T>(object: T): T {
  * @param comparationAttribute the attribute to compare for finding the item to remove
  * @return the cloned array without `itemToRemove` or the original array if it doesn't contain `itemToRemove`
  */
-export function cloneArrayWithItemRemoved<T, K extends keyof T>(array: T[], itemToRemove: T, comparationAttribute: K = null): T[] {
+export function cloneArrayWithItemRemoved<T, K extends keyof T>(array: T[], itemToRemove: T, comparationAttribute: K | null = null): T[] {
     let itemIndex: number
     if (comparationAttribute) {
         itemIndex = -1

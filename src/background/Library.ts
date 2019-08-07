@@ -64,7 +64,7 @@ class Library {
             .fetchAll()
             .then(versions => {
                 versions.toJSON().forEach(version => {
-                    let versionName = version.master.match(/\w+-[\wéè]+-\d.\w{1,5}$/)[0]
+                    let versionName = version.master!.match(/\w+-[\wéè]+-\d.\w{1,5}$/)![0]
                     let outputPath = `${this.versionsPath}/${versionName}`
 
                     if (fs.existsSync(outputPath)) {

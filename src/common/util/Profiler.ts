@@ -61,7 +61,7 @@ export default class Profiler {
      */
     logResult() {
         if (!logProfilesInstantly) {
-            const result = []
+            const result: string[] = []
 
             result.push(`${this.title} took ${this.overallDuration} ms:`)
             for (const measure of this.measureList) {

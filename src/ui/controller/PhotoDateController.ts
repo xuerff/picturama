@@ -3,6 +3,7 @@ import { DatesState } from '../state/reducers/data'
 import store from '../state/store'
 import { fetchDatesAction } from '../state/actions'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
+import { DateTree } from 'ui/type/UiTypes'
 
 
 assertRendererProcess()
@@ -20,7 +21,7 @@ export function fetchDates() {
 
 
 function processDates(data: { date: string }[]): DatesState {
-    let dates = { years: [] }
+    let dates: DateTree = { years: [] }
 
     data.forEach(date => {
         const [ year, month ] = date.date.split('-')

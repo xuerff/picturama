@@ -37,7 +37,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 }
             }
         case SET_DETAIL_PHOTO_SUCCESS:
-            return {
+            return state && {
                 ...state,
                 currentPhoto: {
                     ...state.currentPhoto,
@@ -47,7 +47,7 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 }
             }
         case SET_DETAIL_PHOTO_FAILURE:
-            return {
+            return state && {
                 ...state,
                 currentPhoto: {
                     ...state.currentPhoto,
@@ -99,12 +99,12 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 return state
             }
         case OPEN_DIFF:
-            return {
+            return state && {
                 ...state,
                 showDiff: true
             }
         case CLOSE_DIFF:
-            return {
+            return state && {
                 ...state,
                 showDiff: false
             }

@@ -60,11 +60,15 @@ export default class PhotoInfo extends React.Component<Props, State> {
     }
 
     showPhotoInFolder() {
-        shell.showItemInFolder(this.props.photo.master)
+        if (this.props.photo) {
+            shell.showItemInFolder(this.props.photo.master)
+        }
     }
 
     copyPhotoPath() {
-        clipboard.writeText(this.props.photo.master)
+        if (this.props.photo) {
+            clipboard.writeText(this.props.photo.master)
+        }
     }
 
     render() {

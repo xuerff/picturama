@@ -4,22 +4,21 @@ import { assertRendererProcess } from '../../common/util/ElectronUtil'
 
 import { fetchPhotoDetail, fetchPhotoWork } from '../BackgroundClient'
 import { setDetailPhotoAction, closeDetailAction } from '../state/actions'
-import { getPhotoByIndex, getPhotoById, getSectionById } from '../state/selectors'
+import { getPhotoByIndex, getSectionById } from '../state/selectors'
 import store from '../state/store'
-import { setPhotosFlagged } from './PhotoController'
 
 
 assertRendererProcess()
 
 export function setDetailPhotoById(sectionId: PhotoSectionId, photoId: PhotoId | null) {
     const section = getSectionById(sectionId)
-    const photoIndex = (section && section.photoIds) ? section.photoIds.indexOf(photoId) : -1
+    const photoIndex = (section && section.photoIds && photoId != null) ? section.photoIds.indexOf(photoId) : -1
     setDetailPhotoByIndex(sectionId, (photoIndex === -1) ? null : photoIndex)
 }
 
-let runningDetailPhotoFetch: CancelablePromise<void> | null = null
-export function setDetailPhotoByIndex(sectionId: PhotoSectionId, photoIndex: number | null) {
-    if (photoIndex == null) {
+let runningDetailPhotoFetch: CancelablePromise<any> | null = null
+export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIndex: number | null) {
+    if (sectionId == null || photoIndex == null) {
         store.dispatch(closeDetailAction())
         return
     }

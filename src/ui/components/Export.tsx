@@ -40,7 +40,7 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
-    folder: string
+    folder: string | null
     quality: number
     format: string
     progress: { processed: number, total: number, photosDir: string } | null
@@ -211,8 +211,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         return {
             ...props,
-            photoIds: state.export.photoIds,
-            photos: state.data.sections.byId[state.export.sectionId].photoData
+            photoIds: state.export!.photoIds,
+            photos: state.data.sections.byId[state.export!.sectionId].photoData!
         }
     },
     {

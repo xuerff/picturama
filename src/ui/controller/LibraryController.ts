@@ -63,7 +63,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
                     // See `createLayoutForLoadedSection`
             ) ? prevGridLayout.sectionLayouts[sectionIndex] : null
 
-        let layout: GridSectionLayout
+        let layout: GridSectionLayout | null = null
         if (prevLayout) {
             const prevLayoutIsPlaceholder = !prevLayout.boxes
             if (usePlaceholder == prevLayoutIsPlaceholder) {
@@ -100,8 +100,9 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
 
         const sectionHeight = sectionHeadHeight + layout.containerHeight
         const sectionBottom = sectionTop + sectionHeight
-        const showSectionInDom = inDomMinY !== null && sectionBottom >= inDomMinY && sectionTop <= inDomMaxY
-        if (showSectionInDom) {
+        if (inDomMinY !== null && inDomMaxY !== null && sectionBottom >= inDomMinY && sectionTop <= inDomMaxY) {
+            // Show section in DOM
+
             if (fromSectionIndex === null) {
                 fromSectionIndex = sectionIndex
             }
@@ -145,8 +146,8 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
             }
             if (layout.boxes) {
                 // This section is fully invisible -> Keep the layout but add no photos to the DOM
-                layout.fromBoxIndex = null
-                layout.toBoxIndex = null
+                layout.fromBoxIndex = undefined
+                layout.toBoxIndex = undefined
             }
         }
 
@@ -173,7 +174,11 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         || fromSectionIndex !== prevGridLayout.fromSectionIndex
         || toSectionIndex !== prevGridLayout.toSectionIndex)
     {
-        nextGridLayout = { fromSectionIndex, toSectionIndex, sectionLayouts }
+        nextGridLayout = {
+            fromSectionIndex: fromSectionIndex || 0,
+            toSectionIndex: toSectionIndex || 0,
+            sectionLayouts
+        }
     } else {
         nextGridLayout = prevGridLayout
     }
@@ -191,8 +196,13 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
 
 
 export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: number, containerWidth: number, targetRowHeight: number): GridSectionLayout {
+    const { photoData } = section
+    if (!section.photoIds || !photoData) {
+        throw new Error('Section is not loaded')
+    }
+
     const aspects = section.photoIds.map(photoId => {
-        const photo = section.photoData[photoId]
+        const photo = photoData[photoId]
         const { master_width, master_height } = photo
         // If we have no master size yet (which happens when loading an old DB were it was missing), the following will happen:
         //   - We calculate a layout using the average aspect (which is how the loading rect of the photo is shown)
@@ -252,8 +262,8 @@ export function createDummyLayoutBoxes(viewportWidth: number, gridRowHeight: num
 function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
     viewportTop: number, viewportHeight: number, sectionLayouts: GridSectionLayout[])
 {
-    let sectionIdsToProtect: { [index: string]: true }
-    let sectionIdsToForget: { [index: string]: true } = null
+    let sectionIdsToProtect: { [index: string]: true } | null = null
+    let sectionIdsToForget: { [index: string]: true } | null = null
     let sectionIdToLoad: PhotoSectionId | null = null
     let sectionIdToLoadDistance = Number.POSITIVE_INFINITY
 
@@ -303,7 +313,8 @@ function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: Photo
     }
 
     if (sectionIdsToForget) {
-        setTimeout(() => store.dispatch(forgetSectionPhotosAction(sectionIdsToForget)))
+        const nailedSectionIdsToForget = sectionIdsToForget
+        setTimeout(() => store.dispatch(forgetSectionPhotosAction(nailedSectionIdsToForget)))
     }
     if (sectionIdToLoad) {
         fetchSectionPhotos(sectionIdToLoad)
@@ -380,7 +391,7 @@ export function setInfoPhoto(sectionId: PhotoSectionId | null, photoId: PhotoId 
 }
 
 
-type CreateThumbnailJob = { isCancelled: boolean, sectionId: PhotoSectionId, photo: PhotoType, profiler: Profiler }
+type CreateThumbnailJob = { isCancelled: boolean, sectionId: PhotoSectionId, photo: PhotoType, profiler: Profiler | null }
 
 const createThumbnailQueue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.photo.id === existingJob.photo.id) ? newJob : null,
@@ -420,7 +431,7 @@ function getThumbnailPriority(job: CreateThumbnailJob): number {
     const sectionIndex = prevSectionIds.indexOf(sectionId)
     const section = prevSectionById[sectionId]
     const layout = prevGridLayout.sectionLayouts[sectionIndex]
-    if (!section || !layout || !layout.boxes) {
+    if (!section || !section.photoIds || !layout || !layout.boxes) {
         return Number.MIN_VALUE
     }
 

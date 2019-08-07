@@ -25,7 +25,7 @@ interface Props {
     isActive: boolean
     sectionIds: PhotoSectionId[]
     sectionById: PhotoSectionById
-    selectedSectionId: PhotoSectionId
+    selectedSectionId: PhotoSectionId | null
     selectedPhotoIds: PhotoId[]
     gridRowHeight: number
     getGridLayout: GetGridLayoutFunction
@@ -77,7 +77,10 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             if (this.nailedSectionIndex === null && prevGridLayout) {
                 this.nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevGridLayout.sectionLayouts)
             }
-            clearTimeout(this.releaseNailTimer)
+
+            if (this.releaseNailTimer) {
+                clearTimeout(this.releaseNailTimer)
+            }
             this.releaseNailTimer = setTimeout(() => {
                 this.nailedSectionIndex = null
             }, 1000)
@@ -140,7 +143,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     pressedEnter() {
         const props = this.props
-        if (props.selectedPhotoIds.length === 1) {
+        if (props.selectedSectionId && props.selectedPhotoIds.length === 1) {
             props.setDetailPhotoById(props.selectedSectionId, props.selectedPhotoIds[0])
         }
     }
@@ -190,8 +193,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     moveHighlight(x: number, y: number) {
         const props = this.props
-        const selectedSection = props.sectionById[props.selectedSectionId]
-        if (!selectedSection) {
+        const selectedSection = props.selectedSectionId && props.sectionById[props.selectedSectionId]
+        if (!selectedSection || !selectedSection.photoIds) {
             return
         }
 
@@ -234,7 +237,11 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         const state = this.state
         const gridLayout = this.gridLayout
 
-        let result = []
+        if (!gridLayout) {
+            return
+        }
+
+        let result: JSX.Element[] = []
         for (let sectionIndex = gridLayout.fromSectionIndex; sectionIndex < gridLayout.toSectionIndex; sectionIndex++) {
             const sectionId = props.sectionIds[sectionIndex]
             const layout = gridLayout.sectionLayouts[sectionIndex]
@@ -265,7 +272,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     renderBottomSpacer() {
         const props = this.props
         const sectionCount = props.sectionIds.length
-        if (sectionCount === 0 || this.gridLayout.toSectionIndex >= sectionCount) {
+        if (!this.gridLayout || sectionCount === 0 || this.gridLayout.toSectionIndex >= sectionCount) {
             // We don't need a spacer
             return null
         } else {

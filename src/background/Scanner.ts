@@ -63,15 +63,15 @@ export default class Scanner {
         let rawFiles = filePaths.map(filePath =>
             filePath.match(allowed) ? filePath : null
         )
-        .filter(filePath => filePath);
+        .filter(filePath => filePath) as string[];
 
         let imgFiles = filePaths.map(filePath =>
             filePath.match(allowedImg) ? filePath : null
         )
-        .filter(filePath => filePath);
+        .filter(filePath => filePath) as string[];
 
         let preparedFiles = rawFiles.map(rawFile => {
-            let filename = rawFile.match(extract)[1];
+            let filename = rawFile.match(extract)![1];
             let imgPos = matches(imgFiles, filename);
 
             let element: FileInfo = {
@@ -92,7 +92,7 @@ export default class Scanner {
         });
 
         imgFiles.forEach(imgFile => {
-            let filename = imgFile.match(extractImg)[1];
+            let filename = imgFile.match(extractImg)![1];
 
             preparedFiles.push({
                 path: imgFile,
@@ -127,12 +127,12 @@ export default class Scanner {
             let switchSides = (metaData.orientation == ExifOrientation.Left) || (metaData.orientation == ExifOrientation.Right)
             let master_width = metaData.imgWidth
             let master_height = metaData.imgHeight
-            let nonRawImgPath: string = null
+            let nonRawImgPath: string | null = null
             if (file.isRaw) {
                 nonRawImgPath = `${config.nonRawPath}/${photoId}.${config.workExt}`
 
                 let imgPath: string
-                if (file.hasOwnProperty('imgPath')) {
+                if (file.imgPath) {
                     imgPath = file.imgPath
                 } else {
                     imgPath = await libraw.extractThumb(
@@ -154,6 +154,14 @@ export default class Scanner {
                 master_height = outputInfo.height
                 if (profiler) profiler.addPoint('Rotated extracted image')
             }
+            if (!master_width || !master_height) {
+                console.error('Detecting photo size failed', file)
+                if (profiler) {
+                    profiler.addPoint('Detecting photo size failed')
+                    profiler.logResult()
+                }
+                return
+            }
 
             if ((photoWork.rotationTurns || 0) === 1) {
                 switchSides = !switchSides
@@ -172,7 +180,7 @@ export default class Scanner {
                 master_width:  switchSides ? master_height : master_width,
                 master_height: switchSides ? master_width : master_height,
                 non_raw: nonRawImgPath,
-                extension: file.path.match(/\.(.+)$/i)[1],
+                extension: file.path.match(/\.(.+)$/i)![1],
                 orientation: metaData.orientation,
                 date: moment(createdAt).format('YYYY-MM-DD'),
                 flag: photoWork.flagged ? 1 : 0,

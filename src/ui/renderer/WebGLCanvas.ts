@@ -45,13 +45,16 @@ export default class WebGLCanvas {
     createBufferFromData(data: Float32Array, componentSize: number = 1): GraphicBuffer {
         const gl = this.gl
         const bufferId = gl.createBuffer()
+        if (!bufferId) {
+            throw new Error('Creating WebGL buffer failed')
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
         gl.bindBuffer(gl.ARRAY_BUFFER, null)
         return new GraphicBuffer(gl, bufferId, gl.FLOAT, componentSize, data.length / componentSize)
     }
 
-    createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler = null): CancelablePromise<Texture> {
+    createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler | null = null): CancelablePromise<Texture> {
         // For details see: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 
         const gl = this.gl
@@ -60,6 +63,9 @@ export default class WebGLCanvas {
             image.onload = () => {
                 if (profiler) profiler.addPoint('Loaded image')
                 const textureId = this.gl.createTexture()
+                if (!textureId) {
+                    throw new Error('Creating WebGL texture failed')
+                }
                 gl.bindTexture(gl.TEXTURE_2D, textureId)
 
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
@@ -149,7 +155,7 @@ export class Texture {
 
     destroy() {
         this.gl.deleteTexture(this.textureId)
-        this.textureId = null
+        this.textureId = null as any as WebGLTexture
     }
 
     bind(unit): this {
@@ -184,6 +190,9 @@ export class ShaderProgram<Uniforms extends ShaderParameterMap> {
 
         // Create the shader program
         const programId = gl.createProgram()
+        if (!programId) {
+            throw new Error('Creating WebGL program failed')
+        }
         this.programId = programId
         gl.attachShader(programId, vertexShader)
         gl.attachShader(programId, fragmentShader)
@@ -247,13 +256,17 @@ export class StandardShaderProgram<Uniforms extends ShaderParameterMap> extends 
     private samplerUniformLocation: WebGLUniformLocation
     private vertexAttribLocation: number
     private textureCoordAttribLocation: number
-    private vertexCount: number | null
+    private vertexCount = 0
 
     constructor(gl: WebGLRenderingContext, vertexShaderSource: string = defaultVertexShaderSource, fragmentShaderSource: string = defaultFragmentShaderSource) {
         super(gl, vertexShaderSource, fragmentShaderSource)
 
         const programId = this.programId
-        this.samplerUniformLocation = gl.getUniformLocation(programId, 'uSampler')
+        const samplerUniformLocation = gl.getUniformLocation(programId, 'uSampler')
+        if (!samplerUniformLocation) {
+            throw new Error('Creating WebGL sampler uniform location failed')
+        }
+        this.samplerUniformLocation = samplerUniformLocation
         this.vertexAttribLocation = gl.getAttribLocation(programId, 'aVertex')
         this.textureCoordAttribLocation = gl.getAttribLocation(programId, 'aTextureCoord')
     }
@@ -331,7 +344,10 @@ export class StandardShaderProgram<Uniforms extends ShaderParameterMap> extends 
  */
 function loadShader(gl: WebGLRenderingContext, type, source: string) {
     const shader = gl.createShader(type)
-  
+    if (!shader) {
+        throw new Error('Creating WebGL shader failed')
+    }
+
     // Send the source to the shader object
     gl.shaderSource(shader, source)
   

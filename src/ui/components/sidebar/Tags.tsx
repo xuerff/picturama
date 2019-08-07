@@ -8,7 +8,7 @@ import TagButton from './TagButton'
 interface Props {
     tagIds: TagId[]
     tagById: TagById
-    currentTagId: TagId
+    currentTagId: TagId | null
     fetchTags: () => void
     onTagSelected: (tag: TagType) => void
 }

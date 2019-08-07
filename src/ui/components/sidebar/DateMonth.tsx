@@ -5,7 +5,7 @@ import DateElement from './DateElement'
 
 interface Props {
     month: { readonly id: string, readonly days: { readonly id: string }[] }
-    currentDate: string
+    currentDate: string | null
     onDateSelected: (date: string) => void
 }
 

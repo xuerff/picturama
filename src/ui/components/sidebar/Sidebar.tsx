@@ -11,8 +11,9 @@ import { setLibraryFilter } from '../../controller/PhotoController'
 import { fetchDates } from '../../controller/PhotoDateController'
 import { fetchTags } from '../../controller/PhotoTagController'
 import { AppState } from '../../state/reducers'
-import Logo from '../widget/icon/Logo'
 import Toolbar from '../widget/Toolbar'
+import { DateTree } from 'ui/type/UiTypes'
+
 import Tags from './Tags'
 import Dates from './Dates'
 import Devices from './Devices'
@@ -37,14 +38,14 @@ interface OwnProps {
 }
 
 interface StateProps {
-    dates: { readonly years: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }[] }
-    currentDate: string
+    dates: DateTree
+    currentDate: string | null
     tagIds: TagId[]
     tagById: TagById
-    currentTagId: TagId
+    currentTagId: TagId | null
     devices: { readonly name: string }[]
 }
-
+ 
 interface DispatchProps {
     fetchDates: () => void
     fetchTags: () => void
@@ -89,7 +90,7 @@ export class Sidebar extends React.Component<Props> {
         const props = this.props
         const menuSettings = settings && settings.menus ? settings.menus : defaultMenuSettings
 
-        let menus = []
+        let menus: JSX.Element[] = []
         menuSettings.forEach((menu, key) => {
             if (menu === 'dates') {
                 menus.push(

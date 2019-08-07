@@ -42,6 +42,10 @@ async function callOnForeground(action: string, params: any): Promise<any> {
 
     return new Promise<any>((resolve, reject) => {
         pendingCalls[callId] = { resolve, reject }
-        mainWindow.webContents.send('executeForegroundAction', callId, action, params)
+        if (!mainWindow) {
+            reject(new Error('ForegroundClient not yet initialized'))
+        } else {
+            mainWindow.webContents.send('executeForegroundAction', callId, action, params)
+        }
     })
 }

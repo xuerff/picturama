@@ -17,7 +17,7 @@ const dialog = remote.dialog;
 
 interface Props {
     className?: any
-    selectedSectionId: PhotoSectionId,
+    selectedSectionId: PhotoSectionId | null
     selectedPhotos: PhotoType[]
     isShowingTrash: boolean
     isShowingInfo: boolean
@@ -32,7 +32,7 @@ interface Props {
     toggleShowInfo: () => void
 }
 
-export default class LibraryTopBar extends React.Component<Props, undefined> {
+export default class LibraryTopBar extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
@@ -79,7 +79,7 @@ export default class LibraryTopBar extends React.Component<Props, undefined> {
                             className="LibraryTopBar-emptyTrash"
                             icon="trash"
                             text="Empty trash"
-                            intent={props.photosCount === 0 ? null : 'warning'}
+                            intent={props.photosCount === 0 ? undefined : 'warning'}
                             disabled={props.photosCount === 0}
                             onClick={this.emptyTrashModal}
                         />

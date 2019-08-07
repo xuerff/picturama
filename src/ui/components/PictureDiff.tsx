@@ -86,7 +86,7 @@ export class PictureDiff extends React.Component<Props, State> {
         ].join(' ')
 
         const photoDetail = props.photoDetail
-        let last: VersionType
+        let last: VersionType | undefined = undefined
         if (photoDetail) {
             last = photoDetail.versions[photoDetail.versions.length - 1]
         }
@@ -104,7 +104,7 @@ export class PictureDiff extends React.Component<Props, State> {
                 <div className="after v-align">
                     <h3>After</h3>
                     <img
-                        src={last.output}
+                        src={last && last.output || undefined}
                         onLoad={this.onImgLoad}
                         className={className} />
                 </div>
@@ -120,11 +120,11 @@ export class PictureDiff extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
-        const currentPhoto = state.detail.currentPhoto
+        const currentPhoto = state.detail!.currentPhoto
         return {
             ...props,
-            photo: getPhotoById(currentPhoto.sectionId, currentPhoto.photoId),
-            photoDetail: state.detail.currentPhoto.photoDetail
+            photo: getPhotoById(currentPhoto.sectionId, currentPhoto.photoId)!,
+            photoDetail: state.detail!.currentPhoto.photoDetail!
         }
     },
     {

@@ -118,8 +118,8 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
             }
         case FETCH_SECTIONS_SUCCESS: {
             let photoCount = 0
-            let ids = []
-            let byId = {}
+            let ids: PhotoSectionId[] = []
+            let byId: PhotoSectionById = {}
             for (const section of action.payload.sections) {
                 photoCount += section.count
                 ids.push(section.id)
@@ -143,8 +143,8 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
             const sectionId = action.payload.sectionId
             const prevSection = state.byId[sectionId]
             if (prevSection) {
-                let photoIds = []
-                let photoData = {}
+                let photoIds: PhotoSectionId[] = []
+                let photoData: PhotoById = {}
                 for (const photo of action.payload.photos) {
                     photoIds.push(photo.id)
                     photoData[photo.id] = photo
@@ -193,28 +193,28 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
 
             let totalPhotoCount = state.totalPhotoCount
             let photoCount = state.photoCount
-            let newSectionIds = []
-            let newSectionById = {}
+            let newSectionIds: PhotoSectionId[] = []
+            let newSectionById: PhotoSectionById = {}
             for (const sectionId of state.ids) {
                 const section = state.byId[sectionId]
-                let newSection: PhotoSection
+                let newSection: PhotoSection | null = null
 
                 const photoData = section.photoData
-                if (photoData) {
-                    let newPhotoData: PhotoById
+                if (photoData && section.photoIds) {
+                    let newPhotoData: PhotoById | null = null
                     for (const updatedPhoto of updatedPhotos) {
                         const prevPhoto = photoData[updatedPhoto.id]
                         if (prevPhoto) {
-                            if (!newPhotoData) {
+                            if (!newPhotoData || !newSection) {
                                 newPhotoData = { ...photoData }
                                 newSection = { ...section, photoData: newPhotoData }
                             }
                             if (removeUpdatedPhotos) {
-                                const prevPhotoIndex = newSection.photoIds.indexOf(prevPhoto.id)
+                                const prevPhotoIndex = newSection.photoIds!.indexOf(prevPhoto.id)
                                 if (prevPhotoIndex !== -1) {
-                                    newSection.photoIds.splice(prevPhotoIndex, 1)
+                                    newSection.photoIds!.splice(prevPhotoIndex, 1)
                                 }
-                                if (action.payload.update.trashed) {
+                                if (totalPhotoCount != null && action.payload.update.trashed) {
                                     totalPhotoCount--
                                 }
                                 newSection.count--
@@ -226,7 +226,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                     }
                 }
 
-                if (!newSection || newSection.photoIds.length !== 0) {
+                if (!newSection || newSection.photoIds!.length !== 0) {
                     newSectionIds.push(sectionId)
                     newSectionById[sectionId] = newSection || section
                 }

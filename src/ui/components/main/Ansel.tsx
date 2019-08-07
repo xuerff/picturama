@@ -24,7 +24,7 @@ interface OwnProps {
 
 interface StateProps {
     settingsExist: boolean
-    importProgress: ImportProgress
+    importProgress: ImportProgress | null
     showDetail: boolean
     showDiff: boolean
     showExport: boolean
@@ -57,7 +57,7 @@ class Ansel extends React.Component<Props, State> {
         const props = this.props
         if (prevProps.modal == 'splash' && props.modal != 'splash') {
             let splash = document.getElementById('splash')
-            if (splash) splash.parentNode.removeChild(splash)
+            if (splash) splash.parentNode!.removeChild(splash)
         }
     }
 
@@ -125,13 +125,12 @@ class Ansel extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
-        const currentPhoto = state.detail && state.detail.currentPhoto
         return {
             ...props,
             settingsExist: state.navigation.settingsExist,
             importProgress: state.import && state.import.progress,
             showDetail: !!state.detail,
-            showDiff: state.detail && state.detail.showDiff,
+            showDiff: !!(state.detail && state.detail.showDiff),
             showExport: !!state.export,
             modal: state.navigation.modal
         }

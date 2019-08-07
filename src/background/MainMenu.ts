@@ -46,7 +46,7 @@ class MainMenu {
             return {
                 label: menu.label,
                 submenu: menu.submenu.map(submenu => {
-                    if (this.hasOwnProperty(submenu.click))
+                    if (submenu.click)
                         submenu.click = this[submenu.click]
 
                     if (submenu.label.toLowerCase() === 'version')

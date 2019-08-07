@@ -5,7 +5,7 @@ import DateYear from './DateYear'
 
 interface Props {
     dates: { readonly years: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }[] }
-    currentDate: string
+    currentDate: string | null
     fetchDates: () => void
     onDateSelected: (date: string) => void
 }
@@ -16,7 +16,7 @@ export default class Dates extends React.Component<Props> {
     }
 
     render() {
-        let dateYearsList = []
+        let dateYearsList: JSX.Element[] = []
 
         if (this.props.dates.years) {
             dateYearsList = this.props.dates.years.map(year =>

@@ -10,7 +10,7 @@ interface Props {
 /**
  * Shows a [Font Awesome Icon](https://fontawesome.com/icons).
  */
-export default class FaIcon extends React.Component<Props, undefined> {
+export default class FaIcon extends React.Component<Props> {
     render() {
         const props = this.props
         return (

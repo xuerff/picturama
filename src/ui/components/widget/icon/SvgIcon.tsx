@@ -20,7 +20,7 @@ export interface Props {
 /**
  * Base class for SVG icons
  */
-export default class SvgIcon extends React.Component<Props, undefined> {
+export default class SvgIcon extends React.Component<Props> {
     static defaultProps: Partial<Props> = {
         color: 'currentColor'
     }

@@ -1,11 +1,13 @@
 import React from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
+
+import './UiTester.less'
 
 
 // UI-Tester. Inspired by [react-storyboard](https://github.com/storybooks/react-storybook) - but not so bloated
 
 
-const sections: Section[] = []
+let sections: Section[] = []
 
 
 export interface TestContext {
@@ -15,7 +17,7 @@ export interface TestContext {
 
 interface Test {
     title: string
-    renderTest: (context: TestContext) => void
+    renderTest: (context: TestContext) => JSX.Element
     path: string
     state: any
 }
@@ -25,28 +27,39 @@ interface Section {
     title: string
     tests: Test[]
     arenaStyle?: any
-    renderDecorator?: (testView: React.ReactInstance) => React.ReactInstance
+    renderDecorator?: (testView: JSX.Element) => JSX.Element
 }
 
 
-export function addSection(sectionTitle: string) {
+interface SectionBuilder {
+    setArenaStyle(style: any): this
+    setDecorator(renderDecorator: (testView: JSX.Element) => JSX.Element): this
+    add(title: string, renderTest: (context: TestContext) => JSX.Element): this
+}
+
+
+export function clearAll() {
+    sections = []
+}
+
+export function addSection(sectionTitle: string): SectionBuilder {
     const tests: Test[] = [],
         section: Section = { title: sectionTitle, tests }
 
     sections.push(section)
 
-    const sectionBuilder = {
-        setArenaStyle(style) {
+    const sectionBuilder: SectionBuilder = {
+        setArenaStyle(style: any) {
             section.arenaStyle = style
             return sectionBuilder
         },
 
-        setDecorator(renderDecorator) {
+        setDecorator(renderDecorator: (testView: JSX.Element) => JSX.Element) {
             section.renderDecorator = renderDecorator
             return sectionBuilder
         },
 
-        add(title, renderTest) {
+        add(title: string, renderTest: (context: TestContext) => JSX.Element) {
             tests.push({
                 title,
                 renderTest,
@@ -61,66 +74,81 @@ export function addSection(sectionTitle: string) {
 }
 
 
-function encodePathItem(pathItem) {
+function encodePathItem(pathItem: string) {
     return encodeURIComponent(pathItem.replace(/[ /_]+/g, '_'))
 }
 
 
-export function action(name) {
-    return (...args) => {
+export function action(name: string) {
+    return (...args: any[]) => {
         console.log('Action ' + name + ':', ...args)
     }
 }
 
 
 interface Props {
+    className?: any
 }
 
 interface State {
-    currentSection: Section
-    currentTest: Test
+    prevSections: Section[] | null
+    currentSection: Section | null
+    currentTest: Test | null
 }
 
 export default class UiTester extends React.Component<Props, State> {
 
-    constructor(props: Props) {
-        super(props)
+    static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
+        if (sections !== prevState.prevSections) {
+            let currentSection: Section | null = null,
+                currentTest: Test | null = null,
+                path = location.hash.substring(1) // Remove leading `#`
 
-        let currentSection = null,
-            currentTest = null,
-            path = location.hash.substring(1) // Remove leading `#`
+            for (let section of sections) {
+                for (let test of section.tests) {
+                    if (test.path == path) {
+                        currentSection = section
+                        currentTest = test
+                        break
+                    }
+                }
 
-        for (let section of sections) {
-            for (let test of section.tests) {
-                if (test.path == path) {
-                    currentSection = section
-                    currentTest = test
+                if (currentTest) {
                     break
                 }
             }
 
-            if (currentTest) {
-                break
+            return {
+                prevSections: sections,
+                currentSection,
+                currentTest
             }
         }
 
+        return null
+    }
+
+    constructor(props: Props) {
+        super(props)
         this.state = {
-            currentSection,
-            currentTest
+            prevSections: null,
+            currentSection: null,
+            currentTest: null
         }
     }
 
-    _showTest(section, test) {
+    _showTest(section: Section, test: Test) {
         this.setState({ currentSection: section, currentTest: test })
         location.hash = test.path
     }
 
     render() {
+        const props = this.props
         const state = this.state
 
-        let testView = null
-        let arenaStyle = null
-        if (state.currentTest) {
+        let testView: JSX.Element | null = null
+        let arenaStyle: any = undefined
+        if (state.currentSection && state.currentTest) {
             testView = state.currentTest.renderTest({
                 forceUpdate: this.forceUpdate.bind(this),
                 state: state.currentTest.state
@@ -132,7 +160,7 @@ export default class UiTester extends React.Component<Props, State> {
         }
 
         return (
-            <div className="UITester">
+            <div className={classnames(props.className, 'UITester')}>
                 <div className="UITester-sidebar">
                     {sections.map((section, sectionIndex) =>
                         <div className="form-group" key={sectionIndex}>
@@ -140,7 +168,7 @@ export default class UiTester extends React.Component<Props, State> {
                             <div className="btn-group-vertical btn-block" role="group">
                                 {section.tests.map((test, testIndex) =>
                                     <button key={testIndex}
-                                            className={classNames('btn btn-default', { active: test == state.currentTest })}
+                                            className={classnames('btn btn-default', { active: test == state.currentTest })}
                                             onClick={() => this._showTest(section, test)}
                                     >
                                         {test.title}

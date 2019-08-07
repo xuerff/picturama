@@ -104,7 +104,7 @@ type InfoState = {
 const info = (state: InfoState = null, action: Action): InfoState => {
     switch (action.type) {
         case SET_LIBRARY_INFO_PHOTO_REQUEST:
-            if (action.payload.photoId) {
+            if (action.payload.sectionId && action.payload.photoId) {
                 return {
                     sectionId: action.payload.sectionId,
                     photoId: action.payload.photoId,
@@ -114,7 +114,7 @@ const info = (state: InfoState = null, action: Action): InfoState => {
                 return null
             }
         case SET_LIBRARY_INFO_PHOTO_SUCCESS:
-            return {
+            return state && {
                 ...state,
                 photoDetail: action.payload.photoDetail
             }

@@ -78,7 +78,7 @@ export default class PhotoCanvas {
         return this
     }
 
-    loadFromSrc(src: string, profiler: Profiler = null): CancelablePromise<void> {
+    loadFromSrc(src: string, profiler: Profiler | null = null): CancelablePromise<void> {
         if (this.baseTexturePromise !== null) {
             this.baseTexturePromise.cancel()
         }
@@ -95,7 +95,7 @@ export default class PhotoCanvas {
         return this.baseTexturePromise
     }
 
-    createTextureFromSrc(src: string, profiler: Profiler = null): CancelablePromise<Texture> {
+    createTextureFromSrc(src: string, profiler: Profiler | null = null): CancelablePromise<Texture> {
         return this.webGlCanvas.createTextureFromSrc(src, undefined, undefined, profiler)
     }
 
@@ -110,15 +110,15 @@ export default class PhotoCanvas {
     }
 
     update(): this {
-        if (!this.isValid()) {
+        const { baseTexture, photoWork, exifOrientation} = this
+
+        if (!baseTexture || !photoWork) {
             const gl = this.webGlCanvas.gl
             gl.clearColor(0.0, 0.0, 0.0, 1.0)
             gl.clear(gl.COLOR_BUFFER_BIT)
 
             return this
         }
-
-        const { baseTexture, photoWork, exifOrientation} = this
 
         // ===== Calculate =====
 

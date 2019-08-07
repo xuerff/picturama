@@ -78,7 +78,7 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
 
                 return Promise.all([
                     storePhotoWork(photoPath, photoWork),
-                    thumbnailNeedsUpdate ? onThumbnailChange(photo.id) : null
+                    thumbnailNeedsUpdate ? onThumbnailChange(photo.id) : Promise.resolve()
                 ])
             })
             .catch(error => {
@@ -121,7 +121,7 @@ export function updatePhoto(photo: PhotoType, update: Partial<PhotoType>) {
 }
 
 export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
-    let updatePhotoWorkPromise = null
+    let updatePhotoWorkPromise: Promise<any> | null = null
     if (update.hasOwnProperty('flag')) {
         updatePhotoWorkPromise = Promise.all(photos.map(photo =>
             updatePhotoWork(

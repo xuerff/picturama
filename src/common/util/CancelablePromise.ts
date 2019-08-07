@@ -2,9 +2,9 @@ type ValueOrPromise<ValueType> = ValueType | Promise<ValueType> | CancelableProm
 
 type Executor<ValueType> = (
     resolve: (value: ValueOrPromise<ValueType>) => void,
-    reject?: (error?: any) => void,
-    cancel?: (taskDesc?: string) => void)
-    => void
+    reject: (error?: any) => void,
+    cancel: (taskDesc?: string) => void
+) => void
 
 /**
  * A promise having cancel support.
@@ -12,6 +12,31 @@ type Executor<ValueType> = (
  * @extends Promise
  */
 export default class CancelablePromise<ValueType> {
+
+    static all<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>, T10 | PromiseLike<T10>]): CancelablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>;
+    static all<T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>]): CancelablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
+    static all<T1, T2, T3, T4, T5, T6, T7, T8>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>]): CancelablePromise<[T1, T2, T3, T4, T5, T6, T7, T8]>;
+    static all<T1, T2, T3, T4, T5, T6, T7>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>]): CancelablePromise<[T1, T2, T3, T4, T5, T6, T7]>;
+    static all<T1, T2, T3, T4, T5, T6>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>]): CancelablePromise<[T1, T2, T3, T4, T5, T6]>;
+    static all<T1, T2, T3, T4, T5>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>, T5 | PromiseLike<T5>]): CancelablePromise<[T1, T2, T3, T4, T5]>;
+    static all<T1, T2, T3, T4>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike <T4>]): CancelablePromise<[T1, T2, T3, T4]>;
+    static all<T1, T2, T3>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]): CancelablePromise<[T1, T2, T3]>;
+    static all<T1, T2>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]): CancelablePromise<[T1, T2]>;
+    static all<T>(values: (T | PromiseLike<T>)[]): CancelablePromise<T[]>;
+    static all<T>(values: (T | PromiseLike<T>)[]): CancelablePromise<T[]> {
+        return new CancelablePromise(Promise.all(values))
+            .catch((error) => {
+                if (isCancelError(error)) {
+                    for (const value of values) {
+                        if (value instanceof CancelablePromise) {
+                            value.cancel()
+                        }
+                    }
+                }
+                throw error
+            })
+    }
+
 
     private _wrappedPromise: Promise<ValueType>
 
@@ -49,6 +74,8 @@ export default class CancelablePromise<ValueType> {
         })
     }
 
+    readonly [Symbol.toStringTag]: 'Promise'
+
     /**
      * Cancels this promise. This will reject the promise with an error object having a property
      * `isCancelled` set to `true`.
@@ -65,14 +92,12 @@ export default class CancelablePromise<ValueType> {
      * @param onRejected - A function called when the Promise is rejected. This function has one argument, the rejection reason.
      * @returns the child promise
      */
-    then<ChildValueType>(
-        onFulfilled?: (value: ValueType) => ValueOrPromise<ChildValueType>,
-        onRejected?: (error: any) => ValueOrPromise<ChildValueType>):
-        CancelablePromise<ChildValueType>
+    then<TResult1 = ValueType, TResult2 = never>(
+        onfulfilled?: ((value: ValueType) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null):
+        CancelablePromise<TResult1 | TResult2>
     {
-        return linkChildPromise(this, this._wrappedPromise.then(
-            onFulfilled as (value: ValueType) => ChildValueType | Promise<ChildValueType>,
-            onRejected as (error: any) => ChildValueType | Promise<ChildValueType>))
+        return linkChildPromise(this, this._wrappedPromise.then(onfulfilled, onrejected))
     }
 
     /**
@@ -95,7 +120,7 @@ export default class CancelablePromise<ValueType> {
 let linkingChildPromise = false
 
 // Turns a child promise into a CancelablePromise which lets cancels walk up the promise chain
-function linkChildPromise<ValueType, ChildValueType>(parentPromise: CancelablePromise<ChildValueType>, childPromise) {
+function linkChildPromise<ValueType, ChildValueType>(parentPromise: CancelablePromise<ChildValueType>, childPromise: any) {
     if (!linkingChildPromise) {
         if (! (childPromise instanceof CancelablePromise)) {
             childPromise = new CancelablePromise(childPromise)
@@ -103,7 +128,7 @@ function linkChildPromise<ValueType, ChildValueType>(parentPromise: CancelablePr
 
         try {
             linkingChildPromise = true
-            childPromise.catch(error => {
+            childPromise.catch((error: Error) => {
                 if (isCancelError(error)) {
                     parentPromise.cancel()
                 }

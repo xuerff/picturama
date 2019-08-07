@@ -60,10 +60,10 @@ export default class SerialJobQueue<Job, JobResult> {
             return
         }
 
-        let nextJobInfo: JobInfo<Job, JobResult> = null
+        let nextJobInfo: JobInfo<Job, JobResult> | undefined = undefined
         if (this.getJobPriority) {
             let nextJobIndex = -1
-            let nextJobPrio: number
+            let nextJobPrio = Number.NEGATIVE_INFINITY
             const jobCount = this.jobQueue.length
             for (let jobIndex = 0; jobIndex < jobCount; jobIndex++) {
                 const jobInfo = this.jobQueue[jobIndex]
@@ -80,15 +80,16 @@ export default class SerialJobQueue<Job, JobResult> {
             nextJobInfo = this.jobQueue.shift()
         }
 
-        if (!nextJobInfo) {
+        const nailedNextJobInfo = nextJobInfo
+        if (!nailedNextJobInfo) {
             return
         }
     
         this.isJobRunning = true
-        this.processJob(nextJobInfo.job)
+        this.processJob(nailedNextJobInfo.job)
             .then(
-                thumbailData => nextJobInfo.resolve(thumbailData),
-                error => nextJobInfo.reject(error))
+                thumbailData => nailedNextJobInfo.resolve(thumbailData),
+                error => nailedNextJobInfo.reject(error))
             .then(() => {
                 this.isJobRunning = false
                 this.checkQueue()

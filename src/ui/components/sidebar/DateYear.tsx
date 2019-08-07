@@ -6,7 +6,7 @@ import DateMonth from './DateMonth'
 
 interface Props {
     year: { readonly id: string, readonly months: { readonly id: string, readonly days: { readonly id: string }[] }[] }
-    currentDate: string
+    currentDate: string | null
     onDateSelected: (date: string) => void
 }
 

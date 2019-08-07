@@ -16,7 +16,7 @@ import './PhotoActionButtons.less'
 
 
 interface Props {
-    selectedSectionId: PhotoSectionId,
+    selectedSectionId: PhotoSectionId | null
     selectedPhotos: PhotoType[]
     isShowingTrash: boolean
     isShowingInfo: boolean
@@ -55,7 +55,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         const props = this.props
         const newFlagged = !this.getSelectedAreFlagged()
 
-        let photosToChange = []
+        let photosToChange: PhotoType[] = []
         for (const photo of props.selectedPhotos) {
             if (!!photo.flag !== newFlagged) {
                 photosToChange.push(photo)
@@ -102,7 +102,9 @@ export default class PhotoActionButtons extends React.Component<Props> {
     openExport() {
         const props = this.props
         const selectedPhotoIds = props.selectedPhotos.map(photo => photo.id)
-        props.openExport(props.selectedSectionId, selectedPhotoIds)
+        if (props.selectedSectionId) {
+            props.openExport(props.selectedSectionId, selectedPhotoIds)
+        }
     }
 
     render() {
@@ -135,7 +137,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
                 {props.isShowingTrash &&
                     <Button
                         disabled={!hasSelection}
-                        intent={hasSelection ? 'success' : null}
+                        intent={hasSelection ? 'success' : undefined}
                         title="Restore photo from trash"
                         onClick={this.restoreFromTrash}
                     >

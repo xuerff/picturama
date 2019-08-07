@@ -15,7 +15,7 @@ import { init as initForegroundClient } from './ForegroundClient'
 initSourceMapSupport()
 initPrettyError()
 
-let initDbPromise: Promise<void> | null = null
+let initDbPromise: Promise<any> | null = null
 let mainWindow: BrowserWindow | null = null
 
 
@@ -71,7 +71,8 @@ app.on('ready', () => {
         initLibrary(mainWindow)
     } else {
         initDb()
-        ipcMain.on('settings-created', () => initLibrary(mainWindow))
+        const nailedMainWindow = mainWindow
+        ipcMain.on('settings-created', () => initLibrary(nailedMainWindow))
     }
 
     // Emitted when the window is closed.
@@ -88,7 +89,7 @@ function initDb(): Promise<void> {
     if (!initDbPromise) {
         const knex = require('knex')(config.knex)
 
-        initDbPromise = knex.migrate.latest()
+        initDbPromise = (knex.migrate.latest() as Promise<void>)
             .then(() =>
                 DB({
                     path: config.knex.connection.filename,

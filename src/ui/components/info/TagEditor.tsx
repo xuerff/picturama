@@ -52,7 +52,7 @@ export default class TagEditor extends React.Component<Props, State> {
         }
 
         let selectableTags: string[] = []
-        let activeTag = null
+        let activeTag: string | null = null
         let newTag: string | null = query ? query : null
 
         for (let tagIndex = 0, tagCount = props.tags.length; tagIndex < tagCount; tagIndex++) {
@@ -74,7 +74,7 @@ export default class TagEditor extends React.Component<Props, State> {
             }
         }
 
-        if (selectableTags.indexOf(state.activeTag) !== -1) {
+        if (state.activeTag && selectableTags.indexOf(state.activeTag) !== -1) {
             activeTag = state.activeTag
         } else if (selectableTags.length > 0) {
             activeTag = selectableTags[0]
@@ -180,8 +180,8 @@ export default class TagEditor extends React.Component<Props, State> {
                 tagInputProps={{
                     disabled: isLoading,
                     onRemove: this.onItemRemove,
-                    leftIcon: isLoading ? <Spinner size={24}/> : null,
-                    placeholder: isLoading ? null : 'Add tags...'
+                    leftIcon: isLoading ? <Spinner size={24}/> : undefined,
+                    placeholder: isLoading ? undefined : 'Add tags...'
                 }}
                 popoverProps={{ minimal: true }}
                 activeItem={state.activeTag}

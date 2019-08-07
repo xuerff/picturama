@@ -36,17 +36,17 @@ export interface PhotoType {
     /** Example: 1 (= ExifOrientation.Up) */
     orientation: ExifOrientation,
     /** Example: 'SONY DSC-N2' */
-    camera: string | null,
+    camera?: string,
     /** Example: 0.0166 */
-    exposure_time: number,
+    exposure_time?: number,
     /** Example: 0 */
-    iso: number,
+    iso?: number,
     /** Example: 5 */
-    focal_length: number,
+    focal_length?: number,
     /** Example: 5.6 */
-    aperture: number,
+    aperture?: number,
     /** Example: '2016-09-18' */
-    date: string,
+    date?: string,
     /** Example: 0 */
     trashed: 0 | 1
 }

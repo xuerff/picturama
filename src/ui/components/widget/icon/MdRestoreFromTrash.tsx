@@ -7,7 +7,7 @@ import SvgIcon, { Props as SvgIconProps } from './SvgIcon'
  *
  * This icon doesn't exist in `react-icons` - therefore we need this class.
  */
-export default class MdRestoreFromTrash extends React.Component<SvgIconProps, undefined> {
+export default class MdRestoreFromTrash extends React.Component<SvgIconProps> {
     render() {
         return (
             <SvgIcon viewBox="0 0 24 24" {...this.props}>

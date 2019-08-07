@@ -22,16 +22,16 @@ interface TextureInfo {
 }
 
 
-interface Props {
+export interface Props {
     className?: any
     style?: any
     width: number
     height: number
     src: string
-    srcPrev?: string
-    srcNext?: string
+    srcPrev: string | null
+    srcNext: string | null
     orientation: ExifOrientation
-    photoWork?: PhotoWork
+    photoWork: PhotoWork | null
     setLoading: (loading: boolean) => void
 }
 
@@ -58,14 +58,18 @@ export default class PhotoPane extends React.Component<Props, State> {
         const canvasElem = this.canvas.getElement()
         canvasElem.className = 'PhotoPane-canvas'
         canvasElem.style.display = 'none'
-        findDOMNode(this.refs.main).appendChild(canvasElem)
+        const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
+        mainElem.appendChild(canvasElem)
 
         this.updateCanvas({})
     }
 
     componentWillUnmount() {
-        const canvasElem = this.canvas.getElement()
-        canvasElem.parentNode.removeChild(canvasElem)
+        if (this.canvas) {
+            const canvasElem = this.canvas.getElement()
+            canvasElem.parentNode!.removeChild(canvasElem)
+            this.canvas = null
+        }
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
@@ -73,8 +77,10 @@ export default class PhotoPane extends React.Component<Props, State> {
     }
 
     updateCanvas(prevProps: Partial<Props>) {
-        const props = this.props
-        const canvas = this.canvas
+        const { props, canvas } = this
+        if (!canvas) {
+            return
+        }
 
         if (props.src !== prevProps.src || props.srcNext !== prevProps.srcNext || props.srcPrev !== prevProps.srcPrev) {
             this.texturesWithError = {}
@@ -93,7 +99,7 @@ export default class PhotoPane extends React.Component<Props, State> {
 
         let canvasChanged = false
         if (this.canvasSrc !== props.src) {
-            let textureToShow = null
+            let textureToShow: Texture | null = null
             const textureInfo = this.textureCache[props.src]
             if (textureInfo) {
                 textureInfo.lastUse = Date.now()
@@ -140,16 +146,16 @@ export default class PhotoPane extends React.Component<Props, State> {
         }
     }
 
-    tryToFetchTexture(src?: string) {
-        const { textureCache } = this
+    tryToFetchTexture(src?: string | null) {
+        const { canvas, textureCache } = this
 
-        if (!src || textureCache[src] || this.isLoadingTexture || this.texturesWithError[src]) {
+        if (!canvas || !src || textureCache[src] || this.isLoadingTexture || this.texturesWithError[src]) {
             return
         }
 
         const profiler = profileDetailView ? new Profiler(`Fetching texture for ${src}`) : null
         this.isLoadingTexture = true
-        this.canvas.createTextureFromSrc(src, profiler)
+        canvas.createTextureFromSrc(src, profiler)
             .then(texture => {
                 if (profiler) profiler.addPoint('Loaded texture')
                 textureCache[src] = { src, texture, lastUse: Date.now() }
@@ -163,8 +169,10 @@ export default class PhotoPane extends React.Component<Props, State> {
                             oldestTextureInfo = textureInfo
                         }
                     }
-                    oldestTextureInfo.texture.destroy()
-                    delete textureCache[oldestTextureInfo.src]
+                    if (oldestTextureInfo) {
+                        oldestTextureInfo.texture.destroy()
+                        delete textureCache[oldestTextureInfo.src]
+                    }
                 }
 
                 this.isLoadingTexture = false

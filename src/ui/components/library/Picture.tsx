@@ -56,7 +56,9 @@ export default class Picture extends React.Component<Props, State> {
         const props = this.props
 
         if (props.photo.id != prevProps.photo.id) {
-            window.clearTimeout(this.delayedUpdateTimout)
+            if (this.delayedUpdateTimout) {
+                window.clearTimeout(this.delayedUpdateTimout)
+            }
             if (this.createThumbnailPromise) {
                 this.createThumbnailPromise.cancel()
                 this.createThumbnailPromise = null
@@ -67,7 +69,7 @@ export default class Picture extends React.Component<Props, State> {
         if (props.isHighlighted && props.isHighlighted !== prevProps.isHighlighted) {
             const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
             let rect = pictureElem.getBoundingClientRect()
-            let containerElem = pictureElem.parentNode.parentNode.parentNode as Element
+            let containerElem = pictureElem.parentNode!.parentNode!.parentNode as Element
             let containerRect = containerElem.getBoundingClientRect()
 
             if (rect.bottom > containerRect.bottom) {
@@ -81,7 +83,9 @@ export default class Picture extends React.Component<Props, State> {
     componentWillUnmount() {
         window.removeEventListener('edit:thumnailChange', this.onThumnailChange)
         if (this.createThumbnailPromise) {
-            window.clearTimeout(this.delayedUpdateTimout)
+            if (this.delayedUpdateTimout) {
+                window.clearTimeout(this.delayedUpdateTimout)
+            }
             this.createThumbnailPromise.cancel()
             this.createThumbnailPromise = null
         }
@@ -117,7 +121,9 @@ export default class Picture extends React.Component<Props, State> {
     }
 
     createThumbnail(delayUpdate: boolean) {
-        window.clearTimeout(this.delayedUpdateTimout)
+        if (this.delayedUpdateTimout) {
+            window.clearTimeout(this.delayedUpdateTimout)
+        }
         if (delayUpdate) {
             this.delayedUpdateTimout = window.setTimeout(() => this.setState({ thumbnailSrc: null, isThumbnailLoaded: false }), 1000)
         } else {
@@ -126,7 +132,9 @@ export default class Picture extends React.Component<Props, State> {
 
         this.createThumbnailPromise = this.props.createThumbnail(this.props.sectionId, this.props.photo)
             .then(thumbnailSrc => {
-                window.clearTimeout(this.delayedUpdateTimout)
+                if (this.delayedUpdateTimout) {
+                    window.clearTimeout(this.delayedUpdateTimout)
+                }
                 if (thumbnailSrc === this.state.thumbnailSrc) {
                     // Force loading the same image again
                     this.setState({ thumbnailSrc: null, isThumbnailLoaded: false })

@@ -40,7 +40,7 @@ interface StateProps {
     totalPhotoCount: number | null
     sectionIds: PhotoSectionId[]
     sectionById: PhotoSectionById
-    selectedSectionId: PhotoSectionId
+    selectedSectionId: PhotoSectionId | null
     selectedPhotoIds: PhotoId[]
     infoPhoto: PhotoType | null
     infoPhotoDetail: PhotoDetail | null
@@ -57,7 +57,7 @@ interface DispatchProps {
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
     setGridRowHeight: (gridRowHeight: number) => void
-    setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
+    setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     setInfoPhoto: (sectionId: PhotoSectionId | null, photoId: PhotoId | null) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
@@ -70,7 +70,7 @@ interface DispatchProps {
     startScanning: () => void
 }
 
-interface Props extends OwnProps, StateProps, DispatchProps {
+export interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
@@ -108,7 +108,9 @@ export class Library extends React.Component<Props, State> {
 
     openExport() {
         const props = this.props
-        props.openExport(props.selectedSectionId, props.selectedPhotoIds)
+        if (props.selectedSectionId) {
+            props.openExport(props.selectedSectionId, props.selectedPhotoIds)
+        }
     }
 
     clearHighlight() {
@@ -134,8 +136,8 @@ export class Library extends React.Component<Props, State> {
     }
 
     render() {
-        const props = this.props
-        const state = this.state
+        const { props, state } = this
+        const { selectedSectionId } = props
 
         this.updateInfoPhoto()
 
@@ -181,7 +183,7 @@ export class Library extends React.Component<Props, State> {
                     isActive={props.isActive}
                     sectionIds={props.sectionIds}
                     sectionById={props.sectionById}
-                    selectedSectionId={props.selectedSectionId}
+                    selectedSectionId={selectedSectionId}
                     selectedPhotoIds={props.selectedPhotoIds}
                     gridRowHeight={props.gridRowHeight}
                     getGridLayout={props.getGridLayout}
@@ -192,6 +194,9 @@ export class Library extends React.Component<Props, State> {
                 />
         }
 
+        const photoData = selectedSectionId && props.sectionById[selectedSectionId].photoData
+        const selectedPhotos = photoData ? props.selectedPhotoIds.map(photoId => photoData[photoId]) : []
+
         return (
             <div
                 ref="library"
@@ -200,8 +205,8 @@ export class Library extends React.Component<Props, State> {
             >
                 <LibraryTopBar
                     className="Library-topBar"
-                    selectedSectionId={props.selectedSectionId}
-                    selectedPhotos={props.selectedPhotoIds.map(photoId => props.sectionById[props.selectedSectionId].photoData[photoId])}
+                    selectedSectionId={selectedSectionId}
+                    selectedPhotos={selectedPhotos}
                     isShowingTrash={props.isShowingTrash}
                     isShowingInfo={state.isShowingInfo}
                     photosCount={props.photoCount}
@@ -244,6 +249,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         const sections = state.data.sections
         const libraryInfo = state.library.info
+        const photoData = libraryInfo && sections.byId[libraryInfo.sectionId].photoData
         return {
             ...props,
             isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
@@ -253,12 +259,12 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             sectionById: sections.byId,
             selectedSectionId: state.library.selection.sectionId,
             selectedPhotoIds: state.library.selection.photoIds,
-            infoPhoto: libraryInfo ? sections.byId[libraryInfo.sectionId].photoData[libraryInfo.photoId] : null,
+            infoPhoto: (libraryInfo && photoData) ? photoData[libraryInfo.photoId] : null,
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
             showOnlyFlagged: state.library.filter.showOnlyFlagged,
-            isShowingTrash: state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash'
+            isShowingTrash: !!(state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash')
         }
     },
     dispatch => ({

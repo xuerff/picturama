@@ -49,7 +49,7 @@ function readExifOfImage(imagePath) {
 }
 
 
-const simplifiedBrandNames = {
+const simplifiedBrandNames: { [K in string]: string } = {
     'NIKON CORPORATION': 'Nikon',
     'OLYMPUS IMAGING CORP.': 'Olympus'
 }
@@ -63,9 +63,9 @@ function extractMetaDataFromExif(exifData): MetaData {
     //   - Make = 'SONY', Model = 'DSC-N2'  ->  'SONY DSC-N2'
     //   - Make = 'NIKON CORPORATION', Model = 'NIKON D7200'  ->  'Nikon D7200'
     //   - Make = 'OLYMPUS IMAGING CORP.', Model = 'E-M10'  ->  'Olympus E-M10'
-    var cameraBrand: string | null = exifTags.Make
-    var cameraModel: string | null = exifTags.Model
-    var camera: string = cameraModel
+    let cameraBrand: string | null = exifTags.Make
+    let cameraModel: string | null = exifTags.Model
+    let camera = cameraModel
     if (cameraBrand && cameraModel) {
         cameraBrand = simplifiedBrandNames[cameraBrand] || cameraBrand
         if (cameraModel.toLowerCase().indexOf(cameraBrand.toLowerCase()) === 0) {
@@ -78,7 +78,7 @@ function extractMetaDataFromExif(exifData): MetaData {
     const metaData: MetaData = {
         imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
         imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
-        camera:       (camera.length === 0) ? null : camera,
+        camera:       camera || undefined,
         exposureTime: exifTags.ExposureTime,
         iso:          exifTags.ISO,
         aperture:     exifTags.FNumber,

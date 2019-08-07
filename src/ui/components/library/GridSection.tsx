@@ -25,27 +25,27 @@ interface Props {
     onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }
 
-export default class GridSection extends React.Component<Props, undefined> {
+export default class GridSection extends React.Component<Props> {
 
     renderPictures() {
         const props = this.props
-        if (!props.layout.boxes || props.layout.toBoxIndex === null) {
+        if (!props.layout.boxes || props.layout.fromBoxIndex == null || props.layout.toBoxIndex == null) {
             return
         }
 
         const toBoxIndex = props.layout.toBoxIndex
-        const photoIds = props.section.photoIds
-        let elems = []
-        if (photoIds) {
+        const { photoIds, photoData } = props.section
+        let elems: JSX.Element[] = []
+        if (photoIds && photoData) {
             for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
                 const photoId = photoIds[photoIndex]
                 elems.push(
                     <Picture
                         key={photoId}
                         sectionId={props.section.id}
-                        photo={props.section.photoData[photoId]}
+                        photo={photoData[photoId]}
                         layoutBox={props.layout.boxes[photoIndex]}
-                        isHighlighted={props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
+                        isHighlighted={!!props.selectedPhotoIds && props.selectedPhotoIds.indexOf(photoId) !== -1}
                         getThumbnailSrc={props.getThumbnailSrc}
                         createThumbnail={props.createThumbnail}
                         onPhotoClick={props.onPhotoClick}

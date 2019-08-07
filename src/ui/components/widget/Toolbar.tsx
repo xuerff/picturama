@@ -13,7 +13,7 @@ interface Props {
     isLeft?: boolean
 }
 
-class Toolbar extends React.Component<Props, undefined> {
+class Toolbar extends React.Component<Props> {
     static defaultProps: Partial<Props> = {
         isTopBar: true,
         isLeft: false

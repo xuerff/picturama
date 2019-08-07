@@ -31,14 +31,9 @@ export const testUprightPhoto: PhotoType = {
     non_raw: null,
     extension: 'jpg',
     flag: 1,
-    created_at: null,
+    created_at: 1474222345000,
     updated_at: null,
     orientation: 1,
-    camera: null,
-    exposure_time: null,
-    iso: null,
-    focal_length: null,
-    aperture: null,
     date: '2018-05-15',
     trashed: 0
 }
@@ -52,14 +47,9 @@ export const testPanoramaPhoto: PhotoType = {
     non_raw: null,
     extension: 'jpg',
     flag: 0,
-    created_at: null,
+    created_at: 1474222345000,
     updated_at: null,
     orientation: 1,
-    camera: null,
-    exposure_time: null,
-    iso: null,
-    focal_length: null,
-    aperture: null,
     date: '2018-05-15',
     trashed: 0
 }

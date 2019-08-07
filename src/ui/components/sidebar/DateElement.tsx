@@ -4,7 +4,7 @@ import React from 'react'
 
 interface Props {
     date: string
-    currentDate: string
+    currentDate: string | null
     onDateSelected: (date: string) => void
 }
 

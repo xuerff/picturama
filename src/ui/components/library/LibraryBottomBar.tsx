@@ -17,7 +17,7 @@ interface Props {
     setGridRowHeight: (gridRowHeight: number) => void
 }
 
-export default class LibraryBottomBar extends React.Component<Props, undefined> {
+export default class LibraryBottomBar extends React.Component<Props> {
     render() {
         const props = this.props
         return (

@@ -9,7 +9,7 @@ import { defaultGridRowHeight } from '../../ui/UiConstants'
 import { GridLayout } from '../../ui/UITypes'
 import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
 import { sectionHeadHeight } from '../../ui/components/library/GridSection'
-import { Library } from '../../ui/components/library/Library'
+import { Library, Props } from '../../ui/components/library/Library'
 
 import { testPhoto, testUprightPhoto, testPanoramaPhoto } from '../util/MockData'
 import { createRandomDummyPhoto, createSection, createLayoutForSection } from '../util/TestUtil'
@@ -19,7 +19,7 @@ const defaultSectionId: PhotoSectionId = '2018-08-15'
 const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
 
-const defaultProps = {
+const defaultProps: Props = {
     style: { width: '100%', height: '100%', overflow: 'hidden' },
     isActive: true,
 
@@ -36,6 +36,7 @@ const defaultProps = {
     infoPhoto: null,
     infoPhotoDetail: null,
     tags: [],
+    gridRowHeight: defaultGridRowHeight,
     showOnlyFlagged: false,
     isShowingTrash: false,
 
@@ -51,6 +52,7 @@ const defaultProps = {
             return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
         }
     },
+    setGridRowHeight: action('setGridRowHeight'),
     setSelectedPhotos: action('setSelectedPhotos'),
     setDetailPhotoById: action('setDetailPhotoById'),
     setInfoPhoto: action('setInfoPhoto'),

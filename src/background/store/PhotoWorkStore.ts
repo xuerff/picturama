@@ -58,7 +58,7 @@ class DirectoryWork {
 
     private data: DirectoryData | null = null
     private lastFetchTime: number = 0
-    private runningFetch: Promise<DirectoryData>
+    private runningFetch: Promise<DirectoryData> | null = null
     private isStoreRunning: boolean = false
     private needsStoreFollowup: boolean = false
 
@@ -85,7 +85,7 @@ class DirectoryWork {
                 ])
                 .then(results => {
                     const [ anselData, picasaData ] = results
-                    return { anselData, picasaData }
+                    return { anselData, picasaData: picasaData || undefined }
                 })
 
             this.runningFetch.then(
@@ -154,8 +154,8 @@ class DirectoryWork {
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
                 this.needsStoreFollowup = false
-                const anselData = this.data.anselData
-                const isEmpty = Object.keys(anselData.photos).length === 0
+                const anselData = this.data && this.data.anselData
+                const isEmpty = !anselData || Object.keys(anselData.photos).length === 0
                 if (isEmpty) {
                     if (await exists(directoryWorkFile)) {
                         await unlink(directoryWorkFile)
@@ -215,11 +215,11 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
             })
 
             let currentSectionKey: string | null = null
-            let currentSectionRules = []
+            let currentSectionRules: string[] = []
             lineReader.on('line', line => {
                 try {
-                    let match: RegExpMatchArray
-                    if (match = sectionStartRegExp.exec(line)) {
+                    const match = sectionStartRegExp.exec(line)
+                    if (match) {
                         if (currentSectionKey) {
                             picasaData.photos[currentSectionKey] = currentSectionRules
                         }
@@ -254,7 +254,7 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
     const photoWork: PhotoWork = {}
 
     let importProblems: string[] | null = null
-    let match: RegExpMatchArray
+    let match: RegExpMatchArray | null = null
     for (const rule of picasaRules) {
         if (match = rotateRuleRegExp.exec(rule)) {
             rotate(photoWork, parseInt(match[1]))

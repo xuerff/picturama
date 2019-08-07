@@ -39,10 +39,10 @@ interface OwnProps {
 interface StateProps {
     sectionId: PhotoSectionId
     photo: PhotoType
-    photoPrev?: PhotoType
-    photoNext?: PhotoType
-    photoDetail?: PhotoDetail
-    photoWork?: PhotoWork
+    photoPrev: PhotoType | null
+    photoNext: PhotoType | null
+    photoDetail: PhotoDetail | null
+    photoWork: PhotoWork | null
     tags: string[]
     isFirst: boolean
     isLast: boolean
@@ -61,14 +61,14 @@ interface DispatchProps {
     closeDetail: () => void
 }
 
-interface Props extends OwnProps, StateProps, DispatchProps {
+export interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
     bound: boolean,
     loading: boolean,
-    bodyWidth?: number
-    bodyHeight?: number
+    bodyWidth: number
+    bodyHeight: number
     isShowingInfo: boolean
 }
 
@@ -80,7 +80,7 @@ export class PictureDetail extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { bound: false, loading: true, isShowingInfo: false }
+        this.state = { bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
             'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onBodyResize')
@@ -290,8 +290,8 @@ export class PictureDetail extends React.Component<Props, State> {
                 <PhotoInfo
                     className="PictureDetail-rightSidebar"
                     isActive={state.isShowingInfo}
-                    photo={state.isShowingInfo && props.photo}
-                    photoDetail={state.isShowingInfo && props.photoDetail}
+                    photo={(state.isShowingInfo && props.photo) || null}
+                    photoDetail={state.isShowingInfo && props.photoDetail || null}
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
                     setPhotoTags={props.setPhotoTags}
@@ -304,19 +304,20 @@ export class PictureDetail extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
-        const currentPhoto = state.detail && state.detail.currentPhoto
+        const currentPhoto = state.detail!.currentPhoto
         const sectionId = currentPhoto.sectionId
+        const section = getSectionById(sectionId)
         return {
             ...props,
             sectionId: currentPhoto.sectionId,
-            photo: getPhotoById(sectionId, currentPhoto.photoId),
+            photo: getPhotoById(sectionId, currentPhoto.photoId)!,
             photoPrev: getPhotoByIndex(sectionId, currentPhoto.photoIndex - 1),
             photoNext: getPhotoByIndex(sectionId, currentPhoto.photoIndex + 1),
             photoDetail: currentPhoto.photoDetail,
             photoWork: currentPhoto.photoWork,
             tags: getTagTitles(),
             isFirst: currentPhoto.photoIndex === 0,
-            isLast: currentPhoto.photoIndex === getSectionById(sectionId).photoIds.length - 1
+            isLast: !section || !section.photoIds || currentPhoto.photoIndex === section.photoIds.length - 1
         }
     },
     dispatch => ({
