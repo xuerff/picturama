@@ -74,6 +74,42 @@ export default class PhotoCanvas {
         return this.webGlCanvas.getElement()
     }
 
+    /**
+     * Returns a PhotoPosition which keeps the photo inside the view. Returns `photoPosition` it is already OK.
+     *
+     * @param allowExceedingToCurrentPosition Whether to allow exceeding min/max as far as the current photoPosition does.
+     *      This may happen after zooming using the mouse wheel.
+     *      So when min/max is exceeded because the user zoomed near the edges,
+     *      the photo won't jump when panned, but panning back so far won't work.
+     */
+    limitPhotoPosition(photoPosition: PhotoPosition, allowExceedingToCurrentPosition: boolean): PhotoPosition {
+        const { size, rotatedWidth, finalPhotoPosition, rotatedHeight } = this
+        const { zoom } = photoPosition
+
+        const halfCanvasWidthInPhotoPix = size.width / 2 / zoom
+        const halfCanvasHeightInPhotoPix = size.height / 2 / zoom
+        let minCenterX = Math.min(halfCanvasWidthInPhotoPix, rotatedWidth - halfCanvasWidthInPhotoPix)
+        let minCenterY = Math.min(halfCanvasHeightInPhotoPix, rotatedHeight - halfCanvasHeightInPhotoPix)
+        let maxCenterX = rotatedWidth - minCenterX
+        let maxCenterY = rotatedHeight - minCenterY
+
+        if (allowExceedingToCurrentPosition && finalPhotoPosition && photoPosition.zoom === finalPhotoPosition.zoom) {
+            minCenterX = Math.min(minCenterX, finalPhotoPosition.centerX)
+            maxCenterX = Math.max(maxCenterX, finalPhotoPosition.centerX)
+            minCenterY = Math.min(minCenterY, finalPhotoPosition.centerY)
+            maxCenterY = Math.max(maxCenterY, finalPhotoPosition.centerY)
+        }
+
+        const centerX = Math.max(minCenterX, Math.min(maxCenterX, photoPosition.centerX))
+        const centerY = Math.max(minCenterY, Math.min(maxCenterY, photoPosition.centerY))
+
+        if (centerX === photoPosition.centerX && centerY === photoPosition.centerY) {
+            return photoPosition
+        } else {
+            return { centerX, centerY, zoom }
+        }
+    }
+
     isValid(): boolean {
         return !!(this.baseTexture && this.photoWork)
     }

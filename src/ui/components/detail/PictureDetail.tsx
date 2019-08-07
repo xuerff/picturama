@@ -2,7 +2,7 @@ import { ipcRenderer, remote, Menu as MenuType } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry } from '@blueprintjs/core'
+import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from '@blueprintjs/core'
 
 import keymapManager from '../../keymap-manager'
 import createVersionAndOpenWith from '../../create-version'
@@ -69,6 +69,9 @@ interface State {
     loading: boolean,
     bodyWidth: number
     bodyHeight: number
+    zoom: number
+    minZoom: number
+    maxZoom: number
     isShowingInfo: boolean
 }
 
@@ -80,10 +83,11 @@ export class PictureDetail extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
+        this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
-            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onBodyResize')
+            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onZoomSliderChange', 'onZoomChange',
+            'onBodyResize')
     }
 
     componentDidMount() {
@@ -217,6 +221,17 @@ export class PictureDetail extends React.Component<Props, State> {
         }
     }
 
+    private onZoomSliderChange(sliderScale: number) {
+        const { minZoom, maxZoom } = this.state
+        const percentage = fromSliderScale(sliderScale)
+        const zoom = minZoom + percentage * (maxZoom - minZoom)
+        this.setState({ zoom })
+    }
+
+    private onZoomChange(zoom: number, minZoom: number, maxZoom: number) {
+        this.setState({ zoom, minZoom, maxZoom })
+    }
+
     onBodyResize(entries: IResizeEntry[]) {
         const state = this.state
 
@@ -230,8 +245,7 @@ export class PictureDetail extends React.Component<Props, State> {
     }
 
     render() {
-        const props = this.props
-        const state = this.state
+        const { props, state } = this
 
         return (
             <div
@@ -253,6 +267,18 @@ export class PictureDetail extends React.Component<Props, State> {
                         </Button>
                     </ButtonGroup>
                     <span className="pull-right">
+                        <div className='PictureDetail-zoomPane'>
+                            <Slider className='PictureDetail-zoomSlider'
+                                value={toSliderScale((state.zoom - state.minZoom) / (state.maxZoom - state.minZoom))}
+                                min={0}
+                                max={1}
+                                stepSize={0.000001}
+                                labelRenderer={false}
+                                showTrackFill={false}
+                                onChange={this.onZoomSliderChange}
+                            />
+                            <div className='PictureDetail-zoomValue'>{state.zoom < state.minZoom + 0.00001 ? '' : `${Math.round(state.zoom * 100)}%`}</div>
+                        </div>
                         <PhotoActionButtons
                             selectedSectionId={props.sectionId}
                             selectedPhotos={[ props.photo ]}
@@ -279,7 +305,9 @@ export class PictureDetail extends React.Component<Props, State> {
                             srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}
                             orientation={props.photo.orientation}
                             photoWork={props.photoWork}
+                            zoom={state.zoom}
                             setLoading={this.setLoading}
+                            onZoomChange={this.onZoomChange}
                         />
                         {state.loading &&
                             <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
@@ -299,6 +327,19 @@ export class PictureDetail extends React.Component<Props, State> {
             </div>
         );
     }
+}
+
+
+function toSliderScale(percentage: number): number {
+    const sliderScale = Math.max(0, Math.min(1, Math.sqrt(percentage)))
+
+    // Workaround: For very small values (e.g. `6e-16`) the Slider widget shows no track bar
+    // -> Pull small values to 0
+    return sliderScale < 0.000001 ? 0 : sliderScale
+}
+
+function fromSliderScale(sliderScale: number): number {
+    return sliderScale * sliderScale
 }
 
 

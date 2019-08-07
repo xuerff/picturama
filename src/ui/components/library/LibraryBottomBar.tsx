@@ -37,7 +37,6 @@ export default class LibraryBottomBar extends React.Component<Props> {
                 </div>
                 <div className="LibraryBottomBar-right">
                     <Slider
-                        className="LibraryBottomBar-thumbSizeSlider"
                         value={props.gridRowHeight}
                         min={minGridRowHeight}
                         max={maxGridRowHeight}

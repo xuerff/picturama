@@ -19,6 +19,30 @@
 .PictureDetail-topBar {
     top: 0;
 }
+.PictureDetail-zoomPane {
+    position: relative;
+    display: inline-block;
+    margin-right: 8px;
+    width: 50px;
+    -webkit-app-region: none;
+    min-width: 0;
+    vertical-align: middle;
+}
+.PictureDetail-zoomSlider {
+    min-width: 0 !important;
+}
+.PictureDetail-zoomValue {
+    // Use `position: absolute` in order to take no height
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 100%;
+
+    text-align: center;
+    color: @blue-grey-300;
+    font-size: 9px;
+    line-height: 9px;
+}
 .PictureDetail-body {
     top: @toolbarHeight;
     bottom: 0;

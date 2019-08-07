@@ -6,7 +6,7 @@ import { profileDetailView } from 'common/LogConstants'
 import { ExifOrientation } from 'common/models/DataTypes'
 import { PhotoWork } from 'common/models/Photo'
 import Profiler from 'common/util/Profiler'
-import { bindMany } from 'common/util/LangUtil'
+import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import PhotoCanvas, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'ui/renderer/PhotoCanvas'
 import { Texture } from 'ui/renderer/WebGLCanvas'
@@ -34,10 +34,13 @@ export interface Props {
     srcNext: string | null
     orientation: ExifOrientation
     photoWork: PhotoWork | null
-    setLoading: (loading: boolean) => void
+    zoom: number
+    setLoading(loading: boolean): void
+    onZoomChange(zoom: number, minZoom: number, maxZoom: number): void
 }
 
 interface State {
+    canvas: PhotoCanvas | null
     prevSrc: string | null
     photoPosition: RequestedPhotoPosition
     dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null
@@ -54,17 +57,31 @@ export default class PhotoPane extends React.Component<Props, State> {
     private deferredHideCanvasTimeout: NodeJS.Timer | null
 
     private prevLoading: boolean | null = null
+    private prevZoom: number | null = null
+    private prevMinZoom: number | null = null
 
 
     constructor(props: Props) {
         super(props)
-        this.state = { prevSrc: null, photoPosition: 'contain', dragStart: null }
+        this.state = { canvas: null, prevSrc: null, photoPosition: 'contain', dragStart: null }
         bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel')
     }
 
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
         if (nextProps.src !== prevState.prevSrc) {
             return { prevSrc: nextProps.src, photoPosition: 'contain' }
+        } else {
+            const { canvas } = prevState
+            if (canvas) {
+                const photoPosition = canvas.getFinalPhotoPosition()
+                if (photoPosition && nextProps.zoom !== photoPosition.zoom) {
+                    let nextPhotoPosition: RequestedPhotoPosition = canvas.limitPhotoPosition({ ...photoPosition, zoom: nextProps.zoom }, false)
+                    if (nextPhotoPosition.zoom <= canvas.getMinZoom()) {
+                        nextPhotoPosition = 'contain'
+                    }
+                    return { photoPosition: nextPhotoPosition }
+                }
+            }
         }
         return null
     }
@@ -77,6 +94,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
         mainElem.appendChild(canvasElem)
 
+        this.setState({ canvas: this.canvas })
         this.updateCanvas({}, {})
     }
 
@@ -123,43 +141,15 @@ export default class PhotoPane extends React.Component<Props, State> {
         const { canvas } = this
         const { dragStart } = this.state
         if (canvas && dragStart) {
-            const photoPosition = canvas.getFinalPhotoPosition()
-            if (photoPosition) {
-                const startPhotoPosition = dragStart.photoPosition
-                const zoom = startPhotoPosition.zoom
+            const startPhotoPosition = dragStart.photoPosition
+            const zoom = startPhotoPosition.zoom
 
-                const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
-                const rotatedWidth = canvas.getRotatedWidth()
-                const rotatedHeight = canvas.getRotatedHeight()
-                const halfCanvasWidthInPhotoPix = mainElem.offsetWidth / 2 / zoom
-                const halfCanvasHeightInPhotoPix = mainElem.offsetHeight / 2 / zoom
-                const minCenterX = Math.min(halfCanvasWidthInPhotoPix, rotatedWidth - halfCanvasWidthInPhotoPix)
-                const minCenterY = Math.min(halfCanvasHeightInPhotoPix, rotatedHeight - halfCanvasHeightInPhotoPix)
-                const maxCenterX = rotatedWidth - minCenterX
-                const maxCenterY = rotatedHeight - minCenterY
+            let centerX = startPhotoPosition.centerX - (event.clientX - dragStart.x) / zoom
+            let centerY = startPhotoPosition.centerY - (event.clientY - dragStart.y) / zoom
+            const nextPhotoPosition = canvas.limitPhotoPosition({ centerX, centerY, zoom }, true)
 
-                // Don't allow panning the photo out of view
-                // Allow exceeding min/max as far as the current photoPosition does
-                // This may happen after zooming. So when min/max is exceeded because the user zoomed near the edges,
-                // the photo won't jump when panned, but panning back so far won't work.
-                let centerX = startPhotoPosition.centerX - (event.clientX - dragStart.x) / zoom
-                let centerY = startPhotoPosition.centerY - (event.clientY - dragStart.y) / zoom
-                if (centerX < minCenterX) {
-                    centerX = Math.max(centerX, Math.min(minCenterX, photoPosition.centerX))
-                }
-                if (centerX > maxCenterX) {
-                    centerX = Math.min(centerX, Math.max(maxCenterX, photoPosition.centerX))
-                }
-                if (centerY < minCenterY) {
-                    centerY = Math.max(centerY, Math.min(minCenterY, photoPosition.centerY))
-                }
-                if (centerY > maxCenterY) {
-                    centerY = Math.min(centerY, Math.max(maxCenterY, photoPosition.centerY))
-                }
-
-                if (centerX !== photoPosition.centerX || centerY !== photoPosition.centerY) {
-                    this.setState({ photoPosition: { centerX, centerY, zoom } })
-                }
+            if (!isShallowEqual(nextPhotoPosition, canvas.getFinalPhotoPosition())) {
+                this.setState({ photoPosition: nextPhotoPosition })
             }
         }
     }
@@ -272,6 +262,14 @@ export default class PhotoPane extends React.Component<Props, State> {
                 canvas.update()
                 canvas.getElement().style.display = null
                 this.setLoading(false)
+
+                const photoPosition = canvas.getFinalPhotoPosition()
+                const minZoom = canvas.getMinZoom()
+                if (photoPosition && (photoPosition.zoom !== this.prevZoom || minZoom !== this.prevMinZoom)) {
+                    this.prevZoom = photoPosition.zoom
+                    this.prevMinZoom = minZoom
+                    props.onZoomChange(photoPosition.zoom, minZoom, maxZoom)
+                }
             } else if (!this.deferredHideCanvasTimeout) {
                 // We hide the old image of an invalid canvas with a little delay,
                 // in order to avoid blinking if loading the next texture and photo work is fast
