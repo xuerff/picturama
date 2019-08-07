@@ -68,7 +68,7 @@
     "shortid": "^2.2.14",
     "source-map-support": "^0.5.13",
     "sqlite3": "4.0.9",
-    "sqlite3-helper": "git+https://github.com/ansel-app/sqlite3-helper.git#af477f3",
+    "sqlite3-helper": "1.2.1",
     "typesafe-actions": "^4.4.2",
     "walk": "^2.3.14"
   },
