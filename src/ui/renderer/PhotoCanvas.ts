@@ -8,12 +8,27 @@ import CancelablePromise from '../../common/util/CancelablePromise'
 import Profiler from '../../common/util/Profiler'
 
 
-export type Size = { width: number, height: number }
+export interface Size {
+    width: number
+    height: number
+}
+
+export interface PhotoPosition {
+    /** The x-coordinate of the photo's pixel to show at the center */
+    centerX: number
+    /** The y-coordinate of the photo's pixel to show at the center */
+    centerY: number
+    /** The zoom factor (1 = show photo 1:1) */
+    zoom: number
+}
+
+export const maxZoom = 2
+
 /**
  * - `contain`: Show the whole photo, centered in the canvas
  * - `adjust-canvas`: Show the whole photo, adjust the size of the canvas so it has no borders
  */
-export type PhotoPosition = 'contain' | 'adjust-canvas'
+export type RequestedPhotoPosition = 'contain' | 'adjust-canvas' | PhotoPosition
 
 /**
  * Renders a photo using a WebGL canvas. Provides a high-level API suited for Ansel's photo rendering.
@@ -25,8 +40,13 @@ export default class PhotoCanvas {
     private size: Size = { width: 0, height: 0 }
 
     private exifOrientation: ExifOrientation
-    private photoPosition: PhotoPosition = 'contain'
     private photoWork: PhotoWork | null
+
+    private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
+    private finalPhotoPosition: PhotoPosition | null = null
+    private rotatedWidth = 0
+    private rotatedHeight = 0
+    private minZoom = 0
 
     private baseTexturePromise: CancelablePromise<void> | null = null
     private baseTexture: Texture | null = null
@@ -63,9 +83,25 @@ export default class PhotoCanvas {
         return this
     }
 
-    setPhotoPosition(photoPosition: PhotoPosition): this {
-        this.photoPosition = photoPosition
+    setPhotoPosition(photoPosition: RequestedPhotoPosition): this {
+        this.requestedPhotoPosition = photoPosition
         return this
+    }
+
+    getFinalPhotoPosition(): PhotoPosition | null {
+        return this.finalPhotoPosition
+    }
+
+    getRotatedWidth(): number {
+        return this.rotatedWidth
+    }
+
+    getRotatedHeight(): number {
+        return this.rotatedHeight
+    }
+
+    getMinZoom(): number {
+        return this.minZoom
     }
 
     setExifOrientation(exifOrientation: ExifOrientation): this {
@@ -110,7 +146,7 @@ export default class PhotoCanvas {
     }
 
     update(): this {
-        const { baseTexture, photoWork, exifOrientation} = this
+        const { baseTexture, photoWork, exifOrientation, requestedPhotoPosition } = this
 
         if (!baseTexture || !photoWork) {
             const gl = this.webGlCanvas.gl
@@ -128,16 +164,37 @@ export default class PhotoCanvas {
         const switchSides = rotationTurns % 2 === 1
         const rotatedWidth  = switchSides ? textureHeight : textureWidth
         const rotatedHeight = switchSides ? textureWidth : textureHeight
-        const zoom = Math.min(1, this.size.width / rotatedWidth, this.size.height / rotatedHeight)
-        const canvasWidth  = (this.photoPosition === 'adjust-canvas') ? Math.floor(rotatedWidth  * zoom) : this.size.width
-        const canvasHeight = (this.photoPosition === 'adjust-canvas') ? Math.floor(rotatedHeight * zoom) : this.size.height
+
+        let finalPhotoPosition: PhotoPosition
+        let canvasWidth  = this.size.width
+        let canvasHeight = this.size.height
+        const minZoom = Math.min(maxZoom, this.size.width / rotatedWidth, this.size.height / rotatedHeight)
+        if (typeof requestedPhotoPosition === 'string') {
+            if (requestedPhotoPosition === 'adjust-canvas') {
+                canvasWidth  = Math.floor(rotatedWidth  * minZoom)
+                canvasHeight = Math.floor(rotatedHeight * minZoom)
+            }
+            finalPhotoPosition = { centerX: rotatedWidth / 2, centerY: rotatedHeight / 2, zoom: minZoom }
+        } else {
+            finalPhotoPosition = requestedPhotoPosition
+            const zoom = finalPhotoPosition.zoom
+            if (zoom < minZoom || zoom > maxZoom) {
+                finalPhotoPosition = { ...finalPhotoPosition, zoom: Math.min(maxZoom, Math.max(minZoom, zoom)) }
+            }
+        }
+        this.finalPhotoPosition = finalPhotoPosition
+        this.rotatedWidth = rotatedWidth
+        this.rotatedHeight = rotatedHeight
+        this.minZoom = minZoom
 
         // Important for matrix: Build it backwards (first operation last)
         const matrix = mat4.create()
         // Scale from from canvas coordinates (-canvasSize/2 .. canvasSize/2) to clipspace coordinates (-1 .. 1)
         mat4.scale(matrix, matrix, [ 1 / (canvasWidth / 2), -1 / (canvasHeight / 2), 1 ])
-        // Scale texture to canvas size
-        mat4.scale(matrix, matrix, [ zoom, zoom, 1 ])
+        // Zoom texture
+        mat4.scale(matrix, matrix, [ finalPhotoPosition.zoom, finalPhotoPosition.zoom, 1 ])
+        // Translate texture
+        mat4.translate(matrix, matrix, [ rotatedWidth / 2 - finalPhotoPosition.centerX, rotatedHeight / 2 - finalPhotoPosition.centerY, 0 ])
         // Apply 90° rotation
         mat4.rotateZ(matrix, matrix, rotationTurns * Math.PI / 2)
         // Scale to texture coordinates (-textureSize/2 .. textureSize/2)

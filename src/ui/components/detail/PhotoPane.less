@@ -1,5 +1,13 @@
 .PhotoPane {
     position: relative;
+    user-select: none;
+
+    &.isZoomed {
+        cursor: grab;
+    }
+    &.isDragging {
+        cursor: grabbing;
+    }
 }
 
 .PhotoPane-canvas {
