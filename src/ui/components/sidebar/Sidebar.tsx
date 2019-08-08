@@ -12,7 +12,7 @@ import { fetchDates } from '../../controller/PhotoDateController'
 import { fetchTags } from '../../controller/PhotoTagController'
 import { AppState } from '../../state/reducers'
 import Toolbar from '../widget/Toolbar'
-import { DateTree } from 'ui/type/UiTypes'
+import { DateTree } from 'ui/UITypes'
 
 import Tags from './Tags'
 import Dates from './Dates'

@@ -3,7 +3,7 @@ import { DatesState } from '../state/reducers/data'
 import store from '../state/store'
 import { fetchDatesAction } from '../state/actions'
 import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import { DateTree } from 'ui/type/UiTypes'
+import { DateTree } from 'ui/UITypes'
 
 
 assertRendererProcess()
