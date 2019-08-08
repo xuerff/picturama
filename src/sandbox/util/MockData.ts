@@ -1,7 +1,7 @@
 import { PhotoType, PhotoDetail } from '../../common/models/Photo'
 
 
-export const testPhoto: PhotoType = {
+export const testBigPhoto: PhotoType = {
     id: 'B1m80éAMpf',
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
@@ -22,10 +22,26 @@ export const testPhoto: PhotoType = {
     trashed: 0
 }
 
-export const testUprightPhoto: PhotoType = {
+export const testLandscapePhoto: PhotoType = {
+    id: 'kuV2UXUZNX',
+    title: 'landscape',
+    master: '../specs/photos/landscape.jpg',
+    master_width: 800,
+    master_height: 530,
+    non_raw: null,
+    extension: 'jpg',
+    flag: 0,
+    created_at: 1474222345000,
+    updated_at: null,
+    orientation: 1,
+    date: '2018-05-15',
+    trashed: 0
+}
+
+export const testPortraitPhoto: PhotoType = {
     id: 'FRL1FAT1G3',
-    title: 'upright',
-    master: '../specs/photos/upright.jpg',
+    title: 'portrait',
+    master: '../specs/photos/portrait.jpg',
     master_width: 785,
     master_height: 1024,
     non_raw: null,
@@ -53,6 +69,35 @@ export const testPanoramaPhoto: PhotoType = {
     date: '2018-05-15',
     trashed: 0
 }
+
+export const testPhotos: PhotoType[] = [
+    { name: 'alone',          width: 800, height: 533 },
+    { name: 'architecture',   width: 800, height: 533 },
+    { name: 'door-knocker',   width: 800, height: 533 },
+    { name: 'ice-cubes',      width: 800, height: 533 },
+    { name: 'koblenz',        width: 800, height: 518 },
+    { name: 'light-bulb',     width: 800, height: 533 },
+    { name: 'railway-tracks', width: 800, height: 533 },
+    { name: 'rustic',         width: 800, height: 450 },
+    { name: 'tomatoes',       width: 516, height: 800 },
+    { name: 'water',          width: 800, height: 450 },
+    { name: 'wolf',           width: 800, height: 498 },
+].map((info, index) => ({
+    id: `test-${index}`,
+    title: info.name,
+    master: `../specs/photos/800/${info.name}.jpg`,
+    master_width: info.width,
+    master_height: info.height,
+    non_raw: null,
+    extension: 'jpg',
+    flag: 0,
+    created_at: 1474222345000,
+    updated_at: null,
+    orientation: 1,
+    date: '2018-05-15',
+    trashed: 0
+}))
+testPhotos.push(testLandscapePhoto, testPortraitPhoto)
 
 export const testPhotoDetail: PhotoDetail = {
     tags: [],

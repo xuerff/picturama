@@ -1,9 +1,9 @@
-import { PhotoType, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from '../../common/models/Photo'
+import { PhotoType, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/models/Photo'
 
-import { GridSectionLayout } from '../../ui/UITypes'
-import { createLayoutForLoadedSection } from '../../ui/controller/LibraryController'
+import { GridSectionLayout } from 'ui/UITypes'
+import { createLayoutForLoadedSection } from 'ui/controller/LibraryController'
 
-import { testPhoto } from './MockData'
+import { testBigPhoto } from './MockData'
 
 
 let nextDummyId = 1
@@ -15,7 +15,7 @@ export function createRandomDummyPhoto(): PhotoType {
     const master_width  = 200 + Math.random() * 2000
     const master_height = master_width / aspect
     return {
-        ...testPhoto,
+        ...testBigPhoto,
         id: `dummy-${id}`,
         title: `dummy-${id}.JPG`,
         master: 'dummy',

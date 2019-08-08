@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { addSection, action, TestContext } from '../core/UiTester'
+import { PhotoType, PhotoDetail } from 'common/models/Photo'
 
-import { PhotoType, PhotoDetail } from '../../common/models/Photo'
+import PhotoInfo from 'ui/components/info/PhotoInfo'
 
-import PhotoInfo from '../../ui/components/info/PhotoInfo'
-import { testPhoto } from '../util/MockData'
+import { addSection, action, TestContext } from 'sandbox/core/UiTester'
+import { testBigPhoto } from 'sandbox/util/MockData'
 
 
 const baseUrl = 'dist'
@@ -15,7 +15,7 @@ const defaultProps = {
     style: { width: '300px', height: '100%' },
 
     isActive: true,
-    photo: { ...testPhoto, master: `${baseUrl}/${testPhoto.master}` },
+    photo: { ...testBigPhoto, master: `${baseUrl}/${testBigPhoto.master}` },
     tags: defaultTags,
     closeInfo: action('closeInfo')
 }
@@ -50,7 +50,7 @@ addSection('PhotoInfo')
         <PhotoInfo
             {...defaultProps}
             {...createGridRowHeightProps(context)}
-            photo={{ ...testPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
+            photo={{ ...testBigPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
         />
     ))
     .add('no tags', context => (

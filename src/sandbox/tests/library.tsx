@@ -1,22 +1,21 @@
 import React from 'react'
 
-import {addSection, action, TestContext} from '../core/UiTester'
+import { PhotoType, PhotoSectionById, PhotoSectionId } from 'common/models/Photo'
+import CancelablePromise from 'common/util/CancelablePromise'
 
-import { PhotoType, PhotoSectionById, PhotoSectionId, PhotoId, PhotoDetail } from '../../common/models/Photo'
-import CancelablePromise from '../../common/util/CancelablePromise'
+import { defaultGridRowHeight } from 'ui/UiConstants'
+import { GridLayout } from 'ui/UITypes'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { sectionHeadHeight } from 'ui/components/library/GridSection'
+import { Library, Props } from 'ui/components/library/Library'
 
-import { defaultGridRowHeight } from '../../ui/UiConstants'
-import { GridLayout } from '../../ui/UITypes'
-import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
-import { sectionHeadHeight } from '../../ui/components/library/GridSection'
-import { Library, Props } from '../../ui/components/library/Library'
-
-import { testPhoto, testUprightPhoto, testPanoramaPhoto } from '../util/MockData'
-import { createRandomDummyPhoto, createSection, createLayoutForSection } from '../util/TestUtil'
+import { addSection, action, TestContext } from 'sandbox/core/UiTester'
+import { testLandscapePhoto, testPortraitPhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'
+import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'sandbox/util/TestUtil'
 
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
-const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
+const defaultPhotos = [ testLandscapePhoto, testPortraitPhoto, testPanoramaPhoto ]
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
 
 const defaultProps: Props = {
@@ -112,12 +111,34 @@ addSection('Library')
             {...defaultProps}
             {...createGridRowHeightProps(context)}
             selectedSectionId={defaultSectionId}
-            selectedPhotoIds={[ testPhoto.id ]}
-            infoPhoto={testPhoto}
+            selectedPhotoIds={[ testLandscapePhoto.id ]}
+            infoPhoto={testLandscapePhoto}
             infoPhotoDetail={{ versions:[], tags: [] }}
         />
     ))
-     .add('creating thumbnails', context => {
+    .add('scrolling', context => {
+        const sectionIds: PhotoSectionId[] = []
+        for (let i = 50; i > 0; i--) {
+            const month = (i % 12) + 1
+            const year = 2000 + Math.floor(i / 12)
+            sectionIds.push(`${year}-${month < 10 ? '0' : ''}${month}-01`)
+        }
+
+        const sectionById: PhotoSectionById = {}
+        for (const sectionId of sectionIds) {
+            sectionById[sectionId] = createSection(sectionId, randomizedArray(testPhotos))
+        }
+
+        return (
+            <Library
+                {...defaultProps}
+                {...createGridRowHeightProps(context)}
+                sectionIds={sectionIds}
+                sectionById={sectionById}
+            />
+        )
+    })
+    .add('creating thumbnails', context => {
         let photos = [ ...defaultPhotos ]
         for (let i = 0; i < 100; i++) {
             photos.push(createRandomDummyPhoto())
@@ -185,8 +206,8 @@ addSection('Library')
             {...createGridRowHeightProps(context)}
             isShowingTrash={true}
             selectedSectionId={defaultSectionId}
-            selectedPhotoIds={[ testPhoto.id ]}
-            infoPhoto={testPhoto}
+            selectedPhotoIds={[ testLandscapePhoto.id ]}
+            infoPhoto={testLandscapePhoto}
             infoPhotoDetail={{ versions:[], tags: [] }}
         />
     ))
@@ -200,3 +221,14 @@ addSection('Library')
             sectionById={{}}
         />
     ))
+
+
+function randomizedArray<T>(array: T[]): T[] {
+    const remaining = [ ...array ]
+    const result: T[] = []
+    while (remaining.length > 0) {
+        const randomIndex = Math.floor(Math.random() * remaining.length)
+        result.push(remaining.splice(randomIndex, 1)[0])
+    }
+    return result
+}

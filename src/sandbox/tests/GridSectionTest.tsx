@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { addSection, action } from '../core/UiTester'
-import { testPhoto, testPanoramaPhoto, testUprightPhoto } from '../util/MockData'
+import { testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
 import { createSection, createRandomDummyPhoto, createLayoutForSection } from '../util/TestUtil'
 
 import CancelablePromise from '../../common/util/CancelablePromise'
@@ -18,7 +18,7 @@ const scrollBarWidth = 20
 const viewportWidth = containerWidth - scrollBarWidth
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
-const defaultPhotos = [ testPhoto, testUprightPhoto, testPanoramaPhoto ]
+const defaultPhotos = [ testBigPhoto, testPortraitPhoto, testPanoramaPhoto ]
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
 const defaultLayout = createLayoutForSection(defaultSection, 0, viewportWidth, defaultGridRowHeight)
 
@@ -51,7 +51,7 @@ addSection('GridSection')
     .add('selection', context => (
         <GridSection
             {...defaultProps}
-            selectedPhotoIds={[ testUprightPhoto.id ]}
+            selectedPhotoIds={[ testPortraitPhoto.id ]}
         />
     ))
     .add('creating thumbnails', context => {
