@@ -294,6 +294,12 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         return (
             <ResizeSensor onResize={this.onResize}>
                 <div className={classNames(props.className, 'Grid')}>
+                    <div ref='scrollPane' className='Grid-scrollPane' style={{ right: `-${scrollbarWidth}px` }} onScroll={this.onScroll}>
+                        {this.renderVisibleSections()}
+                        {contentHeight &&
+                            <div className='Grid-spacer' style={{ top: contentHeight - gridSpacerHeight }} />
+                        }
+                    </div>
                     <GridScrollBar
                         className='Grid-scrollBar'
                         gridLayout={gridLayout!}
@@ -301,12 +307,6 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                         contentHeight={contentHeight}
                         scrollTop={state.scrollTop}
                     />
-                    <div ref='scrollPane' className='Grid-scrollPane' style={{ right: `-${scrollbarWidth}px` }} onScroll={this.onScroll}>
-                        {this.renderVisibleSections()}
-                        {contentHeight &&
-                            <div className='Grid-spacer' style={{ top: contentHeight - gridSpacerHeight }} />
-                        }
-                    </div>
                 </div>
             </ResizeSensor>
         )
