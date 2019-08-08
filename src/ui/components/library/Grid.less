@@ -1,7 +1,21 @@
 .Grid {
     position: relative;
+    overflow: hidden;
+}
+
+.Grid-scrollPane {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
     overflow-x: hidden;  // Don't show vertical scrollbars during transition when hiding the sidebar
-    overflow-y: auto;
+    overflow-y: scroll;
+}
+
+.Grid-scrollBar {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .Grid-section,

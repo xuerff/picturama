@@ -3,17 +3,23 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoSectionId, PhotoSectionById } from '../../../common/models/Photo'
-import CancelablePromise from '../../../common/util/CancelablePromise'
-import { bindMany, cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
+import { PhotoId, PhotoType, PhotoSectionId, PhotoSectionById } from 'common/models/Photo'
+import CancelablePromise from 'common/util/CancelablePromise'
+import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
-import keymapManager from '../../keymap-manager'
-import { isMac } from '../../UiConstants'
-import { GridSectionLayout, GridLayout } from '../../UITypes'
+import keymapManager from 'ui/keymap-manager'
+import { isMac } from 'ui/UiConstants'
+import { GridSectionLayout, GridLayout } from 'ui/UITypes'
+import { gridScrollBarWidth } from 'ui/style/variables'
+import { getScrollbarSize } from 'ui/util/DomUtil'
+
+import GridScrollBar from './GridScrollBar'
 import GridSection, { sectionHeadHeight } from './GridSection'
 
 import './Grid.less'
 
+
+const gridSpacerHeight = 1
 
 export type GetGridLayoutFunction = (
     sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number,
@@ -60,7 +66,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown')
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.addListeners()
 
         this.gridLayout = this.getGridLayout(this.props, this.state)
@@ -113,7 +119,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     getGridLayout(props: Props, state: State): GridLayout {
-        return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop, state.viewportWidth, state.viewportHeight,
+        return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop,
+            state.viewportWidth - gridScrollBarWidth, state.viewportHeight,
             props.gridRowHeight, this.nailedSectionIndex)
     }
 
@@ -154,8 +161,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     onScroll(event: any) {
-        const gridElem = findDOMNode(this.refs.grid) as HTMLElement
-        this.setState({ scrollTop: gridElem.scrollTop })
+        const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
+        this.setState({ scrollTop: scrollPaneElem.scrollTop })
     }
 
     scrollToNailedSection() {
@@ -170,8 +177,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
         const scrollTop = layout.sectionTop
         if (scrollTop !== this.state.scrollTop) {
-            const gridElem = findDOMNode(this.refs.grid) as HTMLElement
-            gridElem.scrollTop = scrollTop
+            const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
+            scrollPaneElem.scrollTop = scrollTop
         }
     }
 
@@ -200,6 +207,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
         let currentIndex = selectedSection.photoIds.indexOf(props.selectedPhotoIds[0])
 
+        // TODO: This is complete non-sense since pictures are not in a fixed grid any more
         const gridElem = findDOMNode(this.refs.grid) as HTMLElement
         const gridWidth = gridElem.getBoundingClientRect().width
         const pictureWidth = gridElem.children[0].getBoundingClientRect().width
@@ -233,9 +241,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     renderVisibleSections() {
-        const props = this.props
-        const state = this.state
-        const gridLayout = this.gridLayout
+        const { props, state, gridLayout } = this
 
         if (!gridLayout) {
             return
@@ -269,26 +275,38 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         return result
     }
 
-    renderBottomSpacer() {
-        const props = this.props
+    calculateContentHeight(): number {
+        const { props, gridLayout } = this
         const sectionCount = props.sectionIds.length
-        if (!this.gridLayout || sectionCount === 0 || this.gridLayout.toSectionIndex >= sectionCount) {
-            // We don't need a spacer
-            return null
+        if (!gridLayout || sectionCount === 0) {
+            return 0
         } else {
-            const lastLayout = this.gridLayout.sectionLayouts[sectionCount - 1]
-            const gridSpacerHeight = 1
-            return <div className="Grid-spacer" style={{ top: lastLayout.sectionTop + sectionHeadHeight + lastLayout.containerHeight - gridSpacerHeight }} />
+            const lastLayout = gridLayout.sectionLayouts[sectionCount - 1]
+            return lastLayout.sectionTop + sectionHeadHeight + lastLayout.containerHeight
         }
     }
 
     render() {
-        const props = this.props
+        const { props, state, gridLayout } = this
+        const contentHeight = this.calculateContentHeight()
+        const scrollbarWidth = getScrollbarSize().width
+
         return (
             <ResizeSensor onResize={this.onResize}>
-                <div ref="grid" className={classNames(props.className, 'Grid')} onScroll={this.onScroll}>
-                    {this.renderVisibleSections()}
-                    {this.renderBottomSpacer()}
+                <div className={classNames(props.className, 'Grid')}>
+                    <GridScrollBar
+                        className='Grid-scrollBar'
+                        gridLayout={gridLayout!}
+                        viewportHeight={state.viewportHeight}
+                        contentHeight={contentHeight}
+                        scrollTop={state.scrollTop}
+                    />
+                    <div ref='scrollPane' className='Grid-scrollPane' style={{ right: `-${scrollbarWidth}px` }} onScroll={this.onScroll}>
+                        {this.renderVisibleSections()}
+                        {contentHeight &&
+                            <div className='Grid-spacer' style={{ top: contentHeight - gridSpacerHeight }} />
+                        }
+                    </div>
                 </div>
             </ResizeSensor>
         )
