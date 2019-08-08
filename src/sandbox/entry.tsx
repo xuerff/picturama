@@ -12,8 +12,7 @@ import './tests/export'
 import './tests/GridSectionTest'
 import './tests/PhotoPaneTest'
 
-import '../ui/entry.less'
-import '../ui/less/index.less'
+import 'ui/entry.less'
 import './entry.less'
 
 

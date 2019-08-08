@@ -7,7 +7,6 @@ import { init as initForegroundService } from './ForegroundService'
 import { checkSettingsExist } from './controller/SettingsController'
 
 import './entry.less'
-import './less/index.less'
 
 import pkgs from '../../package.json'
 
