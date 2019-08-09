@@ -20,37 +20,47 @@ export interface Props {
     viewportHeight: number
     contentHeight: number
     scrollTop: number
+    setScrollTop(scrollTop: number): void
 }
 
 interface State {
-    mouseOverHint: { y: number, visible: boolean, label: string }
+    isMouseInside: boolean
+    isDragging: boolean
+    mouseOverHint: { y: number, label: string }
 }
 
 export default class GridScrollBar extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        this.state = { mouseOverHint: { y: 0, visible: false, label: '' } }
-        bindMany(this, 'onMouseMove', 'onMouseOut')
+        this.state = { isMouseInside: false, isDragging: false, mouseOverHint: { y: 0, label: '' } }
+        bindMany(this, 'onMouseDown', 'onWindowMouseMove', 'onWindowMouseUp', 'onMouseMove', 'onMouseOut')
+    }
+
+    private onMouseDown(event: React.MouseEvent) {
+        const nextState: Partial<State> = { isDragging: true }
+        this.moveHint(event.clientY, nextState, true)
+        window.addEventListener('mousemove', this.onWindowMouseMove)
+        window.addEventListener('mouseup', this.onWindowMouseUp)
+        this.setState(nextState as any)
+    }
+
+    private onWindowMouseMove(event: MouseEvent) {
+        const nextState: Partial<State> = {}
+        this.moveHint(event.clientY, nextState, true)
+        this.setState(nextState as any)
+    }
+
+    private onWindowMouseUp() {
+        window.removeEventListener('mousemove', this.onWindowMouseMove)
+        window.removeEventListener('mouseup', this.onWindowMouseUp)
+        this.setState({ isDragging: false })
     }
 
     private onMouseMove(event: React.MouseEvent) {
-        const { props, state } = this
-
-        const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
-        const mainRect = mainElem.getBoundingClientRect()
-
-        const y = event.clientY - mainRect.top
-        const prevMouseOverHint = state.mouseOverHint
-        if (!prevMouseOverHint || y !== prevMouseOverHint.y) {
-            const contentY = props.contentHeight * y / props.viewportHeight
-
-            const sectionIndex = getSectionIndexAtY(contentY, props.gridLayout.sectionLayouts)
-            const section = (sectionIndex !== null) && props.sectionById[props.sectionIds[sectionIndex]]
-            const label = section ? section.title : ''
-
-            this.setState({ mouseOverHint: { y, visible: true, label } })
-        }
+        const nextState: Partial<State> = { isMouseInside: true }
+        this.moveHint(event.clientY, nextState)
+        this.setState(nextState as any)
     }
 
     private onMouseOut(event: React.MouseEvent) {
@@ -65,7 +75,28 @@ export default class GridScrollBar extends React.Component<Props, State> {
             elem = elem.parentElement
         }
 
-        this.setState({ mouseOverHint: { ...this.state.mouseOverHint, visible: false } })
+        this.setState({ isMouseInside: false })
+    }
+
+    private moveHint(clientY: number, nextState: Partial<State>, scrollToHint?: boolean) {
+        const { props, state } = this
+
+        const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
+        const mainRect = mainElem.getBoundingClientRect()
+
+        const y = clientY - mainRect.top
+        const prevMouseOverHint = state.mouseOverHint
+        const contentY = Math.round(props.contentHeight * y / props.viewportHeight)
+        if (!prevMouseOverHint || y !== prevMouseOverHint.y) {
+            const sectionIndex = getSectionIndexAtY(contentY, props.gridLayout.sectionLayouts)
+            const section = (sectionIndex !== null) && props.sectionById[props.sectionIds[sectionIndex]]
+            const label = section ? section.title : ''
+
+            nextState.mouseOverHint = { y, label }
+        }
+        if (scrollToHint) {
+            props.setScrollTop(contentY)
+        }
     }
 
     render() {
@@ -75,6 +106,7 @@ export default class GridScrollBar extends React.Component<Props, State> {
             <div
                 ref='main'
                 className={classnames(props.className, 'GridScrollBar')}
+                onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseOut={this.onMouseOut}
             >
@@ -82,11 +114,11 @@ export default class GridScrollBar extends React.Component<Props, State> {
                     className='GridScrollBar-thumb'
                     style={{
                         top: Math.round(props.viewportHeight * props.scrollTop / scrollHeight),
-                        height: Math.round(props.viewportHeight * props.viewportHeight / scrollHeight)
+                        height: Math.min(4, Math.round(props.viewportHeight * props.viewportHeight / scrollHeight))
                     }}
                 />
                 <div
-                    className={classnames('GridScrollBar-hint', { isVisible: state.mouseOverHint.visible })}
+                    className={classnames('GridScrollBar-hint', { isVisible: state.isMouseInside || state.isDragging })}
                     style={{ top: state.mouseOverHint.y }}
                 >
                     <div className={classnames('GridScrollBar-hintLabel', { isBelow: state.mouseOverHint.y < 30 })}>

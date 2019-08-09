@@ -62,14 +62,13 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
         this.state = { scrollTop: 0, viewportWidth: 0, viewportHeight: 0 }
 
-        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'pressedEnter', 'onResize', 'onScroll', 'scrollToNailedSection',
-            'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown')
+        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'pressedEnter', 'onResize', 'onScroll',
+            'scrollToNailedSection', 'setScrollTop',  'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp',
+            'moveHighlightDown')
     }
 
     componentDidMount() {
         this.addListeners()
-
-        this.gridLayout = this.getGridLayout(this.props, this.state)
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State, nextContext: any): boolean {
@@ -97,6 +96,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         return this.gridLayout !== prevGridLayout
             || nextProps.selectedSectionId !== prevProps.selectedSectionId
             || nextProps.selectedPhotoIds !== prevProps.selectedPhotoIds
+            || nextState.scrollTop !== prevState.scrollTop
     }
 
     componentDidUpdate(prevProps: Props, prevState: State, snapshot: Snapshot) {
@@ -175,7 +175,10 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             return
         }
 
-        const scrollTop = layout.sectionTop
+        this.setScrollTop(layout.sectionTop)
+    }
+
+    private setScrollTop(scrollTop: number) {
         if (scrollTop !== this.state.scrollTop) {
             const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
             scrollPaneElem.scrollTop = scrollTop
@@ -288,6 +291,12 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
     render() {
         const { props, state, gridLayout } = this
+
+        if (!this.gridLayout) {
+            // This is the first call of `render`
+            this.gridLayout = this.getGridLayout(props, state)
+        }
+
         const contentHeight = this.calculateContentHeight()
         const scrollbarWidth = getScrollbarSize().width
 
@@ -308,6 +317,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                         viewportHeight={state.viewportHeight}
                         contentHeight={contentHeight}
                         scrollTop={state.scrollTop}
+                        setScrollTop={this.setScrollTop}
                     />
                 </div>
             </ResizeSensor>
