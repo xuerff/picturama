@@ -21,9 +21,9 @@ const commonConfig = {
         __filename: false,
     },
     output: {
-        path:       path.resolve(__dirname, 'dist'),  // The path where to build
-        publicPath: '',   // The path where to build seen from the browser
-        filename:   '[name].js'  // The script to build
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '',
+        filename: '[name].js',
     },
     resolve: {
         modules: [
@@ -101,7 +101,7 @@ module.exports = [
 
             // Extract CSS into separate file
             new MiniCssExtractPlugin({
-                filename: 'assets/[name].css',
+                filename: '[name].css',
                 chunkFilename: 'assets/[id].css'
             })
         ],
@@ -111,12 +111,7 @@ module.exports = [
                 {
                     test: /\.(less|css)$/,
                     // We don't extract our CSS in dev mode in order to make hot-reload work
-                    use: production ?
-                        [
-                            MiniCssExtractPlugin.loader,
-                            'css-loader',
-                            'less-loader'
-                        ] :
+                    use: useDevServer ?
                         [
                             { loader: 'style-loader', options: {
                                 sourceMap: true,
@@ -126,6 +121,11 @@ module.exports = [
                             } },
                             { loader: 'css-loader', options: { sourceMap: true, importLoaders: 2 } },
                             { loader: 'less-loader', options: { sourceMap: true, noIeCompat: true } }
+                        ] :
+                        [
+                            MiniCssExtractPlugin.loader,
+                            'css-loader',
+                            'less-loader'
                         ]
                 },
                 {
@@ -133,7 +133,7 @@ module.exports = [
                     // If the asset is smaller than 10kb inline it,
                     // else, fallback to the file-loader and reference it
                     loader: 'url-loader',
-                    options: { limit: 10000 }
+                    options: { name: 'assets/[contenthash].[ext]', limit: 10000 }
                 }
             ]
         },
