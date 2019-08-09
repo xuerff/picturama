@@ -1,15 +1,22 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { assertMainProcess } from '../common/util/ElectronUtil'
-import { fetchPhotoWork, storePhotoWork, storeThumbnail } from './store/PhotoWorkStore'
-import { fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from './store/PhotoStore'
-import { fetchTags, storePhotoTags } from './store/TagStore'
+import { UiConfig } from 'common/CommonTypes'
+import { assertMainProcess } from 'common/util/ElectronUtil'
+
+import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
+import { fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
+import { fetchTags, storePhotoTags } from 'background/store/TagStore'
 
 
 assertMainProcess()
 
 
-export function init(mainWin: BrowserWindow) {
+let uiConfig: UiConfig
+
+
+export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
+    uiConfig = newUiConfig
+
     ipcMain.on('executeBackgroundAction', (event, callId, action, params) => {
         executeBackgroundAction(action, params)
             .then(result => {
@@ -23,7 +30,9 @@ export function init(mainWin: BrowserWindow) {
 }
 
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
-    if (action === 'fetchSections') {
+    if (action === 'fetchUiConfig') {
+        return Promise.resolve(uiConfig)
+    } else if (action === 'fetchSections') {
         return fetchSections(params.filter)
     } else if (action === 'fetchSectionPhotos') {
         return fetchSectionPhotos(params.sectionId, params.filter)

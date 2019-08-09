@@ -51,7 +51,7 @@ app.on('ready', () => {
 
     mainWindow.loadURL('file://' + __dirname + '/ui.html')
     mainWindow.setTitle('Ansel')
-    initBackgroundService(mainWindow)
+    initBackgroundService(mainWindow, { locale: app.getLocale() })
     initForegroundClient(mainWindow)
 
     //let usb = new Usb()

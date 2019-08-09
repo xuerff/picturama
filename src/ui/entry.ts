@@ -1,10 +1,11 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import App from './components/App'
-import { init as initBackgroundClient } from './BackgroundClient'
-import { init as initForegroundService } from './ForegroundService'
-import { checkSettingsExist } from './controller/SettingsController'
+import { init as initBackgroundClient, fetchUiConfig } from 'ui/BackgroundClient'
+import { init as initForegroundService } from 'ui/ForegroundService'
+import App from 'ui/components/App'
+import { checkSettingsExist } from 'ui/controller/SettingsController'
+import { setLocale } from 'ui/i18n/i18n'
 
 import './entry.less'
 
@@ -22,7 +23,17 @@ if (process.env.ANSEL_TEST_MODE) {
 }
 
 initBackgroundClient()
-initForegroundService()
-checkSettingsExist()
 
-render(React.createElement(App), document.getElementById('app'))
+fetchUiConfig()
+    .then(uiConfig => {
+        setLocale(uiConfig.locale)
+
+        initForegroundService()
+        checkSettingsExist()
+        
+        render(React.createElement(App), document.getElementById('app'))
+    })
+    .catch(error => {
+        // TODO: Show error in UI
+        console.error('Initializing UI failed', error)
+    })
