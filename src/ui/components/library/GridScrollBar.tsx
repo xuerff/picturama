@@ -12,6 +12,16 @@ import { sectionHeadHeight } from './GridSection'
 import './GridScrollBar.less'
 
 
+interface ScaleItem {
+    y: number
+    type: 'year' | 'month'
+    title: string
+}
+
+const minMonthScaleItemGap = 8
+const minYearScaleItemGap = 15
+
+
 export interface Props {
     className?: any
     gridLayout: GridLayout
@@ -24,17 +34,40 @@ export interface Props {
 }
 
 interface State {
+    prevGridLayout: GridLayout | null
+    prevViewportHeight: number
     isMouseInside: boolean
     isDragging: boolean
     mouseOverHint: { y: number, label: string }
+    scaleItems: ScaleItem[]
 }
 
 export default class GridScrollBar extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        this.state = { isMouseInside: false, isDragging: false, mouseOverHint: { y: 0, label: '' } }
+        this.state = {
+            prevGridLayout: null,
+            prevViewportHeight: 0,
+            isMouseInside: false,
+            isDragging: false,
+            mouseOverHint: { y: 0, label: '' },
+            scaleItems: [],
+        }
         bindMany(this, 'onMouseDown', 'onWindowMouseMove', 'onWindowMouseUp', 'onMouseMove', 'onMouseOut', 'onWheel')
+    }
+
+    static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
+        if (nextProps.gridLayout !== prevState.prevGridLayout || nextProps.viewportHeight !== prevState.prevViewportHeight) {
+            const scaleItems = generateScaleItems(nextProps.gridLayout.sectionLayouts, nextProps.sectionIds,
+                nextProps.sectionById, nextProps.viewportHeight, nextProps.contentHeight)
+            return {
+                prevGridLayout: nextProps.gridLayout,
+                prevViewportHeight: nextProps.viewportHeight,
+                scaleItems
+            }
+        }
+        return null
     }
 
     private onMouseDown(event: React.MouseEvent) {
@@ -119,9 +152,19 @@ export default class GridScrollBar extends React.Component<Props, State> {
                     className='GridScrollBar-thumb'
                     style={{
                         top: Math.round(props.viewportHeight * props.scrollTop / scrollHeight),
-                        height: Math.min(4, Math.round(props.viewportHeight * props.viewportHeight / scrollHeight))
+                        height: Math.max(4, Math.round(props.viewportHeight * props.viewportHeight / scrollHeight))
                     }}
                 />
+                {state.scaleItems.map(scaleItem =>
+                    <div
+                        key={scaleItem.title}
+                        data-title={scaleItem.title}
+                        className={`GridScrollBar-scaleItem hasType_${scaleItem.type}`}
+                        style={{ top: scaleItem.y }}
+                    >
+                        {scaleItem.type === 'year' && scaleItem.title}
+                    </div>
+                )}
                 <div
                     className={classnames('GridScrollBar-hint', { isVisible: state.isMouseInside || state.isDragging })}
                     style={{ top: state.mouseOverHint.y }}
@@ -134,6 +177,70 @@ export default class GridScrollBar extends React.Component<Props, State> {
         )
     }
 
+}
+
+
+function generateScaleItems(sectionLayouts: GridSectionLayout[], sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
+    viewportHeight: number, contentHeight: number): ScaleItem[]
+{
+    const sectionCount = sectionIds.length
+
+    const result: ScaleItem[] = []
+    let prevBottom = Number.NEGATIVE_INFINITY
+    let prevItemIsMonth = false
+    let prevYear: string | null = null
+    let prevMonth: string | null = null
+    for (let sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
+        const sectionLayout = sectionLayouts[sectionIndex]
+        const y = Math.max(1, Math.round(viewportHeight * sectionLayout.sectionTop / contentHeight))
+            // Use a min y of 1px, so the very first scale item has a little gap to the top of the scrollbar
+
+        const section = sectionById[sectionIds[sectionIndex]]
+        const overlapsLastItem = y < prevBottom
+
+        let year: string
+        let isNewYear: boolean
+        if (!prevYear || !section.title.startsWith(prevYear)) {
+            year = section.title.substr(0, 4)
+            isNewYear = true
+            prevYear = year
+        } else {
+            year = prevYear
+            isNewYear = false
+        }
+
+        if (overlapsLastItem && !(isNewYear && prevItemIsMonth)) {
+            continue
+        }
+
+        const isNewMonth = !prevMonth || !section.title.startsWith(prevMonth)
+        if (!isNewMonth) {
+            continue
+        }
+
+        const bottom = y + (isNewYear ? minYearScaleItemGap : minMonthScaleItemGap)
+        if (bottom > viewportHeight) {
+            continue
+        }
+
+        // Create a scale item
+        const month = section.title.substr(0, 7)
+        const scaleItem: ScaleItem = {
+            y,
+            type: isNewYear ? 'year' : 'month',
+            title: isNewYear ? year : month
+        }
+        if (overlapsLastItem) {
+            result.pop()
+        }
+        result.push(scaleItem)
+
+        prevBottom = bottom
+        prevItemIsMonth = !isNewYear
+        prevMonth = month
+    }
+
+    return result
 }
 
 
