@@ -34,7 +34,7 @@ export default class GridScrollBar extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = { isMouseInside: false, isDragging: false, mouseOverHint: { y: 0, label: '' } }
-        bindMany(this, 'onMouseDown', 'onWindowMouseMove', 'onWindowMouseUp', 'onMouseMove', 'onMouseOut')
+        bindMany(this, 'onMouseDown', 'onWindowMouseMove', 'onWindowMouseUp', 'onMouseMove', 'onMouseOut', 'onWheel')
     }
 
     private onMouseDown(event: React.MouseEvent) {
@@ -78,6 +78,10 @@ export default class GridScrollBar extends React.Component<Props, State> {
         this.setState({ isMouseInside: false })
     }
 
+    private onWheel(event: React.WheelEvent<HTMLDivElement>) {
+        this.props.setScrollTop(this.props.scrollTop + event.deltaY)
+    }
+
     private moveHint(clientY: number, nextState: Partial<State>, scrollToHint?: boolean) {
         const { props, state } = this
 
@@ -109,6 +113,7 @@ export default class GridScrollBar extends React.Component<Props, State> {
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseOut={this.onMouseOut}
+                onWheel={this.onWheel}
             >
                 <div
                     className='GridScrollBar-thumb'

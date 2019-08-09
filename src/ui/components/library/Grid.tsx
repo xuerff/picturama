@@ -179,6 +179,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     private setScrollTop(scrollTop: number) {
+        scrollTop = Math.round(scrollTop)
         if (scrollTop !== this.state.scrollTop) {
             const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
             scrollPaneElem.scrollTop = scrollTop
