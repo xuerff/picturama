@@ -97,7 +97,7 @@ export const testPhotos: PhotoType[] = [
     date: '2018-05-15',
     trashed: 0
 }))
-testPhotos.push(testLandscapePhoto, testPortraitPhoto)
+testPhotos.unshift(testLandscapePhoto, testPortraitPhoto)
 
 export const testPhotoDetail: PhotoDetail = {
     tags: [],

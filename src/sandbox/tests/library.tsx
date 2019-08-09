@@ -15,54 +15,62 @@ import { createRandomDummyPhoto, createSection, createLayoutForSection } from 's
 
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
-const defaultPhotos = [ testLandscapePhoto, testPortraitPhoto, testPanoramaPhoto ]
+const defaultPhotos = testPhotos
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
 
-const defaultProps: Props = {
-    style: { width: '100%', height: '100%', overflow: 'hidden' },
-    isActive: true,
+let sharedGridRowHeight = defaultGridRowHeight
+    // Use the same gridRowHeight amoung all tests (so row height doesn't change when changing between tests)
 
-    isFetching: false,
+function createDefaultProps(context: TestContext): Props {
+    return {
+        style: { width: '100%', height: '100%', overflow: 'hidden' },
+        isActive: true,
 
-    photoCount: 1042,
-    totalPhotoCount: 12345,
-    sectionIds: [ defaultSectionId ],
-    sectionById: {
-        [defaultSectionId]: defaultSection
-    } as PhotoSectionById,
-    selectedSectionId: null,
-    selectedPhotoIds: [],
-    infoPhoto: null,
-    infoPhotoDetail: null,
-    tags: [],
-    gridRowHeight: defaultGridRowHeight,
-    showOnlyFlagged: false,
-    isShowingTrash: false,
+        isFetching: false,
 
-    fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
-    fetchSections: action('fetchSections'),
-    getGridLayout,
-    getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
-        const thumbnailPath = getNonRawImgPath(photo)
-        if (thumbnailPath === 'dummy') {
-            return new CancelablePromise<string>(() => {})
-        } else {
-            return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
-        }
-    },
-    setGridRowHeight: action('setGridRowHeight'),
-    setSelectedPhotos: action('setSelectedPhotos'),
-    setDetailPhotoById: action('setDetailPhotoById'),
-    setInfoPhoto: action('setInfoPhoto'),
-    openExport: action('openExport'),
-    setPhotosFlagged: action('setPhotosFlagged'),
-    setPhotoTags: action('setPhotoTags'),
-    updatePhotoWork: action('updatePhotoWork'),
-    movePhotosToTrash: action('movePhotosToTrash'),
-    restorePhotosFromTrash: action('restorePhotosFromTrash'),
-    toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
-    startScanning: action('startScanning'),
+        photoCount: 1042,
+        totalPhotoCount: 12345,
+        sectionIds: [ defaultSectionId ],
+        sectionById: {
+            [defaultSectionId]: defaultSection
+        } as PhotoSectionById,
+        selectedSectionId: null,
+        selectedPhotoIds: [],
+        infoPhoto: null,
+        infoPhotoDetail: null,
+        tags: [],
+        gridRowHeight: sharedGridRowHeight,
+        showOnlyFlagged: false,
+        isShowingTrash: false,
+
+        fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
+        fetchSections: action('fetchSections'),
+        getGridLayout,
+        getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
+        createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
+            const thumbnailPath = getNonRawImgPath(photo)
+            if (thumbnailPath === 'dummy') {
+                return new CancelablePromise<string>(() => {})
+            } else {
+                return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
+            }
+        },
+        setGridRowHeight: (gridRowHeight: number) => {
+            sharedGridRowHeight = gridRowHeight
+            context.forceUpdate()
+        },
+        setSelectedPhotos: action('setSelectedPhotos'),
+        setDetailPhotoById: action('setDetailPhotoById'),
+        setInfoPhoto: action('setInfoPhoto'),
+        openExport: action('openExport'),
+        setPhotosFlagged: action('setPhotosFlagged'),
+        setPhotoTags: action('setPhotoTags'),
+        updatePhotoWork: action('updatePhotoWork'),
+        movePhotosToTrash: action('movePhotosToTrash'),
+        restorePhotosFromTrash: action('restorePhotosFromTrash'),
+        toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
+        startScanning: action('startScanning'),
+    }
 }
 
 
@@ -85,37 +93,37 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
     }
 }
 
-let sharedGridRowHeight = defaultGridRowHeight
-    // Use the same gridRowHeight amoung all tests (so row height doesn't change when changing between tests)
-
-function createGridRowHeightProps(context: TestContext) {
-    return {
-        gridRowHeight: sharedGridRowHeight,
-        setGridRowHeight: (gridRowHeight: number) => {
-            sharedGridRowHeight = gridRowHeight
-            context.forceUpdate()
-        }
-    }
-}
-
 
 addSection('Library')
     .add('normal', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
         />
     ))
     .add('selection', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testLandscapePhoto.id ]}
             infoPhoto={testLandscapePhoto}
             infoPhotoDetail={{ versions:[], tags: [] }}
         />
     ))
+    .add('panorama', context => {
+        let photos = [ ...defaultPhotos ]
+        photos.splice(2, 0, testPanoramaPhoto)
+        const section = createSection(defaultSectionId, photos)
+
+        return (
+            <Library
+                {...createDefaultProps(context)}
+                sectionIds={[ defaultSectionId ]}
+                sectionById={{
+                    [defaultSectionId]: section
+                } as PhotoSectionById}
+            />
+        )
+    })
     .add('scrolling', context => {
         const sectionIds: PhotoSectionId[] = []
         for (let i = 50; i > 0; i--) {
@@ -125,14 +133,16 @@ addSection('Library')
         }
 
         const sectionById: PhotoSectionById = {}
+        const minPhotoCount = 2
         for (const sectionId of sectionIds) {
-            sectionById[sectionId] = createSection(sectionId, randomizedArray(testPhotos))
+            const photos = randomizedArray(testPhotos)
+            photos.splice(minPhotoCount, Math.floor(Math.random() * (photos.length - minPhotoCount)))
+            sectionById[sectionId] = createSection(sectionId, photos)
         }
 
         return (
             <Library
-                {...defaultProps}
-                {...createGridRowHeightProps(context)}
+                {...createDefaultProps(context)}
                 sectionIds={sectionIds}
                 sectionById={sectionById}
             />
@@ -143,12 +153,12 @@ addSection('Library')
         for (let i = 0; i < 100; i++) {
             photos.push(createRandomDummyPhoto())
         }
+        photos = randomizedArray(photos)
         const section = createSection(defaultSectionId, photos)
 
         return (
             <Library
-                {...defaultProps}
-                {...createGridRowHeightProps(context)}
+                {...createDefaultProps(context)}
                 sectionIds={[ defaultSectionId ]}
                 sectionById={{
                     [defaultSectionId]: section
@@ -165,8 +175,7 @@ addSection('Library')
 
         return (
             <Library
-                {...defaultProps}
-                {...createGridRowHeightProps(context)}
+                {...createDefaultProps(context)}
                 sectionIds={[ defaultSectionId ]}
                 sectionById={{
                     [defaultSectionId]: section
@@ -176,15 +185,13 @@ addSection('Library')
     })
     .add('Fetching sections', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             isFetching={true}
         />
     ))
     .add('Selection empty', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             photoCount={0}
             sectionIds={[]}
             sectionById={{}}
@@ -192,8 +199,7 @@ addSection('Library')
     ))
     .add('No photos', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             photoCount={0}
             totalPhotoCount={0}
             sectionIds={[]}
@@ -202,8 +208,7 @@ addSection('Library')
     ))
     .add('Trash with selection', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             isShowingTrash={true}
             selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testLandscapePhoto.id ]}
@@ -213,8 +218,7 @@ addSection('Library')
     ))
     .add('Trash - no photos', context => (
         <Library
-            {...defaultProps}
-            {...createGridRowHeightProps(context)}
+            {...createDefaultProps(context)}
             isShowingTrash={true}
             photoCount={0}
             sectionIds={[]}
