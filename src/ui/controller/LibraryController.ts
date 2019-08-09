@@ -58,7 +58,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         const usePlaceholder = !section.photoIds
         const prevLayout = (
                 !prevLayoutIsDirty
-                && section === prevSectionById[prevSectionIds[sectionIndex]]
+                && (usePlaceholder || section === prevSectionById[prevSectionIds[sectionIndex]])
                     // We have to compare sections, not section IDs in order to detect changes inside the section.
                     // See `createLayoutForLoadedSection`
             ) ? prevGridLayout.sectionLayouts[sectionIndex] : null
