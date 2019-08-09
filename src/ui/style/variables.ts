@@ -1,1 +1,1 @@
-export const gridScrollBarWidth = 100
+export const gridScrollBarWidth = 75
