@@ -1,6 +1,5 @@
 import { ipcRenderer } from 'electron'
 
-import { fetchDates } from './controller/PhotoDateController'
 import { fetchSections, fetchTotalPhotoCount, updatePhotoVersion } from './controller/PhotoController'
 import { fetchTags } from './controller/PhotoTagController'
 import { Device } from '../common/models/DataTypes'
@@ -32,7 +31,6 @@ export function init() {
     ipcRenderer.on('finish-import', () => {
         fetchTotalPhotoCount()
         fetchSections()
-        fetchDates()
         fetchTags()
     })
 

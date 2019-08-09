@@ -29,9 +29,6 @@ function createWhereForFilter(filter: PhotoFilter): { sql: string, params: any[]
     if (mainFilter && mainFilter.type === 'tag') {
         sql += ' and id in (select photo_id from photos_tags where tag_id = ?)'
         params.push(mainFilter.tagId)
-    } else if (mainFilter && mainFilter.type === 'date') {
-        sql += ' and date = ?'
-        params.push(mainFilter.date)
     }
 
     if (filter.showOnlyFlagged) {

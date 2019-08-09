@@ -9,10 +9,9 @@ import {
     SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_LIBRARY_INFO_PHOTO_FAILURE,FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
-    CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_DATES, FETCH_TAGS, SET_PHOTO_TAGS,
+    CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_TAGS, SET_PHOTO_TAGS,
     INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, TOGGLE_DIFF
 } from './actionTypes'
-import { DatesState } from './reducers/data'
 import { ImportProgress } from './reducers/import'
 
 
@@ -36,8 +35,6 @@ export const emptyTrashAction = (trashedPhotoIds: PhotoId[]) => action(EMPTY_TRA
 
 export const startImportAction = () => action(START_IMPORT)
 export const setImportProgressAction = (progress: ImportProgress) => action(SET_IMPORT_PROGRESS, { progress })
-
-export const fetchDatesAction = (dates: DatesState) => action(FETCH_DATES, { dates })
 
 export const fetchTagsAction = (tags: TagType[]) => action(FETCH_TAGS, { tags })
 export const setPhotoTagsAction = (photoId: PhotoId, tags: string[]) => action(SET_PHOTO_TAGS, { photoId, tags })

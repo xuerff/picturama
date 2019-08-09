@@ -1,16 +1,16 @@
 import { combineReducers } from 'redux'
 
-import { Device } from '../../../common/models/DataTypes'
-import { TagType, TagId, TagById } from '../../../common/models/Tag'
-import { PhotoSection, PhotoSectionId, PhotoById, PhotoSectionById } from '../../../common/models/Photo'
-import { cloneArrayWithItemRemoved } from '../../../common/util/LangUtil'
+import { Device } from 'common/models/DataTypes'
+import { TagId, TagById } from 'common/models/Tag'
+import { PhotoSection, PhotoSectionId, PhotoById, PhotoSectionById } from 'common/models/Photo'
+import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
-import { Action } from '../ActionType'
+import { Action } from 'ui/state/ActionType'
 import {
     FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE, CHANGE_PHOTOS, EMPTY_TRASH,
-    FETCH_DATES, FETCH_TAGS, SET_PHOTO_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
-} from '../actionTypes'
-import { FetchState } from '../../UITypes'
+    FETCH_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
+} from 'ui/state/actionTypes'
+import { FetchState } from 'ui/UITypes'
 
 
 type TagsState = {
@@ -53,33 +53,6 @@ const devices = (state: DevicesState = [], action: Action): DevicesState => {
             ]
         case REMOVE_DEVICE:
             return cloneArrayWithItemRemoved(state, action.payload.device, 'id')
-        default:
-            return state
-    }
-}
-
-
-export type DatesState = {
-    readonly years: {
-        /** E.g. '2018' or 'Invalid date' */
-        readonly id: string
-        readonly months: {
-            /** E.g. '06' or 'Invalid date' */
-            readonly id: string
-            readonly days: {
-                /** E.g. '2018-06-23' or 'Invalid date' */
-                readonly id: string
-            }[]
-        }[]
-    }[]
-}
-
-const initialDatesState: DatesState = { years: [] }
-
-const dates = (state: DatesState = initialDatesState, action: Action): DatesState => {
-    switch (action.type) {
-        case FETCH_DATES:
-            return action.payload.dates
         default:
             return state
     }
@@ -256,13 +229,11 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
 export type DataState = {
     readonly tags: TagsState
     readonly devices: DevicesState
-    readonly dates: DatesState
     readonly sections: SectionsState
 }
 
 export const data = combineReducers<DataState>({
     tags,
     devices,
-    dates,
     sections
 })

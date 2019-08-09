@@ -1,20 +1,8 @@
 @import "../../style/variables.less";
 
-@paddingX: 4px;
 
 .LibraryTopBar {
     padding-left: @nativeTitleBarControlsWidth;
-    transition: padding-left @transition-time ease-out;
-
-    .Ansel.hasSidebar & {
-        padding-left: @paddingX;
-    }
-}
-
-.LibraryTopBar-showSidebar {
-    .Ansel.hasSidebar & {
-        display: none;
-    }
 }
 
 .LibraryTopBar-toggleButton.isActive {

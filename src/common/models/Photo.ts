@@ -78,7 +78,6 @@ export type PhotoSectionById = { [index: string]: PhotoSection }
 
 export type PhotoFilter = {
     readonly mainFilter:
-        { readonly type: 'date', readonly date: string } |
         { readonly type: 'tag', readonly tagId: TagId } |
         { readonly type: 'trash' } |
         { readonly type: 'processed' } |

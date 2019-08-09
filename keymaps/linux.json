@@ -1,6 +1,5 @@
 {
   "body": {
-    "tab": "core:toggleSidebar",
     "escape": "core:cancel"
   },
   ".Grid": {

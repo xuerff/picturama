@@ -1,37 +1,13 @@
 @import "../../style/variables.less";
 
-.Ansel-sidebar,
+
 .Ansel-container {
     position: absolute !important;
     top: 0;
-    height: 100%;
-    transition: left @transition-time ease-out;
-}
-.Ansel-sidebar {
-    z-index: 2;
-
-    left: -@sidebarWidth;
-    width: @sidebarWidth;
-  
-    .Ansel.hasSidebar & {
-        left: 0;
-    }
-}
-.Ansel-container {
-    z-index: 3;  // Show above sidebar
-
     left: 0;
     right: 0;
-
+    bottom: 0;
     background: @blue-grey-100;
-
-    &.isUsingSidebar {
-        z-index: 1;  // Show below sidebar (because of its shadow)
-
-        .Ansel.hasSidebar & {
-            left: @sidebarWidth;
-        }
-    }
 }
 
 .Ansel-detail {

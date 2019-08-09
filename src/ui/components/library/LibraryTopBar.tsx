@@ -8,7 +8,6 @@ import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoFilter } from 'comm
 import { TagId, TagById } from 'common/models/Tag'
 import { bindMany } from 'common/util/LangUtil'
 
-import FaIcon from 'ui/components/widget/icon/FaIcon'
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
 import Toolbar from 'ui/components/widget/Toolbar'
 
@@ -43,12 +42,7 @@ export default class LibraryTopBar extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-
-        bindMany(this, 'showSidebar', 'emptyTrashModal')
-    }
-
-    showSidebar() {
-        window.dispatchEvent(new Event('core:toggleSidebar'))
+        bindMany(this, 'emptyTrashModal')
     }
 
     emptyTrashModal() {
@@ -67,9 +61,6 @@ export default class LibraryTopBar extends React.Component<Props> {
         const props = this.props
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
-                <Button className="LibraryTopBar-showSidebar" minimal={true} onClick={this.showSidebar} title="Show sidebar [tab]">
-                    <FaIcon name="bars" />
-                </Button>
                 <LibraryFilterButton
                     libraryFilter={props.libraryFilter}
                     tagIds={props.tagIds}

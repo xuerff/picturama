@@ -1,18 +1,15 @@
-import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Export from '../Export'
-import PictureDetail from '../detail/PictureDetail'
-import PictureDiff from '../PictureDiff'
-import Settings from '../Settings'
-import Progress from '../Progress'
-import Library from '../library/Library'
-import Sidebar from '../sidebar/Sidebar'
-import { AppState } from '../../state/reducers'
-import { ImportProgress } from '../../state/reducers/import'
-import { ModalState } from '../../state/reducers/navigation'
-import { bindMany } from '../../../common/util/LangUtil'
+import Export from 'ui/components/Export'
+import PictureDetail from 'ui/components//detail/PictureDetail'
+import PictureDiff from 'ui/components/PictureDiff'
+import Settings from 'ui/components/Settings'
+import Progress from 'ui/components/Progress'
+import Library from 'ui/components/library/Library'
+import { AppState } from 'ui/state/reducers'
+import { ImportProgress } from 'ui/state/reducers/import'
+import { ModalState } from 'ui/state/reducers/navigation'
 
 import './Ansel.less'
 
@@ -37,40 +34,14 @@ interface DispatchProps {
 interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
-interface State {
-    showSidebar: boolean
-}
+class Ansel extends React.Component<Props> {
 
-class Ansel extends React.Component<Props, State> {
-
-    constructor(props: Props) {
-        super(props)
-
-        bindMany(this, 'toggleSidebar')
-
-        this.state = {
-            showSidebar: true
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps: Props, prevState: {}) {
         const props = this.props
         if (prevProps.modal == 'splash' && props.modal != 'splash') {
             let splash = document.getElementById('splash')
             if (splash) splash.parentNode!.removeChild(splash)
         }
-    }
-
-    componentDidMount() {
-        window.addEventListener('core:toggleSidebar', this.toggleSidebar);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('core:toggleSidebar', this.toggleSidebar);
-    }
-
-    toggleSidebar() {
-        this.setState({ showSidebar: !this.state.showSidebar })
     }
 
     render() {
@@ -106,14 +77,13 @@ class Ansel extends React.Component<Props, State> {
         } else {
             container =
                 <Library
-                    className="Ansel-container isUsingSidebar"
+                    className='Ansel-container'
                     isActive={!mainView && !modalView}
                 />
         }
 
         return (
-            <div id="ansel" className={classNames('Ansel', { hasSidebar: state.showSidebar })}>
-                <Sidebar className="Ansel-sidebar" />
+            <div id='ansel' className='Ansel'>
                 {container}
                 {mainView}
                 {modalView}
