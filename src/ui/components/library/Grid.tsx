@@ -303,6 +303,8 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                     <GridScrollBar
                         className='Grid-scrollBar'
                         gridLayout={gridLayout!}
+                        sectionIds={props.sectionIds}
+                        sectionById={props.sectionById}
                         viewportHeight={state.viewportHeight}
                         contentHeight={contentHeight}
                         scrollTop={state.scrollTop}
