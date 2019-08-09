@@ -41,7 +41,6 @@ app.on('ready', () => {
         titleBarStyle: 'hiddenInset',
         backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
-            experimentalFeatures: true,
             nodeIntegration: true,
         }
     })

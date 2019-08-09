@@ -95,7 +95,6 @@ class MainMenu {
             this.sandboxWindow = new BrowserWindow({
                 title: 'UI Sandbox',
                 webPreferences: {
-                    experimentalFeatures: true,
                     nodeIntegration: true,
                 }
             })
