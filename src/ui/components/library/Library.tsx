@@ -5,22 +5,25 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from '../../../common/models/Photo'
-import CancelablePromise from '../../../common/util/CancelablePromise'
-import { bindMany } from '../../../common/util/LangUtil'
+import { Device } from 'common/models/DataTypes'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilter } from 'common/models/Photo'
+import { TagId, TagById } from 'common/models/Tag'
+import CancelablePromise from 'common/util/CancelablePromise'
+import { bindMany } from 'common/util/LangUtil'
 
-import { setDetailPhotoById } from '../../controller/DetailController'
-import { getThumbnailSrc } from '../../controller/ImageProvider'
-import { getGridLayout, setInfoPhoto, createThumbnail } from '../../controller/LibraryController'
-import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from '../../controller/PhotoController'
-import { setPhotoTags } from '../../controller/PhotoTagController'
-import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from '../../state/actions'
-import { AppState } from '../../state/reducers'
-import { getTagTitles } from '../../state/selectors'
-import { keySymbols } from '../../UiConstants'
-import { FetchState } from '../../UITypes'
-import store from '../../state/store'
-import PhotoInfo from '../info/PhotoInfo'
+import { setDetailPhotoById } from 'ui/controller/DetailController'
+import { getThumbnailSrc } from 'ui/controller/ImageProvider'
+import { getGridLayout, setInfoPhoto, createThumbnail } from 'ui/controller/LibraryController'
+import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'ui/controller/PhotoController'
+import { fetchTags, setPhotoTags } from 'ui/controller/PhotoTagController'
+import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'ui/state/actions'
+import { AppState } from 'ui/state/reducers'
+import { getTagTitles } from 'ui/state/selectors'
+import { keySymbols } from 'ui/UiConstants'
+import { FetchState } from 'ui/UITypes'
+import store from 'ui/state/store'
+import PhotoInfo from 'ui/components/info/PhotoInfo'
+
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
 import Grid, { GetGridLayoutFunction } from './Grid'
@@ -44,18 +47,23 @@ interface StateProps {
     selectedPhotoIds: PhotoId[]
     infoPhoto: PhotoType | null
     infoPhotoDetail: PhotoDetail | null
+    libraryFilter: PhotoFilter
+    tagIds: TagId[]
+    tagById: TagById
+    devices: Device[]
     tags: string[]
     gridRowHeight: number
-    showOnlyFlagged: boolean
     isShowingTrash: boolean
 }
 
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
+    fetchTags(): void
     getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    setLibraryFilter(newFilter: PhotoFilter): void
     setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
@@ -66,7 +74,6 @@ interface DispatchProps {
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     movePhotosToTrash: (photos: PhotoType[]) => void
     restorePhotosFromTrash: (photos: PhotoType[]) => void
-    toggleShowOnlyFlagged: () => void
     startScanning: () => void
 }
 
@@ -205,18 +212,22 @@ export class Library extends React.Component<Props, State> {
             >
                 <LibraryTopBar
                     className="Library-topBar"
+                    libraryFilter={props.libraryFilter}
+                    tagIds={props.tagIds}
+                    tagById={props.tagById}
+                    devices={props.devices}
                     selectedSectionId={selectedSectionId}
                     selectedPhotos={selectedPhotos}
                     isShowingTrash={props.isShowingTrash}
                     isShowingInfo={state.isShowingInfo}
                     photosCount={props.photoCount}
-                    showOnlyFlagged={props.showOnlyFlagged}
+                    fetchTags={props.fetchTags}
+                    setLibraryFilter={props.setLibraryFilter}
                     openExport={props.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
                     movePhotosToTrash={props.movePhotosToTrash}
                     restorePhotosFromTrash={props.restorePhotosFromTrash}
-                    toggleShowOnlyFlagged={props.toggleShowOnlyFlagged}
                     toggleShowInfo={this.toggleShowInfo}
                 />
                 <div className="Library-body">
@@ -261,18 +272,23 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             selectedPhotoIds: state.library.selection.photoIds,
             infoPhoto: (libraryInfo && photoData) ? photoData[libraryInfo.photoId] : null,
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
+            libraryFilter: state.library.filter,
+            tagIds: state.data.tags.ids,
+            tagById: state.data.tags.byId,
+            devices: state.data.devices,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
-            showOnlyFlagged: state.library.filter.showOnlyFlagged,
             isShowingTrash: !!(state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash')
         }
     },
     dispatch => ({
         fetchTotalPhotoCount,
         fetchSections,
+        fetchTags,
         getGridLayout,
         getThumbnailSrc,
         createThumbnail,
+        setLibraryFilter,
         setDetailPhotoById,
         setInfoPhoto,
         setPhotosFlagged,

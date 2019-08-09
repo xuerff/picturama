@@ -38,13 +38,32 @@ function createDefaultProps(context: TestContext): Props {
         selectedPhotoIds: [],
         infoPhoto: null,
         infoPhotoDetail: null,
-        tags: [],
+        libraryFilter: { mainFilter: null, showOnlyFlagged: false },
+        tagIds: [ 1, 2 ],
+        tagById: {
+            1: {
+                created_at: 1565357205167,
+                id: 1,
+                slug: 'flower',
+                title: 'Flower',
+                updated_at: null
+            },
+            2: {
+                created_at: 1565357205167,
+                id: 2,
+                slug: 'panorama',
+                title: 'Panorama',
+                updated_at: null
+            }
+        },
+        devices: [],
+        tags: [ 'Flower', 'Panorama' ],
         gridRowHeight: sharedGridRowHeight,
-        showOnlyFlagged: false,
         isShowingTrash: false,
 
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
+        fetchTags: action('fetchTags'),
         getGridLayout,
         getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
@@ -55,6 +74,7 @@ function createDefaultProps(context: TestContext): Props {
                 return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
             }
         },
+        setLibraryFilter: action('setLibraryFilter'),
         setGridRowHeight: (gridRowHeight: number) => {
             sharedGridRowHeight = gridRowHeight
             context.forceUpdate()
@@ -68,7 +88,6 @@ function createDefaultProps(context: TestContext): Props {
         updatePhotoWork: action('updatePhotoWork'),
         movePhotosToTrash: action('movePhotosToTrash'),
         restorePhotosFromTrash: action('restorePhotosFromTrash'),
-        toggleShowOnlyFlagged: action('toggleShowOnlyFlagged'),
         startScanning: action('startScanning'),
     }
 }
