@@ -1,8 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { assertMainProcess } from '../common/util/ElectronUtil'
-import { ExifOrientation } from '../common/models/DataTypes'
-import { PhotoWork } from '../common/models/Photo'
+import { assertMainProcess } from 'common/util/ElectronUtil'
 
 
 assertMainProcess()

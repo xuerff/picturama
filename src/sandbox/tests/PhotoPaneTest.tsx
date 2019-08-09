@@ -1,9 +1,11 @@
 import React from 'react'
 
-import {addSection, action, TestContext} from '../core/UiTester'
+import { ExifOrientation } from 'common/CommonTypes'
 
-import PhotoPane, { Props } from '../../ui/components/detail/PhotoPane'
-import { ExifOrientation } from '../../common/models/DataTypes'
+import PhotoPane, { Props } from 'ui/components/detail/PhotoPane'
+
+import { addSection, action, TestContext } from 'sandbox/core/UiTester'
+
 
 function createDefaultProps(context: TestContext): Props {
     return {

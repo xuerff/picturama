@@ -1,10 +1,11 @@
-import anselBookshelf from './ansel-bookshelf';
+import anselBookshelf from './ansel-bookshelf'
 import shortid from 'shortid'
 
-import config from '../config';
+import config from 'common/config'
+import { ExifOrientation } from 'common/CommonTypes'
 
-import { ExifOrientation, BookshelfClass } from './DataTypes'
-import Tag, { TagType, TagId } from './Tag'
+import { BookshelfClass } from './DataTypes'
+import Tag, { TagId } from './Tag'
 import Version, { VersionType } from './Version'
 
 shortid.characters(config.characters);

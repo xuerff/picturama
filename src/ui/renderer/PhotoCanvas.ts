@@ -1,11 +1,12 @@
 import { mat4 } from 'gl-matrix'
 
+import { ExifOrientation } from 'common/CommonTypes'
+import { PhotoWork, getTotalRotationTurns } from 'common/models/Photo'
+import CancelablePromise from 'common/util/CancelablePromise'
+import Profiler from 'common/util/Profiler'
+
 import WebGLCanvas, { GraphicBuffer, Texture } from './WebGLCanvas'
 import { TransformationShader } from './Shaders'
-import { ExifOrientation } from '../../common/models/DataTypes'
-import { PhotoWork, getTotalRotationTurns } from '../../common/models/Photo'
-import CancelablePromise from '../../common/util/CancelablePromise'
-import Profiler from '../../common/util/Profiler'
 
 
 export interface Size {

@@ -45,9 +45,6 @@ export interface BookshelfCollection<Fields> {
     toJSON(): Fields[]
 }
 
-/** An EXIF orientation. See: https://www.impulseadventure.com/photo/exif-orientation.html */
-export enum ExifOrientation { Up = 1, Bottom = 3, Right = 6, Left = 8 }
-
 /** See: src/usb.js */
 export interface Device {
     id: any  // TODO
