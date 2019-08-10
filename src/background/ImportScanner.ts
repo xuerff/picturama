@@ -10,6 +10,7 @@ import { ExifOrientation, ImportProgress } from 'common/CommonTypes'
 import config from 'common/config'
 import { profileScanner } from 'common/LogConstants'
 import { PhotoType, generatePhotoId } from 'common/models/Photo'
+import { TagType } from 'common/models/Tag'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
@@ -17,6 +18,7 @@ import matches from 'background/lib/matches'
 import walker from 'background/lib/walker'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
 import { storePhotoTags } from 'background/store/TagStore'
+import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 
 
@@ -47,20 +49,34 @@ interface FileInfo {
 
 export default class ImportScanner {
 
+    private isScanning = false
     private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
+    private updatedTags: TagType[] | null = null
 
     constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
         this.progress = {
             processed: 0,
             total: 0,
-            photosDir: path
+            photosDir: this.path
         }
-
-        bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'onImportedStep', 'filterStoredPhoto', 'walk')
+        bindMany(this, 'scanPictures', 'prepare', 'walk', 'onProgressChange', 'filterStoredPhoto', 'setTotal')
     }
 
     scanPictures() {
+        if (this.isScanning) {
+            // Already scanning
+            return
+        }
+
+        this.isScanning = true
+        this.progress = {
+            processed: 0,
+            total: 0,
+            photosDir: this.path
+        }
+        this.onProgressChange(true)
+
         const profiler = profileScanner ? new Profiler('Overall scanning') : null
         return walker(this.path, [ this.versionsPath ])
             .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
@@ -74,12 +90,22 @@ export default class ImportScanner {
                 concurrency: config.concurrency
             })
             .then(result => {
-                this.mainWindow.webContents.send('progress', this.progress)
+                this.isScanning = false
+                this.onProgressChange(true)
                 if (profiler) {
-                    profiler.addPoint(`Scanned ${this.progress.total} images`)
+                    profiler.addPoint(`Scanned ${this.progress!.total} images`)
                     profiler.logResult()
                 }
                 return result
+            })
+            .catch(error => {
+                if (profiler) {
+                    profiler.addPoint('Scanning failed')
+                    profiler.logResult()
+                }
+                this.isScanning = false
+                this.onProgressChange(true)
+                throw error
             })
     }
 
@@ -222,11 +248,15 @@ export default class ImportScanner {
 
             const tags = photoWork.tags || metaData.tags
             if (tags && tags.length) {
-                await storePhotoTags(photoId, tags)
+                const updatedTags = await storePhotoTags(photoId, tags)
+                if (updatedTags) {
+                    this.updatedTags = updatedTags
+                }
                 if (profiler) profiler.addPoint(`Added ${tags.length} tags`)
             }
 
-            await this.onImportedStep()
+            this.progress.processed++
+            this.onProgressChange()
             if (profiler) { profiler.addPoint('Updated import progress') }
         } catch (error) {
             // TODO: Show error in UI
@@ -238,13 +268,12 @@ export default class ImportScanner {
         }
     }
 
-    private onImportedStep() {
-        this.progress.processed++
-
+    private onProgressChange(forceSendingNow?: boolean) {
         const now = Date.now()
-        if (now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
+        if (forceSendingNow || now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
             this.lastProgressUIUpdateTime = now
-            this.mainWindow.webContents.send('progress', this.progress)
+            ForegroundClient.setImportProgress(this.isScanning ? this.progress : null, this.updatedTags)
+            this.updatedTags = null
         }
     }
 

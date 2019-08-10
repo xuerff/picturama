@@ -4,12 +4,13 @@ import DB from 'sqlite3-helper/no-generators'
 import { install as initSourceMapSupport } from 'source-map-support'
 import { start as initPrettyError } from 'pretty-error'
 
-import MainMenu from './MainMenu'
-// import Usb from './usb'
-import config from '../common/config'
-import Watch from './watch'
-import { init as initBackgroundService } from './BackgroundService'
-import { init as initForegroundClient } from './ForegroundClient'
+import config from 'common/config'
+
+import MainMenu from 'background/MainMenu'
+// import Usb from 'background/usb'
+import Watch from 'background/watch'
+import { init as initBackgroundService } from 'background/BackgroundService'
+import ForegroundClient from 'background/ForegroundClient'
 
 
 initSourceMapSupport()
@@ -51,7 +52,7 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + __dirname + '/ui.html')
     mainWindow.setTitle('Ansel')
     initBackgroundService(mainWindow, { locale: app.getLocale() })
-    initForegroundClient(mainWindow)
+    ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()
     //

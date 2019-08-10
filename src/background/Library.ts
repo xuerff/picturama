@@ -5,30 +5,26 @@ import moment from 'moment'
 import notifier from 'node-notifier'
 import { promisify } from 'bluebird'
 
-import config from '../common/config'
-import { getThumbnailPath, PhotoId } from '../common/models/Photo'
-import Version from '../common/models/Version'
+import config from 'common/config'
+import { getThumbnailPath, PhotoId } from 'common/models/Photo'
+import Version from 'common/models/Version'
+import { bindMany } from 'common/util/LangUtil'
 
-import { removePhotoWork } from './store/PhotoWorkStore'
-import { toSqlStringCsv } from './util/DbUtil'
-import ImportScanner from './ImportScanner'
+import { removePhotoWork } from 'background/store/PhotoWorkStore'
+import { toSqlStringCsv } from 'background/util/DbUtil'
+import ImportScanner from 'background/ImportScanner'
 
 const unlink = promisify<void, string | Buffer>(fs.unlink)
 
 
 class Library {
 
-    private mainWindow: BrowserWindow
     private path: string | null = null
     private versionsPath: string | null = null
 
 
-    constructor(mainWindow: BrowserWindow) {
-        this.mainWindow = mainWindow
-
-        this.scan = this.scan.bind(this)
-        this.emptyTrash = this.emptyTrash.bind(this)
-        this.fixMissingVersions = this.fixMissingVersions.bind(this)
+    constructor(private mainWindow: BrowserWindow) {
+        bindMany(this, 'scan', 'emptyTrash', 'fixMissingVersions')
 
         if (fs.existsSync(config.settings)) {
             let settings = JSON.parse(fs.readFileSync(config.settings)) as any
@@ -112,21 +108,18 @@ class Library {
     scan() {
         const start = new Date().getTime()
 
-        this.mainWindow.webContents.send('start-import', true)
-
-        if (!this.path || !this.versionsPath)
+        if (!this.path || !this.versionsPath) {
             return false
+        }
         new ImportScanner(this.path, this.versionsPath, this.mainWindow)
             .scanPictures()
             .then(pics => {
                 let end = new Date().getTime()
                 let time = moment.duration(end - start)
 
-                this.mainWindow.webContents.send('finish-import', true)
-
                 notifier.notify({
                     title: 'Ansel',
-                    message: `Finish importing ${pics.length} in ${time.humanize()}`
+                    message: `Finish importing ${pics.length} photos in ${time.humanize()}`
                 })
             })
             .catch(error => {

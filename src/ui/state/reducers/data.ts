@@ -28,7 +28,7 @@ const tags = (state: TagsState = initialTagsState, action: Action): TagsState =>
         case FETCH_TAGS: {
             let ids: TagId[] = []
             let byId: TagById = {}
-            for (const tag of action.payload.tags) {
+            for (const tag of action.payload) {
                 ids.push(tag.id)
                 byId[tag.id] = tag
             }

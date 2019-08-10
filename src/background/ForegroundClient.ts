@@ -1,6 +1,8 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
+import { TagType } from 'common/models/Tag'
 import { assertMainProcess } from 'common/util/ElectronUtil'
+import { ImportProgress } from 'common/CommonTypes'
 
 
 assertMainProcess()
@@ -18,20 +20,28 @@ let nextCallId = 1
 const pendingCalls: { [key:number]: CallInfo } = {}
 
 
-export function init(mainWin: BrowserWindow) {
-    mainWindow = mainWin
+export default {
 
-    ipcMain.on('onForegroundActionDone', (event, callId, error, result) => {
-        const callInfo = pendingCalls[callId]
-        delete pendingCalls[callId]
-        if (callInfo) {
-            if (error) {
-                callInfo.reject(error)
-            } else {
-                callInfo.resolve(result)
+    init(mainWin: BrowserWindow) {
+        mainWindow = mainWin
+    
+        ipcMain.on('onForegroundActionDone', (event, callId, error, result) => {
+            const callInfo = pendingCalls[callId]
+            delete pendingCalls[callId]
+            if (callInfo) {
+                if (error) {
+                    callInfo.reject(error)
+                } else {
+                    callInfo.resolve(result)
+                }
             }
-        }
-    })
+        })
+    },
+
+    async setImportProgress(progress: ImportProgress | null, updatedTags: TagType[] | null): Promise<void> {
+        return callOnForeground('setImportProgress', { progress, updatedTags })
+    },
+    
 }
 
 

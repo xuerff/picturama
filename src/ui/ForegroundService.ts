@@ -2,12 +2,13 @@ import { ipcRenderer } from 'electron'
 
 import { Device } from 'common/models/DataTypes'
 import { PhotoId } from 'common/models/Photo'
+import { TagType } from 'common/models/Tag'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { ImportProgress } from 'common/CommonTypes'
 
 import { fetchSections, fetchTotalPhotoCount, updatePhotoVersion } from 'ui/controller/PhotoController'
-import { fetchTags } from 'ui/controller/PhotoTagController'
-import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from 'ui/state/actions'
+import { setTags } from 'ui/controller/PhotoTagController'
+import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, setImportProgressAction } from 'ui/state/actions'
 import store from 'ui/state/store'
 
 
@@ -26,15 +27,6 @@ export function init() {
             })
     })
 
-    ipcRenderer.on('start-import', () => store.dispatch(startImportAction()))
-    ipcRenderer.on('progress', (event, progress: ImportProgress) => store.dispatch(setImportProgressAction(progress)))
-
-    ipcRenderer.on('finish-import', () => {
-        fetchTotalPhotoCount()
-        fetchSections()
-        fetchTags()
-    })
-
     ipcRenderer.on('new-version', (event, version: any /* Type should be `Version`, but it doesn't work */) => updatePhotoVersion(version))
     ipcRenderer.on('scanned-devices', (event, devices: Device[]) => store.dispatch(initDevicesAction(devices)))
     ipcRenderer.on('add-device', (event, device: Device) => store.dispatch(addDeviceAction(device)))
@@ -44,8 +36,23 @@ export function init() {
 
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
-    //if (action === 'todo') {
-    //} else {
+    if (action === 'setImportProgress') {
+        const { progress, updatedTags } = params as { progress: ImportProgress | null, updatedTags: TagType[] | null }
+
+        store.dispatch(setImportProgressAction(progress))
+
+        if (!progress) {
+            // Import is finished
+            fetchTotalPhotoCount()
+            fetchSections()
+        }
+
+        if (updatedTags) {
+            setTags(updatedTags)
+        }
+
+        return Promise.resolve()
+    } else {
         throw new Error('Unknown foreground action: ' + action)
-    //}
+    }
 }
