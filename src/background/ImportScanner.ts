@@ -46,6 +46,7 @@ interface FileInfo {
 }
 
 export default class ImportScanner {
+
     private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
 
@@ -54,12 +55,35 @@ export default class ImportScanner {
             processed: 0,
             total: 0,
             photosDir: path
-        };
+        }
 
         bindMany(this, 'scanPictures', 'prepare', 'setTotal', 'onImportedStep', 'filterStoredPhoto', 'walk')
     }
 
-    prepare(filePaths: string[]): FileInfo[] {
+    scanPictures() {
+        const profiler = profileScanner ? new Profiler('Overall scanning') : null
+        return walker(this.path, [ this.versionsPath ])
+            .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
+            .then(this.prepare)
+            .then(result => { if (profiler) { profiler.addPoint('Prepared files') }; return result })
+            .filter(this.filterStoredPhoto)
+            .then(result => { if (profiler) { profiler.addPoint('Filtered files') }; return result })
+            .then(this.setTotal)
+            .then(result => { if (profiler) { profiler.addPoint('Set total') }; return result })
+            .map(this.walk, {
+                concurrency: config.concurrency
+            })
+            .then(result => {
+                this.mainWindow.webContents.send('progress', this.progress)
+                if (profiler) {
+                    profiler.addPoint(`Scanned ${this.progress.total} images`)
+                    profiler.logResult()
+                }
+                return result
+            })
+    }
+
+    private prepare(filePaths: string[]): FileInfo[] {
         let rawFiles = filePaths.map(filePath =>
             filePath.match(allowed) ? filePath : null
         )
@@ -104,7 +128,7 @@ export default class ImportScanner {
         return preparedFiles;
     }
 
-    async walk(file: FileInfo): Promise<void> {
+    private async walk(file: FileInfo): Promise<void> {
         const profiler = profileScanner ? new Profiler(`Importing ${file.path}`) : null
 
         try {
@@ -214,7 +238,7 @@ export default class ImportScanner {
         }
     }
 
-    onImportedStep() {
+    private onImportedStep() {
         this.progress.processed++
 
         const now = Date.now()
@@ -224,41 +248,19 @@ export default class ImportScanner {
         }
     }
 
-    photoExists(originalImgPath: string): Promise<boolean> {
+    private photoExists(originalImgPath: string): Promise<boolean> {
         return DB().queryFirstCell<0 | 1>('select exists(select 1 from photos where master = ?)', originalImgPath)
             .then(rawBoolean => !!rawBoolean)
     }
 
-    filterStoredPhoto(fileInfo: FileInfo) {
+    private filterStoredPhoto(fileInfo: FileInfo) {
         return this.photoExists(fileInfo.path)
             .then(photoExists => !photoExists)
     }
 
-    setTotal(files) {
+    private setTotal(files) {
         this.progress.total = files.length;
         return files;
     }
 
-    scanPictures() {
-        const profiler = profileScanner ? new Profiler('Overall scanning') : null
-        return walker(this.path, [ this.versionsPath ])
-            .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
-            .then(this.prepare)
-            .then(result => { if (profiler) { profiler.addPoint('Prepared files') }; return result })
-            .filter(this.filterStoredPhoto)
-            .then(result => { if (profiler) { profiler.addPoint('Filtered files') }; return result })
-            .then(this.setTotal)
-            .then(result => { if (profiler) { profiler.addPoint('Set total') }; return result })
-            .map(this.walk, {
-                concurrency: config.concurrency
-            })
-            .then(result => {
-                this.mainWindow.webContents.send('progress', this.progress)
-                if (profiler) {
-                    profiler.addPoint(`Scanned ${this.progress.total} images`)
-                    profiler.logResult()
-                }
-                return result
-            })
-      }
 }
