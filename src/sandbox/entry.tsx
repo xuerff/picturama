@@ -3,18 +3,18 @@ import { render } from 'react-dom'
 
 import { setLocale } from 'ui/i18n/i18n'
 
-import UiTester from './core/UiTester'
-import './tests/library'
-import './tests/detail'
-import './tests/settings'
-import './tests/info'
-import './tests/import'
-import './tests/export'
-import './tests/GridSectionTest'
-import './tests/PhotoPaneTest'
+import UiTester from 'sandbox/core/UiTester'
+import 'sandbox/tests/library'
+import 'sandbox/tests/detail'
+import 'sandbox/tests/settings'
+import 'sandbox/tests/info'
+import 'sandbox/tests/ImportProgressButtonTest'
+import 'sandbox/tests/export'
+import 'sandbox/tests/GridSectionTest'
+import 'sandbox/tests/PhotoPaneTest'
 
 import 'ui/entry.less'
-import './entry.less'
+import 'sandbox/entry.less'
 
 
 window['Sandbox'] = {

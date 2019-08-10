@@ -33,6 +33,7 @@ interface OwnProps {
     style?: any
     className?: any
     topBarLeftItem?: MaybeElement
+    bottomBarLeftItem?: MaybeElement
     isActive: boolean
 }
 
@@ -223,6 +224,7 @@ export class Library extends React.Component<Props, State> {
                 </div>
                 <LibraryBottomBar
                     className="Library-bottomBar"
+                    leftItem={props.bottomBarLeftItem}
                     highlightedCount={props.selectedPhotoIds.length}
                     photosCount={props.photoCount}
                     gridRowHeight={props.gridRowHeight}

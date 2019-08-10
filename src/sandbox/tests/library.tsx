@@ -9,6 +9,7 @@ import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { sectionHeadHeight } from 'ui/components/library/GridSection'
 import { Library, Props } from 'ui/components/library/Library'
 import { LibraryFilterButton } from 'ui/components/library/LibraryFilterButton'
+import ImportProgressButton from 'ui/components/ImportProgressButton'
 
 import { addSection, action, TestContext } from 'sandbox/core/UiTester'
 import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'
@@ -172,6 +173,16 @@ addSection('Library')
             />
         )
     })
+    .add('importing', context => (
+        <Library
+            {...createDefaultProps(context)}
+            bottomBarLeftItem={
+                <ImportProgressButton
+                    progress={{ processed: 120, total: 1042, photosDir: '/user/me/documents/mypics/2018/summer vacation' }}
+                />
+            }
+        />
+    ))
     .add('creating thumbnails', context => {
         let photos = [ ...defaultPhotos ]
         for (let i = 0; i < 100; i++) {

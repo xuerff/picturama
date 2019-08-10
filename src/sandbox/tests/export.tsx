@@ -17,6 +17,7 @@ const defaultProps = {
 
 
 addSection('Export')
+    .setArenaStyle({ zIndex: -1 })
     .add('normal', context => (
         <Export
             {...defaultProps}

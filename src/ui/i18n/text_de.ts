@@ -1,4 +1,8 @@
 export default {
+
+    ImportProgressButton_phase: 'Importiere',
+    ImportProgressButton_ratio: '{0} von {1}',
+
     LibraryFilterButton_shown: 'Angezeigt: {0}',
     LibraryFilterButton_filter_all: 'Alle Bilder',
     LibraryFilterButton_filter_flagged: 'Favoriten',
@@ -6,4 +10,5 @@ export default {
     LibraryFilterButton_filter_trash: 'Papierkorb',
     LibraryFilterButton_filter_tag: 'Mit Tag "{0}"',
     LibraryFilterButton_tag_title: 'Mit Tag:',
+
 }

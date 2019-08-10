@@ -1,10 +1,8 @@
 import React from 'react'
 
-import { ImportProgress } from '../state/reducers/import'
-
 
 interface Props {
-    progress: ImportProgress
+    progress: { processed: number, total: number, photosDir: string }
 }
 
 /** Shows the progress of import or export */
@@ -30,7 +28,7 @@ export default class Progress extends React.Component<Props> {
         const progress = this.props.progress
         return (
             <div id="progress">
-                <h2>scanning: {progress.photosDir}</h2>
+                <h2>Exporting to: {progress.photosDir}</h2>
 
                 <div className="progress-bar">
                     <div
