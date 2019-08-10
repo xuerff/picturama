@@ -12,12 +12,12 @@ addSection('ImportProgressButton')
             {testView}
         </Toolbar>
     )
-    .add('start', context => (
+    .add('scanning dirs', context => (
         <ImportProgressButton
             progress={{ processed: 0, total: 0, photosDir: null }}
         />
     ))
-    .add('progress', context => (
+    .add('importing photos', context => (
         <ImportProgressButton
             progress={{ processed: 120, total: 1042, photosDir: '/user/me/documents/mypics/2018/summer vacation' }}
         />

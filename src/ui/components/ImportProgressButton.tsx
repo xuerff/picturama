@@ -46,7 +46,7 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                 {state.isShowingPopover &&
                     <>
                         <div className='ImportProgressButton-phase'>
-                            {msg('ImportProgressButton_phase')}
+                            {msg(progress.total === 0 ? 'ImportProgressButton_phase_scanningDirs' : 'ImportProgressButton_phase_importingPhoto')}
                         </div>
                         {progress.photosDir &&
                             <div className='ImportProgressButton-photosDir'>

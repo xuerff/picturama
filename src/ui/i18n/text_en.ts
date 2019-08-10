@@ -1,6 +1,7 @@
 export default {
 
-    ImportProgressButton_phase: 'Importing',
+    ImportProgressButton_phase_scanningDirs: 'Scanning directories',
+    ImportProgressButton_phase_importingPhoto: 'Importing',
     ImportProgressButton_ratio: '{0} of {1}',
 
     LibraryFilterButton_shown: 'Shown: {0}',
