@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { Popover, Button, IconName, Position, Menu, MenuItem, MenuDivider } from '@blueprintjs/core'
 import classnames from 'classnames'
 
@@ -7,7 +8,10 @@ import { PhotoFilter } from 'common/models/Photo'
 import { TagId, TagById } from 'common/models/Tag'
 
 import FaIcon from 'ui/components/widget/icon/FaIcon'
+import { setLibraryFilter } from 'ui/controller/PhotoController'
+import { fetchTags } from 'ui/controller/PhotoTagController'
 import { msg } from 'ui/i18n/i18n'
+import { AppState } from 'ui/state/reducers'
 
 import './LibraryFilterButton.less'
 
@@ -25,18 +29,25 @@ const iconByFilterType: { [K in FilterType]: IconName | JSX.Element } = {
     tag: 'tag',
 }
 
-
-export interface Props {
+export interface OwnProps {
     className?: any
+}
+
+interface StateProps {
     libraryFilter: PhotoFilter
     tagIds: TagId[]
     tagById: TagById
     devices: Device[]
+}
+
+interface DispatchProps {
     fetchTags(): void
     setLibraryFilter(newFilter: PhotoFilter): void
 }
 
-export default class LibraryFilterButton extends React.Component<Props> {
+export interface Props extends OwnProps, StateProps, DispatchProps {}
+
+export class LibraryFilterButton extends React.Component<Props> {
 
     private onSimpleFilterClick(type: SimpleFilterType) {
         let libraryFilter: PhotoFilter
@@ -129,3 +140,22 @@ function getTypeForFilter(libraryFilter: PhotoFilter): FilterType {
         return libraryFilter.showOnlyFlagged ? 'flagged' : 'all'
     }
 }
+
+
+const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
+    (state: AppState, props: OwnProps) => {
+        return {
+            ...props,
+            libraryFilter: state.library.filter,
+            tagIds: state.data.tags.ids,
+            tagById: state.data.tags.byId,
+            devices: state.data.devices,
+        }
+    },
+    dispatch => ({
+        fetchTags,
+        setLibraryFilter,
+    })
+)(LibraryFilterButton)
+
+export default Connected

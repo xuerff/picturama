@@ -7,6 +7,7 @@ import PictureDiff from 'ui/components/PictureDiff'
 import Settings from 'ui/components/Settings'
 import Progress from 'ui/components/Progress'
 import Library from 'ui/components/library/Library'
+import LibraryFilterButton from 'ui/components/library/LibraryFilterButton'
 import { AppState } from 'ui/state/reducers'
 import { ImportProgress } from 'ui/state/reducers/import'
 import { ModalState } from 'ui/state/reducers/navigation'
@@ -78,6 +79,9 @@ class Ansel extends React.Component<Props> {
             container =
                 <Library
                     className='Ansel-container'
+                    topBarLeftItem={
+                        <LibraryFilterButton/>
+                    }
                     isActive={!mainView && !modalView}
                 />
         }

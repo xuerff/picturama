@@ -8,9 +8,10 @@ import { GridLayout } from 'ui/UITypes'
 import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { sectionHeadHeight } from 'ui/components/library/GridSection'
 import { Library, Props } from 'ui/components/library/Library'
+import { LibraryFilterButton } from 'ui/components/library/LibraryFilterButton'
 
 import { addSection, action, TestContext } from 'sandbox/core/UiTester'
-import { testLandscapePhoto, testPortraitPhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'
+import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'
 import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'sandbox/util/TestUtil'
 
 
@@ -24,6 +25,31 @@ let sharedGridRowHeight = defaultGridRowHeight
 function createDefaultProps(context: TestContext): Props {
     return {
         style: { width: '100%', height: '100%', overflow: 'hidden' },
+        topBarLeftItem: (
+            <LibraryFilterButton
+                libraryFilter={{ mainFilter: null, showOnlyFlagged: false }}
+                tagIds={[ 1, 2 ]}
+                tagById={{
+                    1: {
+                        created_at: 1565357205167,
+                        id: 1,
+                        slug: 'flower',
+                        title: 'Flower',
+                        updated_at: null
+                    },
+                    2: {
+                        created_at: 1565357205167,
+                        id: 2,
+                        slug: 'panorama',
+                        title: 'Panorama',
+                        updated_at: null
+                    }
+                }}
+                devices={[]}
+                fetchTags={action('fetchTags')}
+                setLibraryFilter={action('setLibraryFilter')}
+            />
+        ),
         isActive: true,
 
         isFetching: false,
@@ -38,32 +64,12 @@ function createDefaultProps(context: TestContext): Props {
         selectedPhotoIds: [],
         infoPhoto: null,
         infoPhotoDetail: null,
-        libraryFilter: { mainFilter: null, showOnlyFlagged: false },
-        tagIds: [ 1, 2 ],
-        tagById: {
-            1: {
-                created_at: 1565357205167,
-                id: 1,
-                slug: 'flower',
-                title: 'Flower',
-                updated_at: null
-            },
-            2: {
-                created_at: 1565357205167,
-                id: 2,
-                slug: 'panorama',
-                title: 'Panorama',
-                updated_at: null
-            }
-        },
-        devices: [],
         tags: [ 'Flower', 'Panorama' ],
         gridRowHeight: sharedGridRowHeight,
         isShowingTrash: false,
 
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
-        fetchTags: action('fetchTags'),
         getGridLayout,
         getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
@@ -74,7 +80,6 @@ function createDefaultProps(context: TestContext): Props {
                 return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
             }
         },
-        setLibraryFilter: action('setLibraryFilter'),
         setGridRowHeight: (gridRowHeight: number) => {
             sharedGridRowHeight = gridRowHeight
             context.forceUpdate()

@@ -1,35 +1,27 @@
 import { remote, ipcRenderer } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
-import { Button } from '@blueprintjs/core'
+import { Button, MaybeElement } from '@blueprintjs/core'
 
-import { Device } from 'common/models/DataTypes'
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoFilter } from 'common/models/Photo'
-import { TagId, TagById } from 'common/models/Tag'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from 'common/models/Photo'
 import { bindMany } from 'common/util/LangUtil'
 
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
 import Toolbar from 'ui/components/widget/Toolbar'
 
 import './LibraryTopBar.less'
-import LibraryFilterButton from './LibraryFilterButton'
 
 const dialog = remote.dialog;
 
 
 interface Props {
     className?: any
-    libraryFilter: PhotoFilter
-    tagIds: TagId[]
-    tagById: TagById
-    devices: Device[]
+    leftItem?: MaybeElement
     selectedSectionId: PhotoSectionId | null
     selectedPhotos: PhotoType[]
     isShowingTrash: boolean
     isShowingInfo: boolean
     photosCount: number
-    fetchTags(): void
-    setLibraryFilter(newFilter: PhotoFilter): void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
@@ -61,14 +53,7 @@ export default class LibraryTopBar extends React.Component<Props> {
         const props = this.props
         return (
             <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
-                <LibraryFilterButton
-                    libraryFilter={props.libraryFilter}
-                    tagIds={props.tagIds}
-                    tagById={props.tagById}
-                    devices={props.devices}
-                    fetchTags={props.fetchTags}
-                    setLibraryFilter={props.setLibraryFilter}
-                />
+                {props.leftItem}
 
                 <div className="pull-right">
                     {this.props.isShowingTrash &&

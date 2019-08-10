@@ -3,11 +3,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
-import { Button, NonIdealState, Spinner } from '@blueprintjs/core'
+import { Button, NonIdealState, Spinner, MaybeElement } from '@blueprintjs/core'
 
-import { Device } from 'common/models/DataTypes'
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilter } from 'common/models/Photo'
-import { TagId, TagById } from 'common/models/Tag'
+import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from 'common/models/Photo'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -15,7 +13,7 @@ import { setDetailPhotoById } from 'ui/controller/DetailController'
 import { getThumbnailSrc } from 'ui/controller/ImageProvider'
 import { getGridLayout, setInfoPhoto, createThumbnail } from 'ui/controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'ui/controller/PhotoController'
-import { fetchTags, setPhotoTags } from 'ui/controller/PhotoTagController'
+import { setPhotoTags } from 'ui/controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 import { getTagTitles } from 'ui/state/selectors'
@@ -34,6 +32,7 @@ import './Library.less'
 interface OwnProps {
     style?: any
     className?: any
+    topBarLeftItem?: MaybeElement
     isActive: boolean
 }
 
@@ -47,10 +46,6 @@ interface StateProps {
     selectedPhotoIds: PhotoId[]
     infoPhoto: PhotoType | null
     infoPhotoDetail: PhotoDetail | null
-    libraryFilter: PhotoFilter
-    tagIds: TagId[]
-    tagById: TagById
-    devices: Device[]
     tags: string[]
     gridRowHeight: number
     isShowingTrash: boolean
@@ -59,11 +54,9 @@ interface StateProps {
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
-    fetchTags(): void
     getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: PhotoType) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
-    setLibraryFilter(newFilter: PhotoFilter): void
     setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
@@ -212,17 +205,12 @@ export class Library extends React.Component<Props, State> {
             >
                 <LibraryTopBar
                     className="Library-topBar"
-                    libraryFilter={props.libraryFilter}
-                    tagIds={props.tagIds}
-                    tagById={props.tagById}
-                    devices={props.devices}
+                    leftItem={props.topBarLeftItem}
                     selectedSectionId={selectedSectionId}
                     selectedPhotos={selectedPhotos}
                     isShowingTrash={props.isShowingTrash}
                     isShowingInfo={state.isShowingInfo}
                     photosCount={props.photoCount}
-                    fetchTags={props.fetchTags}
-                    setLibraryFilter={props.setLibraryFilter}
                     openExport={props.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
@@ -272,10 +260,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             selectedPhotoIds: state.library.selection.photoIds,
             infoPhoto: (libraryInfo && photoData) ? photoData[libraryInfo.photoId] : null,
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
-            libraryFilter: state.library.filter,
-            tagIds: state.data.tags.ids,
-            tagById: state.data.tags.byId,
-            devices: state.data.devices,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
             isShowingTrash: !!(state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash')
@@ -284,11 +268,9 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     dispatch => ({
         fetchTotalPhotoCount,
         fetchSections,
-        fetchTags,
         getGridLayout,
         getThumbnailSrc,
         createThumbnail,
-        setLibraryFilter,
         setDetailPhotoById,
         setInfoPhoto,
         setPhotosFlagged,
