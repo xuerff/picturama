@@ -45,7 +45,7 @@ interface FileInfo {
     isRaw: boolean
 }
 
-export default class Scanner {
+export default class ImportScanner {
     private progress: { processed: number, total: number, photosDir: string }
     private lastProgressUIUpdateTime = 0
 

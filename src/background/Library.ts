@@ -11,7 +11,7 @@ import Version from '../common/models/Version'
 
 import { removePhotoWork } from './store/PhotoWorkStore'
 import { toSqlStringCsv } from './util/DbUtil'
-import Scanner from './Scanner'
+import ImportScanner from './ImportScanner'
 
 const unlink = promisify<void, string | Buffer>(fs.unlink)
 
@@ -116,7 +116,7 @@ class Library {
 
         if (!this.path || !this.versionsPath)
             return false
-        new Scanner(this.path, this.versionsPath, this.mainWindow)
+        new ImportScanner(this.path, this.versionsPath, this.mainWindow)
             .scanPictures()
             .then(pics => {
                 let end = new Date().getTime()
