@@ -1,12 +1,8 @@
-import { Action } from '../ActionType'
-import { START_IMPORT, SET_IMPORT_PROGRESS, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE } from '../actionTypes'
+import { ImportProgress } from 'common/CommonTypes'
 
+import { Action } from 'ui/state/ActionType'
+import { START_IMPORT, SET_IMPORT_PROGRESS, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE } from 'ui/state/actionTypes'
 
-export type ImportProgress = {
-    readonly processed: number
-    readonly total: number
-    readonly photosDir: string | null
-}
 
 export type ImportState = {
     readonly progress: ImportProgress

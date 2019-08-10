@@ -3,9 +3,9 @@ import classnames from 'classnames'
 import { Popover, Position, Button, Spinner } from '@blueprintjs/core'
 
 import { bindMany } from 'common/util/LangUtil'
+import { ImportProgress } from 'common/CommonTypes'
 
 import { msg } from 'ui/i18n/i18n'
-import { ImportProgress } from 'ui/state/reducers/import'
 
 import './ImportProgressButton.less'
 

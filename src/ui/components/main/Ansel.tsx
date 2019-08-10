@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { ImportProgress } from 'common/CommonTypes'
+
 import Export from 'ui/components/Export'
 import PictureDetail from 'ui/components//detail/PictureDetail'
 import PictureDiff from 'ui/components/PictureDiff'
@@ -9,7 +11,6 @@ import Library from 'ui/components/library/Library'
 import LibraryFilterButton from 'ui/components/library/LibraryFilterButton'
 import ImportProgressButton from 'ui/components/ImportProgressButton'
 import { AppState } from 'ui/state/reducers'
-import { ImportProgress } from 'ui/state/reducers/import'
 import { ModalState } from 'ui/state/reducers/navigation'
 
 import './Ansel.less'

@@ -1,8 +1,9 @@
 import { action, createAsyncAction } from 'typesafe-actions'
 
-import { Device } from '../../common/models/DataTypes'
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoFilter } from '../../common/models/Photo'
-import { TagType } from '../../common/models/Tag'
+import { Device } from 'common/models/DataTypes'
+import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoFilter } from 'common/models/Photo'
+import { TagType } from 'common/models/Tag'
+import { ImportProgress } from 'common/CommonTypes'
 
 import {
     SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE, SET_GRID_ROW_HEIGHT,
@@ -12,7 +13,6 @@ import {
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, START_IMPORT, SET_IMPORT_PROGRESS, FETCH_TAGS, SET_PHOTO_TAGS,
     INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, TOGGLE_DIFF
 } from './actionTypes'
-import { ImportProgress } from './reducers/import'
 
 
 export const checkSettingsExistAction = createAsyncAction(SETTINGS_EXISTS_REQUEST, SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE)<void, void, Error>()

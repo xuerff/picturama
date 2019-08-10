@@ -6,7 +6,7 @@ import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
 
-import { ExifOrientation } from 'common/CommonTypes'
+import { ExifOrientation, ImportProgress } from 'common/CommonTypes'
 import config from 'common/config'
 import { profileScanner } from 'common/LogConstants'
 import { PhotoType, generatePhotoId } from 'common/models/Photo'
@@ -46,7 +46,7 @@ interface FileInfo {
 }
 
 export default class ImportScanner {
-    private progress: { processed: number, total: number, photosDir: string }
+    private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
 
     constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {

@@ -1,13 +1,14 @@
 import { ipcRenderer } from 'electron'
 
-import { fetchSections, fetchTotalPhotoCount, updatePhotoVersion } from './controller/PhotoController'
-import { fetchTags } from './controller/PhotoTagController'
-import { Device } from '../common/models/DataTypes'
-import { PhotoId } from '../common/models/Photo'
-import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from './state/actions'
-import store from './state/store'
-import { assertRendererProcess } from '../common/util/ElectronUtil'
-import { ImportProgress } from './state/reducers/import'
+import { Device } from 'common/models/DataTypes'
+import { PhotoId } from 'common/models/Photo'
+import { assertRendererProcess } from 'common/util/ElectronUtil'
+import { ImportProgress } from 'common/CommonTypes'
+
+import { fetchSections, fetchTotalPhotoCount, updatePhotoVersion } from 'ui/controller/PhotoController'
+import { fetchTags } from 'ui/controller/PhotoTagController'
+import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, startImportAction, setImportProgressAction } from 'ui/state/actions'
+import store from 'ui/state/store'
 
 
 assertRendererProcess()
