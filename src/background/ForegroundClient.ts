@@ -1,8 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { TagType } from 'common/models/Tag'
+import { Tag, ImportProgress } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
-import { ImportProgress } from 'common/CommonTypes'
 
 
 assertMainProcess()
@@ -38,7 +37,7 @@ export default {
         })
     },
 
-    async setImportProgress(progress: ImportProgress | null, updatedTags: TagType[] | null): Promise<void> {
+    async setImportProgress(progress: ImportProgress | null, updatedTags: Tag[] | null): Promise<void> {
         return callOnForeground('setImportProgress', { progress, updatedTags })
     },
     

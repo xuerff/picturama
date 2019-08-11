@@ -4,7 +4,7 @@ import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
-import { fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
+import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
 
 
@@ -32,6 +32,8 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
     if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
+    } else if (action === 'fetchTotalPhotoCount') {
+        return fetchTotalPhotoCount()
     } else if (action === 'fetchSections') {
         return fetchSections(params.filter)
     } else if (action === 'fetchSectionPhotos') {

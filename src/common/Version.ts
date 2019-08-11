@@ -1,3 +1,6 @@
+
+// TODO: Revive Legacy code of 'version' feature
+/*
 import anselBookshelf from './ansel-bookshelf'
 import { copy as fsCopy } from 'fs.extra'
 import Promise from 'bluebird'
@@ -7,21 +10,10 @@ import libraw from 'libraw'
 import config from '../config'
 
 import Photo from './Photo'
-import { BookshelfClass } from './DataTypes'
+import { BookshelfClass } from '../DataTypes'
 
 
 const copy = Promise.promisify(fsCopy) as ((fromPath: string, toPath: string) => Promise<void>)
-
-export type VersionId = number
-export interface VersionType {
-    id: VersionId
-    type: string | null,
-    master: string | null,
-    output: string | null,
-    thumbnail: string | null,
-    version: number | null,
-    photo_id: number | null,
-}
 
 const Version = anselBookshelf.Model.extend({
     tableName: 'versions',
@@ -94,3 +86,4 @@ const Version = anselBookshelf.Model.extend({
 }) as BookshelfClass<VersionType>
 
 export default Version
+*/

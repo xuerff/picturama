@@ -3,13 +3,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Spinner } from '@blueprintjs/core'
 
-import keymapManager from '../keymap-manager'
-import { PhotoType, PhotoDetail } from '../../common/models/Photo'
-import { VersionType } from '../../common/models/Version'
-import { getNonRawImgPath } from '../controller/ImageProvider'
-import { closeDiffAction } from '../state/actions'
-import { AppState } from '../state/reducers'
-import { getPhotoById } from '../state/selectors'
+import { Photo, PhotoDetail, Version } from 'common/CommonTypes'
+
+import keymapManager from 'ui/keymap-manager'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { closeDiffAction } from 'ui/state/actions'
+import { AppState } from 'ui/state/reducers'
+import { getPhotoById } from 'ui/state/selectors'
 
 
 let rotation = {}
@@ -23,7 +23,7 @@ interface OwnProps {
 }
 
 interface StateProps {
-    photo: PhotoType
+    photo: Photo
     photoDetail: PhotoDetail
 }
 
@@ -86,7 +86,7 @@ export class PictureDiff extends React.Component<Props, State> {
         ].join(' ')
 
         const photoDetail = props.photoDetail
-        let last: VersionType | undefined = undefined
+        let last: Version | undefined = undefined
         if (photoDetail) {
             last = photoDetail.versions[photoDetail.versions.length - 1]
         }

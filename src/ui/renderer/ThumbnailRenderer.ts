@@ -1,17 +1,19 @@
-import { PhotoType, PhotoWork, getTotalRotationTurns } from '../../common/models/Photo'
-import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import SerialJobQueue from '../../common/util/SerialJobQueue'
-import Profiler from '../../common/util/Profiler'
+import { Photo, PhotoWork } from 'common/CommonTypes'
+import { getTotalRotationTurns } from 'common/util/DataUtil'
+import { assertRendererProcess } from 'common/util/ElectronUtil'
+import SerialJobQueue from 'common/util/SerialJobQueue'
+import Profiler from 'common/util/Profiler'
 
-import { getNonRawImgPath } from '../controller/ImageProvider'
-import { updatePhoto } from '../controller/PhotoController'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { updatePhoto } from 'ui/controller/PhotoController'
+
 import PhotoCanvas from './PhotoCanvas'
 
 
 assertRendererProcess()
 
 
-type RenderJob = { nonRawImgPath: string, photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null }
+type RenderJob = { nonRawImgPath: string, photo: Photo, photoWork: PhotoWork, profiler: Profiler | null }
 
 const queue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.nonRawImgPath === existingJob.nonRawImgPath) ? newJob : null,
@@ -26,7 +28,7 @@ const maxThumbnailHeight = 320
 let canvas: PhotoCanvas | null = null
 
 
-export async function renderThumbnailForPhoto(photo: PhotoType, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
+export async function renderThumbnailForPhoto(photo: Photo, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
     const nonRawImgPath = getNonRawImgPath(photo)
     return queue.addJob({ nonRawImgPath, photo, photoWork, profiler })
 }

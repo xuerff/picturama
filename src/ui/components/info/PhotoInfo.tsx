@@ -6,11 +6,12 @@ import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 
-import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
-import { bindMany } from '../../../common/util/LangUtil'
+import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { bindMany } from 'common/util/LangUtil'
 
-import Toolbar from '../widget/Toolbar'
-import FaIcon from '../widget/icon/FaIcon'
+import Toolbar from 'ui/components/widget/Toolbar'
+import FaIcon from 'ui/components/widget/icon/FaIcon'
+
 import TagEditor from './TagEditor'
 
 import './PhotoInfo.less'
@@ -24,11 +25,11 @@ interface Props {
     style?: any
     className?: any
     isActive: boolean
-    photo: PhotoType | null
+    photo: Photo | null
     photoDetail: PhotoDetail | null
     tags: string[]
     closeInfo: () => void
-    setPhotoTags: (photo: PhotoType, tags: string[]) => void
+    setPhotoTags: (photo: Photo, tags: string[]) => void
 }
 
 interface State {

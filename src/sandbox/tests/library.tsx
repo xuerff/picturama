@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PhotoType, PhotoSectionById, PhotoSectionId } from 'common/models/Photo'
+import { Photo, PhotoSectionById, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 
 import { defaultGridRowHeight } from 'ui/UiConstants'
@@ -72,8 +72,8 @@ function createDefaultProps(context: TestContext): Props {
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
         getGridLayout,
-        getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
-        createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
+        getThumbnailSrc: (photo: Photo) => getNonRawImgPath(photo),
+        createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             const thumbnailPath = getNonRawImgPath(photo)
             if (thumbnailPath === 'dummy') {
                 return new CancelablePromise<string>(() => {})

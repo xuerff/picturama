@@ -1,15 +1,14 @@
-import { PhotoType, PhotoSectionId, PhotoSection } from '../../common/models/Photo'
-import { TagId } from '../../common/models/Tag'
+import { Photo, PhotoSectionId, PhotoSection, TagId } from 'common/CommonTypes'
 
 import store from './store'
 
 
-export function getPhotoByIndex(sectionId: PhotoSectionId, photoIndex: number): PhotoType | null {
+export function getPhotoByIndex(sectionId: PhotoSectionId, photoIndex: number): Photo | null {
     const section = getSectionById(sectionId)
     return (section && section.photoData && section.photoIds) ? section.photoData[section.photoIds[photoIndex]] : null
 }
 
-export function getPhotoById(sectionId: PhotoSectionId, photoId: string): PhotoType | null {
+export function getPhotoById(sectionId: PhotoSectionId, photoId: string): Photo | null {
     const section = getSectionById(sectionId)
     return (section && section.photoData) ? section.photoData[photoId] : null
 }

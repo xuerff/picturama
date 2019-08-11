@@ -1,11 +1,10 @@
 import DB from 'sqlite3-helper/no-generators'
 
-import { PhotoId } from '../../common/models/Photo'
-import { TagType, TagId } from '../../common/models/Tag'
-import { slug } from '../../common/util/LangUtil'
-import SerialJobQueue from '../../common/util/SerialJobQueue'
+import { PhotoId, Tag, TagId } from 'common/CommonTypes'
+import { slug } from 'common/util/LangUtil'
+import SerialJobQueue from 'common/util/SerialJobQueue'
 
-import { toSqlStringCsv } from '../util/DbUtil'
+import { toSqlStringCsv } from 'background/util/DbUtil'
 
 
 type StorePhotoTagsJob = { photoId: PhotoId, photoTags: string[] }
@@ -18,20 +17,20 @@ let tagsHaveChanged = false
 let tagsHaveBeenRemoved = false
 
 
-export function fetchTags(): Promise<TagType[]> {
-    return DB().query<TagType>('select * from tags order by slug')
+export function fetchTags(): Promise<Tag[]> {
+    return DB().query<Tag>('select * from tags order by slug')
 }
 
 
-export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<Tag[] | null> {
     return storePhotoTagsQueue.addJob({ photoId, photoTags })
 }
 
 
-async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<TagType[] | null> {
+async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<Tag[] | null> {
     const { photoId, photoTags } = job
     const photoTagsSlugged = photoTags.map(tag => slug(tag))
-    let updatedTags: TagType[] | null = null
+    let updatedTags: Tag[] | null = null
 
     await DB().query('BEGIN')
     try {

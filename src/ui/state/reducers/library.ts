@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoSectionId, PhotoFilter, PhotoDetail } from '../../../common/models/Photo'
+import { PhotoId, PhotoSectionId, PhotoFilter, PhotoDetail } from 'common/CommonTypes'
 
-import { defaultGridRowHeight } from '../../UiConstants'
-import { Action } from '../ActionType'
+import { defaultGridRowHeight } from 'ui/UiConstants'
+import { Action } from 'ui/state/ActionType'
 import {
     SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     CHANGE_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_PHOTO_TAGS, EMPTY_TRASH
-} from '../actionTypes'
+} from 'ui/state/actionTypes'
 
 
 type DisplayState = {

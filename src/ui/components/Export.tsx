@@ -8,9 +8,9 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
+import { PhotoId, PhotoById } from 'common/CommonTypes'
 import config from 'common/config'
 import { bindMany } from 'common/util/LangUtil'
-import { PhotoId, PhotoById } from 'common/models/Photo'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import keymapManager from 'ui/keymap-manager'

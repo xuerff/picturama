@@ -1,7 +1,7 @@
 import fs from 'fs'
 import chokidar from 'chokidar'
 
-import Version from '../common/models/Version'
+import Version from '../common/Version'
 import config from '../common/config'
 
 

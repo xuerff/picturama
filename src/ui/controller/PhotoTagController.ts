@@ -1,5 +1,4 @@
-import { PhotoType } from 'common/models/Photo'
-import { TagType } from 'common/models/Tag'
+import { Photo, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { slug } from 'common/util/LangUtil'
 
@@ -13,7 +12,7 @@ import { updatePhotoWork } from './PhotoController'
 assertRendererProcess()
 
 
-export function setTags(tags: TagType[]) {
+export function setTags(tags: Tag[]) {
     store.dispatch(fetchTagsAction(tags))
 }
 
@@ -26,7 +25,7 @@ export function fetchTags() {
 }
 
 
-export async function setPhotoTags(photo: PhotoType, tags: string[]) {
+export async function setPhotoTags(photo: Photo, tags: string[]) {
     tags.sort((tag1, tag2) => slug(tag1) < slug(tag2) ? -1 : 1)
 
     store.dispatch(setPhotoTagsAction(photo.id, tags))

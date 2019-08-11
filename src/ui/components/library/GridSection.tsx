@@ -1,10 +1,11 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { PhotoId, PhotoType, PhotoSectionId, PhotoSection } from '../../../common/models/Photo'
-import CancelablePromise from '../../../common/util/CancelablePromise'
+import { PhotoId, Photo, PhotoSectionId, PhotoSection } from 'common/CommonTypes'
+import CancelablePromise from 'common/util/CancelablePromise'
 
-import { GridSectionLayout } from '../../UITypes'
+import { GridSectionLayout } from 'ui/UITypes'
+
 import Picture from './Picture'
 
 import './GridSection.less'
@@ -19,8 +20,8 @@ interface Props {
     section: PhotoSection
     layout: GridSectionLayout
     selectedPhotoIds: PhotoId[] | null
-    getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: Photo) => string
+    createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     onPhotoClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
     onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }

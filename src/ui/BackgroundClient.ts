@@ -1,8 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import { UiConfig } from 'common/CommonTypes'
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId } from 'common/models/Photo'
-import { TagType } from 'common/models/Tag'
+import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 
@@ -43,15 +42,19 @@ export default {
         return callOnBackground('fetchUiConfig')
     },
 
+    fetchTotalPhotoCount(): Promise<number> {
+        return callOnBackground('fetchTotalPhotoCount')
+    },
+
     fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
         return callOnBackground('fetchSections', { filter })
     },
 
-    fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<PhotoType[]> {
+    fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<Photo[]> {
         return callOnBackground('fetchSectionPhotos', { sectionId, filter })
     },
 
-    updatePhotos(photoIds: PhotoId[], update: Partial<PhotoType>): Promise<void> {
+    updatePhotos(photoIds: PhotoId[], update: Partial<Photo>): Promise<void> {
         return callOnBackground('updatePhotos', { photoIds, update })
     },
 
@@ -71,11 +74,11 @@ export default {
         return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
     },
 
-    fetchTags(): Promise<TagType[]> {
+    fetchTags(): Promise<Tag[]> {
         return callOnBackground('fetchTags')
     },
 
-    storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+    storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<Tag[] | null> {
         return callOnBackground('storePhotoTags', { photoId, photoTags })
     },
 

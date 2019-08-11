@@ -1,8 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { Device } from 'common/models/DataTypes'
-import { TagId, TagById } from 'common/models/Tag'
-import { PhotoSection, PhotoSectionId, PhotoById, PhotoSectionById } from 'common/models/Photo'
+import { PhotoId, PhotoById, TagId, TagById, Device, PhotoSection, PhotoSectionId, PhotoSectionById } from 'common/CommonTypes'
 import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { Action } from 'ui/state/ActionType'
@@ -116,7 +114,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
             const sectionId = action.payload.sectionId
             const prevSection = state.byId[sectionId]
             if (prevSection) {
-                let photoIds: PhotoSectionId[] = []
+                let photoIds: PhotoId[] = []
                 let photoData: PhotoById = {}
                 for (const photo of action.payload.photos) {
                     photoIds.push(photo.id)

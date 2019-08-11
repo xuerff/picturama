@@ -3,28 +3,28 @@ import React from 'react'
 import { MdRotateLeft, MdRotateRight } from 'react-icons/md'
 import { Button, ButtonGroup, Classes } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
-import { rotate } from '../../../common/util/EffectsUtil'
-import { bindMany } from '../../../common/util/LangUtil'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import { rotate } from 'common/util/EffectsUtil'
+import { bindMany } from 'common/util/LangUtil'
 
-import toaster from '../../Toaster'
-import FaIcon from './icon/FaIcon'
-import { SVG_ICON_CLASS } from './icon/SvgIcon'
-import MdRestoreFromTrash from './icon/MdRestoreFromTrash'
+import toaster from 'ui/Toaster'
+import FaIcon from 'ui/components/widget/icon/FaIcon'
+import { SVG_ICON_CLASS } from 'ui/components/widget/icon/SvgIcon'
+import MdRestoreFromTrash from 'ui/components/widget/icon/MdRestoreFromTrash'
 
 import './PhotoActionButtons.less'
 
 
 interface Props {
     selectedSectionId: PhotoSectionId | null
-    selectedPhotos: PhotoType[]
+    selectedPhotos: Photo[]
     isShowingTrash: boolean
     isShowingInfo: boolean
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
-    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
-    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
-    movePhotosToTrash: (photos: PhotoType[]) => void
-    restorePhotosFromTrash: (photos: PhotoType[]) => void
+    updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
+    setPhotosFlagged: (photos: Photo[], flag: boolean) => void
+    movePhotosToTrash: (photos: Photo[]) => void
+    restorePhotosFromTrash: (photos: Photo[]) => void
     toggleShowInfo: () => void
 }
 
@@ -55,7 +55,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         const props = this.props
         const newFlagged = !this.getSelectedAreFlagged()
 
-        let photosToChange: PhotoType[] = []
+        let photosToChange: Photo[] = []
         for (const photo of props.selectedPhotos) {
             if (!!photo.flag !== newFlagged) {
                 photosToChange.push(photo)

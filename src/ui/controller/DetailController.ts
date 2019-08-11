@@ -1,4 +1,4 @@
-import { PhotoId, PhotoSectionId } from 'common/models/Photo'
+import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 

@@ -4,9 +4,7 @@ import { Popover, Button, IconName, Position, Menu, MenuItem, MenuDivider } from
 import classnames from 'classnames'
 
 import { msg } from 'common/i18n/i18n'
-import { Device } from 'common/models/DataTypes'
-import { PhotoFilter } from 'common/models/Photo'
-import { TagId, TagById } from 'common/models/Tag'
+import { TagId, TagById, Device, PhotoFilter } from 'common/CommonTypes'
 
 import FaIcon from 'ui/components/widget/icon/FaIcon'
 import { setLibraryFilter } from 'ui/controller/PhotoController'
@@ -16,15 +14,18 @@ import { AppState } from 'ui/state/reducers'
 import './LibraryFilterButton.less'
 
 
-type SimpleFilterType = 'all' | 'flagged' | 'processed' | 'trash'
-const simpleFilterTypes: SimpleFilterType[] = [ 'all', 'flagged', 'processed', 'trash' ]
+type SimpleFilterType = 'all' | 'flagged' | 'trash'
+const simpleFilterTypes: SimpleFilterType[] = [ 'all', 'flagged', 'trash' ]
+    // TODO: Revive Legacy code of 'version' feature
+    // -> Add 'processed'
 
 type FilterType = SimpleFilterType | 'tag'
 
 const iconByFilterType: { [K in FilterType]: IconName | JSX.Element } = {
     all: 'book',
     flagged: <FaIcon name='flag' />,
-    processed: 'settings',
+    // TODO: Revive Legacy code of 'version' feature
+    //processed: 'settings',
     trash: 'trash',
     tag: 'tag',
 }
@@ -128,7 +129,8 @@ function getTypeForFilter(libraryFilter: PhotoFilter): FilterType {
     if (libraryFilter.mainFilter) {
         const type = libraryFilter.mainFilter.type
         switch (type) {
-            case 'processed':
+            // TODO: Revive Legacy code of 'version' feature
+            //case 'processed':
             case 'trash':
             case 'tag':
                 return type

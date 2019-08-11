@@ -1,6 +1,7 @@
 import fs from 'fs'
 
-import { PhotoId, PhotoType, getThumbnailPath } from 'common/models/Photo'
+import { PhotoId, Photo } from 'common/CommonTypes'
+import { getThumbnailPath } from 'common/util/DataUtil'
 import Profiler from 'common/util/Profiler'
 
 import { renderThumbnailForPhoto } from 'ui/renderer/ThumbnailRenderer'
@@ -19,7 +20,7 @@ async function exists(path: string | Buffer): Promise<boolean> {
 let thumbnailVersion = Date.now()
 
 
-export function getNonRawImgPath(photo: PhotoType): string {
+export function getNonRawImgPath(photo: Photo): string {
     return photo.non_raw || photo.master
 }
 
@@ -36,13 +37,13 @@ export async function onThumbnailChange(photoId: PhotoId): Promise<void> {
 }
 
 
-export function getThumbnailSrc(photo: PhotoType): string {
+export function getThumbnailSrc(photo: Photo): string {
     const thumbnailPath = getThumbnailPath(photo.id)
     return `${thumbnailPath}?v=${thumbnailVersion}`
 }
 
 
-export async function createThumbnail(photo: PhotoType, profiler: Profiler | null = null): Promise<void> {
+export async function createThumbnail(photo: Photo, profiler: Profiler | null = null): Promise<void> {
     const thumbnailPath = getThumbnailPath(photo.id)
     const thumbnailExists = await exists(thumbnailPath)
     if (profiler) profiler.addPoint('Checked if thumbnail exists')

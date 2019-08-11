@@ -1,4 +1,4 @@
-import { PhotoWork } from "../models/Photo"
+import { PhotoWork } from 'common/CommonTypes'
 
 
 export function rotate(photoWork: PhotoWork, turns: number) {

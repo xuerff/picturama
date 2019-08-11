@@ -1,7 +1,7 @@
-import { PhotoType, PhotoDetail } from '../../common/models/Photo'
+import { Photo, PhotoDetail } from 'common/CommonTypes'
 
 
-export const testBigPhoto: PhotoType = {
+export const testBigPhoto: Photo = {
     id: 'B1m80éAMpf',
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
@@ -22,7 +22,7 @@ export const testBigPhoto: PhotoType = {
     trashed: 0
 }
 
-export const testLandscapePhoto: PhotoType = {
+export const testLandscapePhoto: Photo = {
     id: 'kuV2UXUZNX',
     title: 'landscape',
     master: '../specs/photos/landscape.jpg',
@@ -38,7 +38,7 @@ export const testLandscapePhoto: PhotoType = {
     trashed: 0
 }
 
-export const testPortraitPhoto: PhotoType = {
+export const testPortraitPhoto: Photo = {
     id: 'FRL1FAT1G3',
     title: 'portrait',
     master: '../specs/photos/portrait.jpg',
@@ -54,7 +54,7 @@ export const testPortraitPhoto: PhotoType = {
     trashed: 0
 }
 
-export const testPanoramaPhoto: PhotoType = {
+export const testPanoramaPhoto: Photo = {
     id: 'BRllCnsu7y',
     title: 'panorama',
     master: '../specs/photos/panorama.jpg',
@@ -70,7 +70,7 @@ export const testPanoramaPhoto: PhotoType = {
     trashed: 0
 }
 
-export const testPhotos: PhotoType[] = [
+export const testPhotos: Photo[] = [
     { name: 'alone',          width: 800, height: 533 },
     { name: 'architecture',   width: 800, height: 533 },
     { name: 'door-knocker',   width: 800, height: 533 },

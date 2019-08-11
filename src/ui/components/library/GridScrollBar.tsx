@@ -2,7 +2,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import classnames from 'classnames'
 
-import { PhotoSectionId, PhotoSectionById } from 'common/models/Photo'
+import { PhotoSectionId, PhotoSectionById } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
 
 import { GridLayout, GridSectionLayout } from 'ui/UITypes'

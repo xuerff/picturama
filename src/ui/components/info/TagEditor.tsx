@@ -3,18 +3,18 @@ import React from 'react'
 import { MenuItem, Spinner } from '@blueprintjs/core'
 import { MultiSelect, IItemRendererProps } from "@blueprintjs/select"
 
-import { PhotoType, PhotoDetail } from '../../../common/models/Photo'
-import { bindMany, slug } from '../../../common/util/LangUtil'
+import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { bindMany, slug } from 'common/util/LangUtil'
 
 
 const StringMultiSelect = MultiSelect.ofType<string>()
 
 interface Props {
     className?: any
-    photo: PhotoType | null
+    photo: Photo | null
     photoDetail: PhotoDetail | null
     tags: string[]
-    setPhotoTags: (photo: PhotoType, tags: string[]) => void
+    setPhotoTags: (photo: Photo, tags: string[]) => void
 }
 
 interface State {

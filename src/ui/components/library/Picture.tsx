@@ -3,12 +3,12 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { Icon } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoSectionId } from '../../../common/models/Photo'
-import CancelablePromise, { isCancelError } from '../../../common/util/CancelablePromise'
-import { bindMany } from '../../../common/util/LangUtil'
+import { PhotoId, Photo, PhotoSectionId } from 'common/CommonTypes'
+import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
+import { bindMany } from 'common/util/LangUtil'
 
-import { JustifiedLayoutBox } from '../../UITypes'
-import FaIcon from '../widget/icon/FaIcon'
+import { JustifiedLayoutBox } from 'ui/UITypes'
+import FaIcon from 'ui/components/widget/icon/FaIcon'
 
 import './Picture.less'
 
@@ -16,11 +16,11 @@ import './Picture.less'
 interface Props {
     className?: any
     sectionId: PhotoSectionId
-    photo: PhotoType
+    photo: Photo
     layoutBox: JustifiedLayoutBox
     isHighlighted: boolean
-    getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: Photo) => string
+    createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     onPhotoClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
     onPhotoDoubleClick: (event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) => void
 }

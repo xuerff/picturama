@@ -1,8 +1,6 @@
 import { action, createAsyncAction } from 'typesafe-actions'
 
-import { Device } from 'common/models/DataTypes'
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoFilter } from 'common/models/Photo'
-import { TagType } from 'common/models/Tag'
+import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoFilter } from 'common/CommonTypes'
 import { ImportProgress } from 'common/CommonTypes'
 
 import {
@@ -27,15 +25,15 @@ export const setLibraryInfoPhotoAction = createAsyncAction(SET_LIBRARY_INFO_PHOT
 
 export const fetchTotalPhotoCountAction = (totalPhotoCount: number) => action(FETCH_TOTAL_PHOTO_COUNT, { totalPhotoCount })
 export const fetchSectionsAction = createAsyncAction(FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE)<{ newFilter: PhotoFilter | null }, { sections: PhotoSection[] }, Error>()
-export const fetchSectionPhotosAction = (sectionId: PhotoSectionId, photos: PhotoType[]) => action(FETCH_SECTION_PHOTOS, { sectionId, photos })
+export const fetchSectionPhotosAction = (sectionId: PhotoSectionId, photos: Photo[]) => action(FETCH_SECTION_PHOTOS, { sectionId, photos })
 export const forgetSectionPhotosAction = (sectionIds: { [index: string]: true }) => action(FORGET_SECTION_PHOTOS, { sectionIds })
 export const changePhotoWorkAction = (photoId: PhotoId, photoWork: PhotoWork) => action(CHANGE_PHOTOWORK, { photoId, photoWork })
-export const changePhotosAction = (photos: PhotoType[], update: Partial<PhotoType>) => action(CHANGE_PHOTOS, { photos, update })
+export const changePhotosAction = (photos: Photo[], update: Partial<Photo>) => action(CHANGE_PHOTOS, { photos, update })
 export const emptyTrashAction = (trashedPhotoIds: PhotoId[]) => action(EMPTY_TRASH, { trashedPhotoIds })
 
 export const setImportProgressAction = (progress: ImportProgress | null) => action(SET_IMPORT_PROGRESS, progress)
 
-export const fetchTagsAction = (tags: TagType[]) => action(FETCH_TAGS, tags)
+export const fetchTagsAction = (tags: Tag[]) => action(FETCH_TAGS, tags)
 export const setPhotoTagsAction = (photoId: PhotoId, tags: string[]) => action(SET_PHOTO_TAGS, { photoId, tags })
 
 export const initDevicesAction = (devices: Device[]) => action(INIT_DEVICES, { devices })

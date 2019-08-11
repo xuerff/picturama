@@ -1,9 +1,12 @@
 import fs from 'fs'
 import { ipcMain, Menu, MenuItemConstructorOptions, BrowserWindow } from 'electron'
 
-import config from '../common/config'
-import Library from './Library';
 import npmPackage from '../../package.json'
+
+import config from 'common/config'
+import { bindMany } from 'common/util/LangUtil'
+
+import Library from './Library'
 
 
 type MenuSpec = {
@@ -32,15 +35,10 @@ class MainMenu {
         this.mainWindow = mainWindow
         this.library = library
 
-        this.render = this.render.bind(this)
-        this.scan = this.scan.bind(this)
-        this.close = this.close.bind(this)
-        this.reload = this.reload.bind(this)
-        this.fullscreen = this.fullscreen.bind(this)
-        this.toggleDevTools = this.toggleDevTools.bind(this)
-        this.toggleSandbox = this.toggleSandbox.bind(this)
-        this.export = this.export.bind(this)
-        this.fixMissingVersions = this.fixMissingVersions.bind(this)
+        bindMany(this, 'render', 'scan', 'close', 'reload', 'fullscreen', 'toggleDevTools', 'toggleSandbox', 'export')
+
+        // TODO: Revive Legacy code of 'version' feature
+        //this.fixMissingVersions = this.fixMissingVersions.bind(this)
 
         this.template = template.menu.map(menu => {
             return {
@@ -108,9 +106,12 @@ class MainMenu {
         this.mainWindow.webContents.send('exportClicked', true)
     }
 
+    // TODO: Revive Legacy code of 'version' feature
+    /*
     fixMissingVersions() {
         this.library.fixMissingVersions()
     }
+    */
 
     render() {
         this.menu = Menu.buildFromTemplate(this.template)

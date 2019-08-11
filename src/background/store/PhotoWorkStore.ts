@@ -4,10 +4,10 @@ import readline from 'readline'
 import { promisify } from 'bluebird'
 import stringify from 'json-stringify-pretty-compact'
 
-import { PhotoWork } from '../../common/models/Photo'
-import { rotate } from '../../common/util/EffectsUtil'
-import { assertMainProcess } from '../../common/util/ElectronUtil'
-import SerialJobQueue from '../../common/util/SerialJobQueue'
+import { PhotoWork } from 'common/CommonTypes'
+import { rotate } from 'common/util/EffectsUtil'
+import { assertMainProcess } from 'common/util/ElectronUtil'
+import SerialJobQueue from 'common/util/SerialJobQueue'
 
 
 const readFile = promisify<Buffer, string>(fs.readFile)

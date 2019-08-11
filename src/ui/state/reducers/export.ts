@@ -1,7 +1,7 @@
-import { PhotoId, PhotoSectionId } from '../../../common/models/Photo'
+import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
 
-import { Action } from '../ActionType'
-import { OPEN_EXPORT, CLOSE_EXPORT } from '../actionTypes'
+import { Action } from 'ui/state/ActionType'
+import { OPEN_EXPORT, CLOSE_EXPORT } from 'ui/state/actionTypes'
 
 
 export type ExportState = {

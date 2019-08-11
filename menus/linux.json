@@ -54,11 +54,6 @@
           "label": "Toggle Sandbox",
           "accelerator": "Shift+Ctrl+S",
           "click": "toggleSandbox"
-        },
-        {
-          "label": "Fix missing versions",
-          "accelerator": "Shift+Ctrl+V",
-          "click": "fixMissingVersions"
         }
       ]
     },

@@ -6,12 +6,11 @@ import path from 'path'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
+import shortid from 'shortid'
 
-import { ExifOrientation, ImportProgress } from 'common/CommonTypes'
+import { Photo, Tag, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
 import config from 'common/config'
 import { profileScanner } from 'common/LogConstants'
-import { PhotoType, generatePhotoId } from 'common/models/Photo'
-import { TagType } from 'common/models/Tag'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
@@ -52,7 +51,7 @@ export default class ImportScanner {
     private isScanning = false
     private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
-    private updatedTags: TagType[] | null = null
+    private updatedTags: Tag[] | null = null
 
     constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
         this.progress = {
@@ -174,7 +173,7 @@ export default class ImportScanner {
                 return
             }
 
-            const photoId = generatePhotoId()
+            const photoId: PhotoId = shortid.generate()
             let switchSides = (metaData.orientation == ExifOrientation.Left) || (metaData.orientation == ExifOrientation.Right)
             let master_width = metaData.imgWidth
             let master_height = metaData.imgHeight
@@ -224,7 +223,7 @@ export default class ImportScanner {
                 createdAt = stat.mtime
             }
 
-            const photo: PhotoType = {
+            const photo: Photo = {
                 id: photoId,
                 title: file.name,
                 master: originalImgPath,

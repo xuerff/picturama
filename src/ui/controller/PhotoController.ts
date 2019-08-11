@@ -1,7 +1,6 @@
 import Promise from 'bluebird'
 
-import Photo, { PhotoWork, PhotoType, PhotoFilter } from 'common/models/Photo'
-import { VersionType } from 'common/models/Version'
+import { PhotoWork, Photo, PhotoFilter } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
@@ -14,8 +13,7 @@ import { onThumbnailChange } from './ImageProvider'
 assertRendererProcess()
 
 export function fetchTotalPhotoCount() {
-    Photo.forge()
-        .count()
+    BackgroundClient.fetchTotalPhotoCount()
         .then(totalPhotoCount => store.dispatch(fetchTotalPhotoCountAction(totalPhotoCount)))
 }
 
@@ -43,9 +41,9 @@ function internalFetchSections(newFilter: PhotoFilter | null) {
 
 
 // We queue pending PhotoWork updates, so we don't get lost updates if multiple updates wait for fetching to finish
-const pendingUpdates: { photo: PhotoType, updates: ((photoWork: PhotoWork) => void)[] }[] = []
+const pendingUpdates: { photo: Photo, updates: ((photoWork: PhotoWork) => void)[] }[] = []
 
-export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork) => void) {
+export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => void) {
     const photoPath = photo.master
     let pendingUpdate = pendingUpdates[photoPath]
     if (pendingUpdate) {
@@ -88,6 +86,8 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
     }
 }
 
+// TODO: Revive Legacy code of 'version' feature
+/*
 export function updatePhotoVersion(version: VersionType) {  // Type should be `Version`, but it doesn't work...
     // TODO: Fix
     throw new Error('Not implemented')
@@ -102,24 +102,25 @@ export function updatePhotoVersion(version: VersionType) {  // Type should be `V
     //            })
     //    })
 }
+*/
 
-export function setPhotosFlagged(photos: PhotoType[], flagged: boolean) {
+export function setPhotosFlagged(photos: Photo[], flagged: boolean) {
     updatePhotos(photos, { flag: flagged ? 1 : 0 })
 }
 
-export function movePhotosToTrash(photos: PhotoType[]) {
+export function movePhotosToTrash(photos: Photo[]) {
     updatePhotos(photos, { trashed: 1 })
 }
 
-export function restorePhotosFromTrash(photos: PhotoType[]) {
+export function restorePhotosFromTrash(photos: Photo[]) {
     updatePhotos(photos, { trashed: 0 })
 }
 
-export function updatePhoto(photo: PhotoType, update: Partial<PhotoType>) {
+export function updatePhoto(photo: Photo, update: Partial<Photo>) {
     updatePhotos([ photo ], update)
 }
 
-export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
+export function updatePhotos(photos: Photo[], update: Partial<Photo>) {
     let updatePhotoWorkPromise: Promise<any> | null = null
     if (update.hasOwnProperty('flag')) {
         updatePhotoWorkPromise = Promise.all(photos.map(photo =>
@@ -141,7 +142,7 @@ export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
         BackgroundClient.updatePhotos(photoIds, update)
     ])
     .then(() => {
-        const changedPhotos = photos.map(photo => ({ ...photo, ...update } as PhotoType))
+        const changedPhotos = photos.map(photo => ({ ...photo, ...update } as Photo))
         store.dispatch(changePhotosAction(changedPhotos, update))
     })
     .catch(error => {

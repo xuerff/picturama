@@ -6,8 +6,8 @@ import notifier from 'node-notifier'
 import { promisify } from 'bluebird'
 
 import config from 'common/config'
-import { getThumbnailPath, PhotoId } from 'common/models/Photo'
-import Version from 'common/models/Version'
+import { PhotoId } from 'common/CommonTypes'
+import { getThumbnailPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import { removePhotoWork } from 'background/store/PhotoWorkStore'
@@ -24,7 +24,7 @@ class Library {
 
 
     constructor(private mainWindow: BrowserWindow) {
-        bindMany(this, 'scan', 'emptyTrash', 'fixMissingVersions')
+        bindMany(this, 'emptyTrash', 'scan')
 
         if (fs.existsSync(config.settings)) {
             let settings = JSON.parse(fs.readFileSync(config.settings)) as any
@@ -49,6 +49,8 @@ class Library {
         ipcMain.on('empty-trash', this.emptyTrash)
     }
 
+    // TODO: Revive Legacy code of 'version' feature
+    /*
     fixMissingVersions() {
         Version
             .query(qb =>
@@ -78,6 +80,7 @@ class Library {
                 })
             })
     }
+    */
 
     emptyTrash() {
         (async () => {

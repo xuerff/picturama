@@ -2,9 +2,8 @@ import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 
-import { ExifOrientation } from 'common/CommonTypes'
+import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
-import { PhotoWork } from 'common/models/Photo'
 import Profiler from 'common/util/Profiler'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 

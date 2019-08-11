@@ -1,4 +1,4 @@
-import { PhotoType, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/models/Photo'
+import { Photo, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/CommonTypes'
 
 import { GridSectionLayout } from 'ui/UITypes'
 import { createLayoutForLoadedSection } from 'ui/controller/LibraryController'
@@ -7,7 +7,7 @@ import { testBigPhoto } from './MockData'
 
 
 let nextDummyId = 1
-export function createRandomDummyPhoto(): PhotoType {
+export function createRandomDummyPhoto(): Photo {
     const id = nextDummyId++
     const minAspect = 3/4
     const maxAspect = 16/9
@@ -26,7 +26,7 @@ export function createRandomDummyPhoto(): PhotoType {
 }
 
 
-export function createSection(sectionId: PhotoSectionId, photos: PhotoType[]): PhotoSection {
+export function createSection(sectionId: PhotoSectionId, photos: Photo[]): PhotoSection {
     let photoIds: PhotoId[] = []
     let photoData: PhotoById = {}
     for (const photo of photos) {

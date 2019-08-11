@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { addSection, action } from '../core/UiTester'
+import CancelablePromise from 'common/util/CancelablePromise'
+import { Photo, PhotoSectionId } from 'common/CommonTypes'
+
+import { defaultGridRowHeight } from 'ui/UiConstants'
+import GridSection from 'ui/components/library/GridSection'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { estimateContainerHeight, createDummyLayoutBoxes } from 'ui/controller/LibraryController'
+
+import { addSection, action } from 'sandbox/core/UiTester'
 import { testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
-import { createSection, createRandomDummyPhoto, createLayoutForSection } from '../util/TestUtil'
-
-import CancelablePromise from '../../common/util/CancelablePromise'
-import { PhotoType, PhotoSectionId } from '../../common/models/Photo'
-
-import { defaultGridRowHeight } from '../../ui/UiConstants'
-import GridSection from '../../ui/components/library/GridSection'
-import { getNonRawImgPath } from '../../ui/controller/ImageProvider'
-import { estimateContainerHeight, createDummyLayoutBoxes } from '../../ui/controller/LibraryController'
+import { createSection, createRandomDummyPhoto, createLayoutForSection } from 'sandbox/util/TestUtil'
 
 
 const containerWidth = 800
@@ -27,8 +27,8 @@ const defaultProps = {
     section: defaultSection,
     layout: defaultLayout,
     selectedPhotoIds: null,
-    getThumbnailSrc: (photo: PhotoType) => getNonRawImgPath(photo),
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => {
+    getThumbnailSrc: (photo: Photo) => getNonRawImgPath(photo),
+    createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
         const thumbnailPath = getNonRawImgPath(photo)
         if (thumbnailPath === 'dummy') {
             return new CancelablePromise<string>(() => {})

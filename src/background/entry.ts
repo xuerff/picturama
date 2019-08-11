@@ -1,8 +1,10 @@
 import fs from 'fs'
 import { app, screen, ipcMain, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
+import { DBOptions } from 'sqlite3-helper'
 import { install as initSourceMapSupport } from 'source-map-support'
 import { start as initPrettyError } from 'pretty-error'
+import BluebirdPromise from 'bluebird'
 
 import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
@@ -13,6 +15,8 @@ import Watch from 'background/watch'
 import { init as initBackgroundService } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
 
+const fsUnlink = BluebirdPromise.promisify(fs.unlink)
+
 
 initSourceMapSupport()
 initPrettyError()
@@ -21,8 +25,9 @@ let initDbPromise: Promise<any> | null = null
 let mainWindow: BrowserWindow | null = null
 
 
-if (!fs.existsSync(config.dotAnsel))
+if (!fs.existsSync(config.dotAnsel)) {
     fs.mkdirSync(config.dotAnsel)
+}
 
 
 app.on('window-all-closed', () => {
@@ -89,21 +94,28 @@ app.on('ready', () => {
 })
 
 
-function initDb(): Promise<void> {
+function initDb(): Promise<any> {
     if (!initDbPromise) {
-        const knex = require('knex')(config.knex)
-
-        initDbPromise = (knex.migrate.latest() as Promise<void>)
-            .then(() =>
-                DB({
-                    path: config.knex.connection.filename,
-                    migrate: {
-                        force: false,
-                        migrationsPath: config.knex.migrations.directory
-                    }
+        const dbOptions: DBOptions = { path: config.dbFile, migrate: false }
+        initDbPromise = DB(dbOptions)
+            .queryFirstCell<boolean>('SELECT 1 FROM sqlite_master WHERE type="table" AND name="knex_migrations"')
+            .then(async (isLegacyDb) => {
+                if (isLegacyDb) {
+                    // This is a DB created with bookshelf.js and knex.js (before 2019-08-11)
+                    // -> Delete the DB and create a new one
+                    console.warn('Ansel database is a legacy database - creating a new one')
+                    await DB().close()
+                    await fsUnlink(config.dbFile)
+                    DB(dbOptions)
+                }
+            })
+            .then(async () => {
+                await DB().connection()
+                await DB().migrate({
+                    force: false,
+                    migrationsPath: config.dbMigrationsFolder
                 })
-                .connection()
-            )
+            })
             .catch(error => console.error('Initializing database failed', error))
     }
 

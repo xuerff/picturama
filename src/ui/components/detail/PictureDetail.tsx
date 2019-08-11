@@ -4,31 +4,31 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from '@blueprintjs/core'
 
-import keymapManager from '../../keymap-manager'
-import createVersionAndOpenWith from '../../create-version'
-import AvailableEditors from '../../available-editors'
+import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import keymapManager from 'ui/keymap-manager'
+import { bindMany } from 'common/util/LangUtil'
+
+import PhotoInfo from 'ui/components/info/PhotoInfo'
+import FaIcon from 'ui/components/widget/icon/FaIcon'
+import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
+import Toolbar from 'ui/components/widget/Toolbar'
+import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from 'ui/controller/DetailController'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from 'ui/controller/PhotoController'
+import { setPhotoTags } from 'ui/controller/PhotoTagController'
+import { openExportAction, openDiffAction } from 'ui/state/actions'
+import { AppState } from 'ui/state/reducers'
+import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from 'ui/state/selectors'
 
 import PhotoPane from './PhotoPane'
-import PhotoInfo from '../info/PhotoInfo'
-import FaIcon from '../widget/icon/FaIcon'
-import PhotoActionButtons from '../widget/PhotoActionButtons'
-import Toolbar from '../widget/Toolbar'
-import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from '../../controller/DetailController'
-import { getNonRawImgPath } from '../../controller/ImageProvider'
-import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from '../../controller/PhotoController'
-import { setPhotoTags } from '../../controller/PhotoTagController'
-import { PhotoId, PhotoType, PhotoDetail, PhotoWork, PhotoSectionId } from '../../../common/models/Photo'
-import { openExportAction, openDiffAction } from '../../state/actions'
-import { AppState } from '../../state/reducers'
-import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from '../../state/selectors'
-import { bindMany } from '../../../common/util/LangUtil'
 
 import './PictureDetail.less'
 
 const { MenuItem } = remote;
 
 
-const availableEditors = new AvailableEditors();
+// TODO: Revive Legacy code of 'version' feature
+//const availableEditors = new AvailableEditors();
 
 interface OwnProps {
     style?: any
@@ -38,9 +38,9 @@ interface OwnProps {
 
 interface StateProps {
     sectionId: PhotoSectionId
-    photo: PhotoType
-    photoPrev: PhotoType | null
-    photoNext: PhotoType | null
+    photo: Photo
+    photoPrev: Photo | null
+    photoNext: Photo | null
     photoDetail: PhotoDetail | null
     photoWork: PhotoWork | null
     tags: string[]
@@ -51,11 +51,11 @@ interface StateProps {
 interface DispatchProps {
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
-    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
-    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
-    setPhotoTags: (photo: PhotoType, tags: string[]) => void
-    movePhotosToTrash: (photos: PhotoType[]) => void
-    restorePhotosFromTrash: (photos: PhotoType[]) => void
+    updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
+    setPhotosFlagged: (photos: Photo[], flag: boolean) => void
+    setPhotoTags: (photo: Photo, tags: string[]) => void
+    movePhotosToTrash: (photos: Photo[]) => void
+    restorePhotosFromTrash: (photos: Photo[]) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     openDiff: () => void
     closeDetail: () => void
@@ -107,7 +107,8 @@ export class PictureDetail extends React.Component<Props, State> {
             type: 'separator'
         }));
 
-        availableEditors.editors.forEach(this.addEditorMenu);
+        // TODO: Revive Legacy code of 'version' feature
+        //availableEditors.editors.forEach(this.addEditorMenu);
 
         this.bindEventListeners()
     }
@@ -181,6 +182,8 @@ export class PictureDetail extends React.Component<Props, State> {
         this.menu.popup({})
     }
 
+    // TODO: Revive Legacy code of 'version' feature
+    /*
     addEditorMenu(editor) {
         this.menu.append(new MenuItem({
             label: `Open with ${editor.name}`,
@@ -193,6 +196,7 @@ export class PictureDetail extends React.Component<Props, State> {
             }
         }));
     }
+    */
 
     openExport() {
         const props = this.props

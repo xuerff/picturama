@@ -3,7 +3,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoSectionId, PhotoSectionById } from 'common/models/Photo'
+import { PhotoId, Photo, PhotoSectionId, PhotoSectionById } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
@@ -35,8 +35,8 @@ interface Props {
     selectedPhotoIds: PhotoId[]
     gridRowHeight: number
     getGridLayout: GetGridLayoutFunction
-    getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: Photo) => string
+    createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     setSelectedPhotos: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
 }

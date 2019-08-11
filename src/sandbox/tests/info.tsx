@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PhotoType, PhotoDetail } from 'common/models/Photo'
+import { Photo, PhotoDetail } from 'common/CommonTypes'
 
 import PhotoInfo from 'ui/components/info/PhotoInfo'
 
@@ -28,7 +28,7 @@ let sharedPhotoDetail: PhotoDetail = {
 function createGridRowHeightProps(context: TestContext) {
     return {
         photoDetail: sharedPhotoDetail,
-        setPhotoTags: (photo: PhotoType, tags: string[]) => {
+        setPhotoTags: (photo: Photo, tags: string[]) => {
             sharedPhotoDetail = {
                 versions: sharedPhotoDetail.versions,
                 tags

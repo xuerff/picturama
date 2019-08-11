@@ -1,3 +1,5 @@
+// TODO: Revive Legacy code of 'version' feature
+/*
 import { spawn } from 'child_process';
 
 import Version from '../common/models/Version'
@@ -24,3 +26,4 @@ export default function createVersionAndOpenWith(photo, type, targetSoftware) {
       console.error('err', err);
     });
 }
+*/

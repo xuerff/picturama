@@ -1,7 +1,7 @@
 import createLayout from 'justified-layout'
 
 import { profileLibraryLayout, profileThumbnailRenderer } from 'common/LogConstants'
-import { PhotoSectionId, PhotoSectionById, PhotoSection, PhotoType, PhotoId } from 'common/models/Photo'
+import { PhotoSectionId, PhotoSectionById, PhotoSection, Photo, PhotoId } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import Profiler from 'common/util/Profiler'
 import SerialJobQueue from 'common/util/SerialJobQueue'
@@ -397,14 +397,14 @@ export function setInfoPhoto(sectionId: PhotoSectionId | null, photoId: PhotoId 
 }
 
 
-type CreateThumbnailJob = { isCancelled: boolean, sectionId: PhotoSectionId, photo: PhotoType, profiler: Profiler | null }
+type CreateThumbnailJob = { isCancelled: boolean, sectionId: PhotoSectionId, photo: Photo, profiler: Profiler | null }
 
 const createThumbnailQueue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.photo.id === existingJob.photo.id) ? newJob : null,
     createNextThumbnail,
     getThumbnailPriority)
 
-export function createThumbnail(sectionId: PhotoSectionId, photo: PhotoType): CancelablePromise<string> {
+export function createThumbnail(sectionId: PhotoSectionId, photo: Photo): CancelablePromise<string> {
     const profiler = profileThumbnailRenderer ? new Profiler(`Creating thumbnail for ${photo.master}`) : null
 
     const job: CreateThumbnailJob = { isCancelled: false, sectionId, photo, profiler }

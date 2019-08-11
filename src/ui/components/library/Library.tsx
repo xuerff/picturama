@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner, MaybeElement } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from 'common/models/Photo'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -45,7 +45,7 @@ interface StateProps {
     sectionById: PhotoSectionById
     selectedSectionId: PhotoSectionId | null
     selectedPhotoIds: PhotoId[]
-    infoPhoto: PhotoType | null
+    infoPhoto: Photo | null
     infoPhotoDetail: PhotoDetail | null
     tags: string[]
     gridRowHeight: number
@@ -56,18 +56,18 @@ interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
     getGridLayout: GetGridLayoutFunction
-    getThumbnailSrc: (photo: PhotoType) => string
-    createThumbnail: (sectionId: PhotoSectionId, photo: PhotoType) => CancelablePromise<string>
+    getThumbnailSrc: (photo: Photo) => string
+    createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     setInfoPhoto: (sectionId: PhotoSectionId | null, photoId: PhotoId | null) => void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
-    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
-    setPhotoTags: (photo: PhotoType, tags: string[]) => void
-    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
-    movePhotosToTrash: (photos: PhotoType[]) => void
-    restorePhotosFromTrash: (photos: PhotoType[]) => void
+    setPhotosFlagged: (photos: Photo[], flag: boolean) => void
+    setPhotoTags: (photo: Photo, tags: string[]) => void
+    updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
+    movePhotosToTrash: (photos: Photo[]) => void
+    restorePhotosFromTrash: (photos: Photo[]) => void
     startScanning: () => void
 }
 

@@ -1,11 +1,11 @@
-import { PhotoId, PhotoWork, PhotoDetail, PhotoSectionId } from '../../../common/models/Photo'
+import { PhotoId, PhotoWork, PhotoDetail, PhotoSectionId } from 'common/CommonTypes'
 
-import { FetchState } from '../../UITypes'
-import { Action } from '../ActionType'
+import { FetchState } from 'ui/UITypes'
+import { Action } from 'ui/state/ActionType'
 import {
     SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK,
     FETCH_SECTIONS_SUCCESS, SET_PHOTO_TAGS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH, FETCH_SECTIONS_FAILURE
-} from '../actionTypes'
+} from 'ui/state/actionTypes'
 
 
 export type DetailState = {

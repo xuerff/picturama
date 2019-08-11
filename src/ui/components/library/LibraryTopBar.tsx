@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { Button, MaybeElement } from '@blueprintjs/core'
 
-import { PhotoId, PhotoType, PhotoWork, PhotoSectionId } from 'common/models/Photo'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
 
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
@@ -18,15 +18,15 @@ interface Props {
     className?: any
     leftItem?: MaybeElement
     selectedSectionId: PhotoSectionId | null
-    selectedPhotos: PhotoType[]
+    selectedPhotos: Photo[]
     isShowingTrash: boolean
     isShowingInfo: boolean
     photosCount: number
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
-    updatePhotoWork: (photo: PhotoType, update: (photoWork: PhotoWork) => void) => void
-    setPhotosFlagged: (photos: PhotoType[], flag: boolean) => void
-    movePhotosToTrash: (photos: PhotoType[]) => void
-    restorePhotosFromTrash: (photos: PhotoType[]) => void
+    updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
+    setPhotosFlagged: (photos: Photo[], flag: boolean) => void
+    movePhotosToTrash: (photos: Photo[]) => void
+    restorePhotosFromTrash: (photos: Photo[]) => void
     toggleShowInfo: () => void
 }
 
