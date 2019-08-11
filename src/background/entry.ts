@@ -5,6 +5,7 @@ import { install as initSourceMapSupport } from 'source-map-support'
 import { start as initPrettyError } from 'pretty-error'
 
 import config from 'common/config'
+import { setLocale } from 'common/i18n/i18n'
 
 import MainMenu from 'background/MainMenu'
 // import Usb from 'background/usb'
@@ -30,6 +31,9 @@ app.on('window-all-closed', () => {
 })
 
 app.on('ready', () => {
+    const locale = app.getLocale()
+    setLocale(locale)
+
     let cursorPos = screen.getCursorScreenPoint()
     let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize
 
@@ -51,7 +55,7 @@ app.on('ready', () => {
 
     mainWindow.loadURL('file://' + __dirname + '/ui.html')
     mainWindow.setTitle('Ansel')
-    initBackgroundService(mainWindow, { locale: app.getLocale() })
+    initBackgroundService(mainWindow, { locale })
     ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()

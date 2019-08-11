@@ -1,11 +1,12 @@
 import React from 'react'
 import { render } from 'react-dom'
 
+import { setLocale } from 'common/i18n/i18n'
+
 import BackgroundClient from 'ui/BackgroundClient'
 import { init as initForegroundService } from 'ui/ForegroundService'
 import App from 'ui/components/App'
 import { checkSettingsExist } from 'ui/controller/SettingsController'
-import { setLocale } from 'ui/i18n/i18n'
 
 import './entry.less'
 

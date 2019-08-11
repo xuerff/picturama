@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { setLocale } from 'ui/i18n/i18n'
+import { setLocale } from 'common/i18n/i18n'
 
 import UiTester from 'sandbox/core/UiTester'
 import 'sandbox/tests/library'
