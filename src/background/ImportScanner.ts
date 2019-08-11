@@ -2,6 +2,7 @@ import { BrowserWindow } from 'electron'
 import sharp from 'sharp'
 import libraw from 'libraw'
 import fs from 'fs'
+import path from 'path'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
@@ -14,16 +15,15 @@ import { TagType } from 'common/models/Tag'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
-import matches from 'background/lib/matches'
-import walker from 'background/lib/walker'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
 import { storePhotoTags } from 'background/store/TagStore'
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 
+const fsReadDir = BluebirdPromise.promisify(fs.readdir)
+const fsReadFile = BluebirdPromise.promisify(fs.readFile)
+const fsStat = BluebirdPromise.promisify(fs.stat)
 
-const readFile = BluebirdPromise.promisify(fs.readFile)
-const fileStat = BluebirdPromise.promisify(fs.stat)
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
 const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
@@ -78,7 +78,7 @@ export default class ImportScanner {
         this.onProgressChange(true)
 
         const profiler = profileScanner ? new Profiler('Overall scanning') : null
-        return walker(this.path, [ this.versionsPath ])
+        return collectFilePaths(this.path, [ this.versionsPath ])
             .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
             .then(this.prepare)
             .then(result => { if (profiler) { profiler.addPoint('Prepared files') }; return result })
@@ -192,7 +192,7 @@ export default class ImportScanner {
                     if (profiler) profiler.addPoint('Extracted non-raw image')
                 }
 
-                const imgBuffer = await readFile(imgPath)
+                const imgBuffer = await fsReadFile(imgPath)
                 if (profiler) profiler.addPoint('Loaded extracted image')
 
                 const outputInfo = await sharp(imgBuffer)
@@ -219,7 +219,7 @@ export default class ImportScanner {
 
             let createdAt = metaData.createdAt
             if (!createdAt) {
-                const stat = await fileStat(originalImgPath)
+                const stat = await fsStat(originalImgPath)
                 createdAt = stat.mtime
             }
 
@@ -292,4 +292,31 @@ export default class ImportScanner {
         return files;
     }
 
+}
+
+
+function collectFilePaths(dirName: string, blacklist: string[]): BluebirdPromise<string[]> {
+    if (blacklist.indexOf(dirName) !== -1) {
+        return BluebirdPromise.resolve([])
+    }
+
+    return fsReadDir(dirName)
+        .map(fileName => {
+            const fullPath = path.join(dirName, fileName)
+
+            return fsStat(fullPath)
+                .then(stat => stat.isDirectory() ? collectFilePaths(fullPath, blacklist) : [ fullPath ])
+        })
+        .reduce<string[], string[]>((result, item) => result.concat(item), [])
+}
+
+
+function matches(array: string[], value: string): number {
+    for (let i = 0, il = array.length; i < il; i++) {
+        const item = array[i]
+        if (item.match(value)) {
+            return i
+        }
+    }
+    return -1
 }
