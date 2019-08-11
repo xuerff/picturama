@@ -63,10 +63,10 @@ export default class ImportScanner {
         bindMany(this, 'scanPictures', 'prepare', 'walk', 'onProgressChange', 'filterStoredPhoto', 'setTotal')
     }
 
-    scanPictures() {
+    scanPictures(): BluebirdPromise<number | null> {
         if (this.isScanning) {
             // Already scanning
-            return
+            return BluebirdPromise.resolve(null)
         }
 
         this.isScanning = true
@@ -89,14 +89,15 @@ export default class ImportScanner {
             .map(this.walk, {
                 concurrency: config.concurrency
             })
-            .then(result => {
+            .then(() => {
+                const photoCount = this.progress!.total
                 this.isScanning = false
                 this.onProgressChange(true)
                 if (profiler) {
-                    profiler.addPoint(`Scanned ${this.progress!.total} images`)
+                    profiler.addPoint(`Scanned ${photoCount} images`)
                     profiler.logResult()
                 }
-                return result
+                return photoCount
             })
             .catch(error => {
                 if (profiler) {

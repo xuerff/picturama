@@ -113,24 +113,23 @@ class Library {
         }
         new ImportScanner(this.path, this.versionsPath, this.mainWindow)
             .scanPictures()
-            .then(pics => {
+            .then(photoCount => {
                 let end = new Date().getTime()
                 let time = moment.duration(end - start)
 
-                notifier.notify({
-                    title: 'Ansel',
-                    message: `Finish importing ${pics.length} photos in ${time.humanize()}`
-                })
+                if (photoCount !== null) {
+                    const message = `Finish importing ${photoCount} photos in ${time.humanize()}`
+                    console.log(message)
+                    notifier.notify({
+                        title: 'Ansel',
+                        message
+                    })
+                }
             })
             .catch(error => {
                 // TODO: Show error in UI
                 console.error('Scanning for pictures failed', error)
             })
-
-        notifier.notify({
-            title: 'Ansel',
-            message: 'Start import'
-        })
     }
 
 }
