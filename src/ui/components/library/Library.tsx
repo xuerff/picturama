@@ -143,9 +143,7 @@ export class Library extends React.Component<Props, State> {
         this.updateInfoPhoto()
 
         let currentView
-        if (props.isFetching) {
-            currentView = <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
-        } else if (props.totalPhotoCount === 0) {
+        if (props.totalPhotoCount === 0) {
             const description =
                 <>
                     Press <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code> or button below to start scanning.
@@ -221,6 +219,9 @@ export class Library extends React.Component<Props, State> {
                 />
                 <div className="Library-body">
                     {currentView}
+                    {props.isFetching &&
+                        <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
+                    }
                 </div>
                 <LibraryBottomBar
                     className="Library-bottomBar"

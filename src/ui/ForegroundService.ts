@@ -15,6 +15,11 @@ import store from 'ui/state/store'
 assertRendererProcess()
 
 
+/** The interval in which to update the library grid while running an import (in ms) */
+const importUiUpdateInterval = 10000
+let prevImportUiUpdateTime = 0
+
+
 export function init() {
     ipcRenderer.on('executeForegroundAction', (event, callId, action, params) => {
         executeForegroundAction(action, params)
@@ -41,8 +46,10 @@ async function executeForegroundAction(action: string, params: any): Promise<any
 
         store.dispatch(setImportProgressAction(progress))
 
-        if (!progress) {
-            // Import is finished
+        const isImportFinished = !progress
+        const now = Date.now()
+        if (isImportFinished || now > prevImportUiUpdateTime + importUiUpdateInterval) {
+            prevImportUiUpdateTime = now
             fetchTotalPhotoCount()
             fetchSections()
         }

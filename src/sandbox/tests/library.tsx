@@ -222,6 +222,8 @@ addSection('Library')
         <Library
             {...createDefaultProps(context)}
             isFetching={true}
+            sectionIds={[]}
+            sectionById={{}}
         />
     ))
     .add('Selection empty', context => (

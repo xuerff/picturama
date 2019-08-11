@@ -23,7 +23,7 @@ const gridSpacerHeight = 1
 
 export type GetGridLayoutFunction = (
     sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number,
-    gridRowHeight: number, nailedSectionIndex: number | null)
+    gridRowHeight: number, nailedSectionId: PhotoSectionId | null)
     => GridLayout
 
 interface Props {
@@ -53,7 +53,7 @@ interface Snapshot {
 export default class Grid extends React.Component<Props, State, Snapshot> {
 
     private gridLayout: GridLayout | null = null
-    private nailedSectionIndex: number | null = null
+    private nailedSectionId: PhotoSectionId | null = null
     private releaseNailTimer: NodeJS.Timer | null = null
 
 
@@ -76,18 +76,21 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         const prevState = this.state
         const prevGridLayout = this.gridLayout
 
-        if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth) {
-            // Sizes have changed
+        if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth ||
+            nextProps.sectionIds !== prevProps.sectionIds)
+        {
+            // Sizes have changed or content has changed (e.g. during import)
             // -> Nail the current section (Change the scroll position, so the same section is shown again)
-            if (this.nailedSectionIndex === null && prevGridLayout) {
-                this.nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevGridLayout.sectionLayouts)
+            if (prevGridLayout) {
+                const nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevGridLayout.sectionLayouts)
+                this.nailedSectionId = nailedSectionIndex == null ? null : prevProps.sectionIds[nailedSectionIndex]
             }
-
+        
             if (this.releaseNailTimer) {
                 clearTimeout(this.releaseNailTimer)
             }
             this.releaseNailTimer = setTimeout(() => {
-                this.nailedSectionIndex = null
+                this.nailedSectionId = null
             }, 1000)
         }
 
@@ -109,7 +112,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             }
         }
 
-        if (this.nailedSectionIndex !== null) {
+        if (this.nailedSectionId !== null) {
             this.scrollToNailedSection()
         }
     }
@@ -121,7 +124,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     getGridLayout(props: Props, state: State): GridLayout {
         return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop,
             state.viewportWidth - gridScrollBarWidth, state.viewportHeight,
-            props.gridRowHeight, this.nailedSectionIndex)
+            props.gridRowHeight, this.nailedSectionId)
     }
 
     onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
@@ -166,16 +169,22 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     scrollToNailedSection() {
-        if (this.nailedSectionIndex === null || !this.gridLayout) {
+        if (this.nailedSectionId === null || !this.gridLayout) {
             return
         }
 
-        const layout = this.gridLayout.sectionLayouts[this.nailedSectionIndex]
+        const nailedSectionIndex = this.props.sectionIds.indexOf(this.nailedSectionId)
+        if (nailedSectionIndex === -1) {
+            return
+        }
+
+        const layout = this.gridLayout.sectionLayouts[nailedSectionIndex]
         if (!layout) {
             return
         }
 
         this.setScrollTop(layout.sectionTop)
+        this.nailedSectionId = null
     }
 
     private setScrollTop(scrollTop: number) {
@@ -310,16 +319,18 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                             <div className='Grid-spacer' style={{ top: contentHeight - gridSpacerHeight }} />
                         }
                     </div>
-                    <GridScrollBar
-                        className='Grid-scrollBar'
-                        gridLayout={gridLayout!}
-                        sectionIds={props.sectionIds}
-                        sectionById={props.sectionById}
-                        viewportHeight={state.viewportHeight}
-                        contentHeight={contentHeight}
-                        scrollTop={state.scrollTop}
-                        setScrollTop={this.setScrollTop}
-                    />
+                    {gridLayout &&
+                        <GridScrollBar
+                            className='Grid-scrollBar'
+                            gridLayout={gridLayout!}
+                            sectionIds={props.sectionIds}
+                            sectionById={props.sectionById}
+                            viewportHeight={state.viewportHeight}
+                            contentHeight={contentHeight}
+                            scrollTop={state.scrollTop}
+                            setScrollTop={this.setScrollTop}
+                        />
+                    }
                 </div>
             </ResizeSensor>
         )

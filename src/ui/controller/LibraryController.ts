@@ -31,7 +31,8 @@ let isFetchingSectionPhotos = false
 
 
 export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
-    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number, nailedSectionIndex: number | null):
+    scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number,
+    nailedSectionId: PhotoSectionId | null):
     GridLayout
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
@@ -44,10 +45,11 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
 
     let inDomMinY: number | null = null
     let inDomMaxY: number | null = null
-    if (nailedSectionIndex === null) {
+    if (nailedSectionId === null) {
         inDomMinY = scrollTop - pagesToPreload * viewportHeight
         inDomMaxY = scrollTop + (pagesToPreload + 1) * viewportHeight
     }
+    let nailedSectionLayout: GridSectionLayout | null = null
 
     let sectionTop = 0
     const sectionCount = sectionIds.length
@@ -93,7 +95,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         }
 
 
-        if (sectionIndex === nailedSectionIndex) {
+        if (sectionId === nailedSectionId) {
             inDomMinY = sectionTop
             inDomMaxY = sectionTop + viewportHeight
         }
@@ -152,6 +154,9 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         }
 
         sectionLayouts.push(layout)
+        if (sectionId === nailedSectionId) {
+            nailedSectionLayout = layout
+        }
 
         // Prepare next iteration
         sectionTop = sectionBottom
@@ -161,7 +166,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         toSectionIndex = sectionCount
     }
 
-    const viewportTop = (nailedSectionIndex === null) ? scrollTop : sectionLayouts[nailedSectionIndex].sectionTop
+    const viewportTop = nailedSectionLayout ? nailedSectionLayout.sectionTop : scrollTop
     forgetAndFetchSections(sectionIds, sectionById, viewportTop, viewportHeight, sectionLayouts)
 
     if (profiler) {
