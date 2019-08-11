@@ -23,20 +23,63 @@ let nextCallId = 1
 const pendingCalls: { [key:number]: CallInfo } = {}
 
 
-export function init() {
-    ipcRenderer.on('onBackgroundActionDone', (event, callId, error, result) => {
-        const callInfo = pendingCalls[callId]
-        delete pendingCalls[callId]
-        if (callInfo) {
-            if (error) {
-                callInfo.reject(error)
-            } else {
-                callInfo.resolve(result)
-            }
-        }
-    })
-}
+export default {
 
+    init() {
+        ipcRenderer.on('onBackgroundActionDone', (event, callId, error, result) => {
+            const callInfo = pendingCalls[callId]
+            delete pendingCalls[callId]
+            if (callInfo) {
+                if (error) {
+                    callInfo.reject(error)
+                } else {
+                    callInfo.resolve(result)
+                }
+            }
+        })
+    },
+
+    fetchUiConfig(): Promise<UiConfig> {
+        return callOnBackground('fetchUiConfig')
+    },
+
+    fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
+        return callOnBackground('fetchSections', { filter })
+    },
+
+    fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<PhotoType[]> {
+        return callOnBackground('fetchSectionPhotos', { sectionId, filter })
+    },
+
+    updatePhotos(photoIds: PhotoId[], update: Partial<PhotoType>): Promise<void> {
+        return callOnBackground('updatePhotos', { photoIds, update })
+    },
+
+    fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
+        return callOnBackground('fetchPhotoDetail', { photoId })
+    },
+
+    fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
+        return callOnBackground('fetchPhotoWork', { photoPath })
+    },
+
+    storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
+        return callOnBackground('storePhotoWork', { photoPath, photoWork })
+    },
+
+    storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
+        return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
+    },
+
+    fetchTags(): Promise<TagType[]> {
+        return callOnBackground('fetchTags')
+    },
+
+    storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
+        return callOnBackground('storePhotoTags', { photoId, photoTags })
+    },
+
+}
 
 async function callOnBackground(action: string, params: any = null): Promise<any> {
     const callId = nextCallId++
@@ -45,45 +88,4 @@ async function callOnBackground(action: string, params: any = null): Promise<any
         pendingCalls[callId] = { resolve, reject }
         ipcRenderer.send('executeBackgroundAction', callId, action, params)
     })
-}
-
-
-export async function fetchUiConfig(): Promise<UiConfig> {
-    return callOnBackground('fetchUiConfig')
-}
-
-export async function fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
-    return callOnBackground('fetchSections', { filter })
-}
-
-export async function fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<PhotoType[]> {
-    return callOnBackground('fetchSectionPhotos', { sectionId, filter })
-}
-
-export async function updatePhotos(photoIds: PhotoId[], update: Partial<PhotoType>): Promise<void> {
-    return callOnBackground('updatePhotos', { photoIds, update })
-}
-
-export async function fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
-    return callOnBackground('fetchPhotoDetail', { photoId })
-}
-
-export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
-    return callOnBackground('fetchPhotoWork', { photoPath })
-}
-
-export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
-    return callOnBackground('storePhotoWork', { photoPath, photoWork })
-}
-
-export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
-    return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
-}
-
-export function fetchTags(): Promise<TagType[]> {
-    return callOnBackground('fetchTags')
-}
-
-export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<TagType[] | null> {
-    return callOnBackground('storePhotoTags', { photoId, photoTags })
 }

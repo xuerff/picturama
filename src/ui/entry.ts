@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { init as initBackgroundClient, fetchUiConfig } from 'ui/BackgroundClient'
+import BackgroundClient from 'ui/BackgroundClient'
 import { init as initForegroundService } from 'ui/ForegroundService'
 import App from 'ui/components/App'
 import { checkSettingsExist } from 'ui/controller/SettingsController'
@@ -22,9 +22,9 @@ if (process.env.ANSEL_TEST_MODE) {
     document.title = 'Ansel - TEST MODE'
 }
 
-initBackgroundClient()
+BackgroundClient.init()
 
-fetchUiConfig()
+BackgroundClient.fetchUiConfig()
     .then(uiConfig => {
         setLocale(uiConfig.locale)
 

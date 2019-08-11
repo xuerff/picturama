@@ -8,15 +8,16 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
-import config from '../../common/config'
-import { bindMany } from '../../common/util/LangUtil'
-import { PhotoId, PhotoById } from '../../common/models/Photo'
+import config from 'common/config'
+import { bindMany } from 'common/util/LangUtil'
+import { PhotoId, PhotoById } from 'common/models/Photo'
 
-import { fetchPhotoDetail } from '../BackgroundClient'
-import keymapManager from '../keymap-manager'
-import { getNonRawImgPath } from '../controller/ImageProvider'
-import { closeExportAction } from '../state/actions'
-import { AppState } from '../state/reducers'
+import BackgroundClient from 'ui/BackgroundClient'
+import keymapManager from 'ui/keymap-manager'
+import { getNonRawImgPath } from 'ui/controller/ImageProvider'
+import { closeExportAction } from 'ui/state/actions'
+import { AppState } from 'ui/state/reducers'
+
 import Progress from './Progress'
 
 
@@ -120,7 +121,7 @@ export class Export extends React.Component<Props, State> {
             }
         })
 
-        const photoDetail = await fetchPhotoDetail(photoId)
+        const photoDetail = await BackgroundClient.fetchPhotoDetail(photoId)
         if (photoDetail.versions.length > 0) {
             const last = photoDetail.versions[photoDetail.versions.length - 1]
             return this.processImg(photo, last.output)

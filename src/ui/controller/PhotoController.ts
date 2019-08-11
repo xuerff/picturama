@@ -1,14 +1,13 @@
 import Promise from 'bluebird'
-import isDeepEqual from 'fast-deep-equal'
 
-import Photo, { PhotoWork, PhotoType, PhotoFilter } from '../../common/models/Photo'
-import { VersionType } from '../../common/models/Version'
-import { assertRendererProcess } from '../../common/util/ElectronUtil'
-import { cloneDeep } from '../../common/util/LangUtil'
+import Photo, { PhotoWork, PhotoType, PhotoFilter } from 'common/models/Photo'
+import { VersionType } from 'common/models/Version'
+import { assertRendererProcess } from 'common/util/ElectronUtil'
 
-import { fetchSections as fetchSectionsFromDb, updatePhotos as updatePhotosInDb, fetchPhotoWork, storePhotoWork } from '../BackgroundClient'
-import store from '../state/store'
-import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from '../state/actions'
+import BackgroundClient from 'ui/BackgroundClient'
+import store from 'ui/state/store'
+import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from 'ui/state/actions'
+
 import { onThumbnailChange } from './ImageProvider'
 
 
@@ -32,7 +31,7 @@ function internalFetchSections(newFilter: PhotoFilter | null) {
     const filter = newFilter || store.getState().library.filter
 
     store.dispatch(fetchSectionsAction.request({ newFilter }))
-    fetchSectionsFromDb(filter)
+    BackgroundClient.fetchSections(filter)
         .then(sections => {
             store.dispatch(fetchSectionsAction.success({ sections }))
         })
@@ -58,7 +57,7 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
         }
         pendingUpdates[photoPath] = pendingUpdate
 
-        fetchPhotoWork(photoPath)
+        BackgroundClient.fetchPhotoWork(photoPath)
             .then(photoWork => {
                 const photoWorkBefore = { ...photoWork }
                 for (const up of pendingUpdate.updates) {
@@ -77,7 +76,7 @@ export function updatePhotoWork(photo: PhotoType, update: (photoWork: PhotoWork)
                 store.dispatch(changePhotoWorkAction(photo.id, photoWork))
 
                 return Promise.all([
-                    storePhotoWork(photoPath, photoWork),
+                    BackgroundClient.storePhotoWork(photoPath, photoWork),
                     thumbnailNeedsUpdate ? onThumbnailChange(photo.id) : Promise.resolve()
                 ])
             })
@@ -139,7 +138,7 @@ export function updatePhotos(photos: PhotoType[], update: Partial<PhotoType>) {
     const photoIds = photos.map(photo => photo.id)
     Promise.all([
         updatePhotoWorkPromise,
-        updatePhotosInDb(photoIds, update)
+        BackgroundClient.updatePhotos(photoIds, update)
     ])
     .then(() => {
         const changedPhotos = photos.map(photo => ({ ...photo, ...update } as PhotoType))

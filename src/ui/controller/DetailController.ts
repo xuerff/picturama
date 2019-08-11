@@ -1,11 +1,11 @@
-import { PhotoId, PhotoSectionId } from '../../common/models/Photo'
-import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
-import { assertRendererProcess } from '../../common/util/ElectronUtil'
+import { PhotoId, PhotoSectionId } from 'common/models/Photo'
+import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
+import { assertRendererProcess } from 'common/util/ElectronUtil'
 
-import { fetchPhotoDetail, fetchPhotoWork } from '../BackgroundClient'
-import { setDetailPhotoAction, closeDetailAction } from '../state/actions'
-import { getPhotoByIndex, getSectionById } from '../state/selectors'
-import store from '../state/store'
+import BackgroundClient from 'ui/BackgroundClient'
+import { setDetailPhotoAction, closeDetailAction } from 'ui/state/actions'
+import { getPhotoByIndex, getSectionById } from 'ui/state/selectors'
+import store from 'ui/state/store'
 
 
 assertRendererProcess()
@@ -38,8 +38,8 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
     const photoPath = photo.master
     runningDetailPhotoFetch = new CancelablePromise(Promise.all(
         [
-            fetchPhotoDetail(photo.id),
-            fetchPhotoWork(photoPath)
+            BackgroundClient.fetchPhotoDetail(photo.id),
+            BackgroundClient.fetchPhotoWork(photoPath)
         ]))
         .then(results => {
             const [ photoDetail, photoWork ] = results

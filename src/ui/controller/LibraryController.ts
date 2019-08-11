@@ -1,16 +1,17 @@
 import createLayout from 'justified-layout'
 
-import { profileLibraryLayout, profileThumbnailRenderer } from '../../common/LogConstants'
-import { PhotoSectionId, PhotoSectionById, PhotoSection, PhotoType, PhotoId } from '../../common/models/Photo'
-import CancelablePromise, { isCancelError } from '../../common/util/CancelablePromise'
-import Profiler from '../../common/util/Profiler'
-import SerialJobQueue from '../../common/util/SerialJobQueue'
+import { profileLibraryLayout, profileThumbnailRenderer } from 'common/LogConstants'
+import { PhotoSectionId, PhotoSectionById, PhotoSection, PhotoType, PhotoId } from 'common/models/Photo'
+import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
+import Profiler from 'common/util/Profiler'
+import SerialJobQueue from 'common/util/SerialJobQueue'
 
-import { fetchSectionPhotos as fetchSectionPhotosFromDb, fetchPhotoDetail } from '../BackgroundClient'
-import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from '../UITypes'
-import { sectionHeadHeight } from '../components/library/GridSection'
-import { forgetSectionPhotosAction, fetchSectionPhotosAction, setLibraryInfoPhotoAction } from '../state/actions'
-import store from '../state/store'
+import BackgroundClient from 'ui/BackgroundClient'
+import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from 'ui/UITypes'
+import { sectionHeadHeight } from 'ui/components/library/GridSection'
+import { forgetSectionPhotosAction, fetchSectionPhotosAction, setLibraryInfoPhotoAction } from 'ui/state/actions'
+import store from 'ui/state/store'
+
 import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './ImageProvider'
 
 
@@ -360,7 +361,7 @@ function fetchSectionPhotos(sectionId: PhotoSectionId) {
     const filter = store.getState().library.filter
 
     isFetchingSectionPhotos = true
-    fetchSectionPhotosFromDb(sectionId, filter)
+    BackgroundClient.fetchSectionPhotos(sectionId, filter)
         .then(photos => {
             isFetchingSectionPhotos = false
             store.dispatch(fetchSectionPhotosAction(sectionId, photos))
@@ -383,7 +384,7 @@ export function setInfoPhoto(sectionId: PhotoSectionId | null, photoId: PhotoId 
     }
 
     if (photoId) {
-        runningInfoPhotoDetailPromise = new CancelablePromise(fetchPhotoDetail(photoId))
+        runningInfoPhotoDetailPromise = new CancelablePromise(BackgroundClient.fetchPhotoDetail(photoId))
             .then(photoDetail => store.dispatch(setLibraryInfoPhotoAction.success({ photoDetail })))
             .catch(error => {
                 if (!isCancelError(error)) {

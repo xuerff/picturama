@@ -1,9 +1,11 @@
 import fs from 'fs'
 
-import { PhotoId, PhotoType, getThumbnailPath } from '../../common/models/Photo'
-import Profiler from '../../common/util/Profiler'
-import { renderThumbnailForPhoto } from '../renderer/ThumbnailRenderer'
-import { fetchPhotoWork, storeThumbnail } from '../BackgroundClient'
+import { PhotoId, PhotoType, getThumbnailPath } from 'common/models/Photo'
+import Profiler from 'common/util/Profiler'
+
+import { renderThumbnailForPhoto } from 'ui/renderer/ThumbnailRenderer'
+import BackgroundClient from 'ui/BackgroundClient'
+
 
 async function unlink(path: string): Promise<void> {
     return new Promise<void>((resolve, reject) => fs.unlink(path, error => { if (error) { reject(error) } else { resolve() } }))
@@ -48,11 +50,11 @@ export async function createThumbnail(photo: PhotoType, profiler: Profiler | nul
         return
     }
 
-    const photoWork = await fetchPhotoWork(photo.master)
+    const photoWork = await BackgroundClient.fetchPhotoWork(photo.master)
     if (profiler) profiler.addPoint('Fetched PhotoWork')
 
     const thumbnailData = await renderThumbnailForPhoto(photo, photoWork, profiler)
 
-    await storeThumbnail(thumbnailPath, thumbnailData)
+    await BackgroundClient.storeThumbnail(thumbnailPath, thumbnailData)
     if (profiler) profiler.addPoint('Stored thumbnail')
 }
