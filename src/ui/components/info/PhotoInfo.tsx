@@ -6,6 +6,7 @@ import moment from 'moment'
 
 import { Photo, PhotoDetail } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
+import { getMasterPath } from 'common/util/DataUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import Toolbar from 'ui/components/widget/Toolbar'
@@ -55,20 +56,20 @@ export default class PhotoInfo extends React.Component<Props, State> {
     async updateMasterFileSize(props: Props) {
         this.setState({ masterFileSize: null })
         if (props.photo) {
-            const masterFileSize = await BackgroundClient.getFileSize(props.photo.master)
+            const masterFileSize = await BackgroundClient.getFileSize(getMasterPath(props.photo))
             this.setState({ masterFileSize })
         }
     }
 
     showPhotoInFolder() {
         if (this.props.photo) {
-            shell.showItemInFolder(this.props.photo.master)
+            shell.showItemInFolder(getMasterPath(this.props.photo))
         }
     }
 
     copyPhotoPath() {
         if (this.props.photo) {
-            clipboard.writeText(this.props.photo.master)
+            clipboard.writeText(getMasterPath(this.props.photo))
         }
     }
 
@@ -81,7 +82,6 @@ export default class PhotoInfo extends React.Component<Props, State> {
         if (!props.isActive) {
             body = null
         } else if (photo) {
-            const photoMasterSplits = photo.master.split(/[\/\\]/g)
             const momentCreated = moment(photo.created_at)
 
             body = (
@@ -99,8 +99,8 @@ export default class PhotoInfo extends React.Component<Props, State> {
                         <Icon className="PhotoInfo-infoIcon" icon="media" iconSize={infoIconSize} />
                         <div className="PhotoInfo-infoBody">
                             <h1 className="PhotoInfo-infoTitle hasColumns">
-                                <div className="PhotoInfo-shrinkable" title={photo.master}>
-                                    {photoMasterSplits[photoMasterSplits.length - 1]}
+                                <div className="PhotoInfo-shrinkable" title={getMasterPath(photo)}>
+                                    {photo.master_filename}
                                 </div>
                                 <Popover position={Position.BOTTOM_RIGHT}>
                                     <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />

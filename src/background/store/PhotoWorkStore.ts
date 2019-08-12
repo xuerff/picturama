@@ -306,26 +306,20 @@ function getDirectoryWork(directoryPath: string): DirectoryWork {
 }
 
 
-export async function fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
-    const directoryPath = dirname(photoPath)
-    const photoBasename = basename(photoPath)
-
-    return getDirectoryWork(directoryPath)
-        .fetchPhotoWork(photoBasename)
+export async function fetchPhotoWork(photoDir: string, photoFileName: string): Promise<PhotoWork> {
+    return getDirectoryWork(photoDir)
+        .fetchPhotoWork(photoFileName)
 }
 
 
-export async function storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
-    const directoryPath = dirname(photoPath)
-    const photoBasename = basename(photoPath)
-
-    return getDirectoryWork(directoryPath)
-        .storePhotoWork(photoBasename, photoWork)
+export async function storePhotoWork(photoDir: string, photoFileName: string, photoWork: PhotoWork): Promise<void> {
+    return getDirectoryWork(photoDir)
+        .storePhotoWork(photoFileName, photoWork)
 }
 
 
-export async function removePhotoWork(photoPath: string): Promise<void> {
-    await storePhotoWork(photoPath, {})
+export async function removePhotoWork(photoDir: string, photoFileName: string): Promise<void> {
+    await storePhotoWork(photoDir, photoFileName, {})
 }
 
 

@@ -2,13 +2,18 @@ import config from 'common/config'
 import { PhotoId, Photo, ExifOrientation, PhotoWork } from 'common/CommonTypes'
 
 
+export function getMasterPath(photo: Photo | { master_dir: string, master_filename: string }): string {
+    return `${photo.master_dir}/${photo.master_filename}`
+}
+
+
 export function getThumbnailPath(photoId: PhotoId): string {
     return `${config.thumbnailPath}/${shortId(photoId)}.${config.workExt}`
 }
 
 
 export function getNonRawPath(photo: Photo): string {
-    return photo.master_is_raw ? `${config.nonRawPath}/${shortId(photo.id)}.${config.workExt}` : photo.master
+    return photo.master_is_raw ? `${config.nonRawPath}/${shortId(photo.id)}.${config.workExt}` : getMasterPath(photo)
 }
 
 

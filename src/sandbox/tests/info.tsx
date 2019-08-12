@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { getMasterPath } from 'common/util/DataUtil'
 
 import PhotoInfo from 'ui/components/info/PhotoInfo'
 
@@ -15,7 +16,7 @@ const defaultProps = {
     style: { width: '300px', height: '100%' },
 
     isActive: true,
-    photo: { ...testBigPhoto, master: `${baseUrl}/${testBigPhoto.master}` },
+    photo: { ...testBigPhoto, master: `${baseUrl}/${getMasterPath(testBigPhoto)}` },
     tags: defaultTags,
     closeInfo: action('closeInfo')
 }
@@ -50,7 +51,7 @@ addSection('PhotoInfo')
         <PhotoInfo
             {...defaultProps}
             {...createGridRowHeightProps(context)}
-            photo={{ ...testBigPhoto, master: `${baseUrl}/../specs/photos/RAW_FUJI_FINEPIX_X100.RAF` }}
+            photo={{ ...testBigPhoto, master_filename: 'RAW_FUJI_FINEPIX_X100.RAF' }}
         />
     ))
     .add('no tags', context => (

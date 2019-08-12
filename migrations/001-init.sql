@@ -1,24 +1,23 @@
 -- Up
 
 CREATE TABLE "photos" (
-    "id"            integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "title"         text NOT NULL,
-    "master"        text NOT NULL,
-    "master_width"  integer,
-    "master_height" integer,
-    "master_is_raw" boolean NOT NULL DEFAULT '0',
-    "extension"     text NOT NULL,
-    "flag"          boolean NOT NULL DEFAULT '0',
-    "created_at"    datetime,
-    "updated_at"    datetime,
-    "orientation"   integer NOT NULL,
-    "camera"        text,
-    "exposure_time" float,
-    "iso"           integer,
-    "focal_length"  integer,
-    "aperture"      float,
-    "date"          date,
-    "trashed"       boolean NOT NULL DEFAULT '0'
+    "id"              integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "master_dir"      text NOT NULL,
+    "master_filename" text NOT NULL,
+    "master_width"    integer,
+    "master_height"   integer,
+    "master_is_raw"   boolean NOT NULL DEFAULT '0',
+    "flag"            boolean NOT NULL DEFAULT '0',
+    "created_at"      datetime,
+    "updated_at"      datetime,
+    "orientation"     integer NOT NULL,
+    "camera"          text,
+    "exposure_time"   float,
+    "iso"             integer,
+    "focal_length"    integer,
+    "aperture"        float,
+    "date"            date,
+    "trashed"         boolean NOT NULL DEFAULT '0'
 );
 CREATE TABLE "tags" (
     "id"         integer NOT NULL PRIMARY KEY AUTOINCREMENT,

@@ -4,18 +4,16 @@
 export type PhotoId = number
 export interface Photo {
     id: PhotoId,
-    /** Example: 'IMG_9700' */
-    title: string,
-    /** The original image. Example: '/specs/photos/IMG_9700.JPG' */
-    master: string,
+    /** The directory of the original image. Example: '/specs/photos' */
+    master_dir: string,
+    /** The filename (without directory) of the original image. Example: 'IMG_9700.JPG' */
+    master_filename: string,
     /** The width of the original image (in px). */
     master_width: number | null
     /** The height of the original image (in px). */
     master_height: number | null
     /** Whether the master image has a raw format */
     master_is_raw: 0 | 1,
-    /** Example: 'JPG' */
-    extension: string,
     /** Whether the image is flagged. */
     flag: 0 | 1,
     /** Example: 0  (for saving Dates work too) */

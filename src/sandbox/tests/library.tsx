@@ -74,11 +74,10 @@ function createDefaultProps(context: TestContext): Props {
         getGridLayout,
         getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
-            const thumbnailPath = getNonRawPath(photo)
-            if (thumbnailPath === 'dummy') {
+            if (photo.master_filename === 'dummy') {
                 return new CancelablePromise<string>(() => {})
             } else {
-                return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
+                return new CancelablePromise<string>(Promise.resolve(getNonRawPath(photo)))
             }
         },
         setGridRowHeight: (gridRowHeight: number) => {
@@ -204,7 +203,7 @@ addSection('Library')
     .add('thumbnail error', context => {
         let photos = [ ...defaultPhotos ]
         const errorPhoto = createRandomDummyPhoto()
-        errorPhoto.master = 'error'
+        errorPhoto.master_filename = 'error'
         photos.splice(1, 0, errorPhoto)
         const section = createSection(defaultSectionId, photos)
 

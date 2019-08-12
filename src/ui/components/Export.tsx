@@ -10,8 +10,9 @@ import { connect } from 'react-redux'
 
 import { PhotoId, PhotoById } from 'common/CommonTypes'
 import config from 'common/config'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
+import { parsePath } from 'common/util/TextUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import keymapManager from 'ui/keymap-manager'
@@ -21,7 +22,7 @@ import { AppState } from 'ui/state/reducers'
 import Progress from './Progress'
 
 
-const readFile = BluebirdPromise.promisify(fs.readFile)
+const fsReadFile = BluebirdPromise.promisify(fs.readFile)
 
 
 interface OwnProps {
@@ -108,7 +109,8 @@ export class Export extends React.Component<Props, State> {
     async onEachPhoto(photoId: PhotoId, i: number) {
         const photo = this.props.photoData[photoId]
 
-        let extension = photo.extension.toLowerCase()
+        const pathParts = parsePath(photo.master_filename)
+        const extension = pathParts.ext ? pathParts.ext.substr(1) : ''
 
         if (!this.state.folder)
             return false
@@ -128,8 +130,8 @@ export class Export extends React.Component<Props, State> {
         }
 
         if (config.acceptedRawFormats.indexOf(extension) !== -1) {
-            return libraw.extract(photo.master, `${config.tmp}/${photo.title}`)
-                .then(imgPath => readFile(imgPath))
+            return libraw.extract(getMasterPath(photo), `${config.tmp}/ansel-export-temp-${photo.id}`)
+                .then(imgPath => fsReadFile(imgPath))
                 .then(img => this.processImg(photo, img))
         }
 

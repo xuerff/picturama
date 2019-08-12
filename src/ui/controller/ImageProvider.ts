@@ -47,7 +47,7 @@ export async function createThumbnail(photo: Photo, profiler: Profiler | null = 
         return
     }
 
-    const photoWork = await BackgroundClient.fetchPhotoWork(photo.master)
+    const photoWork = await BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
     if (profiler) profiler.addPoint('Fetched PhotoWork')
 
     const thumbnailData = await renderThumbnailForPhoto(photo, photoWork, profiler)

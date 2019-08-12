@@ -9,12 +9,11 @@ export function createTestPhotoId(): PhotoId {
 
 export const testBigPhoto: Photo = {
     id: createTestPhotoId(),
-    title: 'IMG_9700',
-    master: '../specs/photos/IMG_9700.JPG',
+    master_dir: '../specs/photos',
+    master_filename: 'IMG_9700.JPG',
     master_width: 5184,
     master_height: 3456,
     master_is_raw: 0,
-    extension: 'JPG',
     flag: 0,
     created_at: 1474222345000,
     updated_at: null,
@@ -30,12 +29,11 @@ export const testBigPhoto: Photo = {
 
 export const testLandscapePhoto: Photo = {
     id: createTestPhotoId(),
-    title: 'landscape',
-    master: '../specs/photos/landscape.jpg',
+    master_dir: '../specs/photos',
+    master_filename: 'landscape.jpg',
     master_width: 800,
     master_height: 530,
     master_is_raw: 0,
-    extension: 'jpg',
     flag: 0,
     created_at: 1474222345000,
     updated_at: null,
@@ -46,12 +44,11 @@ export const testLandscapePhoto: Photo = {
 
 export const testPortraitPhoto: Photo = {
     id: createTestPhotoId(),
-    title: 'portrait',
-    master: '../specs/photos/portrait.jpg',
+    master_dir: '../specs/photos',
+    master_filename: 'portrait.jpg',
     master_width: 785,
     master_height: 1024,
     master_is_raw: 0,
-    extension: 'jpg',
     flag: 1,
     created_at: 1474222345000,
     updated_at: null,
@@ -62,12 +59,11 @@ export const testPortraitPhoto: Photo = {
 
 export const testPanoramaPhoto: Photo = {
     id: createTestPhotoId(),
-    title: 'panorama',
-    master: '../specs/photos/panorama.jpg',
+    master_dir: '../specs/photos',
+    master_filename: 'panorama.jpg',
     master_width: 1024,
     master_height: 225,
     master_is_raw: 0,
-    extension: 'jpg',
     flag: 0,
     created_at: 1474222345000,
     updated_at: null,
@@ -91,7 +87,8 @@ export const testPhotos: Photo[] = [
 ].map(info => ({
     id: createTestPhotoId(),
     title: info.name,
-    master: `../specs/photos/800/${info.name}.jpg`,
+    master_dir: '../specs/photos/800',
+    master_filename: `${info.name}.jpg`,
     master_width: info.width,
     master_height: info.height,
     master_is_raw: 0,

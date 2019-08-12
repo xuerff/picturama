@@ -6,7 +6,7 @@ import notifier from 'node-notifier'
 
 import config from 'common/config'
 import { PhotoId } from 'common/CommonTypes'
-import { getThumbnailPath } from 'common/util/DataUtil'
+import { getThumbnailPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import { removePhotoWork } from 'background/store/PhotoWorkStore'
@@ -81,13 +81,14 @@ class Library {
 
     emptyTrash() {
         (async () => {
-            const photosToDelete = await DB().query<{ id: PhotoId, master: string, non_raw: string }>('select id, master, non_raw from photos where trashed = 1')
+            const photosToDelete = await DB().query<{ id: PhotoId, master_dir: string, master_filename: string, non_raw: string }>(
+                'select id, master_dir, master_filename, non_raw from photos where trashed = 1')
             for (const photo of photosToDelete) {
                 await Promise.all([
-                    shell.moveItemToTrash(photo.master),
+                    shell.moveItemToTrash(getMasterPath(photo)),
                     fsUnlinkIfExists(photo.non_raw),
                     fsUnlinkIfExists(getThumbnailPath(photo.id)),
-                    removePhotoWork(photo.master)
+                    removePhotoWork(photo.master_dir, photo.master_filename)
                 ])
             }
 

@@ -66,12 +66,12 @@ export default {
         return callOnBackground('fetchPhotoDetail', { photoId })
     },
 
-    fetchPhotoWork(photoPath: string): Promise<PhotoWork> {
-        return callOnBackground('fetchPhotoWork', { photoPath })
+    fetchPhotoWork(photoDir: string, photoFileName: string): Promise<PhotoWork> {
+        return callOnBackground('fetchPhotoWork', { photoDir, photoFileName })
     },
 
-    storePhotoWork(photoPath: string, photoWork: PhotoWork): Promise<void> {
-        return callOnBackground('storePhotoWork', { photoPath, photoWork })
+    storePhotoWork(photoDir: string, photoFileName: string, photoWork: PhotoWork): Promise<void> {
+        return callOnBackground('storePhotoWork', { photoDir, photoFileName, photoWork })
     },
 
     storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {

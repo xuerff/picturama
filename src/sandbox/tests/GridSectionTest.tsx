@@ -29,11 +29,10 @@ const defaultProps = {
     selectedPhotoIds: null,
     getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
-        const thumbnailPath = getNonRawPath(photo)
-        if (thumbnailPath === 'dummy') {
+        if (photo.master_filename === 'dummy') {
             return new CancelablePromise<string>(() => {})
         } else {
-            return new CancelablePromise<string>(Promise.resolve(thumbnailPath))
+            return new CancelablePromise<string>(Promise.resolve(getNonRawPath(photo)))
         }
     },
     onPhotoClick: action('onPhotoClick'),
@@ -59,7 +58,7 @@ addSection('GridSection')
         for (let i = 0; i < 20; i++) {
             photos.push(createRandomDummyPhoto())
         }
-        photos[0] = { ...photos[0], id: createTestPhotoId(), master: 'dummy' }
+        photos[0] = { ...photos[0], id: createTestPhotoId(), master_filename: 'dummy' }
         const section = createSection(defaultSectionId, photos)
         const layout = createLayoutForSection(section, 0, viewportWidth, defaultGridRowHeight)
 

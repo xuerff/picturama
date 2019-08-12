@@ -16,8 +16,8 @@ export function createRandomDummyPhoto(): Photo {
     return {
         ...testBigPhoto,
         id,
-        title: `dummy-${id}.JPG`,
-        master: 'dummy',
+        master_dir: 'some/dir',
+        master_filename: 'dummy',
         master_width,
         master_height,
         master_is_raw: 0,

@@ -1,6 +1,7 @@
 import Promise from 'bluebird'
 
 import { PhotoWork, Photo, PhotoFilter } from 'common/CommonTypes'
+import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
@@ -44,7 +45,7 @@ function internalFetchSections(newFilter: PhotoFilter | null) {
 const pendingUpdates: { photo: Photo, updates: ((photoWork: PhotoWork) => void)[] }[] = []
 
 export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => void) {
-    const photoPath = photo.master
+    const photoPath = getMasterPath(photo)
     let pendingUpdate = pendingUpdates[photoPath]
     if (pendingUpdate) {
         pendingUpdate.updates.push(update)
@@ -55,7 +56,7 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
         }
         pendingUpdates[photoPath] = pendingUpdate
 
-        BackgroundClient.fetchPhotoWork(photoPath)
+        BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
             .then(photoWork => {
                 const photoWorkBefore = { ...photoWork }
                 for (const up of pendingUpdate.updates) {
@@ -74,14 +75,14 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
                 store.dispatch(changePhotoWorkAction(photo.id, photoWork))
 
                 return Promise.all([
-                    BackgroundClient.storePhotoWork(photoPath, photoWork),
+                    BackgroundClient.storePhotoWork(photo.master_dir, photo.master_filename, photoWork),
                     thumbnailNeedsUpdate ? onThumbnailChange(photo.id) : Promise.resolve()
                 ])
             })
             .catch(error => {
                 delete pendingUpdates[photoPath]
                 // TODO: Show error message in UI
-                console.error('Updating photo work failed: ' + photo.master, error)
+                console.error('Updating photo work failed: ' + photoPath, error)
             })
     }
 }

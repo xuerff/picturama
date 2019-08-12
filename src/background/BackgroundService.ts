@@ -47,9 +47,9 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'fetchPhotoDetail') {
         return fetchPhotoDetail(params.photoId)
     } else if (action === 'fetchPhotoWork') {
-        return fetchPhotoWork(params.photoPath)
+        return fetchPhotoWork(params.photoDir, params.photoFileName)
     } else if (action === 'storePhotoWork') {
-        return storePhotoWork(params.photoPath, params.photoWork)
+        return storePhotoWork(params.photoDir, params.photoFileName, params.photoWork)
     } else if (action === 'storeThumbnail') {
         return storeThumbnail(params.thumbnailPath, params.thumbnailData)
     } else if (action === 'fetchTags') {

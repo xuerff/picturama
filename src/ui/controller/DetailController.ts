@@ -1,5 +1,6 @@
 import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
+import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
@@ -35,11 +36,10 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
         runningDetailPhotoFetch.cancel()
     }
 
-    const photoPath = photo.master
     runningDetailPhotoFetch = new CancelablePromise(Promise.all(
         [
             BackgroundClient.fetchPhotoDetail(photo.id),
-            BackgroundClient.fetchPhotoWork(photoPath)
+            BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
         ]))
         .then(results => {
             const [ photoDetail, photoWork ] = results
@@ -48,7 +48,7 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
         .catch(error => {
             if (!isCancelError(error)) {
                 // TODO: Show error to the user
-                console.error('Fetching photo work failed: ' + photoPath, error)
+                console.error('Fetching photo work failed: ' + getMasterPath(photo), error)
                 store.dispatch(setDetailPhotoAction.failure(error))
             }
         })
