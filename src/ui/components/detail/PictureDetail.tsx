@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from '@blueprintjs/core'
 
 import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -260,13 +261,13 @@ export class PictureDetail extends React.Component<Props, State> {
                 <Toolbar className="PictureDetail-topBar" isLeft={true}>
                     <Button onClick={props.closeDetail}>
                         <FaIcon name="chevron-left"/>
-                        <span>Back to library</span>
+                        <span>{msg('PictureDetail_back')}</span>
                     </Button>
                     <ButtonGroup>
-                        <Button minimal={true} disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title="Previous image [left]">
+                        <Button minimal={true} disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title={msg('PictureDetail_prevPhoto')}>
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button minimal={true} disabled={props.isLast} onClick={props.setNextDetailPhoto} title="Next image [right]">
+                        <Button minimal={true} disabled={props.isLast} onClick={props.setNextDetailPhoto} title={msg('PictureDetail_nextPhoto')}>
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>

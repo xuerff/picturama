@@ -4,6 +4,7 @@ import { MenuItem, Spinner } from '@blueprintjs/core'
 import { MultiSelect, IItemRendererProps } from "@blueprintjs/select"
 
 import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { bindMany, slug } from 'common/util/LangUtil'
 
 
@@ -171,8 +172,7 @@ export default class TagEditor extends React.Component<Props, State> {
     }
 
     render() {
-        const props = this.props
-        const state = this.state
+        const { props, state } = this
         const isLoading = !props.photo || !props.photoDetail
         return (
             <StringMultiSelect
@@ -181,13 +181,13 @@ export default class TagEditor extends React.Component<Props, State> {
                     disabled: isLoading,
                     onRemove: this.onItemRemove,
                     leftIcon: isLoading ? <Spinner size={24}/> : undefined,
-                    placeholder: isLoading ? undefined : 'Add tags...'
+                    placeholder: isLoading ? undefined : msg('TagEditor_addTag')
                 }}
                 popoverProps={{ minimal: true }}
                 activeItem={state.activeTag}
                 items={state.selectableTags}
                 selectedItems={props.photoDetail ? props.photoDetail.tags : []}
-                noResults={<MenuItem disabled={true} text="Please enter a new tag name" />}
+                noResults={<MenuItem disabled={true} text={msg('TagEditor_error_tagExists')} />}
                 tagRenderer={this.renderTag}
                 itemRenderer={this.renderMenuItem}
                 onQueryChange={this.onQueryChange}

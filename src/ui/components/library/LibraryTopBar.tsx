@@ -4,6 +4,7 @@ import React from 'react'
 import { Button, MaybeElement } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
@@ -40,8 +41,8 @@ export default class LibraryTopBar extends React.Component<Props> {
     emptyTrashModal() {
         dialog.showMessageBox({
             type: 'question',
-            message: 'Are you sure you want to empty the trash?',
-            buttons: [ 'Move picture(s) to trash', 'Cancel' ]
+            message: msg('LibraryTopBar_emptyTrashQuestion'),
+            buttons: [ msg('LibraryTopBar_moveToTrash'), msg('common_cancel') ]
         }, index => {
             if (index === 0) {
                 ipcRenderer.send('empty-trash', true)
@@ -60,7 +61,7 @@ export default class LibraryTopBar extends React.Component<Props> {
                         <Button
                             className="LibraryTopBar-emptyTrash"
                             icon="trash"
-                            text="Empty trash"
+                            text={msg('LibraryTopBar_emptyTrash')}
                             intent={props.photosCount === 0 ? undefined : 'warning'}
                             disabled={props.photosCount === 0}
                             onClick={this.emptyTrashModal}

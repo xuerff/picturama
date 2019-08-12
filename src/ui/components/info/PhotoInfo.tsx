@@ -5,6 +5,7 @@ import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem
 import moment from 'moment'
 
 import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 
@@ -105,8 +106,8 @@ export default class PhotoInfo extends React.Component<Props, State> {
                                 <Popover position={Position.BOTTOM_RIGHT}>
                                     <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />
                                     <Menu>
-                                        <MenuItem text="Show photo in folder" onClick={this.showPhotoInFolder} />
-                                        <MenuItem text="Copy path" onClick={this.copyPhotoPath} />
+                                        <MenuItem text={msg('PhotoInfo_showInFolder')} onClick={this.showPhotoInFolder} />
+                                        <MenuItem text={msg('PhotoInfo_copyPath')} onClick={this.copyPhotoPath} />
                                     </Menu>
                                 </Popover>
                             </h1>
@@ -158,8 +159,8 @@ export default class PhotoInfo extends React.Component<Props, State> {
             body = (
                 <NonIdealState
                     icon="insert"
-                    title="No photo selected"
-                    description="Please select a photo on the left."
+                    title={msg('PhotoInfo_noSelection_title')}
+                    description={msg('PhotoInfo_noSelection_message')}
                 />
             )
         }
@@ -167,7 +168,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
         return (
             <div className={classNames(props.className, 'PhotoInfo bp3-dark')} style={props.style}>
                 <Toolbar className="PhotoInfo-topBar">
-                    <span className="PhotoInfo-title">Info</span>
+                    <span className="PhotoInfo-title">{msg('PhotoInfo_title')}</span>
                     <div className="pull-right">
                         <Button icon="cross" minimal={true} onClick={props.closeInfo} />
                     </div>

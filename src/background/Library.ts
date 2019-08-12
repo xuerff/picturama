@@ -6,6 +6,7 @@ import notifier from 'node-notifier'
 
 import config from 'common/config'
 import { PhotoId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { getThumbnailPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -107,29 +108,28 @@ class Library {
     }
 
     scan() {
-        const start = new Date().getTime()
-
         if (!this.path || !this.versionsPath) {
             return false
         }
+
+        const start = Date.now()
         new ImportScanner(this.path, this.versionsPath, this.mainWindow)
             .scanPictures()
             .then(photoCount => {
-                let end = new Date().getTime()
-                let time = moment.duration(end - start)
-
                 if (photoCount !== null) {
-                    const message = `Finish importing ${photoCount} photos in ${time.humanize()}`
-                    console.log(message)
-                    notifier.notify({
-                        title: 'Ansel',
-                        message
-                    })
+                    const duration = Date.now() - start
+                    console.log(`Finished importing ${photoCount} photos in ${duration} ms`)
+                    if (duration > 30000) {
+                        notifier.notify({
+                            title: 'Ansel',
+                            message: msg('background_Library_importFinished', photoCount, moment.duration(duration).humanize())
+                        })
+                    }
                 }
             })
             .catch(error => {
                 // TODO: Show error in UI
-                console.error('Scanning for pictures failed', error)
+                console.error('Scanning photos failed', error)
             })
     }
 

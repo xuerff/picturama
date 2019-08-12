@@ -2,8 +2,10 @@ import classNames from 'classnames'
 import React from 'react'
 import { Slider, MaybeElement } from '@blueprintjs/core'
 
-import { minGridRowHeight, maxGridRowHeight } from '../../UiConstants'
-import Toolbar from '../widget/Toolbar'
+import { msg } from 'common/i18n/i18n'
+
+import { minGridRowHeight, maxGridRowHeight } from 'ui/UiConstants'
+import Toolbar from 'ui/components/widget/Toolbar'
 
 import './LibraryBottomBar.less'
 
@@ -25,17 +27,18 @@ export default class LibraryBottomBar extends React.Component<Props> {
             <Toolbar className={classNames(props.className, 'LibraryBottomBar')} isTopBar={false}>
                 {props.leftItem}
                 <div className="LibraryBottomBar-selection">
-                    <span>{props.highlightedCount} selected</span>
+                    <span>{msg('LibraryBottomBar_selected', props.highlightedCount)}</span>
                     {props.highlightedCount > 0 &&
                         <button
                             className="LibraryBottomBar-deselectAll"
-                            onClick={props.clearHighlight}>
-                            Deselect all
+                            onClick={props.clearHighlight}
+                        >
+                            {msg('LibraryBottomBar_deselect')}
                         </button>
                     }
                 </div>
                 <div className="LibraryBottomBar-center">
-                    {this.props.photosCount} item{this.props.photosCount > 1 ? 's' : ''}
+                    {props.photosCount === 1 ? msg('LibraryBottomBar_photoCount_one') : msg('LibraryBottomBar_photoCount_more', props.photosCount)}
                 </div>
                 <div className="LibraryBottomBar-right">
                     <Slider

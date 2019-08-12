@@ -8,6 +8,7 @@ import text_en from './text_en'
 export type Locale = 'de' | 'en'
 export const locales = [ 'de', 'en' ]
 
+const fallbackLocale: Locale = 'en'
 export type I18nKey = keyof typeof text_en
 
 const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
@@ -25,7 +26,7 @@ export function setLocale(newLocale: string) {
         newLocale = newLocale.substr(0, 2)
     }
     if (locales.indexOf(newLocale) === -1) {
-        newLocale = 'en'
+        newLocale = fallbackLocale
     }
 
     locale = newLocale as Locale
@@ -37,10 +38,10 @@ export function getLocale(): string {
 }
 
 export function msg(key: I18nKey, ...args: any[]): string {
-    let text: string = textsByLang[locale][key]
+    let text: string | undefined = textsByLang[locale][key]
     if (!text) {
         console.error(`Missing I18N key for ${locale}: ${key}`)
-        return `[${key}]`
+        return textsByLang[fallbackLocale][key] || `[${key}]`
     } else {
         if (args && args.length > 0) {
             return text.replace(msgFormatRe, (match, group1) => args[parseInt(group1)])

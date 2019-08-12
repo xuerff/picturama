@@ -4,6 +4,7 @@ import { MdRotateLeft, MdRotateRight } from 'react-icons/md'
 import { Button, ButtonGroup, Classes } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { rotate } from 'common/util/EffectsUtil'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -84,7 +85,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         this.props.movePhotosToTrash(selectedPhotos)
         toaster.show({
             icon: 'tick',
-            message: selectedPhotos.length === 1 ? 'Moved photo to trash' : `Moved ${selectedPhotos.length} photos to trash`,
+            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_movedToTrash_one') : msg('PhotoActionButtons_movedToTrash_more', selectedPhotos.length),
             intent: 'success'
         })
     }
@@ -94,7 +95,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         this.props.restorePhotosFromTrash(selectedPhotos)
         toaster.show({
             icon: 'tick',
-            message: selectedPhotos.length === 1 ? 'Restored photo from trash' : `Restored ${selectedPhotos.length} photos from trash`,
+            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_restoredFromTrash_one') : msg('PhotoActionButtons_restoredFromTrash_more', selectedPhotos.length),
             intent: 'success'
         })
     }
@@ -114,10 +115,10 @@ export default class PhotoActionButtons extends React.Component<Props> {
         return (
             <>
                 <ButtonGroup>
-                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title="Rotate left">
+                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title={msg('PhotoActionButtons_rotateLeft')}>
                         <MdRotateLeft className={SVG_ICON_CLASS}/>
                     </Button>
-                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title="Rotate right">
+                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title={msg('PhotoActionButtons_rotateRight')}>
                         <MdRotateRight className={SVG_ICON_CLASS}/>
                     </Button>
                 </ButtonGroup>
@@ -127,18 +128,18 @@ export default class PhotoActionButtons extends React.Component<Props> {
                     active={selectedAreFlagged}
                     disabled={!hasSelection}
                     onClick={this.toggleFlagged}
-                    title={selectedAreFlagged ? 'Remove flag' : 'Flag'}
+                    title={selectedAreFlagged ? msg('PhotoActionButtons_removeFavorite') : msg('PhotoActionButtons_addFavorite')}
                 >
                     <FaIcon name="flag" />
                 </Button>
                 {!props.isShowingTrash &&
-                    <Button minimal={true} icon="trash" disabled={!hasSelection} onClick={this.moveToTrash} title="Move photo to trash"/>
+                    <Button minimal={true} icon="trash" disabled={!hasSelection} onClick={this.moveToTrash} title={msg('PhotoActionButtons_trash')}/>
                 }
                 {props.isShowingTrash &&
                     <Button
                         disabled={!hasSelection}
                         intent={hasSelection ? 'success' : undefined}
-                        title="Restore photo from trash"
+                        title={msg('PhotoActionButtons_restoreFromTrash')}
                         onClick={this.restoreFromTrash}
                     >
                         <MdRestoreFromTrash/>
@@ -148,12 +149,12 @@ export default class PhotoActionButtons extends React.Component<Props> {
                 <Button
                     minimal={true}
                     icon="info-sign"
-                    title={props.isShowingInfo ? "Hide photo info" : "Show photo info"}
+                    title={msg('PhotoActionButtons_photoInfo')}
                     active={props.isShowingInfo}
                     disabled={!hasSelection && !props.isShowingInfo}
                     onClick={this.props.toggleShowInfo}
                 />
-                <Button minimal={true} icon="export" disabled={!hasSelection} onClick={this.openExport} title="Export"/>
+                <Button minimal={true} icon='export' disabled={!hasSelection} onClick={this.openExport} title={msg('PhotoActionButtons_export')}/>
             </>
         )    
     }

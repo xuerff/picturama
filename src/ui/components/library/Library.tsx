@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner, MaybeElement } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -144,35 +145,38 @@ export class Library extends React.Component<Props, State> {
 
         let currentView
         if (props.totalPhotoCount === 0) {
-            const description =
-                <>
-                    Press <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code> or button below to start scanning.
-                </>
-            const action =
-                <div className="bp3-dark">
-                    <Button onClick={props.startScanning}>Start scanning</Button>
-                </div>
+            const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
             currentView =
                 <NonIdealState
-                    icon="zoom-out"
-                    title="No photos imported"
-                    description={description}
-                    action={action}
+                    icon='zoom-out'
+                    title={msg('Library_noPhotos_title')}
+                    description={
+                        <>
+                            {descriptionSplits[0]}
+                            <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code>
+                            {descriptionSplits[1]}
+                        </>
+                    }
+                    action={
+                        <div className="bp3-dark">
+                            <Button onClick={props.startScanning}>{msg('Library_startScanning')}</Button>
+                        </div>
+                    }
                 />
         } else if (props.photoCount === 0) {
             if (props.isShowingTrash) {
                 currentView =
                     <NonIdealState
-                        icon="tick"
-                        title="Trash is empty"
-                        description="The trash is empty. Please change your selection on the left."
+                        icon='tick'
+                        title={msg('Library_emptyTrash_title')}
+                        description={msg('Library_emptyTrash_message')}
                     />
             } else {
                 currentView =
                     <NonIdealState
-                        icon="zoom-out"
-                        title="No photos found"
-                        description="Your current selection doesn't match any photo. Please change your selection on the left."
+                        icon='zoom-out'
+                        title={msg('Library_emptyView_title')}
+                        description={msg('Library_emptyView_message')}
                     />
             }
         } else {
