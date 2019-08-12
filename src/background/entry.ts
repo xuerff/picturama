@@ -13,7 +13,7 @@ import MainMenu from 'background/MainMenu'
 import Watch from 'background/watch'
 import { init as initBackgroundService } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
-import { fsUnlink } from 'background/util/FileUtil'
+import { fsUnlink, fsUnlinkDeep } from 'background/util/FileUtil'
 
 
 initSourceMapSupport()
@@ -102,8 +102,14 @@ function initDb(): Promise<any> {
                     // This is a DB created with bookshelf.js and knex.js (before 2019-08-11)
                     // -> Delete the DB and create a new one
                     console.warn('Ansel database is a legacy database - creating a new one')
-                    await DB().close()
-                    await fsUnlink(config.dbFile)
+                    await Promise.all([
+                        DB().close()
+                            .then(() => fsUnlink(config.dbFile)),
+                        fsUnlinkDeep(`${config.dotAnsel}/non-raw`),
+                        fsUnlinkDeep(`${config.dotAnsel}/thumbs`),
+                        fsUnlinkDeep(`${config.dotAnsel}/thumbs-250`),
+                        fsUnlinkDeep(`${config.dotAnsel}/thumbnails`),
+                    ])
                     DB(dbOptions)
                 }
             })
