@@ -1,23 +1,13 @@
 import { dirname, basename } from 'path'
 import fs from 'fs'
 import readline from 'readline'
-import { promisify } from 'bluebird'
 import stringify from 'json-stringify-pretty-compact'
 
 import { PhotoWork } from 'common/CommonTypes'
 import { rotate } from 'common/util/EffectsUtil'
 import { assertMainProcess } from 'common/util/ElectronUtil'
+import { fsExists, fsUnlink, fsWriteFile, fsReadFile } from 'background/util/FileUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
-
-
-const readFile = promisify<Buffer, string>(fs.readFile)
-const writeFile = promisify<void, string, any>(fs.writeFile)
-const unlink = promisify<void, string | Buffer>(fs.unlink)
-
-
-async function exists(path: string | Buffer): Promise<boolean> {
-    return new Promise<boolean>(resolve => fs.exists(path, resolve))
-}
 
 
 declare global {
@@ -157,13 +147,13 @@ class DirectoryWork {
                 const anselData = this.data && this.data.anselData
                 const isEmpty = !anselData || Object.keys(anselData.photos).length === 0
                 if (isEmpty) {
-                    if (await exists(directoryWorkFile)) {
-                        await unlink(directoryWorkFile)
+                    if (await fsExists(directoryWorkFile)) {
+                        await fsUnlink(directoryWorkFile)
                         console.log('Removed empty ' + directoryWorkFile)
                     }
                 } else {
                     const json = stringify(anselData)
-                    await writeFile(directoryWorkFile, json)
+                    await fsWriteFile(directoryWorkFile, json)
                     console.log('Stored ' + directoryWorkFile)
                 }
             })()
@@ -184,10 +174,10 @@ class DirectoryWork {
 
 async function fetchAnselJson(directoryPath: string): Promise<DirectoryWorkData> {
     const directoryWorkFile = directoryPath + '/ansel.json'
-    if (! await exists(directoryWorkFile)) {
+    if (! await fsExists(directoryWorkFile)) {
         return { photos: {} }
     } else {
-        const buffer = await readFile(directoryWorkFile)
+        const buffer = await fsReadFile(directoryWorkFile)
         const anselData = JSON.parse(buffer) as DirectoryWorkData
         console.log('Fetched ' + directoryWorkFile)
         return anselData
@@ -199,9 +189,9 @@ const sectionStartRegExp = /^\[(.*)\]$/
 
 async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null> {
     let picasaFile = directoryPath + '/.picasa.ini'
-    if (! await exists(picasaFile)) {
+    if (! await fsExists(picasaFile)) {
         picasaFile = directoryPath + '/Picasa.ini'
-        if (! await exists(picasaFile)) {
+        if (! await fsExists(picasaFile)) {
             return null
         }
     }
@@ -354,6 +344,6 @@ async function processNextStoreThumbnail(job: {thumbnailPath: string, thumbnailD
     const dataPrefix = 'base64,'
     const base64Data = job.thumbnailData.substr(job.thumbnailData.indexOf(dataPrefix) + dataPrefix.length)
     const dataBuffer = new Buffer(base64Data, 'base64')
-    await writeFile(job.thumbnailPath, dataBuffer)
+    await fsWriteFile(job.thumbnailPath, dataBuffer)
     console.log('Stored ' + job.thumbnailPath)
 }

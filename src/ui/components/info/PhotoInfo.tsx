@@ -1,22 +1,19 @@
-import fs from 'fs'
 import { clipboard, shell } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
 import moment from 'moment'
-import BluebirdPromise from 'bluebird'
 
 import { Photo, PhotoDetail } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
 
+import BackgroundClient from 'ui/BackgroundClient'
 import Toolbar from 'ui/components/widget/Toolbar'
 import FaIcon from 'ui/components/widget/icon/FaIcon'
 
 import TagEditor from './TagEditor'
 
 import './PhotoInfo.less'
-
-const fsStat = BluebirdPromise.promisify(fs.stat)
 
 
 const infoIconSize = 24
@@ -58,8 +55,8 @@ export default class PhotoInfo extends React.Component<Props, State> {
     async updateMasterFileSize(props: Props) {
         this.setState({ masterFileSize: null })
         if (props.photo) {
-            const stat = await fsStat(props.photo.master)
-            this.setState({ masterFileSize: stat.size })
+            const masterFileSize = await BackgroundClient.getFileSize(props.photo.master)
+            this.setState({ masterFileSize })
         }
     }
 

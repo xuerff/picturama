@@ -1,12 +1,8 @@
-import fs from 'fs'
-import Promise from 'bluebird'
 import ExifParser from 'exif-parser'
 
 import { ExifOrientation } from 'common/CommonTypes'
 
-
-const readFile = Promise.promisify(fs.readFile)
-const fileStat = Promise.promisify(fs.stat)
+import { fsStat, fsReadFile } from 'background/util/FileUtil'
 
 
 export interface MetaData {
@@ -31,7 +27,7 @@ export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
             if (error.message !== 'Invalid JPEG section offset') {
                 console.log(`Reading EXIF data from ${imagePath} failed - continuing without. Error: ${error.message}`)
             }
-            return fileStat(imagePath)
+            return fsStat(imagePath)
                 .then(stat => ({
                     createdAt: stat.birthtime,
                     orientation: 1,
@@ -42,7 +38,7 @@ export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
 
 
 function readExifOfImage(imagePath) {
-    return readFile(imagePath)
+    return fsReadFile(imagePath)
         .then(buffer => {
             const parser = ExifParser.create(buffer) as any
             return parser.parse()

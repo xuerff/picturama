@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import sharp from 'sharp'
 import libraw from 'libraw'
-import fs from 'fs'
 import path from 'path'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
@@ -14,16 +13,11 @@ import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
-import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
-import { storePhotoTags } from 'background/store/TagStore'
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
-
-const fsReadDir = BluebirdPromise.promisify(fs.readdir)
-const fsReadFile = BluebirdPromise.promisify(fs.readFile)
-const fsStat = BluebirdPromise.promisify(fs.stat)
-const fsUnlink = BluebirdPromise.promisify(fs.unlink)
-const fsRename = BluebirdPromise.promisify(fs.rename)
+import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
+import { storePhotoTags } from 'background/store/TagStore'
+import { fsReadDir, fsReadFile, fsRename, fsStat, fsUnlink } from 'background/util/FileUtil'
 
 
 const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');

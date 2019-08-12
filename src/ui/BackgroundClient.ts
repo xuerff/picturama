@@ -42,6 +42,10 @@ export default {
         return callOnBackground('fetchUiConfig')
     },
 
+    getFileSize(path: string): Promise<number> {
+        return callOnBackground('getFileSize', { path })
+    },
+
     fetchTotalPhotoCount(): Promise<number> {
         return callOnBackground('fetchTotalPhotoCount')
     },

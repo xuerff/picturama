@@ -3,7 +3,6 @@ import { ipcMain, shell, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 import moment from 'moment'
 import notifier from 'node-notifier'
-import { promisify } from 'bluebird'
 
 import config from 'common/config'
 import { PhotoId } from 'common/CommonTypes'
@@ -11,10 +10,8 @@ import { getThumbnailPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import { removePhotoWork } from 'background/store/PhotoWorkStore'
-import { toSqlStringCsv } from 'background/util/DbUtil'
 import ImportScanner from 'background/ImportScanner'
-
-const unlink = promisify<void, string | Buffer>(fs.unlink)
+import { fsUnlinkIfExists } from 'background/util/FileUtil'
 
 
 class Library {
@@ -88,8 +85,8 @@ class Library {
             for (const photo of photosToDelete) {
                 await Promise.all([
                     shell.moveItemToTrash(photo.master),
-                    unlinkIfExists(photo.non_raw),
-                    unlinkIfExists(getThumbnailPath(photo.id)),
+                    fsUnlinkIfExists(photo.non_raw),
+                    fsUnlinkIfExists(getThumbnailPath(photo.id)),
                     removePhotoWork(photo.master)
                 ])
             }
@@ -138,14 +135,3 @@ class Library {
 }
 
 export default Library
-
-
-async function exists(path: string | Buffer): Promise<boolean> {
-    return new Promise<boolean>(resolve => fs.exists(path, resolve))
-}
-
-async function unlinkIfExists(filePath: string): Promise<void> {
-    if (filePath && await exists(filePath)) {
-        await unlink(filePath)
-    }
-}

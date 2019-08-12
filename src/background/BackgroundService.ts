@@ -6,6 +6,7 @@ import { assertMainProcess } from 'common/util/ElectronUtil'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
+import { fsStat } from 'background/util/FileUtil'
 
 
 assertMainProcess()
@@ -32,6 +33,9 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
     if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
+    } else if (action === 'getFileSize') {
+        const stat = await fsStat(params.path)
+        return stat.size
     } else if (action === 'fetchTotalPhotoCount') {
         return fetchTotalPhotoCount()
     } else if (action === 'fetchSections') {

@@ -4,7 +4,6 @@ import DB from 'sqlite3-helper/no-generators'
 import { DBOptions } from 'sqlite3-helper'
 import { install as initSourceMapSupport } from 'source-map-support'
 import { start as initPrettyError } from 'pretty-error'
-import BluebirdPromise from 'bluebird'
 
 import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
@@ -14,8 +13,7 @@ import MainMenu from 'background/MainMenu'
 import Watch from 'background/watch'
 import { init as initBackgroundService } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
-
-const fsUnlink = BluebirdPromise.promisify(fs.unlink)
+import { fsUnlink } from 'background/util/FileUtil'
 
 
 initSourceMapSupport()
