@@ -35,11 +35,6 @@
       "label": "View",
       "submenu": [
         {
-          "label": "Reload",
-          "accelerator": "Shift+Cmd+R",
-          "click": "reload"
-        },
-        {
           "label": "Enter Fullscreen",
           "accelerator": "F11",
           "click": "fullscreen"
@@ -58,6 +53,11 @@
           "label": "Toggle Sandbox",
           "accelerator": "Cmd+Alt+S",
           "click": "toggleSandbox"
+        },
+        {
+          "label": "Reload",
+          "accelerator": "Shift+Cmd+R",
+          "click": "reload"
         }
       ]
     }
