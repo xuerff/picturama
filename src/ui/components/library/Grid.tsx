@@ -173,18 +173,19 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             return
         }
 
+        let nextScrollTop: number | null = null
         const nailedSectionIndex = this.props.sectionIds.indexOf(this.nailedSectionId)
-        if (nailedSectionIndex === -1) {
-            return
+        if (nailedSectionIndex !== -1) {
+            const layout = this.gridLayout.sectionLayouts[nailedSectionIndex]
+            if (layout) {
+                nextScrollTop = layout.sectionTop
+            }
         }
 
-        const layout = this.gridLayout.sectionLayouts[nailedSectionIndex]
-        if (!layout) {
-            return
-        }
-
-        this.setScrollTop(layout.sectionTop)
         this.nailedSectionId = null
+        if (nextScrollTop !== null && nextScrollTop !== this.state.scrollTop) {
+            this.setScrollTop(nextScrollTop)
+        }
     }
 
     private setScrollTop(scrollTop: number) {
