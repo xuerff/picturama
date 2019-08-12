@@ -47,7 +47,6 @@ function createDefaultProps(context: TestContext): Props {
                     }
                 }}
                 devices={[]}
-                fetchTags={action('fetchTags')}
                 setLibraryFilter={action('setLibraryFilter')}
             />
         ),
@@ -71,6 +70,7 @@ function createDefaultProps(context: TestContext): Props {
 
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
+        fetchTags: action('fetchTags'),
         getGridLayout,
         getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {

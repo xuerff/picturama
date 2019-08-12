@@ -54,7 +54,7 @@ export default class TagEditor extends React.Component<Props, State> {
 
         let selectableTags: string[] = []
         let activeTag: string | null = null
-        let newTag: string | null = query ? query : null
+        let newTag: string | null = query || null
 
         for (let tagIndex = 0, tagCount = props.tags.length; tagIndex < tagCount; tagIndex++) {
             const tag = props.tags[tagIndex]
@@ -183,6 +183,7 @@ export default class TagEditor extends React.Component<Props, State> {
                     leftIcon: isLoading ? <Spinner size={24}/> : undefined,
                     placeholder: isLoading ? undefined : msg('TagEditor_addTag')
                 }}
+                query={state.query}
                 popoverProps={{ minimal: true }}
                 activeItem={state.activeTag}
                 items={state.selectableTags}

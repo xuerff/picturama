@@ -14,7 +14,7 @@ import { setDetailPhotoById } from 'ui/controller/DetailController'
 import { getThumbnailSrc } from 'ui/controller/ImageProvider'
 import { getGridLayout, setInfoPhoto, createThumbnail } from 'ui/controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'ui/controller/PhotoController'
-import { setPhotoTags } from 'ui/controller/PhotoTagController'
+import { fetchTags, setPhotoTags } from 'ui/controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 import { getTagTitles } from 'ui/state/selectors'
@@ -56,6 +56,7 @@ interface StateProps {
 interface DispatchProps {
     fetchTotalPhotoCount: () => void
     fetchSections: () => void
+    fetchTags(): void
     getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: Photo) => string
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
@@ -104,8 +105,10 @@ export class Library extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.props.fetchTotalPhotoCount()
-        this.props.fetchSections()
+        const { props } = this
+        props.fetchTotalPhotoCount()
+        props.fetchSections()
+        props.fetchTags()
     }
 
     openExport() {
@@ -275,6 +278,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     dispatch => ({
         fetchTotalPhotoCount,
         fetchSections,
+        fetchTags,
         getGridLayout,
         getThumbnailSrc,
         createThumbnail,

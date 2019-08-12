@@ -42,7 +42,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-    fetchTags(): void
     setLibraryFilter(newFilter: PhotoFilter): void
 }
 
@@ -155,7 +154,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         }
     },
     dispatch => ({
-        fetchTags,
         setLibraryFilter,
     })
 )(LibraryFilterButton)
