@@ -2,14 +2,14 @@ import React from 'react'
 
 import CancelablePromise from 'common/util/CancelablePromise'
 import { Photo, PhotoSectionId } from 'common/CommonTypes'
+import { getNonRawPath } from 'common/util/DataUtil'
 
 import { defaultGridRowHeight } from 'ui/UiConstants'
 import GridSection from 'ui/components/library/GridSection'
-import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { estimateContainerHeight, createDummyLayoutBoxes } from 'ui/controller/LibraryController'
 
 import { addSection, action } from 'sandbox/core/UiTester'
-import { testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
+import { createTestPhotoId, testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
 import { createSection, createRandomDummyPhoto, createLayoutForSection } from 'sandbox/util/TestUtil'
 
 
@@ -27,9 +27,9 @@ const defaultProps = {
     section: defaultSection,
     layout: defaultLayout,
     selectedPhotoIds: null,
-    getThumbnailSrc: (photo: Photo) => getNonRawImgPath(photo),
+    getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
-        const thumbnailPath = getNonRawImgPath(photo)
+        const thumbnailPath = getNonRawPath(photo)
         if (thumbnailPath === 'dummy') {
             return new CancelablePromise<string>(() => {})
         } else {
@@ -59,7 +59,7 @@ addSection('GridSection')
         for (let i = 0; i < 20; i++) {
             photos.push(createRandomDummyPhoto())
         }
-        photos[0] = { ...photos[0], id: photos[0] + '_dummy', master: 'dummy' }
+        photos[0] = { ...photos[0], id: createTestPhotoId(), master: 'dummy' }
         const section = createSection(defaultSectionId, photos)
         const layout = createLayoutForSection(section, 0, viewportWidth, defaultGridRowHeight)
 

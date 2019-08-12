@@ -2,10 +2,10 @@ import React from 'react'
 
 import { Photo, PhotoSectionById, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
+import { getNonRawPath } from 'common/util/DataUtil'
 
 import { defaultGridRowHeight } from 'ui/UiConstants'
 import { GridLayout } from 'ui/UITypes'
-import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { sectionHeadHeight } from 'ui/components/library/GridSection'
 import { Library, Props } from 'ui/components/library/Library'
 import { LibraryFilterButton } from 'ui/components/library/LibraryFilterButton'
@@ -72,9 +72,9 @@ function createDefaultProps(context: TestContext): Props {
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
         getGridLayout,
-        getThumbnailSrc: (photo: Photo) => getNonRawImgPath(photo),
+        getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
-            const thumbnailPath = getNonRawImgPath(photo)
+            const thumbnailPath = getNonRawPath(photo)
             if (thumbnailPath === 'dummy') {
                 return new CancelablePromise<string>(() => {})
             } else {

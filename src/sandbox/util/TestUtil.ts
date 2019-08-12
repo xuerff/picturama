@@ -3,12 +3,11 @@ import { Photo, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/
 import { GridSectionLayout } from 'ui/UITypes'
 import { createLayoutForLoadedSection } from 'ui/controller/LibraryController'
 
-import { testBigPhoto } from './MockData'
+import { createTestPhotoId, testBigPhoto } from './MockData'
 
 
-let nextDummyId = 1
 export function createRandomDummyPhoto(): Photo {
-    const id = nextDummyId++
+    const id = createTestPhotoId()
     const minAspect = 3/4
     const maxAspect = 16/9
     const aspect = minAspect + Math.random() * (maxAspect - minAspect)
@@ -16,12 +15,12 @@ export function createRandomDummyPhoto(): Photo {
     const master_height = master_width / aspect
     return {
         ...testBigPhoto,
-        id: `dummy-${id}`,
+        id,
         title: `dummy-${id}.JPG`,
         master: 'dummy',
         master_width,
         master_height,
-        non_raw: null
+        master_is_raw: 0,
     }
 }
 

@@ -1,9 +1,19 @@
 import config from 'common/config'
-import { PhotoId, ExifOrientation, PhotoWork } from 'common/CommonTypes'
+import { PhotoId, Photo, ExifOrientation, PhotoWork } from 'common/CommonTypes'
 
 
 export function getThumbnailPath(photoId: PhotoId): string {
-    return `${config.thumbnailPath}/${photoId}.${config.workExt}`
+    return `${config.thumbnailPath}/${shortId(photoId)}.${config.workExt}`
+}
+
+
+export function getNonRawPath(photo: Photo): string {
+    return photo.master_is_raw ? `${config.nonRawPath}/${shortId(photo.id)}.${config.workExt}` : photo.master
+}
+
+
+function shortId(id: number): string {
+    return id.toString(36)
 }
 
 

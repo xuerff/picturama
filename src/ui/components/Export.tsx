@@ -10,11 +10,11 @@ import { connect } from 'react-redux'
 
 import { PhotoId, PhotoById } from 'common/CommonTypes'
 import config from 'common/config'
+import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import keymapManager from 'ui/keymap-manager'
-import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { closeExportAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 
@@ -30,14 +30,14 @@ interface OwnProps {
 
 interface StateProps {
     photoIds: PhotoId[]
-    photos: PhotoById
+    photoData: PhotoById
 }
 
 interface DispatchProps {
     closeExport: () => void
 }
 
-interface Props extends OwnProps, StateProps, DispatchProps {
+export interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
@@ -99,14 +99,14 @@ export class Export extends React.Component<Props, State> {
     afterExport() {
         notifier.notify({
             title: 'Ansel',
-            message: `Finish exporting ${this.props.photos.length} photo(s)`
+            message: `Finish exporting ${this.props.photoIds.length} photo(s)`
         })
 
         this.props.closeExport()
     }
 
     async onEachPhoto(photoId: PhotoId, i: number) {
-        const photo = this.props.photos[photoId]
+        const photo = this.props.photoData[photoId]
 
         let extension = photo.extension.toLowerCase()
 
@@ -133,7 +133,7 @@ export class Export extends React.Component<Props, State> {
                 .then(img => this.processImg(photo, img))
         }
 
-        return this.processImg(photo, getNonRawImgPath(photo))
+        return this.processImg(photo, getNonRawPath(photo))
     }
 
     handleSubmit(e) {
@@ -213,7 +213,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             photoIds: state.export!.photoIds,
-            photos: state.data.sections.byId[state.export!.sectionId].photoData!
+            photoData: state.data.sections.byId[state.export!.sectionId].photoData!
         }
     },
     {

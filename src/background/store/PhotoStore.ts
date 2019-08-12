@@ -60,6 +60,6 @@ export async function fetchPhotoDetail(photoId: PhotoId): Promise<PhotoDetail> {
 
 export async function updatePhotos(photoIds: PhotoId[], update: Partial<Photo>): Promise<void> {
     await Promise.all(photoIds.map(photoId =>
-        DB().update<Photo>('photos', update, photoId)
+        DB().update<Photo>('photos', update, [ 'id = ?', photoId ])
     ))
 }

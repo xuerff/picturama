@@ -5,15 +5,15 @@ import { connect } from 'react-redux'
 import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from '@blueprintjs/core'
 
 import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
-import keymapManager from 'ui/keymap-manager'
+import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
+import keymapManager from 'ui/keymap-manager'
 import PhotoInfo from 'ui/components/info/PhotoInfo'
 import FaIcon from 'ui/components/widget/icon/FaIcon'
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
 import Toolbar from 'ui/components/widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from 'ui/controller/DetailController'
-import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from 'ui/controller/PhotoController'
 import { setPhotoTags } from 'ui/controller/PhotoTagController'
 import { openExportAction, openDiffAction } from 'ui/state/actions'
@@ -86,7 +86,7 @@ export class PictureDetail extends React.Component<Props, State> {
         this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
 
         bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
-            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'addEditorMenu', 'onZoomSliderChange', 'onZoomChange',
+            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange',
             'onBodyResize')
     }
 
@@ -304,9 +304,9 @@ export class PictureDetail extends React.Component<Props, State> {
                             className="PictureDetail-image"
                             width={state.bodyWidth}
                             height={state.bodyHeight}
-                            src={getNonRawImgPath(props.photo)}
-                            srcPrev={props.photoPrev && getNonRawImgPath(props.photoPrev)}
-                            srcNext={props.photoNext && getNonRawImgPath(props.photoNext)}
+                            src={getNonRawPath(props.photo)}
+                            srcPrev={props.photoPrev && getNonRawPath(props.photoPrev)}
+                            srcNext={props.photoNext && getNonRawPath(props.photoNext)}
                             orientation={props.photo.orientation}
                             photoWork={props.photoWork}
                             zoom={state.zoom}

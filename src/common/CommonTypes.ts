@@ -1,9 +1,8 @@
 // ----- Database types -----
 
 
-export type PhotoId = string
+export type PhotoId = number
 export interface Photo {
-    /** Example: 'B1m80éAMpf' */
     id: PhotoId,
     /** Example: 'IMG_9700' */
     title: string,
@@ -13,8 +12,8 @@ export interface Photo {
     master_width: number | null
     /** The height of the original image (in px). */
     master_height: number | null
-    /** Contains non-raw version of raw images. Example: '../dot_ansel/thumbs/B1m80éAMpf.webp' */
-    non_raw: string | null,
+    /** Whether the master image has a raw format */
+    master_is_raw: 0 | 1,
     /** Example: 'JPG' */
     extension: string,
     /** Whether the image is flagged. */

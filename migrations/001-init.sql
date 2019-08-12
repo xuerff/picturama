@@ -1,12 +1,12 @@
 -- Up
 
 CREATE TABLE "photos" (
-    "id"            text NOT NULL,
+    "id"            integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     "title"         text NOT NULL,
     "master"        text NOT NULL,
     "master_width"  integer,
     "master_height" integer,
-    "non_raw"       text,
+    "master_is_raw" boolean NOT NULL DEFAULT '0',
     "extension"     text NOT NULL,
     "flag"          boolean NOT NULL DEFAULT '0',
     "created_at"    datetime,
@@ -18,8 +18,7 @@ CREATE TABLE "photos" (
     "focal_length"  integer,
     "aperture"      float,
     "date"          date,
-    "trashed"       boolean NOT NULL DEFAULT '0',
-    PRIMARY KEY("id")
+    "trashed"       boolean NOT NULL DEFAULT '0'
 );
 CREATE TABLE "tags" (
     "id"         integer NOT NULL PRIMARY KEY AUTOINCREMENT,

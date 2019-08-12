@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { Export } from 'ui/components/Export'
+import { Export, Props } from 'ui/components/Export'
 
 import {addSection, action} from 'sandbox/core/UiTester'
 import { testBigPhoto } from 'sandbox/util/MockData'
 
 
-const defaultProps = {
+const defaultProps: Props = {
     style: { width: '100%', height: '100%' },
 
     photoIds: [ testBigPhoto.id ],
-    photos: { [testBigPhoto.id]: testBigPhoto },
+    photoData: { [testBigPhoto.id]: testBigPhoto },
 
     closeExport: action('closeExport'),
 }

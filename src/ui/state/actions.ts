@@ -17,7 +17,7 @@ export const checkSettingsExistAction = createAsyncAction(SETTINGS_EXISTS_REQUES
 
 export const setGridRowHeightAction = (gridRowHeight: number) => action(SET_GRID_ROW_HEIGHT, { gridRowHeight })
 
-export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ sectionId: PhotoSectionId, photoIndex: number, photoId: string }, { photoDetail: PhotoDetail, photoWork: PhotoWork }, Error>()
+export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ sectionId: PhotoSectionId, photoIndex: number, photoId: PhotoId }, { photoDetail: PhotoDetail, photoWork: PhotoWork }, Error>()
 export const closeDetailAction = () => action(CLOSE_DETAIL)
 
 export const setSelectedPhotosAction = (sectionId: PhotoSectionId, photoIds: PhotoId[]) => action(SET_SELECTED_PHOTOS, { sectionId, photoIds })

@@ -95,7 +95,7 @@ class Library {
             }
 
             const photoIds = photosToDelete.map(photo => photo.id)
-            const photoIdsCsv = toSqlStringCsv(photoIds)
+            const photoIdsCsv = photoIds.join(',')
             await DB().run(`delete from versions where photo_id in (${photoIdsCsv})`)
             await DB().run(`delete from photos_tags where photo_id in (${photoIdsCsv})`)
             await DB().run(`delete from photos where id in (${photoIdsCsv})`)

@@ -20,10 +20,6 @@ async function exists(path: string | Buffer): Promise<boolean> {
 let thumbnailVersion = Date.now()
 
 
-export function getNonRawImgPath(photo: Photo): string {
-    return photo.non_raw || photo.master
-}
-
 export async function onThumbnailChange(photoId: PhotoId): Promise<void> {
     const thumbnailPath = getThumbnailPath(photoId)
 

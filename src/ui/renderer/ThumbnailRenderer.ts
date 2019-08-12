@@ -1,10 +1,9 @@
 import { Photo, PhotoWork } from 'common/CommonTypes'
-import { getTotalRotationTurns } from 'common/util/DataUtil'
+import { getTotalRotationTurns, getNonRawPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
 
-import { getNonRawImgPath } from 'ui/controller/ImageProvider'
 import { updatePhoto } from 'ui/controller/PhotoController'
 
 import PhotoCanvas from './PhotoCanvas'
@@ -29,7 +28,7 @@ let canvas: PhotoCanvas | null = null
 
 
 export async function renderThumbnailForPhoto(photo: Photo, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
-    const nonRawImgPath = getNonRawImgPath(photo)
+    const nonRawImgPath = getNonRawPath(photo)
     return queue.addJob({ nonRawImgPath, photo, photoWork, profiler })
 }
 

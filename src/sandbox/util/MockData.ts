@@ -1,13 +1,19 @@
-import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoDetail } from 'common/CommonTypes'
+
+
+let nextTestPhotoId: PhotoId = 49
+export function createTestPhotoId(): PhotoId {
+    return nextTestPhotoId++
+}
 
 
 export const testBigPhoto: Photo = {
-    id: 'B1m80éAMpf',
+    id: createTestPhotoId(),
     title: 'IMG_9700',
     master: '../specs/photos/IMG_9700.JPG',
     master_width: 5184,
     master_height: 3456,
-    non_raw: null,
+    master_is_raw: 0,
     extension: 'JPG',
     flag: 0,
     created_at: 1474222345000,
@@ -23,12 +29,12 @@ export const testBigPhoto: Photo = {
 }
 
 export const testLandscapePhoto: Photo = {
-    id: 'kuV2UXUZNX',
+    id: createTestPhotoId(),
     title: 'landscape',
     master: '../specs/photos/landscape.jpg',
     master_width: 800,
     master_height: 530,
-    non_raw: null,
+    master_is_raw: 0,
     extension: 'jpg',
     flag: 0,
     created_at: 1474222345000,
@@ -39,12 +45,12 @@ export const testLandscapePhoto: Photo = {
 }
 
 export const testPortraitPhoto: Photo = {
-    id: 'FRL1FAT1G3',
+    id: createTestPhotoId(),
     title: 'portrait',
     master: '../specs/photos/portrait.jpg',
     master_width: 785,
     master_height: 1024,
-    non_raw: null,
+    master_is_raw: 0,
     extension: 'jpg',
     flag: 1,
     created_at: 1474222345000,
@@ -55,12 +61,12 @@ export const testPortraitPhoto: Photo = {
 }
 
 export const testPanoramaPhoto: Photo = {
-    id: 'BRllCnsu7y',
+    id: createTestPhotoId(),
     title: 'panorama',
     master: '../specs/photos/panorama.jpg',
     master_width: 1024,
     master_height: 225,
-    non_raw: null,
+    master_is_raw: 0,
     extension: 'jpg',
     flag: 0,
     created_at: 1474222345000,
@@ -82,13 +88,13 @@ export const testPhotos: Photo[] = [
     { name: 'tomatoes',       width: 516, height: 800 },
     { name: 'water',          width: 800, height: 450 },
     { name: 'wolf',           width: 800, height: 498 },
-].map((info, index) => ({
-    id: `test-${index}`,
+].map(info => ({
+    id: createTestPhotoId(),
     title: info.name,
     master: `../specs/photos/800/${info.name}.jpg`,
     master_width: info.width,
     master_height: info.height,
-    non_raw: null,
+    master_is_raw: 0,
     extension: 'jpg',
     flag: 0,
     created_at: 1474222345000,
