@@ -28,8 +28,8 @@ const platform = os.platform()
 
 export default {
     platform,
-    acceptedRawFormats: [ 'raf', 'cr2', 'arw', 'dng' ],
-    acceptedImgFormats: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
+    acceptedRawExtensions: [ 'raf', 'cr2', 'arw', 'dng' ],
+    acceptedNonRawExtensions: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
     watchedFormats: /([$#\w\d]+)-([$#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
     exportFormats: [ 'jpg', 'png', 'webp' ],
     workExt: 'webp',

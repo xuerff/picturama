@@ -14,23 +14,33 @@ const storePhotoTagsQueue = new SerialJobQueue(
     processNextStorePhotoTags)
 
 let tagsHaveChanged = false
-let tagsHaveBeenRemoved = false
+let tagsHaveBeenDeleted = false
 
 
-export function fetchTags(): Promise<Tag[]> {
+export async function fetchTags(): Promise<Tag[]> {
+    if (tagsHaveBeenDeleted) {
+        tagsHaveBeenDeleted = false
+        await DB().run('delete from tags where id not in (select tag_id from photos_tags group by tag_id)')
+    }
+
+    tagsHaveChanged = false
     return DB().query<Tag>('select * from tags order by slug')
 }
 
 
-export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<Tag[] | null> {
+/**
+ * Stores the tags of a photo
+ *
+ * @return Whether `fetchTags` should be called (the global list of tags should be reloaded).
+ */
+export function storePhotoTags(photoId: PhotoId, photoTags: string[]): Promise<boolean> {
     return storePhotoTagsQueue.addJob({ photoId, photoTags })
 }
 
 
-async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<Tag[] | null> {
+async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<boolean> {
     const { photoId, photoTags } = job
     const photoTagsSlugged = photoTags.map(tag => slug(tag))
-    let updatedTags: Tag[] | null = null
 
     await DB().query('BEGIN')
     try {
@@ -57,26 +67,11 @@ async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<Tag[] 
 
         const deletedCount = (await DB().run('delete from photos_tags where photo_id = ?', photoId)).changes
         if (deletedCount != 0) {
-            tagsHaveBeenRemoved = true
+            tagsHaveChanged = true
+            tagsHaveBeenDeleted = true
         }
         if (photoTagMappings.length > 0) {
             await DB().insert('photos_tags', photoTagMappings)
-        }
-
-        if (storePhotoTagsQueue.getQueueLength() === 0) {
-            // Clean up obsolete tags
-            if (tagsHaveBeenRemoved) {
-                tagsHaveBeenRemoved = false
-                const deletedCount = (await DB().run('delete from tags where id not in (select tag_id from photos_tags group by tag_id)')).changes
-                if (deletedCount !== 0) {
-                    tagsHaveChanged = true
-                }
-            }
-
-            if (tagsHaveChanged) {
-                tagsHaveChanged = false
-                updatedTags = await fetchTags()
-            }
         }
 
         await DB().query('END')
@@ -86,5 +81,24 @@ async function processNextStorePhotoTags(job: StorePhotoTagsJob): Promise<Tag[] 
         throw error
     }
 
-    return updatedTags
+    return tagsHaveChanged && storePhotoTagsQueue.getQueueLength() === 0
+}
+
+
+/**
+ * Deletes all tags of a set of photos
+ *
+ * @return Whether `fetchTags` should be called (the global list of tags should be reloaded).
+ */
+export async function deleteTagsOfPhotos(photoIds: PhotoId[]): Promise<boolean> {
+    if (!photoIds.length) {
+        return false
+    }
+
+    const deletedCount = (await DB().run(`delete from photos_tags where photo_id in (${photoIds.join(',')})`)).changes
+    if (deletedCount != 0) {
+        tagsHaveChanged = true
+        tagsHaveBeenDeleted = true
+    }
+    return tagsHaveChanged
 }

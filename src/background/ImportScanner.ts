@@ -1,7 +1,5 @@
-import { BrowserWindow } from 'electron'
 import sharp from 'sharp'
 import libraw from 'libraw'
-import path from 'path'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
@@ -9,174 +7,224 @@ import DB from 'sqlite3-helper/no-generators'
 import { Photo, Tag, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
 import config from 'common/config'
 import { profileScanner } from 'common/LogConstants'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawPath, getThumbnailPath, getRenderedRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
-import { parsePath } from 'common/util/TextUtil'
 
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
-import { storePhotoTags } from 'background/store/TagStore'
-import { fsReadDir, fsReadFile, fsRename, fsStat, fsUnlink } from 'background/util/FileUtil'
+import { storePhotoTags, fetchTags, deleteTagsOfPhotos } from 'background/store/TagStore'
+import { toSqlStringCsv } from 'background/util/DbUtil'
+import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExists, fsUnlinkIfExists } from 'background/util/FileUtil'
 
 
-const allowed = new RegExp(config.acceptedRawFormats.join('$|') + '$', 'i');
-const allowedImg = new RegExp(config.acceptedImgFormats.join('$|') + '$', 'i');
-
-const extract = new RegExp(
-    '([^\/]+)\.(' + config.acceptedRawFormats.join('|') + ')$',
-    'i'
-);
-
-const extractImg = new RegExp(
-    '([^\/]+)\.(' + config.acceptedImgFormats.join('|') + ')$',
-    'i'
-);
+const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.join('|')})$`, 'i')
+const acceptedExtensionRE = new RegExp(`\\.(${config.acceptedNonRawExtensions.join('|')}|${config.acceptedRawExtensions.join('|')})$`, 'i')
 
 const progressUIUpdateInterval = 200  // In ms
 
-let nextTempNonRawImgPathId = 1
+let nextTempRawConversionId = 1
 
-interface FileInfo {
+interface DirectoryInfo {
     path: string
-    imgPath?: string
-    name: string
-    isRaw: boolean
+    photoFilenames: string[]
 }
 
 export default class ImportScanner {
 
-    private isScanning = false
+    private state: 'idle' | 'scan-dirs' | 'remove-obsolete' | 'import-photos' = 'idle'
+    private paths: string[]
+
     private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
-    private updatedTags: Tag[] | null = null
+    private shouldFetchTags = false
 
-    constructor(private path: string, private versionsPath: string, private mainWindow: BrowserWindow) {
+
+    constructor(paths: string[]) {
+        bindMany(this, 'processDirectory')
+        this.paths = removeSubdirectories(paths)
+        this.reset()
+    }
+
+    private reset() {
+        this.state = 'idle'
         this.progress = {
-            processed: 0,
+            phase: 'scan-dirs',
             total: 0,
-            photosDir: this.path
+            processed: 0,
+            added: 0,
+            removed: 0,
+            currentPath: null
         }
-        bindMany(this, 'scanPictures', 'prepare', 'walk', 'onProgressChange', 'filterStoredPhoto', 'setTotal')
     }
 
     scanPictures(): BluebirdPromise<number | null> {
-        if (this.isScanning) {
+        if (this.state != 'idle') {
             // Already scanning
             return BluebirdPromise.resolve(null)
         }
 
-        this.isScanning = true
-        this.progress = {
-            processed: 0,
-            total: 0,
-            photosDir: this.path
-        }
+        this.state = 'scan-dirs'
+        this.reset()
         this.onProgressChange(true)
 
-        const profiler = profileScanner ? new Profiler('Overall scanning') : null
-        return collectFilePaths(this.path, [ this.versionsPath ])
-            .then(result => { if (profiler) { profiler.addPoint('Scanned directories') }; return result })
-            .then(this.prepare)
-            .then(result => { if (profiler) { profiler.addPoint('Prepared files') }; return result })
-            .filter(this.filterStoredPhoto)
-            .then(result => { if (profiler) { profiler.addPoint('Filtered files') }; return result })
-            .then(this.setTotal)
-            .then(result => { if (profiler) { profiler.addPoint('Set total') }; return result })
-            .map(this.walk, {
-                concurrency: config.concurrency
-            })
-            .then(() => {
-                const photoCount = this.progress!.total
-                this.isScanning = false
-                this.onProgressChange(true)
-                if (profiler) {
-                    profiler.addPoint(`Scanned ${photoCount} images`)
-                    profiler.logResult()
+        const profiler = profileScanner ? new Profiler('Import scanning') : null
+        const dirs: DirectoryInfo[] = []
+        return BluebirdPromise.resolve(this.paths)
+            .reduce(async (result: DirectoryInfo[], path) => {
+                const pathExists = await fsExists(path)
+                if (!pathExists) {
+                    console.warn('Import path does not exist: ' + path)
+                    return
                 }
+
+                const stats = await fsStat(path)
+                if (!stats.isDirectory()) {
+                    console.warn('Import path is no directory: ' + path)
+                    return
+                }
+
+                await this.scanDirectory(result, path)
+
+                return result
+            }, dirs)
+            .then(async () => {
+                if (profiler) { profiler.addPoint(`Scanned directories (${this.progress.total} photos in ${dirs.length} directories)`) }
+
+                // Delete photos of removed directories
+
+                this.state = 'remove-obsolete'
+                this.progress.phase = 'remove-obsolete'
+                this.onProgressChange(true)
+
+                const dirsCsv = toSqlStringCsv(dirs.map(dirInfo => dirInfo.path))
+                let photoIds = await DB().queryColumn<PhotoId>('id', `select id from photos where master_dir not in (${dirsCsv})`)
+                await this.deletePhotos(photoIds)
+                if (profiler) { profiler.addPoint(`Deleted ${photoIds.length} photos of removed directories`) }
+
+                this.state = 'scan-dirs'
+                this.progress.phase = 'scan-dirs'
+                this.onProgressChange(true)
+
+                return dirs
+            })
+            .map(this.processDirectory, { concurrency: config.concurrency })
+            .then(() => {
+                const photoCount = this.progress.total
+                if (profiler) profiler.addPoint(`Scanned ${photoCount} images`)
                 return photoCount
             })
             .catch(error => {
-                if (profiler) {
-                    profiler.addPoint('Scanning failed')
-                    profiler.logResult()
-                }
-                this.isScanning = false
-                this.onProgressChange(true)
+                if (profiler) profiler.addPoint('Scanning failed')
                 throw error
+            })
+            .lastly(() => {
+                if (profiler) profiler.logResult()
+                this.state = 'idle'
+                this.reset()
+                this.onProgressChange(true)
             })
     }
 
-    private prepare(filePaths: string[]): FileInfo[] {
-        let rawFiles = filePaths.map(filePath =>
-            filePath.match(allowed) ? filePath : null
-        )
-        .filter(filePath => filePath) as string[];
-
-        let imgFiles = filePaths.map(filePath =>
-            filePath.match(allowedImg) ? filePath : null
-        )
-        .filter(filePath => filePath) as string[];
-
-        let preparedFiles = rawFiles.map(rawFile => {
-            let filename = rawFile.match(extract)![1];
-            let imgPos = matches(imgFiles, filename);
-
-            let element: FileInfo = {
-                path: rawFile,
-                name: filename,
-                isRaw: true
-            };
-
-            if (imgPos !== -1) {
-                element.imgPath = imgFiles[imgPos];
-
-                imgFiles = imgFiles.filter(imgFile =>
-                    imgFile !== imgFiles[imgPos]
-                );
+    private async scanDirectory(result: DirectoryInfo[], dir: string): Promise<void> {
+        const photoFilenames: string[] = []
+        const files = await fsReadDirWithFileTypes(dir)
+        await Promise.all(files.map(async fileInfo => {
+            const filename = fileInfo.name
+            const filePath = `${dir}/${filename}`
+            if (fileInfo.isDirectory()) {
+                await this.scanDirectory(result, filePath)
+            } else if (fileInfo.isFile()) {
+                if (acceptedExtensionRE.test(filename)) {
+                    photoFilenames.push(filename)
+                }
             }
+        }))
 
-            return element;
-        });
-
-        imgFiles.forEach(imgFile => {
-            let filename = imgFile.match(extractImg)![1];
-
-            preparedFiles.push({
-                path: imgFile,
-                name: filename,
-                isRaw: false
-            });
-        });
-
-        return preparedFiles;
+        if (photoFilenames.length) {
+            result.push({ path: dir, photoFilenames })
+            this.progress.total += photoFilenames.length
+            this.onProgressChange()
+        }
     }
 
-    private async walk(file: FileInfo): Promise<void> {
-        const profiler = profileScanner ? new Profiler(`Importing ${file.path}`) : null
+    private async deletePhotos(photoIds: PhotoId[]): Promise<void> {
+        if (!photoIds.length) {
+            return
+        }
+
+        await DB().query('BEGIN')
+        try {
+            const shouldFetchTags = await deleteTagsOfPhotos(photoIds)
+            if (shouldFetchTags) {
+                this.shouldFetchTags = true
+            }
+
+            await DB().run(`delete from photos where id in (${photoIds.join(',')})`)
+
+            await DB().query('END')
+        } catch (error) {
+            console.error('Removing obsolete photos from DB failed', error)
+            await DB().query('ROLLBACK')
+            throw error
+        }
+
+        await Promise.all([
+            Promise.all(photoIds.map(photoId => fsUnlinkIfExists(getThumbnailPath(photoId)))),
+            Promise.all(photoIds.map(photoId => fsUnlinkIfExists(getRenderedRawPath(photoId))))
+        ])
+
+        this.progress.removed += photoIds.length
+        this.onProgressChange()
+    }
+
+    private async processDirectory(dirInfo: DirectoryInfo) {
+        type PhotoInfo = { id: PhotoId, master_filename: string }
+        const photosInDb = await DB().query<PhotoInfo>(
+            'select id, master_filename from photos where master_dir = ?', dirInfo.path)
+
+        const remainingPhotosMap: { [K in string]: PhotoInfo } = {}
+        for (const photo of photosInDb) {
+            remainingPhotosMap[photo.master_filename] = photo
+        }
+
+        for (const filename of dirInfo.photoFilenames) {
+            this.progress.processed++
+
+            const photo = remainingPhotosMap[filename]
+            if (photo) {
+                // This photo already exists in the DB
+                delete remainingPhotosMap[filename]
+
+                // Don't call `onProgressChange` - delete is too fast (progress will be updated after the next "real" operation)
+            } else {
+                // This is a new photo -> Import it
+                const importSucceed = await this.importPhoto(dirInfo.path, filename)
+                if (importSucceed) {
+                    this.progress.added++
+                    this.onProgressChange()
+                }
+            }
+        }
+        this.onProgressChange()
+
+        const removedIds = Object.values(remainingPhotosMap).map(photo => photo.id)
+        await this.deletePhotos(removedIds)
+    }
+
+    private async importPhoto(masterDir: string, masterFileName: string): Promise<boolean> {
+        const masterFullPath = `${masterDir}/${masterFileName}`
+        const profiler = profileScanner ? new Profiler(`Importing ${masterFullPath}`) : null
 
         try {
             // Fetch meta data and PhotoWork
 
-            const masterPath = file.path
-            const masterPathParts = parsePath(masterPath)
-            const masterDir = masterPathParts.dir || ''
-            const masterFileName = masterPathParts.base
-
-            const [ metaData, photoWork, alreadyExists ] = await Promise.all([
-                readMetadataOfImage(masterPath),
-                fetchPhotoWork(masterDir, masterFileName),
-                this.photoExists(masterPath)
+            const [ metaData, photoWork ] = await Promise.all([
+                readMetadataOfImage(masterFullPath),
+                fetchPhotoWork(masterDir, masterFileName)
             ])
             if (profiler) profiler.addPoint('Fetched meta data and PhotoWork')
-            if (alreadyExists) {
-                if (profiler) {
-                    profiler.addPoint('Photo already exists in DB')
-                    profiler.logResult()
-                }
-                return
-            }
 
             let master_width = metaData.imgWidth
             let master_height = metaData.imgHeight
@@ -188,33 +236,23 @@ export default class ImportScanner {
 
             let createdAt = metaData.createdAt
             if (!createdAt) {
-                const stat = await fsStat(masterPath)
+                const stat = await fsStat(masterFullPath)
                 createdAt = stat.mtime
             }
 
             // Store non-raw version of the photo (only if photo is raw)
 
+            const isRaw = acceptedRawExtensionRE.test(masterFileName)
             let tempNonRawImgPath: string | null = null
-            if (file.isRaw) {
-                tempNonRawImgPath = `${config.nonRawPath}/temp-${nextTempNonRawImgPathId++}.${config.workExt}`
+            if (isRaw) {
+                const tempRawConversionId = nextTempRawConversionId++
+                tempNonRawImgPath = `${config.nonRawPath}/temp-${tempRawConversionId}.${config.workExt}`
 
-                let imgPath: string
-                let tempExtractedThumbPath: string | null = null
-                if (file.imgPath) {
-                    imgPath = file.imgPath
-                } else {
-                    imgPath = await libraw.extractThumb(
-                        file.path,
-                        `${config.tmp}/${file.name}`
-                    )
-                    tempExtractedThumbPath = imgPath
-                    if (profiler) profiler.addPoint('Extracted non-raw image')
-                }
+                const tempExtractedThumbPath = await libraw.extractThumb(masterFullPath, `${config.tmp}/non-raw-${tempRawConversionId}.jpg`)
+                if (profiler) profiler.addPoint('Extracted non-raw image')
 
-                const imgBuffer = await fsReadFile(imgPath)
-                if (tempExtractedThumbPath) {
-                    await fsUnlink(tempExtractedThumbPath)
-                }
+                const imgBuffer = await fsReadFile(tempExtractedThumbPath)
+                await fsUnlink(tempExtractedThumbPath)
                 if (profiler) profiler.addPoint('Loaded extracted image')
 
                 const outputInfo = await sharp(imgBuffer)
@@ -224,18 +262,18 @@ export default class ImportScanner {
                 master_width = outputInfo.width
                 master_height = outputInfo.height
                 switchSides = false
-                if (profiler) profiler.addPoint('Rotated extracted image')
+                if (profiler) profiler.addPoint('Rotated and transcoded extracted image')
             }
 
             // Store photo in DB
 
             if (!master_width || !master_height) {
-                console.error('Detecting photo size failed', file)
+                console.error('Detecting photo size failed', masterFullPath)
                 if (profiler) {
                     profiler.addPoint('Detecting photo size failed')
                     profiler.logResult()
                 }
-                return
+                return false
             }
 
             const photo: Photo = {
@@ -244,7 +282,7 @@ export default class ImportScanner {
                 master_filename: masterFileName,
                 master_width:  switchSides ? master_height : master_width,
                 master_height: switchSides ? master_width : master_height,
-                master_is_raw: file.isRaw ? 1 : 0,
+                master_is_raw: isRaw ? 1 : 0,
                 orientation: metaData.orientation,
                 date: moment(createdAt).format('YYYY-MM-DD'),
                 flag: photoWork.flagged ? 1 : 0,
@@ -260,7 +298,7 @@ export default class ImportScanner {
             photo.id = await DB().insert('photos', photo)
             if (tempNonRawImgPath) {
                 const nonRawPath = getNonRawPath(photo)
-                if (nonRawPath === masterPath) {
+                if (nonRawPath === masterFullPath) {
                     // Should not happen - but we check this just to be shure...
                     throw new Error(`Expected non-raw path to differ original image path: ${nonRawPath}`)
                 }
@@ -272,78 +310,67 @@ export default class ImportScanner {
 
             const tags = photoWork.tags || metaData.tags
             if (tags && tags.length) {
-                const updatedTags = await storePhotoTags(photo.id, tags)
-                if (updatedTags) {
-                    this.updatedTags = updatedTags
+                const shouldUpdateTags = await storePhotoTags(photo.id, tags)
+                if (shouldUpdateTags) {
+                    this.shouldFetchTags = true
                 }
                 if (profiler) profiler.addPoint(`Added ${tags.length} tags`)
             }
 
-            // Update progress
+            // Done
 
-            this.progress.processed++
-            this.onProgressChange()
-            if (profiler) { profiler.addPoint('Updated import progress') }
+            if (profiler) profiler.logResult()
+            return true
         } catch (error) {
             // TODO: Show error in UI
-            console.error('Importing photo failed', file, error)
-            if (profiler) { profiler.addPoint('Caught error') }
-        }
-        if (profiler) {
-            profiler.logResult()
+            console.error('Importing photo failed', masterFullPath, error)
+            if (profiler) {
+                profiler.addPoint('Caught error')
+                profiler.logResult()
+            }
+            return false
         }
     }
 
-    private onProgressChange(forceSendingNow?: boolean) {
+    private async onProgressChange(forceSendingNow?: boolean) {
         const now = Date.now()
         if (forceSendingNow || now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
             this.lastProgressUIUpdateTime = now
-            ForegroundClient.setImportProgress(this.isScanning ? this.progress : null, this.updatedTags)
-            this.updatedTags = null
+
+            let updatedTags: Tag[] | null = null
+            if (this.shouldFetchTags) {
+                updatedTags = await fetchTags()
+                this.shouldFetchTags = false
+            }
+
+            ForegroundClient.setImportProgress(this.state === 'idle' ? null : this.progress, updatedTags)
         }
-    }
-
-    private photoExists(originalImgPath: string): Promise<boolean> {
-        const pathParts = parsePath(originalImgPath)
-        return DB().queryFirstCell<0 | 1>('select exists(select 1 from photos where master_dir = ? and master_filename = ?)', pathParts.dir, pathParts.base)
-            .then(rawBoolean => !!rawBoolean)
-    }
-
-    private filterStoredPhoto(fileInfo: FileInfo) {
-        return this.photoExists(fileInfo.path)
-            .then(photoExists => !photoExists)
-    }
-
-    private setTotal(files) {
-        this.progress.total = files.length;
-        return files;
     }
 
 }
 
 
-function collectFilePaths(dirName: string, blacklist: string[]): BluebirdPromise<string[]> {
-    if (blacklist.indexOf(dirName) !== -1) {
-        return BluebirdPromise.resolve([])
-    }
+/**
+ * Returns a copy of `paths` where all duplicate directories or subdirectories have been removed.
+ *
+ * E.g. [ '/my/pics', '/my/pics/special', '/my/pics' ]  ->  [ '/my/pics' ]
+ */
+function removeSubdirectories(paths: string[]): string[] {
+    const result: string[] = [ ...paths ]
+    for (let i = result.length - 1; i >= 0; i--) {
+        const path = result[i]
 
-    return fsReadDir(dirName)
-        .map(fileName => {
-            const fullPath = path.join(dirName, fileName)
+        let isSubdirectory = false
+        for (let j = 0; j < result.length; j++) {
+            if (j !== i && path.startsWith(result[j])) {
+                isSubdirectory = true
+                break
+            }
+        }
 
-            return fsStat(fullPath)
-                .then(stat => stat.isDirectory() ? collectFilePaths(fullPath, blacklist) : [ fullPath ])
-        })
-        .reduce<string[], string[]>((result, item) => result.concat(item), [])
-}
-
-
-function matches(array: string[], value: string): number {
-    for (let i = 0, il = array.length; i < il; i++) {
-        const item = array[i]
-        if (item.match(value)) {
-            return i
+        if (isSubdirectory) {
+            result.splice(i, 1)
         }
     }
-    return -1
+    return result
 }

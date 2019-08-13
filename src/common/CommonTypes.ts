@@ -74,9 +74,17 @@ export interface UiConfig {
 }
 
 export type ImportProgress = {
-    processed: number
+    phase: 'scan-dirs' | 'remove-obsolete' | 'import-photos'
+    /** Total number of photos found in file system */
     total: number
-    photosDir: string | null
+    /** Number of processed photos (photos which exist in file system and have been checked) */
+    processed: number
+    /** Number of photos added to the DB */
+    added: number
+    /** Number of photos removed from DB */
+    removed: number
+    /** The path of the directory which is currently scanned or processed */
+    currentPath: string | null
 }
 
 /** See: src/usb.js */

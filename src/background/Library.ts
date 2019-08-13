@@ -17,6 +17,7 @@ import { fsUnlinkIfExists } from 'background/util/FileUtil'
 
 class Library {
 
+    private isScanning = false
     private path: string | null = null
     private versionsPath: string | null = null
 
@@ -108,17 +109,19 @@ class Library {
     }
 
     scan() {
-        if (!this.path || !this.versionsPath) {
+        if (this.isScanning || !this.path) {
             return false
         }
 
         const start = Date.now()
-        new ImportScanner(this.path, this.versionsPath, this.mainWindow)
+        this.isScanning = true
+        new ImportScanner([ this.path ])
             .scanPictures()
             .then(photoCount => {
+                this.isScanning = false
                 if (photoCount !== null) {
                     const duration = Date.now() - start
-                    console.log(`Finished importing ${photoCount} photos in ${duration} ms`)
+                    console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
                     if (duration > 30000) {
                         notifier.notify({
                             title: 'Ansel',
@@ -128,6 +131,7 @@ class Library {
                 }
             })
             .catch(error => {
+                this.isScanning = false
                 // TODO: Show error in UI
                 console.error('Scanning photos failed', error)
             })

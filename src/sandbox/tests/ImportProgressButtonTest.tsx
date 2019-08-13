@@ -14,11 +14,11 @@ addSection('ImportProgressButton')
     )
     .add('scanning dirs', context => (
         <ImportProgressButton
-            progress={{ processed: 0, total: 0, photosDir: null }}
+            progress={{ phase: 'scan-dirs', total: 120, processed: 0, added: 0, removed: 0, currentPath: '/user/me/documents/mypics/2016/birthday party' }}
         />
     ))
     .add('importing photos', context => (
         <ImportProgressButton
-            progress={{ processed: 120, total: 1042, photosDir: '/user/me/documents/mypics/2018/summer vacation' }}
+            progress={{ phase: 'import-photos', total: 1042, processed: 120, added: 40, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
         />
     ))

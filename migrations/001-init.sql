@@ -19,6 +19,7 @@ CREATE TABLE "photos" (
     "date"            date,
     "trashed"         boolean NOT NULL DEFAULT '0'
 );
+CREATE INDEX photos_master_dir_index ON photos(master_dir);
 CREATE TABLE "tags" (
     "id"         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     "title"      text,
@@ -49,4 +50,5 @@ CREATE TABLE "versions" (
 DROP TABLE "versions";
 DROP TABLE "photos_tags";
 DROP TABLE "tags";
+DROP INDEX photos_master_dir_index;
 DROP TABLE "photos";

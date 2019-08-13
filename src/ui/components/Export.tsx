@@ -110,7 +110,7 @@ export class Export extends React.Component<Props, State> {
         const photo = this.props.photoData[photoId]
 
         const pathParts = parsePath(photo.master_filename)
-        const extension = pathParts.ext ? pathParts.ext.substr(1) : ''
+        const extension = pathParts.ext.toLowerCase()
 
         if (!this.state.folder)
             return false
@@ -129,7 +129,7 @@ export class Export extends React.Component<Props, State> {
             return this.processImg(photo, last.output)
         }
 
-        if (config.acceptedRawFormats.indexOf(extension) !== -1) {
+        if (config.acceptedRawExtensions.indexOf(extension) !== -1) {
             return libraw.extract(getMasterPath(photo), `${config.tmp}/ansel-export-temp-${photo.id}`)
                 .then(imgPath => fsReadFile(imgPath))
                 .then(img => this.processImg(photo, img))

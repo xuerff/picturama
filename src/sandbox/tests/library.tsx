@@ -177,7 +177,7 @@ addSection('Library')
             {...createDefaultProps(context)}
             bottomBarLeftItem={
                 <ImportProgressButton
-                    progress={{ processed: 120, total: 1042, photosDir: '/user/me/documents/mypics/2018/summer vacation' }}
+                    progress={{ phase: 'import-photos', total: 1042, processed: 120, added: 40, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
                 />
             }
         />

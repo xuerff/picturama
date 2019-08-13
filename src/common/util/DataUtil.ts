@@ -6,14 +6,16 @@ export function getMasterPath(photo: Photo | { master_dir: string, master_filen
     return `${photo.master_dir}/${photo.master_filename}`
 }
 
-
 export function getThumbnailPath(photoId: PhotoId): string {
     return `${config.thumbnailPath}/${shortId(photoId)}.${config.workExt}`
 }
 
+export function getRenderedRawPath(photoId: PhotoId): string {
+    return `${config.nonRawPath}/${shortId(photoId)}.${config.workExt}`
+}
 
 export function getNonRawPath(photo: Photo): string {
-    return photo.master_is_raw ? `${config.nonRawPath}/${shortId(photo.id)}.${config.workExt}` : getMasterPath(photo)
+    return photo.master_is_raw ? getRenderedRawPath(photo.id) : getMasterPath(photo)
 }
 
 

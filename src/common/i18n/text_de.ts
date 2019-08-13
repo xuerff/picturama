@@ -2,7 +2,7 @@ export default {
 
     common_cancel: 'Abbrechen',
 
-    background_Library_importFinished: '{0} Fotos in {1} importiert',
+    background_Library_importFinished: '{0} Fotos in {1} gescannt',
 
     ImportProgressButton_phase_scanningDirs: 'Scanne Verzeichnisse',
     ImportProgressButton_phase_importingPhoto: 'Importiere',

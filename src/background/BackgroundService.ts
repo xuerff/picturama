@@ -55,7 +55,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'fetchTags') {
         return fetchTags()
     } else if (action === 'storePhotoTags') {
-        return storePhotoTags(params.photoId, params.photoTags)
+        const shouldFetchTags = await storePhotoTags(params.photoId, params.photoTags)
+        return shouldFetchTags ? (await fetchTags()) : null
     } else {
         throw new Error('Unknown background action: ' + action)
     }

@@ -47,9 +47,9 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                         <div className='ImportProgressButton-phase'>
                             {msg(progress.total === 0 ? 'ImportProgressButton_phase_scanningDirs' : 'ImportProgressButton_phase_importingPhoto')}
                         </div>
-                        {progress.photosDir &&
-                            <div className='ImportProgressButton-photosDir'>
-                                {progress.photosDir}
+                        {progress.currentPath &&
+                            <div className='ImportProgressButton-currentPath'>
+                                {progress.currentPath}
                             </div>
                         }
                         {spinnerProgress &&
