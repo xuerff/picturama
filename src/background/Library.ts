@@ -122,12 +122,10 @@ class Library {
                 if (photoCount !== null) {
                     const duration = Date.now() - start
                     console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
-                    if (duration > 30000) {
-                        notifier.notify({
-                            title: 'Ansel',
-                            message: msg('background_Library_importFinished', photoCount, moment.duration(duration).humanize())
-                        })
-                    }
+                    notifier.notify({
+                        title: 'Ansel',
+                        message: msg('background_Library_importFinished', photoCount, moment.duration(duration).humanize())
+                    })
                 }
             })
             .catch(error => {

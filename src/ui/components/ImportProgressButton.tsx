@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { Popover, Position, Button, Spinner } from '@blueprintjs/core'
+import { Popover, Position, Button, Spinner, Icon } from '@blueprintjs/core'
 
 import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
@@ -38,14 +38,15 @@ export default class ImportProgressButton extends React.Component<Props, State> 
         const { props, state } = this
         const { progress } = props
 
-        const spinnerProgress = progress.total ? progress.processed / progress.total : undefined
+        const spinnerProgress = progress.phase === 'import-photos' ? progress.processed / progress.total : undefined
+        const hasError = progress.phase === 'error'
 
         const popoverContent = (
             <div className='ImportProgressButton-popoverBody'>
                 {state.isShowingPopover &&
                     <>
                         <div className='ImportProgressButton-phase'>
-                            {msg(progress.total === 0 ? 'ImportProgressButton_phase_scanningDirs' : 'ImportProgressButton_phase_importingPhoto')}
+                            {msg(`ImportProgressButton_phase_${progress.phase.replace(/-/g, '_')}` as any)}
                         </div>
                         {progress.currentPath &&
                             <div className='ImportProgressButton-currentPath'>
@@ -57,9 +58,9 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                                 {`${Math.round(spinnerProgress * 100)}%`}
                             </div>
                         }
-                        {!!progress.total &&
+                        {progress.phase !== 'cleanup' &&
                             <div className='ImportProgressButton-ratio'>
-                                {msg('ImportProgressButton_ratio', progress.processed, progress.total)}
+                                {spinnerProgress ? msg('ImportProgressButton_ratio', progress.processed, progress.total) : progress.total}
                             </div>
                         }
                     </>
@@ -76,10 +77,12 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                 onClosed={this.onClosed}
             >
                 <Button minimal={true} rightIcon='caret-up'>
-                    <Spinner
-                        size={20}
-                        value={spinnerProgress}
-                    />
+                    {!hasError &&
+                        <Spinner size={20} value={spinnerProgress} />
+                    }
+                    {hasError &&
+                        <Icon className='ImportProgressButton-error' icon='error' iconSize={20} />
+                    }
                 </Button>
             </Popover>
         )

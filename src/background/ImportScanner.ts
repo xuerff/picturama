@@ -33,7 +33,7 @@ interface DirectoryInfo {
 
 export default class ImportScanner {
 
-    private state: 'idle' | 'scan-dirs' | 'remove-obsolete' | 'import-photos' = 'idle'
+    private state: 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos' = 'idle'
     private paths: string[]
 
     private progress: ImportProgress
@@ -65,8 +65,9 @@ export default class ImportScanner {
             return BluebirdPromise.resolve(null)
         }
 
-        this.state = 'scan-dirs'
         this.reset()
+        this.state = 'scan-dirs'
+        this.progress.phase = 'scan-dirs'
         this.onProgressChange(true)
 
         const profiler = profileScanner ? new Profiler('Import scanning') : null
@@ -94,8 +95,8 @@ export default class ImportScanner {
 
                 // Delete photos of removed directories
 
-                this.state = 'remove-obsolete'
-                this.progress.phase = 'remove-obsolete'
+                this.state = 'cleanup'
+                this.progress.phase = 'cleanup'
                 this.onProgressChange(true)
 
                 const dirsCsv = toSqlStringCsv(dirs.map(dirInfo => dirInfo.path))
@@ -103,8 +104,8 @@ export default class ImportScanner {
                 await this.deletePhotos(photoIds)
                 if (profiler) { profiler.addPoint(`Deleted ${photoIds.length} photos of removed directories`) }
 
-                this.state = 'scan-dirs'
-                this.progress.phase = 'scan-dirs'
+                this.state = 'import-photos'
+                this.progress.phase = 'import-photos'
                 this.onProgressChange(true)
 
                 return dirs
@@ -113,16 +114,18 @@ export default class ImportScanner {
             .then(() => {
                 const photoCount = this.progress.total
                 if (profiler) profiler.addPoint(`Scanned ${photoCount} images`)
+                this.reset()
                 return photoCount
             })
             .catch(error => {
                 if (profiler) profiler.addPoint('Scanning failed')
+                this.progress.phase = 'error'
+                this.onProgressChange(true)
                 throw error
             })
             .lastly(() => {
                 if (profiler) profiler.logResult()
                 this.state = 'idle'
-                this.reset()
                 this.onProgressChange(true)
             })
     }
@@ -180,6 +183,8 @@ export default class ImportScanner {
     }
 
     private async processDirectory(dirInfo: DirectoryInfo) {
+        this.progress.currentPath = dirInfo.path
+
         type PhotoInfo = { id: PhotoId, master_filename: string }
         const photosInDb = await DB().query<PhotoInfo>(
             'select id, master_filename from photos where master_dir = ?', dirInfo.path)

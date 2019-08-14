@@ -4,8 +4,10 @@ export default {
 
     background_Library_importFinished: 'Scanned {0} photos in {1}',
 
-    ImportProgressButton_phase_scanningDirs: 'Scanning directories',
-    ImportProgressButton_phase_importingPhoto: 'Importing',
+    ImportProgressButton_phase_scan_dirs: 'Scanning directories',
+    ImportProgressButton_phase_cleanup: 'Cleaning up',
+    ImportProgressButton_phase_import_photos: 'Importing',
+    ImportProgressButton_phase_error: 'Scanning failed',
     ImportProgressButton_ratio: '{0} of {1}',
 
     Library_noPhotos_title: 'No photos imported',
