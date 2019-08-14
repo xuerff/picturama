@@ -316,11 +316,11 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
                 <div className={classNames(props.className, 'Grid')}>
                     <div ref='scrollPane' className='Grid-scrollPane' style={{ right: `-${scrollbarWidth}px` }} onScroll={this.onScroll}>
                         {this.renderVisibleSections()}
-                        {contentHeight &&
+                        {!!contentHeight &&
                             <div className='Grid-spacer' style={{ top: contentHeight - gridSpacerHeight }} />
                         }
                     </div>
-                    {gridLayout &&
+                    {gridLayout && props.sectionIds.length > 0 &&
                         <GridScrollBar
                             className='Grid-scrollBar'
                             gridLayout={gridLayout!}

@@ -221,6 +221,7 @@ addSection('Library')
         <Library
             {...createDefaultProps(context)}
             isFetching={true}
+            photoCount={0}
             sectionIds={[]}
             sectionById={{}}
         />

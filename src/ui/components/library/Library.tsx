@@ -147,7 +147,7 @@ export class Library extends React.Component<Props, State> {
         this.updateInfoPhoto()
 
         let currentView
-        if (props.totalPhotoCount === 0) {
+        if (props.totalPhotoCount === 0 && !props.isFetching) {
             const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
             currentView =
                 <NonIdealState
@@ -166,7 +166,7 @@ export class Library extends React.Component<Props, State> {
                         </div>
                     }
                 />
-        } else if (props.photoCount === 0) {
+        } else if (props.photoCount === 0 && !props.isFetching) {
             if (props.isShowingTrash) {
                 currentView =
                     <NonIdealState
