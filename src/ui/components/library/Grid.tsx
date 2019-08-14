@@ -77,7 +77,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         const prevGridLayout = this.gridLayout
 
         if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth ||
-            nextProps.sectionById !== prevProps.sectionById)
+            nextProps.sectionIds !== prevProps.sectionIds)
         {
             // Sizes have changed or content has changed (e.g. during import)
             // -> Nail the current section (Change the scroll position, so the same section is shown again)
