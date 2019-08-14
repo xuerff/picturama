@@ -1,6 +1,8 @@
 import config from 'common/config'
 import { PhotoId, Photo, ExifOrientation, PhotoWork } from 'common/CommonTypes'
 
+import { fileUrlFromPath } from './TextUtil'
+
 
 export function getMasterPath(photo: Photo | { master_dir: string, master_filename: string }): string {
     return `${photo.master_dir}/${photo.master_filename}`
@@ -10,12 +12,20 @@ export function getThumbnailPath(photoId: PhotoId): string {
     return `${config.thumbnailPath}/${shortId(photoId)}.${config.workExt}`
 }
 
+export function getThumbnailUrl(photoId: PhotoId): string {
+    return fileUrlFromPath(getThumbnailPath(photoId))
+}
+
 export function getRenderedRawPath(photoId: PhotoId): string {
     return `${config.nonRawPath}/${shortId(photoId)}.${config.workExt}`
 }
 
 export function getNonRawPath(photo: Photo): string {
     return photo.master_is_raw ? getRenderedRawPath(photo.id) : getMasterPath(photo)
+}
+
+export function getNonRawUrl(photo: Photo): string {
+    return fileUrlFromPath(getNonRawPath(photo))
 }
 
 

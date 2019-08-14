@@ -6,7 +6,7 @@ import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from
 
 import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawUrl } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import keymapManager from 'ui/keymap-manager'
@@ -305,9 +305,9 @@ export class PictureDetail extends React.Component<Props, State> {
                             className="PictureDetail-image"
                             width={state.bodyWidth}
                             height={state.bodyHeight}
-                            src={getNonRawPath(props.photo)}
-                            srcPrev={props.photoPrev && getNonRawPath(props.photoPrev)}
-                            srcNext={props.photoNext && getNonRawPath(props.photoNext)}
+                            src={getNonRawUrl(props.photo)}
+                            srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
+                            srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
                             orientation={props.photo.orientation}
                             photoWork={props.photoWork}
                             zoom={state.zoom}

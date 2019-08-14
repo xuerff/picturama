@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Spinner } from '@blueprintjs/core'
 
 import { Photo, PhotoDetail, Version } from 'common/CommonTypes'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawUrl } from 'common/util/DataUtil'
 
 import keymapManager from 'ui/keymap-manager'
 import { closeDiffAction } from 'ui/state/actions'
@@ -96,7 +96,7 @@ export class PictureDiff extends React.Component<Props, State> {
                 <div className="before v-align">
                     <h3>Before</h3>
                     <img
-                        src={getNonRawPath(props.photo)}
+                        src={getNonRawUrl(props.photo)}
                         onLoad={this.onImgLoad}
                         className={className} />
                 </div>

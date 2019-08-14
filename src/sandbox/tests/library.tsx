@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Photo, PhotoSectionById, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawUrl } from 'common/util/DataUtil'
 
 import { defaultGridRowHeight } from 'ui/UiConstants'
 import { GridLayout } from 'ui/UITypes'
@@ -72,12 +72,12 @@ function createDefaultProps(context: TestContext): Props {
         fetchSections: action('fetchSections'),
         fetchTags: action('fetchTags'),
         getGridLayout,
-        getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
+        getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             if (photo.master_filename === 'dummy') {
                 return new CancelablePromise<string>(() => {})
             } else {
-                return new CancelablePromise<string>(Promise.resolve(getNonRawPath(photo)))
+                return new CancelablePromise<string>(Promise.resolve(getNonRawUrl(photo)))
             }
         },
         setGridRowHeight: (gridRowHeight: number) => {

@@ -2,7 +2,7 @@ import React from 'react'
 
 import CancelablePromise from 'common/util/CancelablePromise'
 import { Photo, PhotoSectionId } from 'common/CommonTypes'
-import { getNonRawPath } from 'common/util/DataUtil'
+import { getNonRawUrl } from 'common/util/DataUtil'
 
 import { defaultGridRowHeight } from 'ui/UiConstants'
 import GridSection from 'ui/components/library/GridSection'
@@ -27,12 +27,12 @@ const defaultProps = {
     section: defaultSection,
     layout: defaultLayout,
     selectedPhotoIds: null,
-    getThumbnailSrc: (photo: Photo) => getNonRawPath(photo),
+    getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
         if (photo.master_filename === 'dummy') {
             return new CancelablePromise<string>(() => {})
         } else {
-            return new CancelablePromise<string>(Promise.resolve(getNonRawPath(photo)))
+            return new CancelablePromise<string>(Promise.resolve(getNonRawUrl(photo)))
         }
     },
     onPhotoClick: action('onPhotoClick'),

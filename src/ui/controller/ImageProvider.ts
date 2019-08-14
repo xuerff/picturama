@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 import { PhotoId, Photo } from 'common/CommonTypes'
-import { getThumbnailPath } from 'common/util/DataUtil'
+import { getThumbnailPath, getThumbnailUrl } from 'common/util/DataUtil'
 import Profiler from 'common/util/Profiler'
 
 import { renderThumbnailForPhoto } from 'ui/renderer/ThumbnailRenderer'
@@ -34,8 +34,8 @@ export async function onThumbnailChange(photoId: PhotoId): Promise<void> {
 
 
 export function getThumbnailSrc(photo: Photo): string {
-    const thumbnailPath = getThumbnailPath(photo.id)
-    return `${thumbnailPath}?v=${thumbnailVersion}`
+    const thumbnailUrl = getThumbnailUrl(photo.id)
+    return `${thumbnailUrl}?v=${thumbnailVersion}`
 }
 
 

@@ -1,5 +1,5 @@
 import { Photo, PhotoWork } from 'common/CommonTypes'
-import { getTotalRotationTurns, getNonRawPath } from 'common/util/DataUtil'
+import { getTotalRotationTurns, getNonRawUrl } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
@@ -12,10 +12,10 @@ import PhotoCanvas from './PhotoCanvas'
 assertRendererProcess()
 
 
-type RenderJob = { nonRawImgPath: string, photo: Photo, photoWork: PhotoWork, profiler: Profiler | null }
+type RenderJob = { nonRawUrl: string, photo: Photo, photoWork: PhotoWork, profiler: Profiler | null }
 
 const queue = new SerialJobQueue(
-    (newJob, existingJob) => (newJob.nonRawImgPath === existingJob.nonRawImgPath) ? newJob : null,
+    (newJob, existingJob) => (newJob.nonRawUrl === existingJob.nonRawUrl) ? newJob : null,
     renderNextThumbnail)
 
 
@@ -28,13 +28,13 @@ let canvas: PhotoCanvas | null = null
 
 
 export async function renderThumbnailForPhoto(photo: Photo, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
-    const nonRawImgPath = getNonRawPath(photo)
-    return queue.addJob({ nonRawImgPath, photo, photoWork, profiler })
+    const nonRawUrl = getNonRawUrl(photo)
+    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, profiler })
 }
 
 
 async function renderNextThumbnail(job: RenderJob): Promise<string> {
-    const { nonRawImgPath, photo, photoWork, profiler } = job
+    const { nonRawUrl, photo, photoWork, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
     if (canvas === null) {
@@ -44,7 +44,7 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
         if (profiler) profiler.addPoint('Created canvas')
     }
 
-    const texture = await canvas.createTextureFromSrc(nonRawImgPath, profiler)
+    const texture = await canvas.createTextureFromSrc(nonRawUrl, profiler)
 
     // Update photo size in DB (asynchronously)
     const rotationTurns = getTotalRotationTurns(photo.orientation, photoWork)
