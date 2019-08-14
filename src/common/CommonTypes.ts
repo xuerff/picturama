@@ -14,12 +14,12 @@ export interface Photo {
     master_height: number | null
     /** Whether the master image has a raw format */
     master_is_raw: 0 | 1,
-    /** Whether the image is flagged. */
-    flag: 0 | 1,
-    /** Example: 0  (for saving Dates work too) */
-    created_at: number | Date,
-    /** Example: null */
-    updated_at: number | null,
+    /** The timestamp when the photo was created */
+    created_at: number,
+    /** The timestamp when the photo was modified */
+    updated_at: number,
+    /** The timestamp when the photo was imported */
+    imported_at: number,
     /** Example: 1 (= ExifOrientation.Up) */
     orientation: ExifOrientation,
     /** Example: 'SONY DSC-N2' */
@@ -34,8 +34,10 @@ export interface Photo {
     aperture?: number,
     /** Example: '2016-09-18' */
     date?: string,
+    /** Whether the image is flagged. */
+    flag: 0 | 1,
     /** Example: 0 */
-    trashed: 0 | 1
+    trashed: 0 | 1,
 }
 export type PhotoById = { [K in PhotoId]: Photo }
 

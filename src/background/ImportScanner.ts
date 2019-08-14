@@ -36,6 +36,7 @@ export default class ImportScanner {
     private state: 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos' = 'idle'
     private paths: string[]
 
+    private importStartTime = 0
     private progress: ImportProgress
     private lastProgressUIUpdateTime = 0
     private shouldFetchTags = false
@@ -67,6 +68,7 @@ export default class ImportScanner {
 
         this.reset()
         this.state = 'scan-dirs'
+        this.importStartTime = Date.now()
         this.progress.phase = 'scan-dirs'
         this.onProgressChange(true)
 
@@ -225,9 +227,10 @@ export default class ImportScanner {
         try {
             // Fetch meta data and PhotoWork
 
-            const [ metaData, photoWork ] = await Promise.all([
+            const [ fileStats, metaData, photoWork ] = await Promise.all([
+                fsStat(masterFullPath),
                 readMetadataOfImage(masterFullPath),
-                fetchPhotoWork(masterDir, masterFileName)
+                fetchPhotoWork(masterDir, masterFileName),
             ])
             if (profiler) profiler.addPoint('Fetched meta data and PhotoWork')
 
@@ -239,11 +242,7 @@ export default class ImportScanner {
                 switchSides = !switchSides
             }
 
-            let createdAt = metaData.createdAt
-            if (!createdAt) {
-                const stat = await fsStat(masterFullPath)
-                createdAt = stat.mtime
-            }
+            let createdAt = metaData.createdAt || fileStats.ctime
 
             // Store non-raw version of the photo (only if photo is raw)
 
@@ -292,8 +291,9 @@ export default class ImportScanner {
                 date: moment(createdAt).format('YYYY-MM-DD'),
                 flag: photoWork.flagged ? 1 : 0,
                 trashed: 0,
-                created_at: createdAt,
-                updated_at: null,
+                created_at: createdAt.getTime(),
+                updated_at: fileStats.mtime.getTime(),
+                imported_at: this.importStartTime,
                 camera: metaData.camera,
                 exposure_time: metaData.exposureTime,
                 iso: metaData.iso,
