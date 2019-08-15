@@ -121,11 +121,11 @@ export interface PhotoSection {
 export type PhotoSectionById = { [K in PhotoSectionId]: PhotoSection }
 
 
-export type PhotoFilter = {
-    readonly mainFilter:
-        { readonly type: 'tag', readonly tagId: TagId } |
-        { readonly type: 'trash' } |
-        { readonly type: 'processed' } |
-        null
-    readonly showOnlyFlagged: boolean
-}
+export type PhotoFilterType = 'all' | 'flagged' | 'processed' | 'trash' | 'tag'
+export type PhotoFilter =
+    { readonly type: 'all' } |
+    { readonly type: 'flagged' } |
+    { readonly type: 'trash' } |
+    { readonly type: 'tag', readonly tagId: TagId }
+    // TODO: Revive Legacy code of 'version' feature
+    // -> Add 'processed'

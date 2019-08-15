@@ -57,7 +57,7 @@ export default class LibraryTopBar extends React.Component<Props> {
                 {props.leftItem}
 
                 <div className="pull-right">
-                    {this.props.isShowingTrash &&
+                    {props.isShowingTrash &&
                         <Button
                             className="LibraryTopBar-emptyTrash"
                             icon="trash"

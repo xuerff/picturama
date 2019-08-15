@@ -50,27 +50,16 @@ export interface Props extends OwnProps, StateProps, DispatchProps {}
 export class LibraryFilterButton extends React.Component<Props> {
 
     private onSimpleFilterClick(type: SimpleFilterType) {
-        let libraryFilter: PhotoFilter
-        if (type === 'all') {
-            libraryFilter = { mainFilter: null, showOnlyFlagged: false }
-        } else if (type === 'flagged') {
-            libraryFilter = { mainFilter: null, showOnlyFlagged: true }
-        } else {
-            libraryFilter = { mainFilter: { type }, showOnlyFlagged: false }
-        }
-
-        this.props.setLibraryFilter(libraryFilter)
+        this.props.setLibraryFilter({ type })
     }
 
     private onTagFilterClick(tagId: TagId) {
-        this.props.setLibraryFilter({ mainFilter: { type: 'tag', tagId }, showOnlyFlagged: false })
+        this.props.setLibraryFilter({ type: 'tag', tagId })
     }
 
     render() {
         const { props } = this
-        const mainFilter = props.libraryFilter.mainFilter
-
-        const activeFilterType = getTypeForFilter(props.libraryFilter)
+        const { libraryFilter } = props
 
         const menu = (
             <Menu className='LibraryFilterButton-menu'>
@@ -79,7 +68,7 @@ export class LibraryFilterButton extends React.Component<Props> {
                         key={type}
                         icon={iconByFilterType[type]}
                         text={msg(`LibraryFilterButton_filter_${type}` as any)}
-                        active={type === activeFilterType}
+                        active={type === libraryFilter.type}
                         onClick={() => this.onSimpleFilterClick(type)}
                     />
                 )}
@@ -91,7 +80,7 @@ export class LibraryFilterButton extends React.Component<Props> {
                                 key={tagId}
                                 icon={iconByFilterType['tag']}
                                 text={props.tagById[tagId].title}
-                                active={!!(mainFilter && mainFilter.type === 'tag' && mainFilter.tagId === tagId)}
+                                active={!!(libraryFilter.type === 'tag' && libraryFilter.tagId === tagId)}
                                 onClick={() => this.onTagFilterClick(tagId)}
                             />
                         )}
@@ -101,10 +90,10 @@ export class LibraryFilterButton extends React.Component<Props> {
         )
 
         let activeFilterLabel: string
-        if (mainFilter && mainFilter.type === 'tag') {
-            activeFilterLabel = msg('LibraryFilterButton_filter_tag', props.tagById[mainFilter.tagId].title)
+        if (libraryFilter.type === 'tag') {
+            activeFilterLabel = msg('LibraryFilterButton_filter_tag', props.tagById[libraryFilter.tagId].title)
         } else {
-            activeFilterLabel = msg(`LibraryFilterButton_filter_${activeFilterType}` as any)
+            activeFilterLabel = msg(`LibraryFilterButton_filter_${libraryFilter.type}` as any)
         }
 
         return (
@@ -121,25 +110,6 @@ export class LibraryFilterButton extends React.Component<Props> {
         )
     }
 
-}
-
-
-function getTypeForFilter(libraryFilter: PhotoFilter): FilterType {
-    if (libraryFilter.mainFilter) {
-        const type = libraryFilter.mainFilter.type
-        switch (type) {
-            // TODO: Revive Legacy code of 'version' feature
-            //case 'processed':
-            case 'trash':
-            case 'tag':
-                return type
-            default:
-                console.warn('Unknown mainFilter type: ' + type)
-                return 'all'
-        }
-    } else {
-        return libraryFilter.showOnlyFlagged ? 'flagged' : 'all'
-    }
 }
 
 

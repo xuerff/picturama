@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner, MaybeElement } from '@blueprintjs/core'
 
-import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilterType } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
@@ -41,6 +41,7 @@ interface OwnProps {
 interface StateProps {
     isFetching: boolean
     isImporting: boolean
+    libraryFilterType: PhotoFilterType
     photoCount: number
     totalPhotoCount: number | null
     sectionIds: PhotoSectionId[]
@@ -51,7 +52,6 @@ interface StateProps {
     infoPhotoDetail: PhotoDetail | null
     tags: string[]
     gridRowHeight: number
-    isShowingTrash: boolean
 }
 
 interface DispatchProps {
@@ -168,21 +168,19 @@ export class Library extends React.Component<Props, State> {
                     }
                 />
         } else if (props.photoCount === 0 && !props.isFetching && !props.isImporting) {
-            if (props.isShowingTrash) {
-                currentView =
-                    <NonIdealState
-                        icon='tick'
-                        title={msg('Library_emptyTrash_title')}
-                        description={msg('Library_emptyTrash_message')}
-                    />
-            } else {
-                currentView =
-                    <NonIdealState
-                        icon='zoom-out'
-                        title={msg('Library_emptyView_title')}
-                        description={msg('Library_emptyView_message')}
-                    />
+            let title: string
+            switch (props.libraryFilterType) {
+                case 'flagged': title = msg('Library_emptyFavorites'); break
+                case 'trash':   title = msg('Library_emptyTrash'); break
+                default:        title = msg('Library_emptyView'); break
             }
+
+            currentView =
+                <NonIdealState
+                    icon={props.libraryFilterType === 'trash' ? 'tick' : 'zoom-out'}
+                    title={title}
+                    description={msg('Library_selectOtherView')}
+                />
         } else {
             currentView =
                 <Grid
@@ -215,7 +213,7 @@ export class Library extends React.Component<Props, State> {
                     leftItem={props.topBarLeftItem}
                     selectedSectionId={selectedSectionId}
                     selectedPhotos={selectedPhotos}
-                    isShowingTrash={props.isShowingTrash}
+                    isShowingTrash={props.libraryFilterType === 'trash'}
                     isShowingInfo={state.isShowingInfo}
                     photosCount={props.photoCount}
                     openExport={props.openExport}
@@ -264,6 +262,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             ...props,
             isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
             isImporting: !!state.import && state.import.progress.phase !== 'error',
+            libraryFilterType: state.library.filter.type,
             photoCount: sections.photoCount,
             totalPhotoCount: sections.totalPhotoCount,
             sectionIds: sections.ids,
@@ -274,7 +273,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
-            isShowingTrash: !!(state.library.filter.mainFilter && state.library.filter.mainFilter.type === 'trash')
         }
     },
     dispatch => ({
@@ -291,10 +289,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         updatePhotoWork,
         movePhotosToTrash,
         restorePhotosFromTrash,
-        toggleShowOnlyFlagged: () => {
-            const oldFilter = store.getState().library.filter
-            setLibraryFilter({ ...oldFilter, showOnlyFlagged: !oldFilter.showOnlyFlagged })
-        },
         startScanning: () => {
             ipcRenderer.send('start-scanning')
         },

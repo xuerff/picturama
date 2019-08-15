@@ -24,20 +24,18 @@ export async function fetchSectionPhotos(sectionId: PhotoSectionId, filter: Phot
 
 
 function createWhereForFilter(filter: PhotoFilter): { sql: string, params: any[] } {
-    const mainFilter = filter.mainFilter
-
     let sql = 'trashed = ?'
     let params: any[] = [
-        (mainFilter && mainFilter.type === 'trash') ? 1 : 0  // trashed
+        (filter.type === 'trash') ? 1 : 0
     ]
 
-    if (mainFilter && mainFilter.type === 'tag') {
-        sql += ' and id in (select photo_id from photos_tags where tag_id = ?)'
-        params.push(mainFilter.tagId)
+    if (filter.type === 'flagged') {
+        sql += ' and flag = 1'
     }
 
-    if (filter.showOnlyFlagged) {
-        sql += ' and flag = 1'
+    if (filter.type === 'tag') {
+        sql += ' and id in (select photo_id from photos_tags where tag_id = ?)'
+        params.push(filter.tagId)
     }
 
     return { sql, params }

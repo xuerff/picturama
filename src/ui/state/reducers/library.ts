@@ -32,8 +32,7 @@ const display = (state: DisplayState = initialDisplayState, action: Action): Dis
 
 
 const initialFilterState: PhotoFilter = {
-    mainFilter: null,
-    showOnlyFlagged: false,
+    type: 'all'
 }
 
 const filter = (state: PhotoFilter = initialFilterState, action: Action): PhotoFilter => {

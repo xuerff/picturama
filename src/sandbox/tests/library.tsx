@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Photo, PhotoSectionById, PhotoSectionId } from 'common/CommonTypes'
+import { Photo, PhotoSectionById, PhotoSectionId, PhotoFilter } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
@@ -26,34 +26,12 @@ let sharedGridRowHeight = defaultGridRowHeight
 function createDefaultProps(context: TestContext): Props {
     return {
         style: { width: '100%', height: '100%', overflow: 'hidden' },
-        topBarLeftItem: (
-            <LibraryFilterButton
-                libraryFilter={{ mainFilter: null, showOnlyFlagged: false }}
-                tagIds={[ 1, 2 ]}
-                tagById={{
-                    1: {
-                        created_at: 1565357205167,
-                        id: 1,
-                        slug: 'flower',
-                        title: 'Flower',
-                        updated_at: null
-                    },
-                    2: {
-                        created_at: 1565357205167,
-                        id: 2,
-                        slug: 'panorama',
-                        title: 'Panorama',
-                        updated_at: null
-                    }
-                }}
-                devices={[]}
-                setLibraryFilter={action('setLibraryFilter')}
-            />
-        ),
+        topBarLeftItem: renderLibraryFilterButton({ type: 'all' }),
         isActive: true,
 
         isFetching: false,
         isImporting: false,
+        libraryFilterType: 'all',
         photoCount: 1042,
         totalPhotoCount: 12345,
         sectionIds: [ defaultSectionId ],
@@ -66,7 +44,6 @@ function createDefaultProps(context: TestContext): Props {
         infoPhotoDetail: null,
         tags: [ 'Flower', 'Panorama' ],
         gridRowHeight: sharedGridRowHeight,
-        isShowingTrash: false,
 
         fetchTotalPhotoCount: action('fetchTotalPhotoCount'),
         fetchSections: action('fetchSections'),
@@ -95,6 +72,33 @@ function createDefaultProps(context: TestContext): Props {
         restorePhotosFromTrash: action('restorePhotosFromTrash'),
         startScanning: action('startScanning'),
     }
+}
+
+function renderLibraryFilterButton(libraryFilter: PhotoFilter): JSX.Element {
+    return (
+        <LibraryFilterButton
+            libraryFilter={libraryFilter}
+            tagIds={[ 1, 2 ]}
+            tagById={{
+                1: {
+                    created_at: 1565357205167,
+                    id: 1,
+                    slug: 'flower',
+                    title: 'Flower',
+                    updated_at: null
+                },
+                2: {
+                    created_at: 1565357205167,
+                    id: 2,
+                    slug: 'panorama',
+                    title: 'Panorama',
+                    updated_at: null
+                }
+            }}
+            devices={[]}
+            setLibraryFilter={action('setLibraryFilter')}
+        />
+    )
 }
 
 
@@ -241,14 +245,6 @@ addSection('Library')
             />
         )
     })
-    .add('Empty view', context => (
-        <Library
-            {...createDefaultProps(context)}
-            photoCount={0}
-            sectionIds={[]}
-            sectionById={{}}
-        />
-    ))
     .add('No photos', context => (
         <Library
             {...createDefaultProps(context)}
@@ -258,23 +254,35 @@ addSection('Library')
             sectionById={{}}
         />
     ))
+    .add('Empty favorites', context => (
+        <Library
+            {...createDefaultProps(context)}
+            topBarLeftItem={renderLibraryFilterButton({ type: 'flagged' })}
+            libraryFilterType={'flagged'}
+            photoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
+        />
+    ))
+    .add('Empty trash', context => (
+        <Library
+            {...createDefaultProps(context)}
+            topBarLeftItem={renderLibraryFilterButton({ type: 'trash' })}
+            libraryFilterType={'trash'}
+            photoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
+        />
+    ))
     .add('Trash with selection', context => (
         <Library
             {...createDefaultProps(context)}
-            isShowingTrash={true}
+            topBarLeftItem={renderLibraryFilterButton({ type: 'trash' })}
+            libraryFilterType={'trash'}
             selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testLandscapePhoto.id ]}
             infoPhoto={testLandscapePhoto}
             infoPhotoDetail={{ versions:[], tags: [] }}
-        />
-    ))
-    .add('Trash - no photos', context => (
-        <Library
-            {...createDefaultProps(context)}
-            isShowingTrash={true}
-            photoCount={0}
-            sectionIds={[]}
-            sectionById={{}}
         />
     ))
 

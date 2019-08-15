@@ -118,7 +118,6 @@ export class Settings extends React.Component<Props, State> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
-        const mainFilter = state.library.filter.mainFilter
         return {
             ...props,
         }
