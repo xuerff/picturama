@@ -1,4 +1,4 @@
-import { ipcRenderer, remote, Menu as MenuType } from 'electron'
+import { ipcRenderer } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
@@ -25,11 +25,6 @@ import PhotoPane from './PhotoPane'
 
 import './PictureDetail.less'
 
-const { MenuItem } = remote;
-
-
-// TODO: Revive Legacy code of 'version' feature
-//const availableEditors = new AvailableEditors();
 
 interface OwnProps {
     style?: any
@@ -78,39 +73,16 @@ interface State {
 
 export class PictureDetail extends React.Component<Props, State> {
 
-    menu: MenuType
-
-
     constructor(props: Props) {
         super(props);
 
         this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
 
-        bindMany(this, 'contextMenu', 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport',
-            'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange',
-            'onBodyResize')
+        bindMany(this, 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport', 'toggleDiff',
+            'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange', 'onBodyResize')
     }
 
     componentDidMount() {
-        this.menu = new remote.Menu();
-
-        this.menu.append(new MenuItem({
-            label: 'Export',
-            click: this.openExport
-        }));
-
-        this.menu.append(new MenuItem({
-            label: 'Move to trash',
-            click: this.moveToTrash
-        }));
-
-        this.menu.append(new MenuItem({
-            type: 'separator'
-        }));
-
-        // TODO: Revive Legacy code of 'version' feature
-        //availableEditors.editors.forEach(this.addEditorMenu);
-
         this.bindEventListeners()
     }
 
@@ -126,14 +98,10 @@ export class PictureDetail extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this.unbindEventListeners();
-
-        delete this.menu;
     }
 
     bindEventListeners() {
         this.setState({ bound: true })
-
-        document.addEventListener('contextmenu', this.contextMenu)
 
         ipcRenderer.send('toggleExportMenu', true)
 
@@ -157,8 +125,6 @@ export class PictureDetail extends React.Component<Props, State> {
     unbindEventListeners() {
         this.setState({ bound: false })
 
-        document.removeEventListener('contextmenu', this.contextMenu)
-
         ipcRenderer.send('toggleExportMenu', false)
 
         window.removeEventListener('core:cancel', this.props.closeDetail)
@@ -177,27 +143,6 @@ export class PictureDetail extends React.Component<Props, State> {
 
         keymapManager.unbind();
     }
-
-    contextMenu(e) {
-        e.preventDefault();
-        this.menu.popup({})
-    }
-
-    // TODO: Revive Legacy code of 'version' feature
-    /*
-    addEditorMenu(editor) {
-        this.menu.append(new MenuItem({
-            label: `Open with ${editor.name}`,
-            click: () => {
-                createVersionAndOpenWith(
-                    this.props.photo,
-                    editor.format,
-                    editor.cmd
-                );
-            }
-        }));
-    }
-    */
 
     openExport() {
         const props = this.props

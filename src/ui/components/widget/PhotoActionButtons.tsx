@@ -112,6 +112,22 @@ export default class PhotoActionButtons extends React.Component<Props> {
         const props = this.props
         const hasSelection = props.selectedPhotos.length > 0
         const selectedAreFlagged = this.getSelectedAreFlagged()
+
+        // TODO: Revive Legacy code of 'version' feature
+        //const availableEditors = new AvailableEditors();
+        //availableEditors.editors.forEach(editor =>
+        //  this.menu.append(new MenuItem({
+        //      label: `Open with ${editor.name}`,
+        //      click: () => {
+        //          createVersionAndOpenWith(
+        //              this.props.photo,
+        //              editor.format,
+        //              editor.cmd
+        //          );
+        //      }
+        //  }));
+        //)
+
         return (
             <>
                 <ButtonGroup>
