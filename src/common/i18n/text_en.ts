@@ -16,7 +16,7 @@ export default {
     Library_emptyTrash_title: 'Trash is empty',
     Library_emptyTrash_message: 'The trash is empty. Please select another view on the top left.',
     Library_emptyView_title: 'No photos found',
-    Library_emptyView_message: "Your current selection doesn't match any photo. Please select another view on the top left.",
+    Library_emptyView_message: "Your current view doesn't match any photo. Please select another view on the top left.",
 
     LibraryBottomBar_selected: '{0} selected',
     LibraryBottomBar_deselect: 'Deselect',

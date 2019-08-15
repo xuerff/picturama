@@ -241,7 +241,7 @@ addSection('Library')
             />
         )
     })
-    .add('Selection empty', context => (
+    .add('Empty view', context => (
         <Library
             {...createDefaultProps(context)}
             photoCount={0}
