@@ -53,7 +53,7 @@ function createDefaultProps(context: TestContext): Props {
         isActive: true,
 
         isFetching: false,
-
+        isImporting: false,
         photoCount: 1042,
         totalPhotoCount: 12345,
         sectionIds: [ defaultSectionId ],
@@ -180,6 +180,30 @@ addSection('Library')
                     progress={{ phase: 'import-photos', total: 1042, processed: 120, added: 40, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
                 />
             }
+            isImporting={true}
+        />
+    ))
+    .add('first import', context => (
+        <Library
+            {...createDefaultProps(context)}
+            bottomBarLeftItem={
+                <ImportProgressButton
+                    progress={{ phase: 'scan-dirs', total: 120, processed: 0, added: 0, removed: 0, currentPath: '/user/me/documents/mypics/2016/birthday party' }}
+                />
+            }
+            isImporting={true}
+            photoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
+        />
+    ))
+    .add('Fetching sections', context => (
+        <Library
+            {...createDefaultProps(context)}
+            isFetching={true}
+            photoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
         />
     ))
     .add('creating thumbnails', context => {
@@ -217,15 +241,6 @@ addSection('Library')
             />
         )
     })
-    .add('Fetching sections', context => (
-        <Library
-            {...createDefaultProps(context)}
-            isFetching={true}
-            photoCount={0}
-            sectionIds={[]}
-            sectionById={{}}
-        />
-    ))
     .add('Selection empty', context => (
         <Library
             {...createDefaultProps(context)}

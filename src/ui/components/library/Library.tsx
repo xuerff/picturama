@@ -40,6 +40,7 @@ interface OwnProps {
 
 interface StateProps {
     isFetching: boolean
+    isImporting: boolean
     photoCount: number
     totalPhotoCount: number | null
     sectionIds: PhotoSectionId[]
@@ -147,7 +148,7 @@ export class Library extends React.Component<Props, State> {
         this.updateInfoPhoto()
 
         let currentView
-        if (props.totalPhotoCount === 0 && !props.isFetching) {
+        if (props.totalPhotoCount === 0 && !props.isFetching && !props.isImporting) {
             const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
             currentView =
                 <NonIdealState
@@ -166,7 +167,7 @@ export class Library extends React.Component<Props, State> {
                         </div>
                     }
                 />
-        } else if (props.photoCount === 0 && !props.isFetching) {
+        } else if (props.photoCount === 0 && !props.isFetching && !props.isImporting) {
             if (props.isShowingTrash) {
                 currentView =
                     <NonIdealState
@@ -226,7 +227,7 @@ export class Library extends React.Component<Props, State> {
                 />
                 <div className="Library-body">
                     {currentView}
-                    {props.isFetching &&
+                    {(props.isFetching || (props.isImporting && props.photoCount === 0)) &&
                         <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
                     }
                 </div>
@@ -262,6 +263,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
+            isImporting: !!state.import && state.import.progress.phase !== 'error',
             photoCount: sections.photoCount,
             totalPhotoCount: sections.totalPhotoCount,
             sectionIds: sections.ids,
