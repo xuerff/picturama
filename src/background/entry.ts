@@ -129,6 +129,6 @@ async function initLibrary(mainWindow: BrowserWindow) {
 
     await initDb()
 
-    new Library(mainWindow)
+    new Library()
     new MainMenu(mainWindow)
 }

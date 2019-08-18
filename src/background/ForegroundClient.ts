@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { Tag, ImportProgress } from 'common/CommonTypes'
+import { Tag, ImportProgress, PhotoId } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
 
@@ -50,7 +50,10 @@ export default {
     async setImportProgress(progress: ImportProgress | null, updatedTags: Tag[] | null): Promise<void> {
         return callOnForeground('setImportProgress', { progress, updatedTags })
     },
-    
+
+    async onPhotoTrashed(photoIds: PhotoId[], updatedTags: Tag[] | null): Promise<void> {
+        return callOnForeground('onPhotoTrashed', { photoIds, updatedTags })
+    },
 }
 
 

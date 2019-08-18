@@ -3,18 +3,20 @@ import { ipcMain, shell, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 
 import config from 'common/config'
-import { PhotoId } from 'common/CommonTypes'
-import { getThumbnailPath, getMasterPath } from 'common/util/DataUtil'
+import { PhotoId, Tag } from 'common/CommonTypes'
+import { getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
-import { removePhotoWork } from 'background/store/PhotoWorkStore'
+import ForegroundClient from 'background/ForegroundClient'
 import { startImport } from 'background/ImportScanner'
-import { fsUnlinkIfExists } from 'background/util/FileUtil'
+import { deletePhotos } from 'background/store/PhotoStore'
+import { removePhotoWork } from 'background/store/PhotoWorkStore'
+import { fetchTags } from 'background/store/TagStore'
 
 
 class Library {
 
-    constructor(private mainWindow: BrowserWindow) {
+    constructor() {
         bindMany(this, 'emptyTrash', 'scan')
 
         if (!fs.existsSync(config.tmp)) {
@@ -60,24 +62,24 @@ class Library {
 
     emptyTrash() {
         (async () => {
-            const photosToDelete = await DB().query<{ id: PhotoId, master_dir: string, master_filename: string, non_raw: string }>(
-                'select id, master_dir, master_filename, non_raw from photos where trashed = 1')
-            for (const photo of photosToDelete) {
-                await Promise.all([
-                    shell.moveItemToTrash(getMasterPath(photo)),
-                    fsUnlinkIfExists(photo.non_raw),
-                    fsUnlinkIfExists(getThumbnailPath(photo.id)),
-                    removePhotoWork(photo.master_dir, photo.master_filename)
-                ])
-            }
+            const photosToDelete = await DB().query<{ id: PhotoId, master_dir: string, master_filename: string }>(
+                'select id, master_dir, master_filename from photos where trashed = 1')
 
             const photoIds = photosToDelete.map(photo => photo.id)
-            const photoIdsCsv = photoIds.join(',')
-            await DB().run(`delete from versions where photo_id in (${photoIdsCsv})`)
-            await DB().run(`delete from photos_tags where photo_id in (${photoIdsCsv})`)
-            await DB().run(`delete from photos where id in (${photoIdsCsv})`)
 
-            this.mainWindow.webContents.send('photos-trashed', photoIds)
+            const shouldFetchTags = await deletePhotos(photoIds)
+            let updatedTags: Tag[] | null = null
+            if (shouldFetchTags) {
+                updatedTags = await fetchTags()
+            }
+
+            for (const photo of photosToDelete) {
+                shell.moveItemToTrash(getMasterPath(photo))
+            }
+
+            await Promise.all(photosToDelete.map(photo => removePhotoWork(photo.master_dir, photo.master_filename)))
+
+            await ForegroundClient.onPhotoTrashed(photoIds, updatedTags)
         })()
         .catch(error => {
             // TODO: Show error in UI

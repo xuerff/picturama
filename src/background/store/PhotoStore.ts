@@ -1,6 +1,11 @@
 import DB from 'sqlite3-helper/no-generators'
 
 import { PhotoId, Photo, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId, Version } from 'common/CommonTypes'
+import { getThumbnailPath, getRenderedRawPath } from 'common/util/DataUtil'
+
+import { fsUnlinkIfExists } from 'background/util/FileUtil'
+
+import { deleteTagsOfPhotos } from './TagStore'
 
 
 export async function fetchTotalPhotoCount(): Promise<number> {
@@ -60,4 +65,38 @@ export async function updatePhotos(photoIds: PhotoId[], update: Partial<Photo>):
     await Promise.all(photoIds.map(photoId =>
         DB().update<Photo>('photos', update, [ 'id = ?', photoId ])
     ))
+}
+
+
+export async function deletePhotos(photoIds: PhotoId[]): Promise<boolean> {
+    if (!photoIds.length) {
+        return false
+    }
+
+    let shouldFetchTags: boolean
+    await DB().query('BEGIN')
+    try {
+        const photoIdsCsv = photoIds.join(',')
+
+        shouldFetchTags = await deleteTagsOfPhotos(photoIds)
+        await DB().run(`delete from versions where photo_id in (${photoIdsCsv})`)
+        await DB().run(`delete from photos where id in (${photoIdsCsv})`)
+
+        await DB().query('END')
+    } catch (error) {
+        console.error('Removing obsolete photos from DB failed', error)
+        await DB().query('ROLLBACK')
+        throw error
+    }
+
+    const deletePromises: Promise<any>[] = []
+    for (const photoId of photoIds) {
+        deletePromises.push(
+            fsUnlinkIfExists(getThumbnailPath(photoId)),
+            fsUnlinkIfExists(getRenderedRawPath(photoId)),
+        )
+    }
+    await Promise.all(deletePromises)
+
+    return shouldFetchTags
 }

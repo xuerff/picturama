@@ -36,7 +36,6 @@ export function init() {
     ipcRenderer.on('scanned-devices', (event, devices: Device[]) => store.dispatch(initDevicesAction(devices)))
     ipcRenderer.on('add-device', (event, device: Device) => store.dispatch(addDeviceAction(device)))
     ipcRenderer.on('remove-device', (event, device: Device) => store.dispatch(removeDeviceAction(device)))
-    ipcRenderer.on('photos-trashed', (event, photoIds: PhotoId[]) => store.dispatch(emptyTrashAction(photoIds)))
 }
 
 
@@ -58,6 +57,12 @@ async function executeForegroundAction(action: string, params: any): Promise<any
 
         if (updatedTags) {
             setTags(updatedTags)
+        }
+    } else if (action === 'onPhotoTrashed') {
+        store.dispatch(emptyTrashAction(params.photoIds))
+
+        if (params.updatedTags) {
+            setTags(params.updatedTags)
         }
     } else {
         throw new Error('Unknown foreground action: ' + action)

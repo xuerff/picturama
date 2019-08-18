@@ -9,17 +9,18 @@ import { Photo, Tag, ExifOrientation, ImportProgress, PhotoId } from 'common/Com
 import { profileScanner } from 'common/LogConstants'
 import config from 'common/config'
 import { msg } from 'common/i18n/i18n'
-import { getNonRawPath, getThumbnailPath, getRenderedRawPath } from 'common/util/DataUtil'
+import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
+import { deletePhotos } from 'background/store/PhotoStore'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
 import { fetchSettings } from 'background/store/SettingsStore'
-import { storePhotoTags, fetchTags, deleteTagsOfPhotos } from 'background/store/TagStore'
+import { storePhotoTags, fetchTags } from 'background/store/TagStore'
 import { toSqlStringCsv } from 'background/util/DbUtil'
-import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExists, fsUnlinkIfExists } from 'background/util/FileUtil'
+import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExists } from 'background/util/FileUtil'
 
 
 const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.join('|')})$`, 'i')
@@ -184,26 +185,10 @@ class ImportScanner {
             return
         }
 
-        await DB().query('BEGIN')
-        try {
-            const shouldFetchTags = await deleteTagsOfPhotos(photoIds)
-            if (shouldFetchTags) {
-                this.shouldFetchTags = true
-            }
-
-            await DB().run(`delete from photos where id in (${photoIds.join(',')})`)
-
-            await DB().query('END')
-        } catch (error) {
-            console.error('Removing obsolete photos from DB failed', error)
-            await DB().query('ROLLBACK')
-            throw error
+        const shouldFetchTags = await deletePhotos(photoIds)
+        if (shouldFetchTags) {
+            this.shouldFetchTags = shouldFetchTags
         }
-
-        await Promise.all([
-            Promise.all(photoIds.map(photoId => fsUnlinkIfExists(getThumbnailPath(photoId)))),
-            Promise.all(photoIds.map(photoId => fsUnlinkIfExists(getRenderedRawPath(photoId))))
-        ])
 
         this.progress.removed += photoIds.length
         this.onProgressChange()
