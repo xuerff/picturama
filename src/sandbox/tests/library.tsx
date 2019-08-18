@@ -30,6 +30,7 @@ function createDefaultProps(context: TestContext): Props {
         topBarLeftItem: renderTopBarLeftItem({ type: 'all' }),
         isActive: true,
 
+        hasPhotoDirs: true,
         isFetching: false,
         isImporting: false,
         libraryFilterType: 'all',
@@ -253,6 +254,16 @@ addSection('Library')
             />
         )
     })
+    .add('No photo dirs', context => (
+        <Library
+            {...createDefaultProps(context)}
+            hasPhotoDirs={false}
+            photoCount={0}
+            totalPhotoCount={0}
+            sectionIds={[]}
+            sectionById={{}}
+        />
+    ))
     .add('No photos', context => (
         <Library
             {...createDefaultProps(context)}

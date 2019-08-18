@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
-import { Button, NonIdealState, Spinner, MaybeElement } from '@blueprintjs/core'
+import { Button, NonIdealState, Spinner, MaybeElement, Icon } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilterType } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
@@ -38,6 +38,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+    hasPhotoDirs: boolean
     isFetching: boolean
     isImporting: boolean
     libraryFilterType: PhotoFilterType
@@ -148,24 +149,40 @@ export class Library extends React.Component<Props, State> {
 
         let currentView
         if (props.totalPhotoCount === 0 && !props.isFetching && !props.isImporting) {
-            const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
-            currentView =
-                <NonIdealState
-                    icon='zoom-out'
-                    title={msg('Library_noPhotos_title')}
-                    description={
-                        <>
-                            {descriptionSplits[0]}
-                            <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code>
-                            {descriptionSplits[1]}
-                        </>
-                    }
-                    action={
-                        <div className="bp3-dark">
-                            <Button onClick={props.startScanning}>{msg('Library_startScanning')}</Button>
-                        </div>
-                    }
-                />
+            if (!props.hasPhotoDirs) {
+                const descriptionSplits = msg('Library_noSettings_message').split('{0}')
+                currentView =
+                    <NonIdealState
+                        icon='zoom-out'
+                        title={msg('Library_noPhotos_title')}
+                        description={
+                            <>
+                                {descriptionSplits[0]}
+                                <Icon icon='cog' style={{ verticalAlign: 'middle' }}/>
+                                {descriptionSplits[1]}
+                            </>
+                        }
+                    />
+            } else {
+                const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
+                currentView =
+                    <NonIdealState
+                        icon='zoom-out'
+                        title={msg('Library_noPhotos_title')}
+                        description={
+                            <>
+                                {descriptionSplits[0]}
+                                <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code>
+                                {descriptionSplits[1]}
+                            </>
+                        }
+                        action={
+                            <div className="bp3-dark">
+                                <Button onClick={props.startScanning}>{msg('Library_startScanning')}</Button>
+                            </div>
+                        }
+                    />
+            }
         } else if (props.photoCount === 0 && !props.isFetching && !props.isImporting) {
             let title: string
             switch (props.libraryFilterType) {
@@ -259,6 +276,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         const photoData = libraryInfo && sections.byId[libraryInfo.sectionId].photoData
         return {
             ...props,
+            hasPhotoDirs: state.data.settings.photoDirs.length !== 0,
             isFetching: sections.totalPhotoCount === null || sections.fetchState === FetchState.FETCHING,
             isImporting: !!state.import && state.import.progress.phase !== 'error',
             libraryFilterType: state.library.filter.type,

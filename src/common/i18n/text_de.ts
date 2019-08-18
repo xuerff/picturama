@@ -13,6 +13,7 @@ export default {
     ImportScanner_importFinished: '{0} Fotos in {1} gescannt',
 
     Library_noPhotos_title: 'Keine Fotos importiert',
+    Library_noSettings_message: 'Klicke oben auf {0} um die Einstellungen zu öffnen.',
     Library_noPhotos_message: 'Drücke {0} oder folgenden Knopf um Scan zu starten.',
     Library_startScanning: 'Scan starten',
     Library_emptyTrash: 'Papierkorb ist leer',
