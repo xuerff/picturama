@@ -39,5 +39,3 @@ export const CLOSE_DIFF = 'CLOSE_DIFF'
 
 export const OPEN_EXPORT = 'OPEN_EXPORT'  // Was: 'OPEN_EXPORT'
 export const CLOSE_EXPORT = 'CLOSE_EXPORT'  // Was: 'CLOSE_EXPORT'
-
-export const TOGGLE_DIFF = 'TOGGLE_DIFF'  // Was: 'TOGGLE_DIFF_SUCCESS'
