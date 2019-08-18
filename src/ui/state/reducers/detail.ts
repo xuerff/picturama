@@ -4,12 +4,11 @@ import { FetchState } from 'ui/UITypes'
 import { Action } from 'ui/state/ActionType'
 import {
     SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK,
-    FETCH_SECTIONS_SUCCESS, SET_PHOTO_TAGS, OPEN_DIFF, CLOSE_DIFF, CHANGE_PHOTOS, EMPTY_TRASH, FETCH_SECTIONS_FAILURE
+    FETCH_SECTIONS_SUCCESS, SET_PHOTO_TAGS, CHANGE_PHOTOS, EMPTY_TRASH, FETCH_SECTIONS_FAILURE
 } from 'ui/state/actionTypes'
 
 
 export type DetailState = {
-    readonly showDiff: boolean
     readonly currentPhoto: {
         readonly fetchState: FetchState
         readonly sectionId: PhotoSectionId
@@ -26,7 +25,6 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
     switch (action.type) {
         case SET_DETAIL_PHOTO_REQUEST:
             return {
-                showDiff: false,
                 currentPhoto: {
                     fetchState: FetchState.FETCHING,
                     sectionId: action.payload.sectionId,
@@ -97,16 +95,6 @@ export const detail = (state: DetailState = null, action: Action): DetailState =
                 return null
             } else {
                 return state
-            }
-        case OPEN_DIFF:
-            return state && {
-                ...state,
-                showDiff: true
-            }
-        case CLOSE_DIFF:
-            return state && {
-                ...state,
-                showDiff: false
             }
         default:
             return state

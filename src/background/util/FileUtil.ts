@@ -2,6 +2,7 @@ import fs, { PathLike, Dirent } from 'fs'
 import BluebirdPromise, { promisify } from 'bluebird'
 
 
+export const fsMkDir = promisify(fs.mkdir)
 export const fsReadDir: (path: PathLike, options?: { encoding?: string, withFileTypes?: false }) => BluebirdPromise<string[]> = promisify(fs.readdir)
 export const fsReadFile = promisify(fs.readFile)
 export const fsRename = promisify(fs.rename)
@@ -18,6 +19,13 @@ export function fsReadDirWithFileTypes(path: PathLike, options?: { encoding?: st
 
 export async function fsExists(path: PathLike): Promise<boolean> {
     return new Promise<boolean>(resolve => fs.exists(path, resolve))
+}
+
+
+export async function fsMkDirIfNotExists(path: PathLike): Promise<void> {
+    if (!await fsExists(path)) {
+        await fsMkDir(path)
+    }
 }
 
 

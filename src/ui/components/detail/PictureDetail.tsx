@@ -206,7 +206,7 @@ export class PictureDetail extends React.Component<Props, State> {
                 <Toolbar className="PictureDetail-topBar" isLeft={true}>
                     <Button onClick={props.closeDetail}>
                         <FaIcon name="chevron-left"/>
-                        <span>{msg('PictureDetail_back')}</span>
+                        <span>{msg('common_backToLibrary')}</span>
                     </Button>
                     <ButtonGroup>
                         <Button minimal={true} disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title={msg('PictureDetail_prevPhoto')}>

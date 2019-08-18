@@ -1,14 +1,16 @@
 export default {
 
     common_cancel: 'Abbrechen',
-
-    background_Library_importFinished: '{0} Fotos in {1} gescannt',
+    common_close: 'Schließen',
+    common_backToLibrary: 'Zurück zur Bibliothek',
 
     ImportProgressButton_phase_scan_dirs: 'Scanne Verzeichnisse',
     ImportProgressButton_phase_cleanup: 'Räume auf',
     ImportProgressButton_phase_import_photos: 'Importiere',
     ImportProgressButton_phase_error: 'Fehler beim Scannen',
     ImportProgressButton_ratio: '{0} von {1}',
+
+    ImportScanner_importFinished: '{0} Fotos in {1} gescannt',
 
     Library_noPhotos_title: 'Keine Fotos importiert',
     Library_noPhotos_message: 'Drücke {0} oder folgenden Knopf um Scan zu starten.',
@@ -54,9 +56,14 @@ export default {
     PhotoInfo_noSelection_title: 'Kein Foto gewählt',
     PhotoInfo_noSelection_message: 'Bitte wähle links ein Foto.',
 
-    PictureDetail_back: 'Zurück zur Bibliothek',
     PictureDetail_prevPhoto: 'Voriges Foto',
     PictureDetail_nextPhoto: 'Nächstes Foto',
+
+    Settings_title: 'Einstellungen',
+    Settings_selectPhotoDirs: 'Bitte wähle die Ordner, die nach Bildern durchsucht werden sollen.',
+    Settings_photoDirs: 'Ordner, die nach Bildern durchsucht werden sollen:',
+    Settings_addPhotoDir: 'Foto-Ordner hinzufügen',
+    Settings_closeAndImport: 'Schließen und nach Bildern suchen',
 
     TagEditor_addTag: 'Schlagwort hinzufügen...',
     TagEditor_error_tagExists: 'Bitte neues Schlagwort eingeben',

@@ -6,7 +6,8 @@ import { setLocale } from 'common/i18n/i18n'
 import BackgroundClient from 'ui/BackgroundClient'
 import { init as initForegroundService } from 'ui/ForegroundService'
 import App from 'ui/components/App'
-import { checkSettingsExist } from 'ui/controller/SettingsController'
+import { initAction } from 'ui/state/actions'
+import store from 'ui/state/store'
 
 import './entry.less'
 
@@ -25,13 +26,16 @@ if (process.env.ANSEL_TEST_MODE) {
 
 BackgroundClient.init()
 
-BackgroundClient.fetchUiConfig()
-    .then(uiConfig => {
+Promise
+    .all([
+        BackgroundClient.fetchUiConfig(),
+        BackgroundClient.fetchSettings(),
+    ])
+    .then(([ uiConfig, settings ]) => {
         setLocale(uiConfig.locale)
-
         initForegroundService()
-        checkSettingsExist()
-        
+        store.dispatch(initAction(settings))
+
         render(React.createElement(App), document.getElementById('app'))
     })
     .catch(error => {

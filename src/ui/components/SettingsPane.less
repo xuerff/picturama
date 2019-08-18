@@ -1,0 +1,41 @@
+@import "../style/variables.less";
+
+@buttonBarHeight: 80px;
+
+.SettingsPane {
+    position: relative;
+}
+.SettingsPane-topBar,
+.SettingsPane-body,
+.SettingsPane-buttonBar {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+.PictureDetail-topBar {
+    top: 0;
+}
+.SettingsPane-body {
+    top: @toolbarHeight;
+    bottom: @buttonBarHeight;
+    background-color: @blue-grey-100;
+}
+.SettingsPane-buttonBar {
+    bottom: 0;
+    height: @buttonBarHeight;
+    line-height: @buttonBarHeight;
+    background-color: @blue-grey-100;
+    text-align: center;
+}
+
+.SettingsPane-content {
+    margin: 0 auto;
+    max-width: 800px;
+    height: 100%;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.SettingsPane-addPhotoDir {
+    margin: 10px 0;
+}

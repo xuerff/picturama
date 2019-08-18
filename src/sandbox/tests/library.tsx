@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from '@blueprintjs/core'
 
 import { Photo, PhotoSectionById, PhotoSectionId, PhotoFilter } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
@@ -26,7 +27,7 @@ let sharedGridRowHeight = defaultGridRowHeight
 function createDefaultProps(context: TestContext): Props {
     return {
         style: { width: '100%', height: '100%', overflow: 'hidden' },
-        topBarLeftItem: renderLibraryFilterButton({ type: 'all' }),
+        topBarLeftItem: renderTopBarLeftItem({ type: 'all' }),
         isActive: true,
 
         isFetching: false,
@@ -74,30 +75,37 @@ function createDefaultProps(context: TestContext): Props {
     }
 }
 
-function renderLibraryFilterButton(libraryFilter: PhotoFilter): JSX.Element {
+function renderTopBarLeftItem(libraryFilter: PhotoFilter): JSX.Element {
     return (
-        <LibraryFilterButton
-            libraryFilter={libraryFilter}
-            tagIds={[ 1, 2 ]}
-            tagById={{
-                1: {
-                    created_at: 1565357205167,
-                    id: 1,
-                    slug: 'flower',
-                    title: 'Flower',
-                    updated_at: null
-                },
-                2: {
-                    created_at: 1565357205167,
-                    id: 2,
-                    slug: 'panorama',
-                    title: 'Panorama',
-                    updated_at: null
-                }
-            }}
-            devices={[]}
-            setLibraryFilter={action('setLibraryFilter')}
-        />
+        <>
+            <LibraryFilterButton
+                libraryFilter={libraryFilter}
+                tagIds={[ 1, 2 ]}
+                tagById={{
+                    1: {
+                        created_at: 1565357205167,
+                        id: 1,
+                        slug: 'flower',
+                        title: 'Flower',
+                        updated_at: null
+                    },
+                    2: {
+                        created_at: 1565357205167,
+                        id: 2,
+                        slug: 'panorama',
+                        title: 'Panorama',
+                        updated_at: null
+                    }
+                }}
+                devices={[]}
+                setLibraryFilter={action('setLibraryFilter')}
+            />
+            <Button
+                minimal={true}
+                icon='cog'
+                onClick={action('openSettings')}
+            />
+        </>
     )
 }
 
@@ -257,7 +265,7 @@ addSection('Library')
     .add('Empty favorites', context => (
         <Library
             {...createDefaultProps(context)}
-            topBarLeftItem={renderLibraryFilterButton({ type: 'flagged' })}
+            topBarLeftItem={renderTopBarLeftItem({ type: 'flagged' })}
             libraryFilterType={'flagged'}
             photoCount={0}
             sectionIds={[]}
@@ -267,7 +275,7 @@ addSection('Library')
     .add('Empty trash', context => (
         <Library
             {...createDefaultProps(context)}
-            topBarLeftItem={renderLibraryFilterButton({ type: 'trash' })}
+            topBarLeftItem={renderTopBarLeftItem({ type: 'trash' })}
             libraryFilterType={'trash'}
             photoCount={0}
             sectionIds={[]}
@@ -277,7 +285,7 @@ addSection('Library')
     .add('Trash with selection', context => (
         <Library
             {...createDefaultProps(context)}
-            topBarLeftItem={renderLibraryFilterButton({ type: 'trash' })}
+            topBarLeftItem={renderTopBarLeftItem({ type: 'trash' })}
             libraryFilterType={'trash'}
             selectedSectionId={defaultSectionId}
             selectedPhotoIds={[ testLandscapePhoto.id ]}

@@ -4,6 +4,10 @@
       "label": "File",
       "submenu": [
         {
+          "label": "Settings",
+          "click": "showSettings"
+        },
+        {
           "id": "export",
           "label": "Export picture(s)",
           "accelerator": "Ctrl+Shift+E",

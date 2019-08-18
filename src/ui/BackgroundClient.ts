@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig } from 'common/CommonTypes'
+import { UiConfig, Settings } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
@@ -18,6 +18,7 @@ interface CallInfo {
 }
 
 
+let isInitialized = false
 let nextCallId = 1
 const pendingCalls: { [key:number]: CallInfo } = {}
 
@@ -25,6 +26,10 @@ const pendingCalls: { [key:number]: CallInfo } = {}
 export default {
 
     init() {
+        if (isInitialized) {
+            throw new Error('BackgroundClient is already initialized')
+        }
+        isInitialized = true
         ipcRenderer.on('onBackgroundActionDone', (event, callId, error, result) => {
             const callInfo = pendingCalls[callId]
             delete pendingCalls[callId]
@@ -42,8 +47,24 @@ export default {
         return callOnBackground('fetchUiConfig')
     },
 
+    fetchSettings(): Promise<Settings> {
+        return callOnBackground('fetchSettings')
+    },
+
+    storeSettings(settings: Settings) {
+        return callOnBackground('storeSettings', { settings })
+    },
+
     getFileSize(path: string): Promise<number> {
         return callOnBackground('getFileSize', { path })
+    },
+
+    selectDirectories(): Promise<string[] | undefined> {
+        return callOnBackground('selectDirectories')
+    },
+
+    startImport(): Promise<void> {
+        return callOnBackground('startImport')
     },
 
     fetchTotalPhotoCount(): Promise<number> {
@@ -89,6 +110,10 @@ export default {
 }
 
 async function callOnBackground(action: string, params: any = null): Promise<any> {
+    if (!isInitialized) {
+        throw new Error('BackgroundClient is not yet initialized')
+    }
+
     const callId = nextCallId++
 
     return new Promise<any>((resolve, reject) => {

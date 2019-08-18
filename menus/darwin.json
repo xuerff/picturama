@@ -8,6 +8,10 @@
           "enabled": false
         },
         {
+          "label": "Settings",
+          "click": "showSettings"
+        },
+        {
           "label": "Quit",
           "accelerator": "Cmd+Q",
           "click": "close"

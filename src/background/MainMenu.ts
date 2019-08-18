@@ -6,7 +6,8 @@ import npmPackage from '../../package.json'
 import config from 'common/config'
 import { bindMany } from 'common/util/LangUtil'
 
-import Library from './Library'
+import ForegroundClient from 'background/ForegroundClient'
+import { startImport } from 'background/ImportScanner'
 
 
 type MenuSpec = {
@@ -26,16 +27,14 @@ class MainMenu {
 
     private mainWindow: BrowserWindow
     private sandboxWindow: BrowserWindow | null = null
-    private library: Library
     private template: { label: string, submenu: MenuItemConstructorOptions[] }[]
     private menu: Menu
 
 
-    constructor(mainWindow: BrowserWindow, library: Library) {
+    constructor(mainWindow: BrowserWindow) {
         this.mainWindow = mainWindow
-        this.library = library
 
-        bindMany(this, 'render', 'scan', 'close', 'reload', 'fullscreen', 'toggleDevTools', 'toggleSandbox', 'export')
+        bindMany(this, 'render', 'showSettings', 'scan', 'close', 'reload', 'fullscreen', 'toggleDevTools', 'toggleSandbox', 'export')
 
         // TODO: Revive Legacy code of 'version' feature
         //this.fixMissingVersions = this.fixMissingVersions.bind(this)
@@ -62,8 +61,12 @@ class MainMenu {
         this.render()
     }
 
+    showSettings() {
+        ForegroundClient.showSettings()
+    }
+
     scan() {
-        this.library.scan()
+        startImport()
     }
 
     close() {

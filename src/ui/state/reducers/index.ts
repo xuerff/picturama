@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { Action } from 'ui/state/ActionType'
 
 import { NavigationState, navigation } from './navigation'
 import { DataState, data } from './data'
@@ -17,11 +17,14 @@ export type AppState = {
     readonly export: ExportState
 }
 
-export default combineReducers<AppState>({
-    navigation,
-    data,
-    library,
-    detail,
-    import: importReducer,
-    export: exportReducer
-})
+export default (state: AppState = {} as AppState, action: Action) => {
+    const detailState = detail(state.detail, action)
+    return {
+        navigation: navigation(state.navigation, detailState, action),
+        data: data(state.data, action),
+        library: library(state.library, action),
+        detail: detailState,
+        import: importReducer(state.import, action),
+        export: exportReducer(state.export, action),
+    }
+}

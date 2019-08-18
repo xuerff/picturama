@@ -1,10 +1,12 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, dialog } from 'electron'
 
 import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
+import { startImport } from 'background/ImportScanner'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
+import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
 import { fsStat } from 'background/util/FileUtil'
 
@@ -33,9 +35,19 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
     if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
+    } else if (action === 'fetchSettings') {
+        return fetchSettings()
+    } else if (action === 'storeSettings') {
+        await storeSettings(params.settings)
     } else if (action === 'getFileSize') {
         const stat = await fsStat(params.path)
         return stat.size
+    } else if (action === 'selectDirectories') {
+        return new Promise(resolve =>
+            dialog.showOpenDialog({ properties: [ 'openDirectory' ] }, resolve)
+        )
+    } else if (action === 'startImport') {
+        startImport()
     } else if (action === 'fetchTotalPhotoCount') {
         return fetchTotalPhotoCount()
     } else if (action === 'fetchSections') {

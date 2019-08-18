@@ -1,32 +1,45 @@
-import { Action } from '../ActionType'
-import { SETTINGS_EXISTS_SUCCESS, SETTINGS_EXISTS_FAILURE } from '../actionTypes'
+import { Action } from 'ui/state/ActionType'
+import { OPEN_SETTINGS, CLOSE_SETTINGS, OPEN_DIFF, CLOSE_DIFF } from 'ui/state/actionTypes'
+
+import { DetailState } from './detail'
 
 
-export type ModalState = 'splash' | 'settings' | null
+export type MainViewState = 'settings' | 'detail' | 'diff' | null
 
 export type NavigationState = {
-    settingsExist: boolean
-    modal: ModalState
+    mainView: MainViewState
 }
 
 const initialNavigationState: NavigationState = {
-    settingsExist: false,
-    modal: 'splash'
+    mainView: null
 }
 
-export const navigation = (state: NavigationState = initialNavigationState, action: Action): NavigationState => {
+export const navigation = (state: NavigationState = initialNavigationState, detailState: DetailState | null, action: Action): NavigationState => {
     switch (action.type) {
-        case SETTINGS_EXISTS_SUCCESS:
+        case OPEN_SETTINGS:
             return {
-                settingsExist: true,
-                modal: (state.modal == 'splash') ? null : state.modal
+                mainView: 'settings'
             }
-        case SETTINGS_EXISTS_FAILURE:
+        case OPEN_DIFF:
             return {
-                settingsExist: false,
-                modal: 'settings'
+                mainView: 'diff'
+            }
+        case CLOSE_SETTINGS:
+        case CLOSE_DIFF:
+            return {
+                mainView: null
             }
         default:
-            return state
+            if (state.mainView === null && detailState) {
+                return {
+                    mainView: 'detail'
+                }
+            } else if (state.mainView === 'detail' && !detailState) {
+                return {
+                    mainView: null
+                }
+            } else {
+                return state
+            }
     }
 }

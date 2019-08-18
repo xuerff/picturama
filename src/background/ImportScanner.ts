@@ -3,10 +3,12 @@ import libraw from 'libraw'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
+import notifier from 'node-notifier'
 
 import { Photo, Tag, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
-import config from 'common/config'
 import { profileScanner } from 'common/LogConstants'
+import config from 'common/config'
+import { msg } from 'common/i18n/i18n'
 import { getNonRawPath, getThumbnailPath, getRenderedRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
@@ -14,6 +16,7 @@ import Profiler from 'common/util/Profiler'
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
+import { fetchSettings } from 'background/store/SettingsStore'
 import { storePhotoTags, fetchTags, deleteTagsOfPhotos } from 'background/store/TagStore'
 import { toSqlStringCsv } from 'background/util/DbUtil'
 import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExists, fsUnlinkIfExists } from 'background/util/FileUtil'
@@ -31,10 +34,24 @@ interface DirectoryInfo {
     photoFilenames: string[]
 }
 
-export default class ImportScanner {
+let importScanner: ImportScanner | null = null
+
+
+export function startImport(): void {
+    if (!importScanner) {
+        importScanner = new ImportScanner()
+    }
+    importScanner.scanPhotos()
+        .catch(error => {
+            // TODO: Show error in UI
+            console.error('Scanning photos failed', error)
+        })
+}
+
+
+class ImportScanner {
 
     private state: 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos' = 'idle'
-    private paths: string[]
 
     private importStartTime = 0
     private progress: ImportProgress
@@ -42,9 +59,8 @@ export default class ImportScanner {
     private shouldFetchTags = false
 
 
-    constructor(paths: string[]) {
+    constructor() {
         bindMany(this, 'processDirectory')
-        this.paths = removeSubdirectories(paths)
         this.reset()
     }
 
@@ -60,11 +76,14 @@ export default class ImportScanner {
         }
     }
 
-    scanPictures(): BluebirdPromise<number | null> {
+    scanPhotos(): BluebirdPromise<void> {
         if (this.state != 'idle') {
             // Already scanning
-            return BluebirdPromise.resolve(null)
+            return BluebirdPromise.resolve()
         }
+
+        const startTime = Date.now()
+        const profiler = profileScanner ? new Profiler('Import scanning') : null
 
         this.reset()
         this.state = 'scan-dirs'
@@ -72,9 +91,9 @@ export default class ImportScanner {
         this.progress.phase = 'scan-dirs'
         this.onProgressChange(true)
 
-        const profiler = profileScanner ? new Profiler('Import scanning') : null
         const dirs: DirectoryInfo[] = []
-        return BluebirdPromise.resolve(this.paths)
+        return BluebirdPromise.cast(fetchSettings())
+            .then(settings => removeSubdirectories(settings.photoDirs))
             .reduce(async (result: DirectoryInfo[], path) => {
                 const pathExists = await fsExists(path)
                 if (!pathExists) {
@@ -117,7 +136,13 @@ export default class ImportScanner {
                 const photoCount = this.progress.total
                 if (profiler) profiler.addPoint(`Scanned ${photoCount} images`)
                 this.reset()
-                return photoCount
+
+                const duration = Date.now() - startTime
+                console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
+                notifier.notify({
+                    title: 'Ansel',
+                    message: msg('ImportScanner_importFinished', photoCount, moment.duration(duration).humanize())
+                })
             })
             .catch(error => {
                 if (profiler) profiler.addPoint('Scanning failed')

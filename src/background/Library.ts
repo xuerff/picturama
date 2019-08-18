@@ -1,44 +1,21 @@
 import fs from 'fs'
 import { ipcMain, shell, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
-import moment from 'moment'
-import notifier from 'node-notifier'
 
 import config from 'common/config'
 import { PhotoId } from 'common/CommonTypes'
-import { msg } from 'common/i18n/i18n'
 import { getThumbnailPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import { removePhotoWork } from 'background/store/PhotoWorkStore'
-import ImportScanner from 'background/ImportScanner'
+import { startImport } from 'background/ImportScanner'
 import { fsUnlinkIfExists } from 'background/util/FileUtil'
 
 
 class Library {
 
-    private isScanning = false
-    private path: string | null = null
-    private versionsPath: string | null = null
-
-
     constructor(private mainWindow: BrowserWindow) {
         bindMany(this, 'emptyTrash', 'scan')
-
-        if (fs.existsSync(config.settings)) {
-            let settings = JSON.parse(fs.readFileSync(config.settings)) as any
-
-            this.path = settings.directories.photos
-            this.versionsPath = settings.directories.versions
-
-            if (!fs.existsSync(config.nonRawPath)) {
-                fs.mkdirSync(config.nonRawPath)
-            }
-
-            if (!fs.existsSync(config.thumbnailPath)) {
-                fs.mkdirSync(config.thumbnailPath)
-            }
-        }
 
         if (!fs.existsSync(config.tmp)) {
             fs.mkdirSync(config.tmp)
@@ -108,31 +85,8 @@ class Library {
         })
     }
 
-    scan() {
-        if (this.isScanning || !this.path) {
-            return false
-        }
-
-        const start = Date.now()
-        this.isScanning = true
-        new ImportScanner([ this.path ])
-            .scanPictures()
-            .then(photoCount => {
-                this.isScanning = false
-                if (photoCount !== null) {
-                    const duration = Date.now() - start
-                    console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
-                    notifier.notify({
-                        title: 'Ansel',
-                        message: msg('background_Library_importFinished', photoCount, moment.duration(duration).humanize())
-                    })
-                }
-            })
-            .catch(error => {
-                this.isScanning = false
-                // TODO: Show error in UI
-                console.error('Scanning photos failed', error)
-            })
+    private scan() {
+        startImport()
     }
 
 }

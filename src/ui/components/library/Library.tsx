@@ -20,7 +20,6 @@ import { AppState } from 'ui/state/reducers'
 import { getTagTitles } from 'ui/state/selectors'
 import { keySymbols } from 'ui/UiConstants'
 import { FetchState } from 'ui/UITypes'
-import store from 'ui/state/store'
 import PhotoInfo from 'ui/components/info/PhotoInfo'
 
 import LibraryTopBar from './LibraryTopBar'

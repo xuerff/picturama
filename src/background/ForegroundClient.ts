@@ -15,6 +15,7 @@ interface CallInfo {
 
 let mainWindow: BrowserWindow | null = null
 
+let isInitialized = false
 let nextCallId = 1
 const pendingCalls: { [key:number]: CallInfo } = {}
 
@@ -22,8 +23,13 @@ const pendingCalls: { [key:number]: CallInfo } = {}
 export default {
 
     init(mainWin: BrowserWindow) {
+        if (isInitialized) {
+            throw new Error('ForegroundClient is already initialized')
+        }
+        isInitialized = true
+
         mainWindow = mainWin
-    
+
         ipcMain.on('onForegroundActionDone', (event, callId, error, result) => {
             const callInfo = pendingCalls[callId]
             delete pendingCalls[callId]
@@ -37,6 +43,10 @@ export default {
         })
     },
 
+    async showSettings(): Promise<void> {
+        return callOnForeground('showSettings')
+    },
+
     async setImportProgress(progress: ImportProgress | null, updatedTags: Tag[] | null): Promise<void> {
         return callOnForeground('setImportProgress', { progress, updatedTags })
     },
@@ -44,7 +54,11 @@ export default {
 }
 
 
-async function callOnForeground(action: string, params: any): Promise<any> {
+async function callOnForeground(action: string, params: any = null): Promise<any> {
+    if (!isInitialized) {
+        throw new Error('ForegroundClient is not yet initialized')
+    }
+
     const callId = nextCallId++
 
     return new Promise<any>((resolve, reject) => {

@@ -62,6 +62,11 @@ export function isShallowEqual(obj1: any, obj2: any): boolean {
 }
 
 
+export function isArray(value: any): value is any[] {
+    return Array.isArray(value)
+}
+
+
 /**
  * Returns whether a value is a plain JavaScript object.
  *

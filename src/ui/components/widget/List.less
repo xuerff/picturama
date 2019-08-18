@@ -1,0 +1,33 @@
+@import "../../style/variables.less";
+
+
+.List {
+    background-color: white;
+    overflow-y: auto;
+    max-height: 120px;
+}
+
+.List-row {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        background-color: @blue-grey-200;
+    }
+}
+
+.List-item {
+    flex: 1 1 100%;
+    padding: 2px 4px;
+}
+
+.List-removeItem {
+    flex: 0 0 auto;
+    height: 100%;
+
+    visibility: hidden;
+
+    .List-row:hover & {
+        visibility: visible;
+    }
+}

@@ -6,7 +6,7 @@ import { ImportProgress } from 'common/CommonTypes'
 
 import { fetchSections, fetchTotalPhotoCount } from 'ui/controller/PhotoController'
 import { setTags } from 'ui/controller/PhotoTagController'
-import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, setImportProgressAction } from 'ui/state/actions'
+import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, setImportProgressAction, openSettingsAction } from 'ui/state/actions'
 import store from 'ui/state/store'
 
 
@@ -41,7 +41,9 @@ export function init() {
 
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
-    if (action === 'setImportProgress') {
+    if (action === 'showSettings') {
+        store.dispatch(openSettingsAction())
+    } else if (action === 'setImportProgress') {
         const { progress, updatedTags } = params as { progress: ImportProgress | null, updatedTags: Tag[] | null }
 
         store.dispatch(setImportProgressAction(progress))
@@ -57,8 +59,6 @@ async function executeForegroundAction(action: string, params: any): Promise<any
         if (updatedTags) {
             setTags(updatedTags)
         }
-
-        return Promise.resolve()
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }
