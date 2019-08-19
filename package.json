@@ -2,30 +2,51 @@
   "name": "ansel",
   "productName": "Ansel",
   "version": "0.4.2",
-  "description": "",
+  "description": "Digital image organizer powered by the web",
+  "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
+  "license": "MIT",
   "main": "dist/background.js",
   "engineStrict": true,
   "engines": {
     "node": ">=12.0.0",
     "npm": ">=6.0.0"
   },
+  "build": {
+    "appId": "github.ansel_app",
+    "directories": {
+      "app": ".",
+      "output": "dist-package",
+      "buildResources": "src/package"
+    },
+    "files": [
+      "dist/**",
+      "package.json",
+      "!**/node_modules/sharp/docs",
+      "!**/node_modules/sharp/src",
+      "!**/node_modules/sqlite3/src"
+    ],
+    "extraResources": {
+      "to": "app",
+      "filter": [
+        "keymaps/**",
+        "menus/**",
+        "migrations/**"
+      ]
+    }
+  },
   "scripts": {
-    "postinstall": "./node_modules/.bin/electron-rebuild",
-    "todo-test": "./node_modules/.bin/gulp tests",
-    "todo-watch": "./node_modules/.bin/gulp watch",
-    "todo-prebuild": "gulp increment-buildnum",
-    "todo-build": "./scripts/build.sh",
-    "todo-postbuild": "./scripts/build-deb.sh",
-    "todo-build-no-bump": "./scripts/build.sh",
+    "postinstall": "electron-builder install-app-deps",
+    "clean": "rm -rf dist dist-package",
+    "clean-package": "rm -rf dist-package",
     "start": "npm run build && npm run start-no-build",
-    "clean": "rm -rf dist",
     "watch": "NODE_ENV=development webpack -w",
     "build": "NODE_ENV=development webpack",
     "build-production": "NODE_ENV=production webpack",
-    "start-no-build": "ANSEL_DEV_MODE=true electron ."
+    "start-no-build": "ANSEL_DEV_MODE=true electron .",
+    "package-dir": "electron-builder --dir",
+    "package": "electron-builder",
+    "release": "npm run clean && npm run build-production && npm run package"
   },
-  "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
-  "license": "MIT",
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",
     "@blueprintjs/select": "^3.10.0",
@@ -73,9 +94,8 @@
     "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^3.1.0",
     "electron": "5.0.8",
+    "electron-builder": "^21.2.0",
     "electron-mocha": "^8.1.1",
-    "electron-packager": "14.0.4",
-    "electron-rebuild": "1.8.5",
     "enzyme": "3.10.0",
     "file-loader": "^4.1.0",
     "jsdom": "^15.1.1",

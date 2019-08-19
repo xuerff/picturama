@@ -90,6 +90,26 @@ So debugging is easy:
 
 
 
+Build distributable package
+---------------------------
+
+Build whole project from scratch:
+
+    npm run release
+
+Build distributable package only (use existing `dist` folder):
+
+    npm run package
+
+Only generate the package directory without really packaging it (This is useful for testing purposes):
+
+    npm run package-dir
+
+**Hint:** In order check what is packed, add a `"asar": false` to the `build`-Object of `package.json`, then run
+`npm run package-dir` and check the folder `dist-package/mac/Ansel.app/Contents/Resources/app`
+
+
+
 CSS naming conventions
 ----------------------
 

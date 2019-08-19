@@ -1,26 +1,10 @@
-/photos/
-thumbs/
-thumbs-250/
-versions/
-cross-compilation/
-node_modules/
-static/bundle.css
-dist/
-tests-dist/
-dot-ansel*/
-build/
-ansel.json
+/dist/
+/dist-package/
+/dot-ansel*/
+/node_modules/
+/tests-dist/
 /*.patch
+ansel.json
 
 npm-debug.log
 .DS_Store
-
-# VIM related files
-*.swo
-*.swp
-*.swn
-*.swm
-
-*.tar.gz
-*.old
-*~

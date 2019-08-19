@@ -1,0 +1,22 @@
+<script>
+const svgUrl = 'icon.svg'
+const svgWidth = 90
+const svgHeight = 103.9
+const pngSize = 1024
+
+const svgImage = new Image()
+svgImage.addEventListener('load', () => {
+    const canvas = document.createElement('canvas')
+    canvas.width  = pngSize
+    canvas.height = pngSize
+
+    const ctx = canvas.getContext('2d')
+    const scaledSvgWidth = Math.round(pngSize * svgWidth / svgHeight)
+    ctx.drawImage(svgImage, Math.round((pngSize - scaledSvgWidth) / 2), 0, scaledSvgWidth, pngSize)
+
+    const pngImage = document.createElement('img')
+    pngImage.src = canvas.toDataURL('image/png')
+    document.body.appendChild(pngImage)
+})
+svgImage.src = svgUrl
+</script>
