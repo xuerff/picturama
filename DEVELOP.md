@@ -17,19 +17,22 @@ Build from sources
 
 Prerequirements:
 
+  - Install yarn (Mac OS: `brew install yarn`)
+    - **Note:** It's important to use yarn instead of npm for
+      [getting smaller distributable packages](https://github.com/electron-userland/electron-builder/issues/1147#issuecomment-276284477)
   - Mac OS: Install Xcode and start it once. You can close Xcode after the "required components" have been installed.
 
 
 ```bash
-npm i
-npm start
+yarn
+yarn start
 ```
 
 If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try again:
 
 ```bash
 rm -rf ~/.node-gyp
-npm i
+yarn
 ```
 
 
@@ -39,12 +42,12 @@ UI sandbox
 
 1. Run watch build:
     ```bash
-    npm run watch
+    yarn run watch
     ```
 
 2. Run Ansel (in extra console):
     ```bash
-    npm run start-no-build
+    yarn run start-no-build
     ```
 
 3. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)
@@ -65,14 +68,14 @@ Here's how you can use a watch build in order to reduce turnaround time:
 
 1. Run watch build (in extra console):
     ```bash
-    npm run watch
+    yarn run watch
     ```
 
 2. Change your code.
 
 3. Restart Ansel without building (since building is done by the watch):
     ```bash
-    npm run start-no-build
+    yarn run start-no-build
     ```
 
 
@@ -95,18 +98,18 @@ Build distributable package
 
 Build whole project from scratch:
 
-    npm run release
+    yarn run release
 
 Build distributable package only (use existing `dist` folder):
 
-    npm run package
+    yarn run package
 
 Only generate the package directory without really packaging it (This is useful for testing purposes):
 
-    npm run package-dir
+    yarn run package-dir
 
 **Hint:** In order check what is packed, add a `"asar": false` to the `build`-Object of `package.json`, then run
-`npm run package-dir` and check the folder `dist-package/mac/Ansel.app/Contents/Resources/app`
+`yarn run package-dir` and check the folder `dist-package/mac/Ansel.app/Contents/Resources/app`
 
 
 
