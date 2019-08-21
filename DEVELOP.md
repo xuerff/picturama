@@ -36,6 +36,35 @@ yarn
 ```
 
 
+Build distributable package
+---------------------------
+
+Build distributable package:
+
+    yarn package
+
+Cross-build linux package on Mac OS or Windows:
+
+  1.  Run docker container:
+
+          docker run --rm -ti \
+          --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|  CIRCLETRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|  TRAVIS_BRANCHTRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|  STRIP|BUILD_') \
+          --env ELECTRON_CACHE="/root/.cache/electron" \
+          --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+          -v ${PWD}:/project \
+          -v ${PWD##*/}-node-modules:/project/node_modules \
+          -v ~/.cache/electron:/root/.cache/electron \
+          -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+          electronuserland/builder
+
+  2.  Build `dist-package/Ansel-xyz.deb` for Linux (in docker container):
+
+          yarn && yarn package
+
+For more details see:
+
+  - https://www.electron.build/multi-platform-build
+
 
 UI sandbox
 ----------
