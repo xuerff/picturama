@@ -78,7 +78,7 @@
     "redux-thunk": "^2.3.0",
     "sharp": "0.23.0",
     "source-map-support": "^0.5.13",
-    "sqlite3": "4.0.9",
+    "sqlite3": "^4.0.9",
     "sqlite3-helper": "1.2.1",
     "typesafe-actions": "^4.4.2"
   },
