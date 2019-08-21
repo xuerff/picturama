@@ -71,9 +71,18 @@ Cross-build linux package on Mac OS or Windows:
 
           yarn && yarn package
 
+Cross-build windows package on Mac OS or Linux:
+
+  - Log in to [AppYeyor](https://www.appveyor.com/)
+  - Create a project for Ansel:
+    - Type: "Git"
+    - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/ansel-app/ansel/master/appveyor.yml`
+  - Click "New build" on the project details screen.
+
 For more details see:
 
   - https://www.electron.build/multi-platform-build
+  - https://github.com/appveyor/ci/issues/1089#issuecomment-264549196
 
 
 UI Tester
