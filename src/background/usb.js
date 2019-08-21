@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
 import udev from 'udev';
-import njds from 'nodejs-disks';
+import njds from 'nodejs-disks';  // "nodejs-disks": "git+https://github.com/shaun-h/nodejs-disks.git#master",
 
 const njdsDrives = Promise.promisify(njds.drives);
 const njdsDrivesDetail = Promise.promisify(njds.drivesDetail);

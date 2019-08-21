@@ -591,11 +591,6 @@ async@^1.5.2:
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
   integrity sha1-7GphrlZIDAw8skHJVhjiCJL5Zyo=
 
-async@~0.2.9:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
-  integrity sha1-trvgsGdLnXGXCMo43owjfLUmw9E=
-
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
@@ -4044,13 +4039,6 @@ node-pre-gyp@^0.13.0:
     semver "^5.3.0"
     tar "^4"
 
-"nodejs-disks@git+https://github.com/shaun-h/nodejs-disks.git#master":
-  version "0.2.2"
-  resolved "git+https://github.com/shaun-h/nodejs-disks.git#2e8edba599d5186d9fc2fd9bcdb7079f3f1607bb"
-  dependencies:
-    async "~0.2.9"
-    numeral "~1.4.8"
-
 noop-logger@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/noop-logger/-/noop-logger-0.1.1.tgz#94a2b1633c4f1317553007d8966fd0e841b6a4c2"
@@ -4167,11 +4155,6 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
   integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
-
-numeral@~1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/numeral/-/numeral-1.4.8.tgz#3355e175069f7b2721574126789916d02dbcd31d"
-  integrity sha1-M1XhdQafeychV0EmeJkW0C280x0=
 
 oauth-sign@~0.9.0:
   version "0.9.0"
