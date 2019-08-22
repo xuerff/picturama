@@ -9,7 +9,6 @@ import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 
-import BackgroundClient from 'app/BackgroundClient'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 
@@ -28,6 +27,7 @@ interface Props {
     photoDetail: PhotoDetail | null
     tags: string[]
     closeInfo: () => void
+    getFileSize(path: string): Promise<number>
     setPhotoTags: (photo: Photo, tags: string[]) => void
 }
 
@@ -37,6 +37,8 @@ interface State {
 
 export default class PhotoInfo extends React.Component<Props, State> {
 
+    private isFetchingMasterFileSize = false
+
     constructor(props: Props) {
         super(props)
         bindMany(this, 'showPhotoInFolder', 'copyPhotoPath')
@@ -44,21 +46,40 @@ export default class PhotoInfo extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.updateMasterFileSize(this.props)
+        this.updateMasterFileSize()
     }
 
-    componentWillReceiveProps(nextProps: Props) {
-        const props = this.props
-        if (nextProps.photo !== props.photo) {
-            this.updateMasterFileSize(nextProps)
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        const { props, state } = this
+        if (props.photo !== prevProps.photo) {
+            this.setState({ masterFileSize: null })
+            if (props.isActive) {
+                this.updateMasterFileSize()
+            }
+        } else if (props.photo && props.isActive && state.masterFileSize === null) {
+            this.updateMasterFileSize()
         }
     }
 
-    async updateMasterFileSize(props: Props) {
-        this.setState({ masterFileSize: null })
-        if (props.photo) {
-            const masterFileSize = await BackgroundClient.getFileSize(getMasterPath(props.photo))
-            this.setState({ masterFileSize })
+    updateMasterFileSize() {
+        const photo = this.props.photo
+        if (photo && !this.isFetchingMasterFileSize) {
+            this.isFetchingMasterFileSize = true
+            this.props.getFileSize(getMasterPath(photo))
+                .then(masterFileSize => {
+                    this.isFetchingMasterFileSize = false
+                    if (photo === this.props.photo) {
+                        this.setState({ masterFileSize })
+                    } else {
+                        // The photo has changed in the mean time -> Fetch again
+                        this.updateMasterFileSize()
+                    }
+                })
+                .catch(error => {
+                    this.isFetchingMasterFileSize = false
+                    // TODO: Show error in UI
+                    console.error('Fetching master file size failed', error)
+                })
         }
     }
 

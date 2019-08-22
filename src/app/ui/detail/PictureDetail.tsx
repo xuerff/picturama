@@ -20,6 +20,7 @@ import { setPhotoTags } from 'app/controller/PhotoTagController'
 import { openExportAction, openDiffAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
 import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from 'app/state/selectors'
+import BackgroundClient from 'app/BackgroundClient'
 
 import PhotoPane from './PhotoPane'
 
@@ -47,6 +48,7 @@ interface StateProps {
 interface DispatchProps {
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
+    getFileSize(path: string): Promise<number>
     updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
     setPhotoTags: (photo: Photo, tags: string[]) => void
@@ -236,6 +238,7 @@ export class PictureDetail extends React.Component<Props, State> {
                     photoDetail={state.isShowingInfo && props.photoDetail || null}
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
+                    getFileSize={props.getFileSize}
                     setPhotoTags={props.setPhotoTags}
                 />
             </div>
@@ -279,6 +282,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     dispatch => ({
         setPreviousDetailPhoto,
         setNextDetailPhoto,
+        getFileSize: BackgroundClient.getFileSize,
         updatePhotoWork,
         setPhotosFlagged,
         setPhotoTags,

@@ -18,9 +18,10 @@ import { fetchTags, setPhotoTags } from 'app/controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
 import { getTagTitles } from 'app/state/selectors'
+import PhotoInfo from 'app/ui/info/PhotoInfo'
+import BackgroundClient from 'app/BackgroundClient'
 import { keySymbols } from 'app/UiConstants'
 import { FetchState } from 'app/UITypes'
-import PhotoInfo from 'app/ui/info/PhotoInfo'
 
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
@@ -60,6 +61,7 @@ interface DispatchProps {
     fetchTags(): void
     getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: Photo) => string
+    getFileSize(path: string): Promise<number>
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     setGridRowHeight: (gridRowHeight: number) => void
     setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
@@ -261,6 +263,7 @@ export class Library extends React.Component<Props, State> {
                     photoDetail={props.infoPhotoDetail}
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
+                    getFileSize={props.getFileSize}
                     setPhotoTags={props.setPhotoTags}
                 />
             </div>
@@ -298,6 +301,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         fetchTags,
         getGridLayout,
         getThumbnailSrc,
+        getFileSize: BackgroundClient.getFileSize,
         createThumbnail,
         setDetailPhotoById,
         setInfoPhoto,

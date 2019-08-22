@@ -20,6 +20,7 @@ const defaultProps: Props = {
     isLast: false,
     setPreviousDetailPhoto: action('setPreviousDetailPhoto'),
     setNextDetailPhoto: action('setNextDetailPhoto'),
+    getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
     updatePhotoWork: action('updatePhotoWork'),
     setPhotosFlagged: action('setPhotosFlagged'),
     setPhotoTags: action('setPhotoTags'),

@@ -18,7 +18,8 @@ const defaultProps = {
     isActive: true,
     photo: { ...testBigPhoto, master: `${baseUrl}/${getMasterPath(testBigPhoto)}` },
     tags: defaultTags,
-    closeInfo: action('closeInfo')
+    closeInfo: action('closeInfo'),
+    getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
 }
 
 let sharedPhotoDetail: PhotoDetail = {

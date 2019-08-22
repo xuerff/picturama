@@ -52,6 +52,7 @@ function createDefaultProps(context: TestContext): Props {
         fetchTags: action('fetchTags'),
         getGridLayout,
         getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
+        getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             if (photo.master_filename === 'dummy') {
                 return new CancelablePromise<string>(() => {})
