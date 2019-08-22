@@ -62,7 +62,7 @@ app.on('ready', () => {
         mainWindow.maximize()
     }
 
-    mainWindow.loadURL('file://' + __dirname + '/ui.html')
+    mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Ansel')
     initBackgroundService(mainWindow, { locale })
     ForegroundClient.init(mainWindow)

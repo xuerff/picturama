@@ -2,8 +2,8 @@ import React from 'react'
 
 import {addSection} from 'sandbox/core/UiTester'
 
-import ImportProgressButton from 'ui/components/ImportProgressButton'
-import Toolbar from 'ui/components/widget/Toolbar';
+import ImportProgressButton from 'app/ui/ImportProgressButton'
+import Toolbar from 'app/ui/widget/Toolbar'
 
 
 addSection('ImportProgressButton')

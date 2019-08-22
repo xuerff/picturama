@@ -1,7 +1,7 @@
 import { Photo, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/CommonTypes'
 
-import { GridSectionLayout } from 'ui/UITypes'
-import { createLayoutForLoadedSection } from 'ui/controller/LibraryController'
+import { GridSectionLayout } from 'app/UITypes'
+import { createLayoutForLoadedSection } from 'app/controller/LibraryController'
 
 import { createTestPhotoId, testBigPhoto } from './MockData'
 

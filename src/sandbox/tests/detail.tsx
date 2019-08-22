@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PictureDetail, Props } from 'ui/components/detail/PictureDetail'
+import { PictureDetail, Props } from 'app/ui/detail/PictureDetail'
 
 import {addSection, action} from 'sandbox/core/UiTester'
 import { testBigPhoto } from 'sandbox/util/MockData'

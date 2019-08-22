@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ExifOrientation } from 'common/CommonTypes'
 
-import PhotoPane, { Props } from 'ui/components/detail/PhotoPane'
+import PhotoPane, { Props } from 'app/ui/detail/PhotoPane'
 
 import { addSection, action, TestContext } from 'sandbox/core/UiTester'
 

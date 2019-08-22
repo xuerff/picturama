@@ -13,7 +13,7 @@ import 'sandbox/tests/export'
 import 'sandbox/tests/GridSectionTest'
 import 'sandbox/tests/PhotoPaneTest'
 
-import 'ui/entry.less'
+import 'app/entry.less'
 import 'sandbox/entry.less'
 
 

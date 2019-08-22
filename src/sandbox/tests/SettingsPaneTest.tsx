@@ -2,7 +2,7 @@ import React from 'react'
 
 import {addSection, action} from 'sandbox/core/UiTester'
 
-import { SettingsPane, Props } from 'ui/components/SettingsPane'
+import { SettingsPane, Props } from 'app/ui/SettingsPane'
 
 
 const defaultProps: Props = {

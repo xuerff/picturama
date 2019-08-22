@@ -5,12 +5,12 @@ import { Photo, PhotoSectionById, PhotoSectionId, PhotoFilter } from 'common/Com
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
-import { defaultGridRowHeight } from 'ui/UiConstants'
-import { GridLayout } from 'ui/UITypes'
-import { sectionHeadHeight } from 'ui/components/library/GridSection'
-import { Library, Props } from 'ui/components/library/Library'
-import { LibraryFilterButton } from 'ui/components/library/LibraryFilterButton'
-import ImportProgressButton from 'ui/components/ImportProgressButton'
+import { defaultGridRowHeight } from 'app/UiConstants'
+import { GridLayout } from 'app/UITypes'
+import { sectionHeadHeight } from 'app/ui/library/GridSection'
+import { Library, Props } from 'app/ui/library/Library'
+import { LibraryFilterButton } from 'app/ui/library/LibraryFilterButton'
+import ImportProgressButton from 'app/ui/ImportProgressButton'
 
 import { addSection, action, TestContext } from 'sandbox/core/UiTester'
 import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'

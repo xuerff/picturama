@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Export, Props } from 'ui/components/Export'
+import { Export, Props } from 'app/ui/Export'
 
 import {addSection, action} from 'sandbox/core/UiTester'
 import { testBigPhoto } from 'sandbox/util/MockData'

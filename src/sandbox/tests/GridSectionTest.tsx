@@ -4,9 +4,9 @@ import CancelablePromise from 'common/util/CancelablePromise'
 import { Photo, PhotoSectionId } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
-import { defaultGridRowHeight } from 'ui/UiConstants'
-import GridSection from 'ui/components/library/GridSection'
-import { estimateContainerHeight, createDummyLayoutBoxes } from 'ui/controller/LibraryController'
+import { defaultGridRowHeight } from 'app/UiConstants'
+import GridSection from 'app/ui/library/GridSection'
+import { estimateContainerHeight, createDummyLayoutBoxes } from 'app/controller/LibraryController'
 
 import { addSection, action } from 'sandbox/core/UiTester'
 import { createTestPhotoId, testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
