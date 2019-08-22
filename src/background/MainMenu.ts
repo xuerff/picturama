@@ -26,7 +26,7 @@ const template = JSON.parse(fs.readFileSync(config.menuPath)) as { menu: MenuSpe
 class MainMenu {
 
     private mainWindow: BrowserWindow
-    private sandboxWindow: BrowserWindow | null = null
+    private uiTesterWindow: BrowserWindow | null = null
     private template: { label: string, submenu: MenuItemConstructorOptions[] }[]
     private menu: Menu
 
@@ -34,7 +34,7 @@ class MainMenu {
     constructor(mainWindow: BrowserWindow) {
         this.mainWindow = mainWindow
 
-        bindMany(this, 'render', 'showSettings', 'scan', 'close', 'reload', 'fullscreen', 'toggleDevTools', 'toggleSandbox', 'export')
+        bindMany(this, 'render', 'showSettings', 'scan', 'close', 'reload', 'fullscreen', 'toggleDevTools', 'toggleUiTester', 'export')
 
         // TODO: Revive Legacy code of 'version' feature
         //this.fixMissingVersions = this.fixMissingVersions.bind(this)
@@ -75,8 +75,8 @@ class MainMenu {
 
     reload() {
         this.mainWindow.reload()
-        if (this.sandboxWindow) {
-            this.sandboxWindow.reload()
+        if (this.uiTesterWindow) {
+            this.uiTesterWindow.reload()
         }
     }
 
@@ -88,20 +88,20 @@ class MainMenu {
         this.mainWindow.webContents.toggleDevTools()
     }
 
-    toggleSandbox() {
-        if (this.sandboxWindow) {
-            this.sandboxWindow.close()
-            this.sandboxWindow = null
+    toggleUiTester() {
+        if (this.uiTesterWindow) {
+            this.uiTesterWindow.close()
+            this.uiTesterWindow = null
         } else {
-            this.sandboxWindow = new BrowserWindow({
-                title: 'UI Sandbox',
+            this.uiTesterWindow = new BrowserWindow({
+                title: 'UI Tester',
                 webPreferences: {
                     nodeIntegration: true,
                 }
             })
-            this.sandboxWindow.maximize()
-            this.sandboxWindow.loadURL('file://' + __dirname + '/sandbox.html')
-            this.sandboxWindow.webContents.toggleDevTools()
+            this.uiTesterWindow.maximize()
+            this.uiTesterWindow.loadURL('file://' + __dirname + '/test-ui.html')
+            this.uiTesterWindow.webContents.toggleDevTools()
         }
     }
 

@@ -5,11 +5,16 @@ How to develop Ansel
 Directory structure
 -------------------
 
+    +-- dist/                 Build artifacts of the app (filled by `webpack`)
+    +-- dist-package/         Build artifacts when creating distributable packages (filled by `electron-builder`)
+    +-- migrations/           DB migration scripts
     +-- src/
-      +-- background/         Code running in main electron process
-      +-- common/             Shared code
-      +-- sandbox/            Code running in renderer electron process of sandbox UI
-      +-- ui/                 Code running in renderer electron process of main UI
+        +-- app/              Code running in renderer electron process of main UI
+        +-- background/       Code running in main electron process
+        +-- common/           Shared code
+        +-- package/          Resources needed for creating distributable packages (used by `electron-builder`)
+        +-- static/           Static files to be copied directly to `dist`
+        +-- test-ui/          Code running in renderer electron process of UI Tester
 
 
 Build from sources
@@ -66,8 +71,8 @@ For more details see:
   - https://www.electron.build/multi-platform-build
 
 
-UI sandbox
-----------
+UI Tester
+---------
 
 1. Run watch build:
     ```bash
@@ -79,13 +84,13 @@ UI sandbox
     yarn run start-no-build
     ```
 
-3. Open the UI sandbox: `Shift`+`Ctrl`+`S` (On Mac: `Alt`+`Cmd`+`S`)
+3. Open the UI Tester: `Shift`+`Ctrl`+`T` (On Mac: `Alt`+`Cmd`+`T`)
 
 4. Change some React code and save
 
 5. Wait for the watch build to build the changes
 
-6. Reload UI sandbox: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
+6. Reload UI Tester: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
 
 
 

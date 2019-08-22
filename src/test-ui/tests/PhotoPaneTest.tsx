@@ -4,7 +4,7 @@ import { ExifOrientation } from 'common/CommonTypes'
 
 import PhotoPane, { Props } from 'app/ui/detail/PhotoPane'
 
-import { addSection, action, TestContext } from 'sandbox/core/UiTester'
+import { addSection, action, TestContext } from 'test-ui/core/UiTester'
 
 
 function createDefaultProps(context: TestContext): Props {

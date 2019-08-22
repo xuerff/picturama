@@ -5,8 +5,8 @@ import { getMasterPath } from 'common/util/DataUtil'
 
 import PhotoInfo from 'app/ui/info/PhotoInfo'
 
-import { addSection, action, TestContext } from 'sandbox/core/UiTester'
-import { testBigPhoto } from 'sandbox/util/MockData'
+import { addSection, action, TestContext } from 'test-ui/core/UiTester'
+import { testBigPhoto } from 'test-ui/util/MockData'
 
 
 const baseUrl = 'dist'

@@ -8,9 +8,9 @@ import { defaultGridRowHeight } from 'app/UiConstants'
 import GridSection from 'app/ui/library/GridSection'
 import { estimateContainerHeight, createDummyLayoutBoxes } from 'app/controller/LibraryController'
 
-import { addSection, action } from 'sandbox/core/UiTester'
-import { createTestPhotoId, testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'sandbox/util/MockData'
-import { createSection, createRandomDummyPhoto, createLayoutForSection } from 'sandbox/util/TestUtil'
+import { addSection, action } from 'test-ui/core/UiTester'
+import { createTestPhotoId, testBigPhoto, testPanoramaPhoto, testPortraitPhoto } from 'test-ui/util/MockData'
+import { createSection, createRandomDummyPhoto, createLayoutForSection } from 'test-ui/util/TestUtil'
 
 
 const containerWidth = 800

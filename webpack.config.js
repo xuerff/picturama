@@ -82,11 +82,11 @@ module.exports = [
                 app: devServerEntry.concat([
                     './src/app/entry.tsx'
                 ]),
-                sandbox: './src/sandbox/entry.tsx'
+                'test-ui': './src/test-ui/entry.tsx'
             }
             if (!production) {
                 //entry['test-ui'] = devServerEntry.concat([
-                //    './src/test/entry.tsx'
+                //    './src/test-ui/entry.tsx'
                 //])
             }
             return entry

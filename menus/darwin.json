@@ -54,9 +54,9 @@
           "click": "toggleDevTools"
         },
         {
-          "label": "Toggle Sandbox",
-          "accelerator": "Cmd+Alt+S",
-          "click": "toggleSandbox"
+          "label": "Toggle UI Tester",
+          "accelerator": "Cmd+Alt+T",
+          "click": "toggleUiTester"
         },
         {
           "label": "Reload",

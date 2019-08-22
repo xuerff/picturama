@@ -12,9 +12,9 @@ import { Library, Props } from 'app/ui/library/Library'
 import { LibraryFilterButton } from 'app/ui/library/LibraryFilterButton'
 import ImportProgressButton from 'app/ui/ImportProgressButton'
 
-import { addSection, action, TestContext } from 'sandbox/core/UiTester'
-import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'sandbox/util/MockData'
-import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'sandbox/util/TestUtil'
+import { addSection, action, TestContext } from 'test-ui/core/UiTester'
+import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'test-ui/util/MockData'
+import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'test-ui/util/TestUtil'
 
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'

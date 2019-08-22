@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Export, Props } from 'app/ui/Export'
 
-import {addSection, action} from 'sandbox/core/UiTester'
-import { testBigPhoto } from 'sandbox/util/MockData'
+import {addSection, action} from 'test-ui/core/UiTester'
+import { testBigPhoto } from 'test-ui/util/MockData'
 
 
 const defaultProps: Props = {

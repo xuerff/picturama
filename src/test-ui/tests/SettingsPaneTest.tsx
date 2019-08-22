@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {addSection, action} from 'sandbox/core/UiTester'
+import {addSection, action} from 'test-ui/core/UiTester'
 
 import { SettingsPane, Props } from 'app/ui/SettingsPane'
 
