@@ -37,8 +37,9 @@ app.on('ready', () => {
 
     app.setName('Ansel')
 
+    const platform = os.platform()
     let icon: string | undefined = undefined
-    if (os.platform() === 'linux') {
+    if (platform === 'linux') {
         // Workaround for Linux: Setting the icon is buggy in electron-builder
         // See: https://github.com/electron-userland/electron-builder/issues/2577
         // Using the 1024x1024 icon makes the icon look bad (Ubuntu doesn't use anti-aliasing - at least for big icons)
@@ -64,7 +65,7 @@ app.on('ready', () => {
 
     mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Ansel')
-    initBackgroundService(mainWindow, { locale })
+    initBackgroundService(mainWindow, { platform, locale })
     ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()
@@ -80,9 +81,9 @@ app.on('ready', () => {
     //    mainWindow.webContents.send('remove-device', drive)
     //})
 
-    mainWindow.on('closed', () => {
-        mainWindow = null
-    })
+    mainWindow.on('enter-full-screen', () => ForegroundClient.onFullScreenChange(true))
+    mainWindow.on('leave-full-screen', () => ForegroundClient.onFullScreenChange(false))
+    mainWindow.on('closed', () => { mainWindow = null })
 
     initDb()
         .then(() => {

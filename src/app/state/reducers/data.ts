@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoById, TagId, TagById, Device, PhotoSection, PhotoSectionId, PhotoSectionById, Settings } from 'common/CommonTypes'
+import { PhotoId, PhotoById, TagId, TagById, Device, PhotoSection, PhotoSectionId, PhotoSectionById, Settings, UiConfig } from 'common/CommonTypes'
 import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { Action } from 'app/state/ActionType'
@@ -12,10 +12,22 @@ import {
 import { FetchState } from 'app/UITypes'
 
 
+const uiConfig = (state: UiConfig | undefined, action: Action): UiConfig => {
+    state = state || {} as UiConfig
+    switch (action.type) {
+        case INIT:
+            return action.payload.uiConfig
+        default:
+            return state
+    }
+}
+
+
 const settings = (state: Settings | undefined, action: Action): Settings => {
     state = state || {} as Settings
     switch (action.type) {
         case INIT:
+            return action.payload.settings
         case CLOSE_SETTINGS:
             return action.payload
         default:
@@ -238,6 +250,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
 
 
 export type DataState = {
+    readonly uiConfig: UiConfig
     readonly settings: Settings
     readonly tags: TagsState
     readonly devices: DevicesState
@@ -245,6 +258,7 @@ export type DataState = {
 }
 
 export const data = combineReducers<DataState>({
+    uiConfig,
     settings,
     tags,
     devices,

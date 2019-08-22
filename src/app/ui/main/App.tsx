@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Button } from '@blueprintjs/core'
+import classNames from 'classnames'
 
 import { ImportProgress } from 'common/CommonTypes'
 
@@ -25,6 +26,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+    hasNativeTrafficLightButtons: boolean
     mainView: MainViewState
     importProgress: ImportProgress | null
     showExport: boolean
@@ -62,7 +64,7 @@ class App extends React.Component<Props> {
         }
 
         return (
-            <div className='App'>
+            <div className={classNames('App', { hasNativeTrafficLightButtons: props.hasNativeTrafficLightButtons })}>
                 <Library
                     className='App-container'
                     topBarLeftItem={
@@ -92,6 +94,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
         return {
             ...props,
+            hasNativeTrafficLightButtons: state.data.uiConfig.platform === 'darwin' && !state.navigation.isFullScreen,
             mainView: state.navigation.mainView,
             importProgress: state.import && state.import.progress,
             showExport: !!state.export,

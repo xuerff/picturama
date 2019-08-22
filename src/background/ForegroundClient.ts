@@ -43,6 +43,10 @@ export default {
         })
     },
 
+    async onFullScreenChange(isFullScreen: boolean): Promise<void> {
+        return callOnForeground('onFullScreenChange', { isFullScreen })
+    },
+
     async showSettings(): Promise<void> {
         return callOnForeground('showSettings')
     },

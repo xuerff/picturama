@@ -6,7 +6,7 @@ import { ImportProgress } from 'common/CommonTypes'
 
 import { fetchSections, fetchTotalPhotoCount } from 'app/controller/PhotoController'
 import { setTags } from 'app/controller/PhotoTagController'
-import { initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, setImportProgressAction, openSettingsAction } from 'app/state/actions'
+import { setFullScreenAction, initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, setImportProgressAction, openSettingsAction } from 'app/state/actions'
 import store from 'app/state/store'
 
 
@@ -40,7 +40,9 @@ export function init() {
 
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
-    if (action === 'showSettings') {
+    if (action === 'onFullScreenChange') {
+        store.dispatch(setFullScreenAction(params.isFullScreen))
+    } else if (action === 'showSettings') {
         store.dispatch(openSettingsAction())
     } else if (action === 'setImportProgress') {
         const { progress, updatedTags } = params as { progress: ImportProgress | null, updatedTags: Tag[] | null }

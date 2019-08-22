@@ -2,7 +2,9 @@
 
 
 .LibraryTopBar {
-    padding-left: @nativeTitleBarControlsWidth;
+    .App.hasNativeTrafficLightButtons & {
+        padding-left: @nativeTrafficLightButtons;
+    }
 }
 
 .LibraryTopBar-toggleButton.isActive {

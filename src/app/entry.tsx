@@ -33,10 +33,10 @@ Promise
         BackgroundClient.fetchSettings(),
         BackgroundClient.waitForBackgroundReady(),
     ])
-    .then(([ uiConfig, settings ]) => {
+    .then(([ uiConfig, settings, backgroundReady ]) => {
         setLocale(uiConfig.locale)
         initForegroundService()
-        store.dispatch(initAction(settings))
+        store.dispatch(initAction(uiConfig, settings))
 
         render(
             <Provider store={store}>
