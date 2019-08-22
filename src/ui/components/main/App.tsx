@@ -16,7 +16,7 @@ import { openSettingsAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 import { MainViewState } from 'ui/state/reducers/navigation'
 
-import './Ansel.less'
+import './App.less'
 
 
 interface OwnProps {
@@ -37,7 +37,7 @@ interface DispatchProps {
 interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
-class Ansel extends React.Component<Props> {
+class App extends React.Component<Props> {
 
     componentDidMount() {
         const splashElem = document.getElementById('splash')
@@ -54,17 +54,17 @@ class Ansel extends React.Component<Props> {
 
         let mainView: ReactNode | null = null
         if (props.mainView === 'settings') {
-            mainView = <SettingsPane className='Ansel-mainView'/>
+            mainView = <SettingsPane className='App-mainView'/>
         } else if (props.mainView === 'detail') {
-            mainView = <PictureDetail className='Ansel-mainView' isActive={!modalView} />
+            mainView = <PictureDetail className='App-mainView' isActive={!modalView} />
         } else if (props.mainView === 'diff') {
-            mainView = <PictureDiff className='Ansel-mainView' />
+            mainView = <PictureDiff className='App-mainView' />
         }
 
         return (
-            <div id='ansel' className='Ansel'>
+            <div className='App'>
                 <Library
-                    className='Ansel-container'
+                    className='App-container'
                     topBarLeftItem={
                         <>
                             <LibraryFilterButton/>
@@ -102,6 +102,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             openSettings: openSettingsAction
         }, dispatch)
     })
-)(Ansel)
+)(App)
 
 export default Connected

@@ -6,7 +6,7 @@ import { setLocale } from 'common/i18n/i18n'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import { init as initForegroundService } from 'ui/ForegroundService'
-import Ansel from 'ui/components/main/Ansel'
+import App from 'ui/components/main/App'
 import { initAction } from 'ui/state/actions'
 import store from 'ui/state/store'
 
@@ -40,7 +40,7 @@ Promise
 
         render(
             <Provider store={store}>
-                <Ansel />
+                <App/>
             </Provider>,
             document.getElementById('app'))
     })
