@@ -9,12 +9,12 @@ import { msg } from 'common/i18n/i18n'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
-import keymapManager from 'ui/keymap-manager'
 import PhotoInfo from 'ui/components/info/PhotoInfo'
 import FaIcon from 'ui/components/widget/icon/FaIcon'
 import PhotoActionButtons from 'ui/components/widget/PhotoActionButtons'
 import Toolbar from 'ui/components/widget/Toolbar'
 import { setDetailPhotoByIndex, setPreviousDetailPhoto, setNextDetailPhoto } from 'ui/controller/DetailController'
+import { Command, getCommandButtonProps, CommandGroupId, addCommandGroup, setCommandGroupEnabled, removeCommandGroup } from 'ui/controller/HotkeyController'
 import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from 'ui/controller/PhotoController'
 import { setPhotoTags } from 'ui/controller/PhotoTagController'
 import { openExportAction, openDiffAction } from 'ui/state/actions'
@@ -71,82 +71,47 @@ interface State {
     isShowingInfo: boolean
 }
 
+type CommandKeys = 'close' | 'toggleDiff' | 'prevPhoto' | 'nextPhoto'
+
 export class PictureDetail extends React.Component<Props, State> {
+
+    private commands: { [K in CommandKeys]: Command }
+    private commandGroupId: CommandGroupId
 
     constructor(props: Props) {
         super(props);
 
         this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
 
-        bindMany(this, 'bindEventListeners', 'unbindEventListeners', 'setLoading', 'openExport', 'toggleDiff',
-            'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange', 'onBodyResize')
+        bindMany(this, 'setLoading', 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange',
+            'onZoomChange', 'onBodyResize')
+
+        this.commands = {
+            close: { combo: 'esc', label: msg('common_backToLibrary'), onAction: props.closeDetail },
+            toggleDiff: { combo: 'd', label: 'Toggle diff' /* TODO: I18N */, onAction: this.toggleDiff },
+            prevPhoto: { combo: 'left', enabled: () => !this.props.isFirst, label: msg('PictureDetail_prevPhoto'), onAction: props.setPreviousDetailPhoto },
+            nextPhoto: { combo: 'right', enabled: () => !this.props.isLast, label: msg('PictureDetail_nextPhoto'), onAction: props.setNextDetailPhoto },
+        }
     }
 
     componentDidMount() {
-        this.bindEventListeners()
+        this.commandGroupId = addCommandGroup(this.commands)
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.isActive !== prevProps.isActive) {
-            if (this.props.isActive) {
-                this.bindEventListeners()
-            } else {
-                this.unbindEventListeners()
-            }
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        const { props } = this
+        if (props.isActive !== prevProps.isActive) {
+            ipcRenderer.send('toggleExportMenu', props.isActive)
+            setCommandGroupEnabled(this.commandGroupId, props.isActive)
         }
     }
 
     componentWillUnmount() {
-        this.unbindEventListeners();
-    }
-
-    bindEventListeners() {
-        this.setState({ bound: true })
-
-        ipcRenderer.send('toggleExportMenu', true)
-
-        window.addEventListener('core:cancel', this.props.closeDetail)
-        window.addEventListener('detail:diff', this.toggleDiff);
-        window.addEventListener('detail:moveToTrash', this.moveToTrash);
-
-        window.addEventListener(
-            'detail:moveLeft',
-            this.props.setPreviousDetailPhoto
-        );
-
-        window.addEventListener(
-            'detail:moveRight',
-            this.props.setNextDetailPhoto
-        );
-
-        keymapManager.bind(this.refs.detail);
-    }
-
-    unbindEventListeners() {
-        this.setState({ bound: false })
-
-        ipcRenderer.send('toggleExportMenu', false)
-
-        window.removeEventListener('core:cancel', this.props.closeDetail)
-        window.removeEventListener('detail:diff', this.toggleDiff);
-        window.removeEventListener('detail:moveToTrash', this.moveToTrash);
-
-        window.removeEventListener(
-            'detail:moveLeft',
-            this.props.setPreviousDetailPhoto
-        );
-
-        window.removeEventListener(
-            'detail:moveRight',
-            this.props.setNextDetailPhoto
-        );
-
-        keymapManager.unbind();
+        removeCommandGroup(this.commandGroupId)
     }
 
     openExport() {
         const props = this.props
-        this.unbindEventListeners();
         props.openExport(props.sectionId, [ props.photo.id ])
     }
 
@@ -195,24 +160,23 @@ export class PictureDetail extends React.Component<Props, State> {
     }
 
     render() {
-        const { props, state } = this
+        const { props, state, commands } = this
 
         return (
             <div
-                ref="detail"
                 className={classNames(props.className, 'PictureDetail', { hasRightSidebar: state.isShowingInfo })}
                 style={props.style}
             >
                 <Toolbar className="PictureDetail-topBar" isLeft={true}>
-                    <Button onClick={props.closeDetail}>
+                    <Button onClick={commands.close.onAction}>
                         <FaIcon name="chevron-left"/>
-                        <span>{msg('common_backToLibrary')}</span>
+                        <span>{commands.close.label}</span>
                     </Button>
                     <ButtonGroup>
-                        <Button minimal={true} disabled={props.isFirst} onClick={props.setPreviousDetailPhoto} title={msg('PictureDetail_prevPhoto')}>
+                        <Button minimal={true} {...getCommandButtonProps(commands.prevPhoto)}>
                             <FaIcon name="arrow-left"/>
                         </Button>
-                        <Button minimal={true} disabled={props.isLast} onClick={props.setNextDetailPhoto} title={msg('PictureDetail_nextPhoto')}>
+                        <Button minimal={true} {...getCommandButtonProps(commands.nextPhoto)}>
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
@@ -277,6 +241,7 @@ export class PictureDetail extends React.Component<Props, State> {
             </div>
         );
     }
+
 }
 
 

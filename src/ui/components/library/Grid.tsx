@@ -7,9 +7,9 @@ import { PhotoId, Photo, PhotoSectionId, PhotoSectionById } from 'common/CommonT
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
-import keymapManager from 'ui/keymap-manager'
 import { isMac } from 'ui/UiConstants'
 import { GridSectionLayout, GridLayout } from 'ui/UITypes'
+import { CommandGroupId, addCommandGroup, setCommandGroupEnabled, removeCommandGroup } from 'ui/controller/HotkeyController'
 import { gridScrollBarWidth } from 'ui/style/variables'
 import { getScrollbarSize } from 'ui/util/DomUtil'
 
@@ -47,10 +47,9 @@ interface State {
     viewportHeight: number
 }
 
-interface Snapshot {
-}
+export default class Grid extends React.Component<Props, State> {
 
-export default class Grid extends React.Component<Props, State, Snapshot> {
+    private commandGroupId: CommandGroupId
 
     private gridLayout: GridLayout | null = null
     private nailedSectionId: PhotoSectionId | null = null
@@ -62,19 +61,29 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
 
         this.state = { scrollTop: 0, viewportWidth: 0, viewportHeight: 0 }
 
-        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'pressedEnter', 'onResize', 'onScroll',
+        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'onEnter', 'onResize', 'onScroll',
             'scrollToNailedSection', 'setScrollTop',  'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp',
             'moveHighlightDown')
     }
 
     componentDidMount() {
-        this.addListeners()
+        this.commandGroupId = addCommandGroup([
+            { combo: 'left', onAction: this.moveHighlightLeft },
+            { combo: 'right', onAction: this.moveHighlightRight },
+            { combo: 'up', onAction: this.moveHighlightUp },
+            { combo: 'down', onAction: this.moveHighlightDown },
+            { combo: 'enter', onAction: this.onEnter },
+        ])
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State, nextContext: any): boolean {
         const prevProps = this.props
         const prevState = this.state
         const prevGridLayout = this.gridLayout
+
+        if (nextProps.isActive !== prevProps.isActive) {
+            setCommandGroupEnabled(this.commandGroupId, nextProps.isActive)
+        }
 
         if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth ||
             nextProps.sectionIds !== prevProps.sectionIds)
@@ -102,23 +111,14 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
             || nextState.scrollTop !== prevState.scrollTop
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State, snapshot: Snapshot) {
-        const props = this.props
-        if (props.isActive !== prevProps.isActive) {
-            if (props.isActive) {
-                this.addListeners()
-            } else {
-                this.removeListeners()
-            }
-        }
-
+    componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.nailedSectionId !== null) {
             this.scrollToNailedSection()
         }
     }
 
     componentWillUnmount() {
-        this.removeListeners()
+        removeCommandGroup(this.commandGroupId)
     }
 
     getGridLayout(props: Props, state: State): GridLayout {
@@ -151,7 +151,7 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
         this.props.setDetailPhotoById(sectionId, photoId)
     }
 
-    pressedEnter() {
+    onEnter() {
         const props = this.props
         if (props.selectedSectionId && props.selectedPhotoIds.length === 1) {
             props.setDetailPhotoById(props.selectedSectionId, props.selectedPhotoIds[0])
@@ -197,61 +197,75 @@ export default class Grid extends React.Component<Props, State, Snapshot> {
     }
 
     moveHighlightLeft() {
-        this.moveHighlight(-1, 0)
+        this.moveHighlight('left')
     }
 
     moveHighlightRight() {
-        this.moveHighlight(1, 0)
+        this.moveHighlight('right')
     }
 
     moveHighlightUp() {
-        this.moveHighlight(0, -1)
+        this.moveHighlight('up')
     }
 
     moveHighlightDown() {
-        this.moveHighlight(0, 1)
+        this.moveHighlight('down')
     }
 
-    moveHighlight(x: number, y: number) {
-        const props = this.props
-        const selectedSection = props.selectedSectionId && props.sectionById[props.selectedSectionId]
+    moveHighlight(move: 'left' | 'right' | 'up' | 'down') {
+        const { props } = this
+        const { selectedSectionId } = props
+
+        if (!selectedSectionId) {
+            return
+        }
+
+        const selectedSection = props.sectionById[selectedSectionId]
         if (!selectedSection || !selectedSection.photoIds) {
             return
         }
 
-        let currentIndex = selectedSection.photoIds.indexOf(props.selectedPhotoIds[0])
+        let currentPhotoIndex = selectedSection.photoIds.indexOf(props.selectedPhotoIds[0])
 
-        // TODO: This is complete non-sense since pictures are not in a fixed grid any more
-        const gridElem = findDOMNode(this.refs.grid) as HTMLElement
-        const gridWidth = gridElem.getBoundingClientRect().width
-        const pictureWidth = gridElem.children[0].getBoundingClientRect().width
-        const columnCount = Math.floor(gridWidth / pictureWidth)
+        let nextPhotoIndex = currentPhotoIndex
+        if (move === 'left' || move === 'right') {
+            nextPhotoIndex = currentPhotoIndex + (move === 'left' ? -1 : 1)
+        } else if (this.gridLayout) {
+            const selectedSectionIndex = props.sectionIds.indexOf(selectedSectionId)
+            const sectionLayout = this.gridLayout.sectionLayouts[selectedSectionIndex]
+            if (sectionLayout && sectionLayout.boxes) {
+                const currentPhotoBox = sectionLayout.boxes[currentPhotoIndex]
+                if (currentPhotoBox) {
+                    const currentPhotoCenterX = currentPhotoBox.left + currentPhotoBox.width / 2
+                    const moveUp = move === 'up'
+                    let prevRowTopY = -1
+                    let bestBoxCenterXDiff = Number.POSITIVE_INFINITY
+                    for (let boxIndex = currentPhotoIndex + (moveUp ? -1 : 1); moveUp ? boxIndex >= 0 : boxIndex < sectionLayout.boxes.length; moveUp ? boxIndex-- : boxIndex++) {
+                        const box = sectionLayout.boxes[boxIndex]
+                        if (box.top !== currentPhotoBox.top) {
+                            if (prevRowTopY === -1) {
+                                prevRowTopY = box.top
+                            } else if (box.top !== prevRowTopY) {
+                                // We are one row to far
+                                break
+                            }
 
-        const newHighlightedIndex = currentIndex + x + y * columnCount
-        const newHighlightedPhotoId = selectedSection.photoIds[newHighlightedIndex]
-        if (newHighlightedPhotoId) {
-            props.setSelectedPhotos(selectedSection.id, [ newHighlightedPhotoId ])
+                            const boxCenterX = box.left + box.width / 2
+                            const boxCenterXDiff = Math.abs(currentPhotoCenterX - boxCenterX)
+                            if (boxCenterXDiff < bestBoxCenterXDiff) {
+                                bestBoxCenterXDiff = boxCenterXDiff
+                                nextPhotoIndex = boxIndex
+                            }
+                        }
+                    }
+                }
+            }
         }
-    }
 
-    addListeners() {
-        window.addEventListener('grid:left', this.moveHighlightLeft)
-        window.addEventListener('grid:right', this.moveHighlightRight)
-        window.addEventListener('grid:up', this.moveHighlightUp)
-        window.addEventListener('grid:down', this.moveHighlightDown)
-        window.addEventListener('grid:enter', this.pressedEnter)
-
-        keymapManager.bind(this.refs.grid)
-    }
-
-    removeListeners() {
-        window.removeEventListener('grid:left', this.moveHighlightLeft)
-        window.removeEventListener('grid:right', this.moveHighlightRight)
-        window.removeEventListener('grid:up', this.moveHighlightUp)
-        window.removeEventListener('grid:down', this.moveHighlightDown)
-        window.removeEventListener('grid:enter', this.pressedEnter)
-
-        keymapManager.unbind()
+        const nextPhotoId = selectedSection.photoIds[nextPhotoIndex]
+        if (nextPhotoId) {
+            props.setSelectedPhotos(selectedSection.id, [ nextPhotoId ])
+        }
     }
 
     renderVisibleSections() {

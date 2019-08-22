@@ -6,7 +6,7 @@ import { Spinner } from '@blueprintjs/core'
 import { Photo, PhotoDetail, Version } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
-import keymapManager from 'ui/keymap-manager'
+import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'ui/controller/HotkeyController'
 import { closeDiffAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 import { getPhotoById } from 'ui/state/selectors'
@@ -41,6 +41,8 @@ interface State {
 
 export class PictureDiff extends React.Component<Props, State> {
 
+    private commandGroupId: CommandGroupId
+
     constructor(props: Props) {
         super(props)
 
@@ -53,10 +55,14 @@ export class PictureDiff extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        window.addEventListener('core:cancel', this.props.closeDiff)
-        window.addEventListener('diff:cancel', this.props.closeDiff)
+        this.commandGroupId = addCommandGroup([
+            { combo: 'esc', onAction: this.props.closeDiff },
+            { combo: 'd', onAction: this.props.closeDiff },
+        ])
+    }
 
-        keymapManager.bind(this.refs.diff)
+    componentWillUnmount() {
+        removeCommandGroup(this.commandGroupId)
     }
 
     onImgLoad() {
@@ -69,12 +75,6 @@ export class PictureDiff extends React.Component<Props, State> {
         }
 
         this.setState(nextState)
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('core:cancel', this.props.closeDiff)
-        window.removeEventListener('diff:cancel', this.props.closeDiff)
-        keymapManager.unbind()
     }
 
     render() {
@@ -92,7 +92,7 @@ export class PictureDiff extends React.Component<Props, State> {
         }
 
         return (
-            <div className={classNames(props.className, "picture-diff")} ref="diff">
+            <div className={classNames(props.className, "picture-diff")}>
                 <div className="before v-align">
                     <h3>Before</h3>
                     <img

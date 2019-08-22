@@ -31,7 +31,6 @@
     "extraResources": {
       "to": "app",
       "filter": [
-        "keymaps/**",
         "menus/**",
         "migrations/**"
       ]
@@ -53,7 +52,6 @@
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",
     "@blueprintjs/select": "^3.10.0",
-    "atom-keymap": "8.2.14",
     "bluebird": "^3.5.5",
     "chokidar": "3.0.2",
     "classnames": "^2.2.6",

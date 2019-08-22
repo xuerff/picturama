@@ -15,7 +15,7 @@ import { bindMany } from 'common/util/LangUtil'
 import { parsePath } from 'common/util/TextUtil'
 
 import BackgroundClient from 'ui/BackgroundClient'
-import keymapManager from 'ui/keymap-manager'
+import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'ui/controller/HotkeyController'
 import { closeExportAction } from 'ui/state/actions'
 import { AppState } from 'ui/state/reducers'
 
@@ -50,6 +50,8 @@ interface State {
 
 export class Export extends React.Component<Props, State> {
 
+    private commandGroupId: CommandGroupId
+
     constructor(props: Props) {
         super(props)
 
@@ -67,13 +69,13 @@ export class Export extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        keymapManager.bind(this.refs.main)
-        window.addEventListener('core:cancel', this.props.closeExport)
+        this.commandGroupId = addCommandGroup([
+            { combo: 'esc', onAction: this.props.closeExport }
+        ])
     }
 
     componentWillUnmount() {
-        keymapManager.unbind()
-        window.removeEventListener('core:cancel', this.props.closeExport)
+        removeCommandGroup(this.commandGroupId)
     }
 
     onFolderSelection(filenames: string[]) {
@@ -160,7 +162,7 @@ export class Export extends React.Component<Props, State> {
             .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>)
 
         return (
-            <div className="ansel-outer-modal" ref="main" style={this.props.style}>
+            <div className="ansel-outer-modal" style={this.props.style}>
                 <div className="ansel-modal shadow--2dp">
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <div>
