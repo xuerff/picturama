@@ -30,6 +30,7 @@ Promise
     .all([
         BackgroundClient.fetchUiConfig(),
         BackgroundClient.fetchSettings(),
+        BackgroundClient.waitForBackgroundReady(),
     ])
     .then(([ uiConfig, settings ]) => {
         setLocale(uiConfig.locale)

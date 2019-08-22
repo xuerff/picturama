@@ -1,11 +1,14 @@
+import { shell } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 
-import { PhotoId, Photo, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId, Version } from 'common/CommonTypes'
-import { getThumbnailPath, getRenderedRawPath } from 'common/util/DataUtil'
+import { PhotoId, Photo, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId, Version, Tag } from 'common/CommonTypes'
+import { getThumbnailPath, getRenderedRawPath, getMasterPath } from 'common/util/DataUtil'
 
+import ForegroundClient from 'background/ForegroundClient'
 import { fsUnlinkIfExists } from 'background/util/FileUtil'
 
-import { deleteTagsOfPhotos } from './TagStore'
+import { deleteTagsOfPhotos, fetchTags } from './TagStore'
+import { removePhotoWork } from './PhotoWorkStore'
 
 
 export async function fetchTotalPhotoCount(): Promise<number> {
@@ -65,6 +68,29 @@ export async function updatePhotos(photoIds: PhotoId[], update: Partial<Photo>):
     await Promise.all(photoIds.map(photoId =>
         DB().update<Photo>('photos', update, [ 'id = ?', photoId ])
     ))
+}
+
+
+export async function emptyTrash(): Promise<void> {
+    const photosToDelete = await DB().query<{ id: PhotoId, master_dir: string, master_filename: string }>(
+        'select id, master_dir, master_filename from photos where trashed = 1')
+
+    const photoIds = photosToDelete.map(photo => photo.id)
+
+    const shouldFetchTags = await deletePhotos(photoIds)
+
+    for (const photo of photosToDelete) {
+        shell.moveItemToTrash(getMasterPath(photo))
+    }
+
+    await Promise.all(photosToDelete.map(photo => removePhotoWork(photo.master_dir, photo.master_filename)))
+
+    let updatedTags: Tag[] | null = null
+    if (shouldFetchTags) {
+        updatedTags = await fetchTags()
+    }
+
+    await ForegroundClient.onPhotoTrashed(photoIds, updatedTags)
 }
 
 

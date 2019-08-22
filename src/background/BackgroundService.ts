@@ -5,7 +5,7 @@ import { assertMainProcess } from 'common/util/ElectronUtil'
 
 import { startImport } from 'background/ImportScanner'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
-import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos } from 'background/store/PhotoStore'
+import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
 import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
 import { fsStat } from 'background/util/FileUtil'
@@ -16,9 +16,21 @@ assertMainProcess()
 
 let uiConfig: UiConfig
 
+let resolveBackgroundReady: () => void
+const waitForBackgroundReadyPromise = new Promise(resolve => resolveBackgroundReady = resolve)
+
 
 export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
     uiConfig = newUiConfig
+
+    ipcMain.on('start-scanning', startImport)
+    ipcMain.on('empty-trash', () => {
+        emptyTrash()
+            .catch(error => {
+                // TODO: Show error in UI
+                console.error('Emptying trash failed', error)
+            })
+    })
 
     ipcMain.on('executeBackgroundAction', (event, callId, action, params) => {
         executeBackgroundAction(action, params)
@@ -32,8 +44,14 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
     })
 }
 
+export function onBackgroundReady() {
+    resolveBackgroundReady()
+}
+
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
-    if (action === 'fetchUiConfig') {
+    if (action === 'waitForBackgroundReady') {
+        return waitForBackgroundReadyPromise
+    } else if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
     } else if (action === 'fetchSettings') {
         return fetchSettings()

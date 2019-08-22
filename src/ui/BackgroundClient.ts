@@ -43,6 +43,10 @@ export default {
         })
     },
 
+    waitForBackgroundReady(): Promise<void> {
+        return callOnBackground('waitForBackgroundReady')
+    },
+
     fetchUiConfig(): Promise<UiConfig> {
         return callOnBackground('fetchUiConfig')
     },

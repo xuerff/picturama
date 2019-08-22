@@ -112,7 +112,33 @@ class MainMenu {
     // TODO: Revive Legacy code of 'version' feature
     /*
     fixMissingVersions() {
-        this.library.fixMissingVersions()
+        Version
+            .query(qb =>
+                qb
+                    .innerJoin('photos', 'versions.photo_id', 'photos.id')
+                    .where('output', null)
+                    .orWhere('thumbnail', null)
+            )
+            .fetchAll()
+            .then(versions => {
+                versions.toJSON().forEach(version => {
+                    let versionName = version.master!.match(/\w+-[\wéè]+-\d.\w{1,5}$/)![0]
+                    let outputPath = `${this.versionsPath}/${versionName}`
+
+                    if (fs.existsSync(outputPath)) {
+                        // TODO: regenerate thumbnail
+                        new Version({ id: version.id })
+                            .save('output', outputPath, { patch: true })
+                            .then(() => {
+                                (Version as any).updateImage(outputPath.match(config.watchedFormats))
+                            })
+                    } else {
+                        new Version({ id: version.id })
+                            .destroy()
+                            .catch(err => console.error('error while destroying', err))
+                    }
+                })
+            })
     }
     */
 

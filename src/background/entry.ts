@@ -11,7 +11,7 @@ import { setLocale } from 'common/i18n/i18n'
 import MainMenu from 'background/MainMenu'
 //import Usb from 'background/usb'
 //import Watch from 'background/watch'
-import { init as initBackgroundService } from 'background/BackgroundService'
+import { init as initBackgroundService, onBackgroundReady } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
 import { fsUnlink, fsUnlinkDeep, fsMkDirIfNotExists } from 'background/util/FileUtil'
 
@@ -84,7 +84,13 @@ app.on('ready', () => {
         mainWindow = null
     })
 
-    initLibrary(mainWindow)
+    initDb()
+        .then(() => {
+            if (mainWindow) {
+                new MainMenu(mainWindow)
+            }
+            onBackgroundReady()
+        })
         .catch(error => {
             // TODO: Show error in UI
             console.error('Initializing failed', error)
@@ -99,6 +105,7 @@ function initDb(): Promise<any> {
             (async() => {
                 await fsMkDirIfNotExists(config.dotAnsel)
                 await Promise.all([
+                    fsMkDirIfNotExists(config.tmp),
                     fsMkDirIfNotExists(config.nonRawPath),
                     fsMkDirIfNotExists(config.thumbnailPath),
                 ])
@@ -132,14 +139,4 @@ function initDb(): Promise<any> {
     }
 
     return initDbPromise
-}
-
-
-async function initLibrary(mainWindow: BrowserWindow) {
-    const Library = require('./Library').default
-
-    await initDb()
-
-    new Library()
-    new MainMenu(mainWindow)
 }
