@@ -3,6 +3,7 @@ import { BrowserWindow, ipcMain, dialog } from 'electron'
 import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
+import AppWindowController from 'background/AppWindowController'
 import { startImport } from 'background/ImportScanner'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
@@ -51,6 +52,8 @@ export function onBackgroundReady() {
 async function executeBackgroundAction(action: string, params: any): Promise<any> {
     if (action === 'waitForBackgroundReady') {
         return waitForBackgroundReadyPromise
+    } else if (action === 'toggleFullScreen') {
+        AppWindowController.toggleFullScreen()
     } else if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
     } else if (action === 'fetchSettings') {

@@ -8,6 +8,7 @@ import { bindMany } from 'common/util/LangUtil'
 
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport } from 'background/ImportScanner'
+import AppWindowController from 'background/AppWindowController'
 
 
 type MenuSpec = {
@@ -81,12 +82,7 @@ class MainMenu {
     }
 
     fullscreen() {
-        const isFullScreen = !this.mainWindow.isFullScreen()
-        ForegroundClient.onFullScreenChange(isFullScreen)
-            // There are also event handlers in `background/entry.ts` which will set this
-            // But we set it a little bit earlier, so the UI adjusts faster
-            // (We can't remove the event handlers in `background/entry.ts` because there are other ways to toggle full screen)
-        this.mainWindow.setFullScreen(isFullScreen)
+        AppWindowController.toggleFullScreen()
     }
 
     toggleDevTools() {

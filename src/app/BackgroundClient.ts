@@ -47,6 +47,10 @@ export default {
         return callOnBackground('waitForBackgroundReady')
     },
 
+    toggleFullScreen(): Promise<void> {
+        return callOnBackground('toggleFullScreen')
+    },
+
     fetchUiConfig(): Promise<UiConfig> {
         return callOnBackground('fetchUiConfig')
     },

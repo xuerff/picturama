@@ -8,6 +8,7 @@ import { start as initPrettyError } from 'pretty-error'
 import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
 
+import AppWindowController from 'background/AppWindowController'
 import MainMenu from 'background/MainMenu'
 //import Usb from 'background/usb'
 //import Watch from 'background/watch'
@@ -65,6 +66,7 @@ app.on('ready', () => {
 
     mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Ansel')
+    AppWindowController.init(mainWindow)
     initBackgroundService(mainWindow, { platform, locale })
     ForegroundClient.init(mainWindow)
 

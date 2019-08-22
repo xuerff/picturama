@@ -6,6 +6,7 @@ import classNames from 'classnames'
 
 import { ImportProgress } from 'common/CommonTypes'
 
+import BackgroundClient from 'app/BackgroundClient'
 import Export from 'app/ui/Export'
 import PictureDetail from 'app/ui//detail/PictureDetail'
 import PictureDiff from 'app/ui/PictureDiff'
@@ -26,6 +27,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+    isFullScreen: boolean
     hasNativeTrafficLightButtons: boolean
     mainView: MainViewState
     importProgress: ImportProgress | null
@@ -33,6 +35,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
+    toggleFullScreen(): void
     openSettings(): void
 }
 
@@ -69,6 +72,13 @@ class App extends React.Component<Props> {
                     className='App-container'
                     topBarLeftItem={
                         <>
+                            {props.isFullScreen &&
+                                <Button
+                                    minimal={true}
+                                    icon='minimize'
+                                    onClick={props.toggleFullScreen}
+                                />
+                            }
                             <LibraryFilterButton/>
                             <Button
                                 minimal={true}
@@ -94,6 +104,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
         return {
             ...props,
+            isFullScreen: state.navigation.isFullScreen,
             hasNativeTrafficLightButtons: state.data.uiConfig.platform === 'darwin' && !state.navigation.isFullScreen,
             mainView: state.navigation.mainView,
             importProgress: state.import && state.import.progress,
@@ -101,6 +112,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         }
     },
     dispatch => ({
+        toggleFullScreen() { BackgroundClient.toggleFullScreen() },
         ...bindActionCreators({
             openSettings: openSettingsAction
         }, dispatch)
