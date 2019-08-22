@@ -14,7 +14,8 @@
   "build": {
     "appId": "github.ansel_app",
     "linux": {
-      "target": "deb"
+      "category": "Graphics",
+      "asar": false
     },
     "directories": {
       "app": ".",

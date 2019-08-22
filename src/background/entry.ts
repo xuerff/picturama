@@ -1,3 +1,4 @@
+import os from 'os'
 import { app, screen, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 import { DBOptions } from 'sqlite3-helper'
@@ -8,8 +9,8 @@ import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
 
 import MainMenu from 'background/MainMenu'
-// import Usb from 'background/usb'
-import Watch from 'background/watch'
+//import Usb from 'background/usb'
+//import Watch from 'background/watch'
 import { init as initBackgroundService } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
 import { fsUnlink, fsUnlinkDeep, fsMkDirIfNotExists } from 'background/util/FileUtil'
@@ -36,9 +37,19 @@ app.on('ready', () => {
 
     app.setName('Ansel')
 
+    let icon: string | undefined = undefined
+    if (os.platform() === 'linux') {
+        // Workaround for Linux: Setting the icon is buggy in electron-builder
+        // See: https://github.com/electron-userland/electron-builder/issues/2577
+        // Using the 1024x1024 icon makes the icon look bad (Ubuntu doesn't use anti-aliasing - at least for big icons)
+        // -> We use a 128x128 px icon
+        icon = __dirname + '/icon_128.png'
+    }
+
     mainWindow = new BrowserWindow({
         width: 1356,
         height: 768,
+        icon,
         title: 'Ansel',
         titleBarStyle: 'hiddenInset',
         backgroundColor: '#37474f',  // @blue-grey-800
