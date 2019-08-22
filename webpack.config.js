@@ -80,7 +80,7 @@ module.exports = [
             const devServerEntry = useDevServer ? [ 'webpack/hot/only-dev-server' ] : []
             entry = {
                 ui: devServerEntry.concat([
-                    './src/ui/entry.ts'
+                    './src/ui/entry.tsx'
                 ]),
                 sandbox: './src/sandbox/entry.tsx'
             }

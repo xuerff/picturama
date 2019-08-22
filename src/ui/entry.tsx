@@ -1,11 +1,12 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { Provider } from 'react-redux'
 
 import { setLocale } from 'common/i18n/i18n'
 
 import BackgroundClient from 'ui/BackgroundClient'
 import { init as initForegroundService } from 'ui/ForegroundService'
-import App from 'ui/components/App'
+import Ansel from 'ui/components/main/Ansel'
 import { initAction } from 'ui/state/actions'
 import store from 'ui/state/store'
 
@@ -37,7 +38,11 @@ Promise
         initForegroundService()
         store.dispatch(initAction(settings))
 
-        render(React.createElement(App), document.getElementById('app'))
+        render(
+            <Provider store={store}>
+                <Ansel />
+            </Provider>,
+            document.getElementById('app'))
     })
     .catch(error => {
         // TODO: Show error in UI
