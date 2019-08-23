@@ -4,6 +4,9 @@ import Profiler from '../../common/util/Profiler'
 
 /**
  * A WebGL canvas. Has a more convenient API than using WebGL directly, but it lets you get down to WebGL if you need to.
+ *
+ * Links:
+ *   - WebGl-Spec: https://www.khronos.org/registry/webgl/specs/1.0/
  */
 export default class WebGLCanvas {
 
