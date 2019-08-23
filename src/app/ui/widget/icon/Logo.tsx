@@ -2,6 +2,9 @@ import React from 'react'
 import SvgIcon, { Props as SvgIconProps } from './SvgIcon'
 
 
+export const logoAspect = 90 / 103.9
+
+
 export default class Logo extends React.Component<SvgIconProps> {
     render() {
         return (

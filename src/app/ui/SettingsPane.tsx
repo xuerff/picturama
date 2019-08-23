@@ -11,6 +11,7 @@ import BackgroundClient from 'app/BackgroundClient'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 import List from 'app/ui/widget/List'
+import LogoDecoration from 'app/ui/widget/LogoDecoration'
 import { setSettingsAction, closeSettingsAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
 
@@ -38,7 +39,7 @@ export class SettingsPane extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onPhotoDirsChange', 'onAddPhotoDir', 'onClose', 'onCloseAndImport')
+        bindMany(this, 'onPhotoDirsChange', 'onAddPhotoDir', 'onClose', 'onCloseAndImport', 'getDecorationWidth')
     }
 
     private onPhotoDirsChange(photoDirs: string[]) {
@@ -68,11 +69,16 @@ export class SettingsPane extends React.Component<Props> {
         this.props.onClose(this.props.settings, true)
     }
 
+    private getDecorationWidth(containerWidth: number): number {
+        return containerWidth - 800
+    }
+
     render() {
         const { props } = this
         const { settings } = props
         return (
             <div className={classnames(props.className, 'SettingsPane')} style={props.style}>
+                <LogoDecoration getDecorationWidth={this.getDecorationWidth}/>
                 <Toolbar className="SettingsPane-topBar" isLeft={true}>
                     <Button onClick={this.onClose}>
                         <FaIcon name="chevron-left"/>

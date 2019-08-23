@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
-import { Button, NonIdealState, Spinner, MaybeElement, Icon } from '@blueprintjs/core'
+import { Button, NonIdealState, Spinner, MaybeElement, Icon, INonIdealStateProps } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilterType } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
@@ -13,12 +13,13 @@ import { bindMany } from 'common/util/LangUtil'
 import { setDetailPhotoById } from 'app/controller/DetailController'
 import { getThumbnailSrc } from 'app/controller/ImageProvider'
 import { getGridLayout, setInfoPhoto, createThumbnail } from 'app/controller/LibraryController'
-import { fetchTotalPhotoCount, fetchSections, setLibraryFilter, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'app/controller/PhotoController'
+import { fetchTotalPhotoCount, fetchSections, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'app/controller/PhotoController'
 import { fetchTags, setPhotoTags } from 'app/controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
 import { getTagTitles } from 'app/state/selectors'
 import PhotoInfo from 'app/ui/info/PhotoInfo'
+import LogoDecoration from 'app/ui/widget/LogoDecoration'
 import BackgroundClient from 'app/BackgroundClient'
 import { keySymbols } from 'app/UiConstants'
 import { FetchState } from 'app/UITypes'
@@ -28,6 +29,9 @@ import LibraryBottomBar from './LibraryBottomBar'
 import Grid, { GetGridLayoutFunction } from './Grid'
 
 import './Library.less'
+
+
+const nonIdealStateMaxWidth = 400
 
 
 interface OwnProps {
@@ -88,8 +92,7 @@ export class Library extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = { isShowingInfo: false }
-
-        bindMany(this, 'openExport', 'clearHighlight', 'toggleShowInfo')
+        bindMany(this, 'openExport', 'clearHighlight', 'toggleShowInfo', 'getNonIdealStateDecorationWidth')
     }
 
     componentDidUpdate(prevProps: Props, prevState) {
@@ -143,47 +146,49 @@ export class Library extends React.Component<Props, State> {
         }
     }
 
+    private getNonIdealStateDecorationWidth(containerWidth: number): number {
+        return (containerWidth - nonIdealStateMaxWidth) / 2 - 20
+    }
+
     render() {
         const { props, state } = this
         const { selectedSectionId } = props
 
         this.updateInfoPhoto()
 
-        let currentView
+        let nonIdealStateProps: INonIdealStateProps | null = null
         if (props.totalPhotoCount === 0 && !props.isFetching && !props.isImporting) {
             if (!props.hasPhotoDirs) {
                 const descriptionSplits = msg('Library_noSettings_message').split('{0}')
-                currentView =
-                    <NonIdealState
-                        icon='zoom-out'
-                        title={msg('Library_noPhotos_title')}
-                        description={
-                            <>
-                                {descriptionSplits[0]}
-                                <Icon icon='cog' style={{ verticalAlign: 'middle' }}/>
-                                {descriptionSplits[1]}
-                            </>
-                        }
-                    />
+                nonIdealStateProps = {
+                    icon: 'zoom-out',
+                    title: msg('Library_noPhotos_title'),
+                    description: (
+                        <>
+                            {descriptionSplits[0]}
+                            <Icon icon='cog' style={{ verticalAlign: 'middle' }}/>
+                            {descriptionSplits[1]}
+                        </>
+                    )
+                }
             } else {
                 const descriptionSplits = msg('Library_noPhotos_message').split('{0}')
-                currentView =
-                    <NonIdealState
-                        icon='zoom-out'
-                        title={msg('Library_noPhotos_title')}
-                        description={
-                            <>
-                                {descriptionSplits[0]}
-                                <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code>
-                                {descriptionSplits[1]}
-                            </>
-                        }
-                        action={
-                            <div className="bp3-dark">
-                                <Button onClick={props.startScanning}>{msg('Library_startScanning')}</Button>
-                            </div>
-                        }
-                    />
+                nonIdealStateProps = {
+                    icon: 'zoom-out',
+                    title: msg('Library_noPhotos_title'),
+                    description: (
+                        <>
+                            {descriptionSplits[0]}
+                            <code>{keySymbols.ctrlOrMacCommand}</code>+<code>R</code>
+                            {descriptionSplits[1]}
+                        </>
+                    ),
+                    action: (
+                        <div className="bp3-dark">
+                            <Button onClick={props.startScanning}>{msg('Library_startScanning')}</Button>
+                        </div>
+                    )
+                }
             }
         } else if (props.photoCount === 0 && !props.isFetching && !props.isImporting) {
             let title: string
@@ -193,28 +198,11 @@ export class Library extends React.Component<Props, State> {
                 default:        title = msg('Library_emptyView'); break
             }
 
-            currentView =
-                <NonIdealState
-                    icon={props.libraryFilterType === 'trash' ? 'tick' : 'zoom-out'}
-                    title={title}
-                    description={msg('Library_selectOtherView')}
-                />
-        } else {
-            currentView =
-                <Grid
-                    className="Library-grid"
-                    isActive={props.isActive}
-                    sectionIds={props.sectionIds}
-                    sectionById={props.sectionById}
-                    selectedSectionId={selectedSectionId}
-                    selectedPhotoIds={props.selectedPhotoIds}
-                    gridRowHeight={props.gridRowHeight}
-                    getGridLayout={props.getGridLayout}
-                    getThumbnailSrc={props.getThumbnailSrc}
-                    createThumbnail={props.createThumbnail}
-                    setSelectedPhotos={props.setSelectedPhotos}
-                    setDetailPhotoById={props.setDetailPhotoById}
-                />
+            nonIdealStateProps = {
+                icon: props.libraryFilterType === 'trash' ? 'tick' : 'zoom-out',
+                title,
+                description: msg('Library_selectOtherView')
+            }
         }
 
         const photoData = selectedSectionId && props.sectionById[selectedSectionId].photoData
@@ -242,7 +230,28 @@ export class Library extends React.Component<Props, State> {
                     toggleShowInfo={this.toggleShowInfo}
                 />
                 <div className="Library-body">
-                    {currentView}
+                    {nonIdealStateProps &&
+                        <>
+                            <LogoDecoration getDecorationWidth={this.getNonIdealStateDecorationWidth}/>
+                            <NonIdealState {...nonIdealStateProps}/>
+                        </>
+                    }
+                    {!nonIdealStateProps &&
+                        <Grid
+                            className="Library-grid"
+                            isActive={props.isActive}
+                            sectionIds={props.sectionIds}
+                            sectionById={props.sectionById}
+                            selectedSectionId={selectedSectionId}
+                            selectedPhotoIds={props.selectedPhotoIds}
+                            gridRowHeight={props.gridRowHeight}
+                            getGridLayout={props.getGridLayout}
+                            getThumbnailSrc={props.getThumbnailSrc}
+                            createThumbnail={props.createThumbnail}
+                            setSelectedPhotos={props.setSelectedPhotos}
+                            setDetailPhotoById={props.setDetailPhotoById}
+                        />
+                    }
                     {(props.isFetching || (props.isImporting && props.photoCount === 0)) &&
                         <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
                     }

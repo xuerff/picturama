@@ -1,9 +1,12 @@
 @import "../style/variables.less";
 
+@contentWidth: 800px;
 @buttonBarHeight: 80px;
 
 .SettingsPane {
     position: relative;
+    background-color: @blue-grey-100;
+    overflow: hidden;
 }
 .SettingsPane-topBar,
 .SettingsPane-body,
@@ -18,19 +21,17 @@
 .SettingsPane-body {
     top: @toolbarHeight;
     bottom: @buttonBarHeight;
-    background-color: @blue-grey-100;
 }
 .SettingsPane-buttonBar {
     bottom: 0;
+    max-width: @contentWidth;
     height: @buttonBarHeight;
     line-height: @buttonBarHeight;
-    background-color: @blue-grey-100;
     text-align: center;
 }
 
 .SettingsPane-content {
-    margin: 0 auto;
-    max-width: 800px;
+    max-width: @contentWidth;
     height: 100%;
     padding: 30px;
     overflow-y: auto;
