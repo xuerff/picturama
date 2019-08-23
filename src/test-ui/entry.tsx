@@ -12,6 +12,7 @@ import 'test-ui/tests/ImportProgressButtonTest'
 import 'test-ui/tests/export'
 import 'test-ui/tests/GridSectionTest'
 import 'test-ui/tests/PhotoPaneTest'
+import 'test-ui/tests/icon'
 
 import 'app/entry.less'
 import 'test-ui/entry.less'
