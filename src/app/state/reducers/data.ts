@@ -5,7 +5,7 @@ import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { Action } from 'app/state/ActionType'
 import {
-    INIT, CLOSE_SETTINGS, FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
+    INIT, SET_SETTINGS, FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     CHANGE_PHOTOS, EMPTY_TRASH,
     FETCH_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
 } from 'app/state/actionTypes'
@@ -28,7 +28,7 @@ const settings = (state: Settings | undefined, action: Action): Settings => {
     switch (action.type) {
         case INIT:
             return action.payload.settings
-        case CLOSE_SETTINGS:
+        case SET_SETTINGS:
             return action.payload
         default:
             return state

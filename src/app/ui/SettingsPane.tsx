@@ -5,13 +5,13 @@ import classnames from 'classnames'
 
 import { Settings } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
-import { bindMany, cloneDeep } from 'common/util/LangUtil'
+import { bindMany } from 'common/util/LangUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 import List from 'app/ui/widget/List'
-import { closeSettingsAction } from 'app/state/actions'
+import { setSettingsAction, closeSettingsAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
 
 import './SettingsPane.less'
@@ -23,40 +23,36 @@ export interface OwnProps {
 }
 
 interface StateProps {
-    initialSettings: Settings
+    settings: Settings
 }
 
 interface DispatchProps {
     selectDirectories(): Promise<string[] | undefined>
+    onSettingsChange(settings: Settings): void
     onClose(settings: Settings, startImport: boolean): void
 }
 
 export interface Props extends OwnProps, StateProps, DispatchProps {}
 
-interface State {
-    settings: Settings
-}
-
-export class SettingsPane extends React.Component<Props, State> {
+export class SettingsPane extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-        this.state = { settings: cloneDeep(props.initialSettings) }
         bindMany(this, 'onPhotoDirsChange', 'onAddPhotoDir', 'onClose', 'onCloseAndImport')
     }
 
     private onPhotoDirsChange(photoDirs: string[]) {
-        this.setState({ settings: { ...this.state.settings, photoDirs } })
+        this.props.onSettingsChange({ ...this.props.settings, photoDirs })
     }
 
     private onAddPhotoDir() {
-        const { props, state } = this
+        const { props } = this
         props.selectDirectories()
             .then(dirs => {
                 if (dirs) {
-                    const nextPhotoDirs = [ ...state.settings.photoDirs, ...dirs ]
+                    const nextPhotoDirs = [ ...props.settings.photoDirs, ...dirs ]
                     nextPhotoDirs.sort()
-                    this.setState({ settings: { ...state.settings, photoDirs: nextPhotoDirs } })
+                    props.onSettingsChange({ ...props.settings, photoDirs: nextPhotoDirs })
                 }
             })
             .catch(error => {
@@ -65,16 +61,16 @@ export class SettingsPane extends React.Component<Props, State> {
     }
 
     private onClose() {
-        this.props.onClose(this.state.settings, false)
+        this.props.onClose(this.props.settings, false)
     }
 
     private onCloseAndImport() {
-        this.props.onClose(this.state.settings, true)
+        this.props.onClose(this.props.settings, true)
     }
 
     render() {
-        const { props, state } = this
-        const { settings } = state
+        const { props } = this
+        const { settings } = props
         return (
             <div className={classnames(props.className, 'SettingsPane')} style={props.style}>
                 <Toolbar className="SettingsPane-topBar" isLeft={true}>
@@ -135,13 +131,16 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props: OwnProps) => {
         return {
             ...props,
-            initialSettings: state.data.settings
+            settings: state.data.settings
         }
     },
     dispatch => ({
         selectDirectories: BackgroundClient.selectDirectories,
+        onSettingsChange(settings: Settings) {
+            dispatch(setSettingsAction(settings))
+        },
         onClose(settings: Settings, startImport: boolean) {
-            dispatch(closeSettingsAction(settings))
+            dispatch(closeSettingsAction())
             BackgroundClient.storeSettings(settings)
                 .then(() => {
                     if (startImport) {

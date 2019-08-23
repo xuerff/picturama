@@ -3,6 +3,7 @@ export const INIT = 'INIT'
 export const SET_FULL_SCREEN = 'SET_FULL_SCREEN'
 
 export const OPEN_SETTINGS = 'OPEN_SETTINGS'
+export const SET_SETTINGS = 'SET_SETTINGS'
 export const CLOSE_SETTINGS = 'CLOSE_SETTINGS'
 
 export const SET_GRID_ROW_HEIGHT = 'SET_GRID_ROW_HEIGHT'
