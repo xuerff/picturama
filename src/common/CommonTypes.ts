@@ -4,7 +4,7 @@
 export type PhotoId = number
 export interface Photo {
     id: PhotoId,
-    /** The directory of the original image. Example: '/specs/photos' */
+    /** The directory of the original image. Example: '/src/test-photos' */
     master_dir: string,
     /** The filename (without directory) of the original image. Example: 'IMG_9700.JPG' */
     master_filename: string,

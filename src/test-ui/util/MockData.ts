@@ -9,7 +9,7 @@ export function createTestPhotoId(): PhotoId {
 
 export const testBigPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../specs/photos',
+    master_dir: '../src/test-photos',
     master_filename: 'IMG_9700.JPG',
     master_width: 5184,
     master_height: 3456,
@@ -30,7 +30,7 @@ export const testBigPhoto: Photo = {
 
 export const testLandscapePhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../specs/photos',
+    master_dir: '../src/test-photos',
     master_filename: 'landscape.jpg',
     master_width: 800,
     master_height: 530,
@@ -46,7 +46,7 @@ export const testLandscapePhoto: Photo = {
 
 export const testPortraitPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../specs/photos',
+    master_dir: '../src/test-photos',
     master_filename: 'portrait.jpg',
     master_width: 785,
     master_height: 1024,
@@ -62,7 +62,7 @@ export const testPortraitPhoto: Photo = {
 
 export const testPanoramaPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../specs/photos',
+    master_dir: '../src/test-photos',
     master_filename: 'panorama.jpg',
     master_width: 1024,
     master_height: 225,
@@ -91,7 +91,7 @@ export const testPhotos: Photo[] = [
 ].map(info => ({
     id: createTestPhotoId(),
     title: info.name,
-    master_dir: '../specs/photos/800',
+    master_dir: '../src/test-photos/800',
     master_filename: `${info.name}.jpg`,
     master_width: info.width,
     master_height: info.height,

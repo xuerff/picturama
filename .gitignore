@@ -2,7 +2,6 @@
 /dist-package/
 /dot-ansel*/
 /node_modules/
-/tests-dist/
 /*.patch
 ansel.json
 
