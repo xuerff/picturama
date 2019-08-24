@@ -1,7 +1,7 @@
 import createLayout from 'justified-layout'
 
 import { profileLibraryLayout, profileThumbnailRenderer } from 'common/LogConstants'
-import { PhotoSectionId, PhotoSectionById, PhotoSection, Photo, PhotoId } from 'common/CommonTypes'
+import { PhotoSectionId, PhotoSectionById, LoadedPhotoSection, isLoadedPhotoSection, Photo, PhotoId } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import { getMasterPath } from 'common/util/DataUtil'
 import Profiler from 'common/util/Profiler'
@@ -59,7 +59,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         const sectionId = sectionIds[sectionIndex]
         const section = sectionById[sectionId]
 
-        const usePlaceholder = !section.photoIds
+        const usePlaceholder = !isLoadedPhotoSection(section)
         const prevLayout = (
                 !prevLayoutIsDirty
                 && (usePlaceholder || section === prevSectionById[prevSectionIds[sectionIndex]])
@@ -92,7 +92,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
                 }
             } else {
                 // Calculate boxes
-                layout = createLayoutForLoadedSection(section, sectionTop, viewportWidth, gridRowHeight)
+                layout = createLayoutForLoadedSection(section as LoadedPhotoSection, sectionTop, viewportWidth, gridRowHeight)
             }
         }
 
@@ -202,11 +202,8 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
 }
 
 
-export function createLayoutForLoadedSection(section: PhotoSection, sectionTop: number, containerWidth: number, targetRowHeight: number): GridSectionLayout {
+export function createLayoutForLoadedSection(section: LoadedPhotoSection, sectionTop: number, containerWidth: number, targetRowHeight: number): GridSectionLayout {
     const { photoData } = section
-    if (!section.photoIds || !photoData) {
-        throw new Error('Section is not loaded')
-    }
 
     const aspects = section.photoIds.map(photoId => {
         const photo = photoData[photoId]
@@ -287,7 +284,7 @@ function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: Photo
 
         const sectionTop = layout.sectionTop
         const sectionBottom = sectionTop + sectionHeadHeight + layout.containerHeight
-        if (section.photoIds) {
+        if (isLoadedPhotoSection(section)) {
             const keepSection = sectionBottom > keepMinY && sectionTop < keepMaxY
             if (!keepSection) {
                 if (!sectionIdsToProtect) {
@@ -438,7 +435,7 @@ function getThumbnailPriority(job: CreateThumbnailJob): number {
     const sectionIndex = prevSectionIds.indexOf(sectionId)
     const section = prevSectionById[sectionId]
     const layout = prevGridLayout.sectionLayouts[sectionIndex]
-    if (!section || !section.photoIds || !layout || !layout.boxes) {
+    if (!isLoadedPhotoSection(section) || !layout || !layout.boxes) {
         return Number.MIN_VALUE
     }
 

@@ -3,7 +3,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
-import { PhotoId, Photo, PhotoSectionId, PhotoSectionById } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoSectionId, PhotoSectionById, isLoadedPhotoSection } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
@@ -221,7 +221,7 @@ export default class Grid extends React.Component<Props, State> {
         }
 
         const selectedSection = props.sectionById[selectedSectionId]
-        if (!selectedSection || !selectedSection.photoIds) {
+        if (!isLoadedPhotoSection(selectedSection)) {
             return
         }
 

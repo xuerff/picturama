@@ -1,4 +1,4 @@
-import { Photo, PhotoId, PhotoById, PhotoSectionId, PhotoSection } from 'common/CommonTypes'
+import { Photo, PhotoId, PhotoById, PhotoSectionId, LoadedPhotoSection } from 'common/CommonTypes'
 
 import { GridSectionLayout } from 'app/UITypes'
 import { createLayoutForLoadedSection } from 'app/controller/LibraryController'
@@ -25,7 +25,7 @@ export function createRandomDummyPhoto(): Photo {
 }
 
 
-export function createSection(sectionId: PhotoSectionId, photos: Photo[]): PhotoSection {
+export function createSection(sectionId: PhotoSectionId, photos: Photo[]): LoadedPhotoSection {
     let photoIds: PhotoId[] = []
     let photoData: PhotoById = {}
     for (const photo of photos) {
@@ -43,7 +43,7 @@ export function createSection(sectionId: PhotoSectionId, photos: Photo[]): Photo
 }
 
 
-export function createLayoutForSection(section: PhotoSection,
+export function createLayoutForSection(section: LoadedPhotoSection,
     sectionTop: number, viewportWidth: number, gridRowHeight: number):
     GridSectionLayout
 {

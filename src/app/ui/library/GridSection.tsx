@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { PhotoId, Photo, PhotoSectionId, PhotoSection } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoSectionId, PhotoSection, isLoadedPhotoSection } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 
 import { GridSectionLayout } from 'app/UITypes'
@@ -35,9 +35,9 @@ export default class GridSection extends React.Component<Props> {
         }
 
         const toBoxIndex = props.layout.toBoxIndex
-        const { photoIds, photoData } = props.section
         let elems: JSX.Element[] = []
-        if (photoIds && photoData) {
+        if (isLoadedPhotoSection(props.section)) {
+            const { photoIds, photoData } = props.section
             for (let photoIndex = props.layout.fromBoxIndex; photoIndex < toBoxIndex; photoIndex++) {
                 const photoId = photoIds[photoIndex]
                 elems.push(

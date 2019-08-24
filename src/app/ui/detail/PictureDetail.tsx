@@ -19,7 +19,7 @@ import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFrom
 import { setPhotoTags } from 'app/controller/PhotoTagController'
 import { openExportAction, openDiffAction } from 'app/state/actions'
 import { AppState } from 'app/state/reducers'
-import { getPhotoById, getPhotoByIndex, getSectionById, getTagTitles } from 'app/state/selectors'
+import { getPhotoById, getPhotoByIndex, getLoadedSectionById, getTagTitles } from 'app/state/selectors'
 import BackgroundClient from 'app/BackgroundClient'
 
 import PhotoPane from './PhotoPane'
@@ -265,7 +265,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         const currentPhoto = state.detail!.currentPhoto
         const sectionId = currentPhoto.sectionId
-        const section = getSectionById(sectionId)
+        const section = getLoadedSectionById(sectionId)
         return {
             ...props,
             sectionId: currentPhoto.sectionId,
@@ -276,7 +276,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             photoWork: currentPhoto.photoWork,
             tags: getTagTitles(),
             isFirst: currentPhoto.photoIndex === 0,
-            isLast: !section || !section.photoIds || currentPhoto.photoIndex === section.photoIds.length - 1
+            isLast: !section || currentPhoto.photoIndex === section.photoIds.length - 1
         }
     },
     dispatch => ({

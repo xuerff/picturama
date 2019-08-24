@@ -1,19 +1,19 @@
-import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
+import { PhotoId, PhotoSectionId, isLoadedPhotoSection } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
 import { setDetailPhotoAction, closeDetailAction } from 'app/state/actions'
-import { getPhotoByIndex, getSectionById } from 'app/state/selectors'
+import { getPhotoByIndex, getLoadedSectionById } from 'app/state/selectors'
 import store from 'app/state/store'
 
 
 assertRendererProcess()
 
 export function setDetailPhotoById(sectionId: PhotoSectionId, photoId: PhotoId | null) {
-    const section = getSectionById(sectionId)
-    const photoIndex = (section && section.photoIds && photoId != null) ? section.photoIds.indexOf(photoId) : -1
+    const section = getLoadedSectionById(sectionId)
+    const photoIndex = (section && photoId != null) ? section.photoIds.indexOf(photoId) : -1
     setDetailPhotoByIndex(sectionId, (photoIndex === -1) ? null : photoIndex)
 }
 
@@ -71,8 +71,8 @@ export function setNextDetailPhoto() {
     if (state.detail) {
         const currentPhoto = state.detail.currentPhoto
         const currentIndex = currentPhoto.photoIndex
-        const section = getSectionById(currentPhoto.sectionId)
-        if (section && section.photoIds && currentIndex < section.photoIds.length - 1) {
+        const section = getLoadedSectionById(currentPhoto.sectionId)
+        if (section && currentIndex < section.photoIds.length - 1) {
             setDetailPhotoByIndex(currentPhoto.sectionId, currentIndex + 1)
         }
     }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@blueprintjs/core'
 
-import { Photo, PhotoSectionById, PhotoSectionId, PhotoFilter } from 'common/CommonTypes'
+import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
@@ -112,14 +112,14 @@ function renderTopBarLeftItem(libraryFilter: PhotoFilter): JSX.Element {
 }
 
 
-export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
+function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
     scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number):
     GridLayout
 {
     let sectionTop = 0
     const sectionLayouts = sectionIds.map(sectionId => {
         const section = sectionById[sectionId]
-        const layout = createLayoutForSection(section, sectionTop, viewportWidth, gridRowHeight)
+        const layout = createLayoutForSection(section as LoadedPhotoSection, sectionTop, viewportWidth, gridRowHeight)
         sectionTop += sectionHeadHeight + layout.containerHeight
         return layout
     })

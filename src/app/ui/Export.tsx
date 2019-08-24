@@ -8,7 +8,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
-import { PhotoId, PhotoById } from 'common/CommonTypes'
+import { PhotoId, PhotoById, LoadedPhotoSection } from 'common/CommonTypes'
 import config from 'common/config'
 import { getNonRawPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
@@ -217,7 +217,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             photoIds: state.export!.photoIds,
-            photoData: state.data.sections.byId[state.export!.sectionId].photoData!
+            photoData: (state.data.sections.byId[state.export!.sectionId] as LoadedPhotoSection).photoData
         }
     },
     {

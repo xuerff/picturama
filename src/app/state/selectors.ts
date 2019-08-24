@@ -1,20 +1,21 @@
-import { PhotoId, Photo, PhotoSectionId, PhotoSection, TagId } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoSectionId, PhotoSection, TagId, isLoadedPhotoSection, LoadedPhotoSection } from 'common/CommonTypes'
 
 import store from './store'
 
 
 export function getPhotoByIndex(sectionId: PhotoSectionId, photoIndex: number): Photo | null {
-    const section = getSectionById(sectionId)
-    return (section && section.photoData && section.photoIds) ? section.photoData[section.photoIds[photoIndex]] : null
+    const section = getLoadedSectionById(sectionId)
+    return section ? section.photoData[section.photoIds[photoIndex]] : null
 }
 
 export function getPhotoById(sectionId: PhotoSectionId, photoId: PhotoId): Photo | null {
-    const section = getSectionById(sectionId)
-    return (section && section.photoData) ? section.photoData[photoId] : null
+    const section = getLoadedSectionById(sectionId)
+    return section ? section.photoData[photoId] : null
 }
 
-export function getSectionById(sectionId: PhotoSectionId): PhotoSection | null {
-    return store.getState().data.sections.byId[sectionId]
+export function getLoadedSectionById(sectionId: PhotoSectionId): LoadedPhotoSection | null {
+    const section = store.getState().data.sections.byId[sectionId]
+    return isLoadedPhotoSection(section) ? section : null
 }
 
 let prevTagIds: TagId[] = []

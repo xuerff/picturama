@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoById, TagId, TagById, Device, PhotoSection, PhotoSectionId, PhotoSectionById, Settings, UiConfig } from 'common/CommonTypes'
+import { PhotoId, PhotoById, TagId, TagById, Device, LoadedPhotoSection, isLoadedPhotoSection, PhotoSectionId, PhotoSectionById, Settings, UiConfig} from 'common/CommonTypes'
 import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { Action } from 'app/state/ActionType'
@@ -193,10 +193,10 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
             let newSectionById: PhotoSectionById = {}
             for (const sectionId of state.ids) {
                 const section = state.byId[sectionId]
-                let newSection: PhotoSection | null = null
+                let newSection: LoadedPhotoSection | null = null
 
-                const photoData = section.photoData
-                if (photoData && section.photoIds) {
+                if (isLoadedPhotoSection(section)) {
+                    const photoData = section.photoData
                     let newPhotoData: PhotoById | null = null
                     for (const updatedPhoto of updatedPhotos) {
                         const prevPhoto = photoData[updatedPhoto.id]
@@ -206,9 +206,9 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                                 newSection = { ...section, photoData: newPhotoData }
                             }
                             if (removeUpdatedPhotos) {
-                                const prevPhotoIndex = newSection.photoIds!.indexOf(prevPhoto.id)
+                                const prevPhotoIndex = newSection.photoIds.indexOf(prevPhoto.id)
                                 if (prevPhotoIndex !== -1) {
-                                    newSection.photoIds!.splice(prevPhotoIndex, 1)
+                                    newSection.photoIds.splice(prevPhotoIndex, 1)
                                 }
                                 if (totalPhotoCount != null && action.payload.update.trashed) {
                                     totalPhotoCount--
@@ -222,7 +222,7 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                     }
                 }
 
-                if (!newSection || newSection.photoIds!.length !== 0) {
+                if (!newSection || newSection.photoIds.length !== 0) {
                     newSectionIds.push(sectionId)
                     newSectionById[sectionId] = newSection || section
                 }

@@ -124,10 +124,15 @@ export interface PhotoSection {
     id: PhotoSectionId
     title: string
     count: number
-    photoIds?: PhotoId[]
-    photoData?: PhotoById
 }
-export type PhotoSectionById = { [K in PhotoSectionId]: PhotoSection }
+export interface LoadedPhotoSection extends PhotoSection {
+    photoIds: PhotoId[]
+    photoData: PhotoById
+}
+export function isLoadedPhotoSection(section: PhotoSection | null | undefined | false): section is LoadedPhotoSection {
+    return !!(section && (section as any).photoIds)
+}
+export type PhotoSectionById = { [K in PhotoSectionId]: PhotoSection | LoadedPhotoSection }
 
 
 export type PhotoFilterType = 'all' | 'flagged' | 'processed' | 'trash' | 'tag'

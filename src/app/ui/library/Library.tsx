@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner, MaybeElement, Icon, INonIdealStateProps } from '@blueprintjs/core'
 
-import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, PhotoDetail, PhotoFilterType } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, isLoadedPhotoSection, PhotoDetail, PhotoFilterType } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
@@ -205,7 +205,8 @@ export class Library extends React.Component<Props, State> {
             }
         }
 
-        const photoData = selectedSectionId && props.sectionById[selectedSectionId].photoData
+        const selectedSection = selectedSectionId != null && props.sectionById[selectedSectionId]
+        const photoData = isLoadedPhotoSection(selectedSection) && selectedSection.photoData
         const selectedPhotos = photoData ? props.selectedPhotoIds.map(photoId => photoData[photoId]) : []
 
         return (
@@ -284,8 +285,14 @@ export class Library extends React.Component<Props, State> {
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         const sections = state.data.sections
+
+        let infoPhoto: Photo | null = null
         const libraryInfo = state.library.info
-        const photoData = libraryInfo && sections.byId[libraryInfo.sectionId].photoData
+        if (libraryInfo) {
+            const libraryInfoSection = sections.byId[libraryInfo.sectionId]
+            infoPhoto = isLoadedPhotoSection(libraryInfoSection) ? libraryInfoSection.photoData[libraryInfo.photoId] : null
+        }
+
         return {
             ...props,
             hasPhotoDirs: state.data.settings.photoDirs.length !== 0,
@@ -298,7 +305,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             sectionById: sections.byId,
             selectedSectionId: state.library.selection.sectionId,
             selectedPhotoIds: state.library.selection.photoIds,
-            infoPhoto: (libraryInfo && photoData) ? photoData[libraryInfo.photoId] : null,
+            infoPhoto,
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
             tags: getTagTitles(),
             gridRowHeight: state.library.display.gridRowHeight,
