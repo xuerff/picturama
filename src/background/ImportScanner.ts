@@ -13,6 +13,7 @@ import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
+import AppWindowController from 'background/AppWindowController'
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 import { deletePhotos } from 'background/store/PhotoStore'
@@ -350,6 +351,8 @@ class ImportScanner {
     private async onProgressChange(forceSendingNow?: boolean) {
         const now = Date.now()
         if (forceSendingNow || now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
+            const { state, progress } = this
+
             this.lastProgressUIUpdateTime = now
 
             let updatedTags: Tag[] | null = null
@@ -358,7 +361,17 @@ class ImportScanner {
                 this.shouldFetchTags = false
             }
 
-            ForegroundClient.setImportProgress(this.state === 'idle' ? null : this.progress, updatedTags)
+            let progressBarProgress = 0
+            if (state === 'idle') {
+                progressBarProgress = -1  // Don't show progress
+            } else if (state === 'import-photos') {
+                progressBarProgress = progress.processed / (progress.total || 1)
+            } else {
+                progressBarProgress = 2  // indeterminate
+            }
+            AppWindowController.getAppWindow().setProgressBar(progressBarProgress)
+
+            ForegroundClient.setImportProgress(state === 'idle' ? null : progress, updatedTags)
         }
     }
 

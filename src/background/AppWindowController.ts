@@ -11,6 +11,10 @@ export default {
         appWindow = newAppWindow
     },
 
+    getAppWindow(): BrowserWindow {
+        return appWindow
+    },
+
     toggleFullScreen() {
         const isFullScreen = !appWindow.isFullScreen()
         ForegroundClient.onFullScreenChange(isFullScreen)
