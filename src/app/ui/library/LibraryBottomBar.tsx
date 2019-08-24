@@ -26,30 +26,35 @@ export default class LibraryBottomBar extends React.Component<Props> {
         return (
             <Toolbar className={classNames(props.className, 'LibraryBottomBar')} isTopBar={false}>
                 {props.leftItem}
-                <div className="LibraryBottomBar-selection">
-                    <span>{msg('LibraryBottomBar_selected', props.highlightedCount)}</span>
-                    {props.highlightedCount > 0 &&
+                {props.highlightedCount > 0 &&
+                    <div className="LibraryBottomBar-selection">
+                        <span>{msg('LibraryBottomBar_selected', props.highlightedCount)}</span>
+                    
                         <button
                             className="LibraryBottomBar-deselectAll"
                             onClick={props.clearHighlight}
                         >
                             {msg('LibraryBottomBar_deselect')}
                         </button>
-                    }
-                </div>
-                <div className="LibraryBottomBar-center">
-                    {props.photosCount === 1 ? msg('LibraryBottomBar_photoCount_one') : msg('LibraryBottomBar_photoCount_more', props.photosCount)}
-                </div>
-                <div className="LibraryBottomBar-right">
-                    <Slider
-                        value={props.gridRowHeight}
-                        min={minGridRowHeight}
-                        max={maxGridRowHeight}
-                        labelRenderer={false}
-                        showTrackFill={false}
-                        onChange={props.setGridRowHeight}
-                    />
-                </div>
+                    </div>
+                }
+                {props.photosCount > 0 &&
+                    <>
+                        <div className="LibraryBottomBar-center">
+                            {props.photosCount === 1 ? msg('LibraryBottomBar_photoCount_one') : msg('LibraryBottomBar_photoCount_more', props.photosCount)}
+                        </div>
+                        <div className="LibraryBottomBar-right">
+                            <Slider
+                                value={props.gridRowHeight}
+                                min={minGridRowHeight}
+                                max={maxGridRowHeight}
+                                labelRenderer={false}
+                                showTrackFill={false}
+                                onChange={props.setGridRowHeight}
+                            />
+                        </div>
+                    </>
+                }
             </Toolbar>
         )
     }
