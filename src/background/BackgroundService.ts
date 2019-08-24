@@ -65,7 +65,7 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return stat.size
     } else if (action === 'selectDirectories') {
         return new Promise(resolve =>
-            dialog.showOpenDialog({ properties: [ 'openDirectory' ] }, resolve)
+            dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory' ] }, resolve)
         )
     } else if (action === 'startImport') {
         startImport()
