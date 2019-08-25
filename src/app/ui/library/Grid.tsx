@@ -121,13 +121,13 @@ export default class Grid extends React.Component<Props, State> {
         removeCommandGroup(this.commandGroupId)
     }
 
-    getGridLayout(props: Props, state: State): GridLayout {
+    private getGridLayout(props: Props, state: State): GridLayout {
         return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop,
             state.viewportWidth - gridScrollBarWidth, state.viewportHeight,
             props.gridRowHeight, this.nailedSectionId)
     }
 
-    onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
+    private onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
         const props = this.props
 
         event.preventDefault()
@@ -147,28 +147,28 @@ export default class Grid extends React.Component<Props, State> {
         }
     }
 
-    onPhotoDoubleClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
+    private onPhotoDoubleClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
         this.props.setDetailPhotoById(sectionId, photoId)
     }
 
-    onEnter() {
+    private onEnter() {
         const props = this.props
         if (props.selectedSectionId && props.selectedPhotoIds.length === 1) {
             props.setDetailPhotoById(props.selectedSectionId, props.selectedPhotoIds[0])
         }
     }
 
-    onResize(entries: IResizeEntry[]) {
+    private onResize(entries: IResizeEntry[]) {
         const contentRect = entries[0].contentRect
         this.setState({ viewportWidth: contentRect.width, viewportHeight: contentRect.height })
     }
 
-    onScroll(event: any) {
+    private onScroll(event: any) {
         const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
         this.setState({ scrollTop: scrollPaneElem.scrollTop })
     }
 
-    scrollToNailedSection() {
+    private scrollToNailedSection() {
         if (this.nailedSectionId === null || !this.gridLayout) {
             return
         }
@@ -196,23 +196,23 @@ export default class Grid extends React.Component<Props, State> {
         }
     }
 
-    moveHighlightLeft() {
+    private moveHighlightLeft() {
         this.moveHighlight('left')
     }
 
-    moveHighlightRight() {
+    private moveHighlightRight() {
         this.moveHighlight('right')
     }
 
-    moveHighlightUp() {
+    private moveHighlightUp() {
         this.moveHighlight('up')
     }
 
-    moveHighlightDown() {
+    private moveHighlightDown() {
         this.moveHighlight('down')
     }
 
-    moveHighlight(move: 'left' | 'right' | 'up' | 'down') {
+    private moveHighlight(move: 'left' | 'right' | 'up' | 'down') {
         const { props } = this
         const { selectedSectionId } = props
 
@@ -268,7 +268,7 @@ export default class Grid extends React.Component<Props, State> {
         }
     }
 
-    renderVisibleSections() {
+    private renderVisibleSections() {
         const { props, state, gridLayout } = this
 
         if (!gridLayout) {
@@ -303,7 +303,7 @@ export default class Grid extends React.Component<Props, State> {
         return result
     }
 
-    calculateContentHeight(): number {
+    private calculateContentHeight(): number {
         const { props, gridLayout } = this
         const sectionCount = props.sectionIds.length
         if (!gridLayout || sectionCount === 0) {
