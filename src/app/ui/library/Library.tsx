@@ -253,7 +253,7 @@ export class Library extends React.Component<Props, State> {
                             setDetailPhotoById={props.setDetailPhotoById}
                         />
                     }
-                    {(props.isFetching || (props.isImporting && props.photoCount === 0)) &&
+                    {(props.isImporting ? props.photoCount === 0 : props.isFetching) &&
                         <Spinner className="Library-spinner" size={Spinner.SIZE_LARGE} />
                     }
                 </div>
