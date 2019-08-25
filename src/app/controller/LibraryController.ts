@@ -16,6 +16,38 @@ import store from 'app/state/store'
 import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './ImageProvider'
 
 
+/**
+ * A nailed grid position.
+ *
+ * **Background:** If the grid data is updated or if sizes are changing, we don't want the grid to keep its scroll
+ * position in terms of pixels. Instead we want the grid to stay at the same photos it showed before.
+ * A `NailedGridPosition` describes the position of photos shown by the grid at a certain moment.
+ * This information is used to restore that position after the mentioned changes were applied.
+ */
+export interface NailedGridPosition {
+    /** The position of the photos in view */
+    positions: PhotoGridPosition[]
+}
+
+/** A y-position within a photo  */
+export interface PhotoGridPosition {
+    sectionId: PhotoSectionId
+    photoId: PhotoId
+    /**
+     * The relative position within the photo.
+     * Has a value between `0` and `1`: `0` = photo's top, `1` = photo's bottom
+     */
+    relativeY: number
+    /**
+     * The offset to apply (in pixels).
+     * 
+     * This is normally `0`. Will be set to another value if the position is outside the photo
+     * - so `relativeY` is either `0` or `1`.
+     */
+    offsetY: number
+}
+
+
 const pagesToKeep = 4
 const pagesToPreload = 3
 const averageAspect = 3 / 2
@@ -32,9 +64,11 @@ let prevGridRowHeight = -1
 let isFetchingSectionPhotos = false
 
 
+export type GetGridLayoutFunction = typeof getGridLayout
+
 export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSectionById,
     scrollTop: number, viewportWidth: number, viewportHeight: number, gridRowHeight: number,
-    nailedSectionId: PhotoSectionId | null):
+    nailedGridPosition: NailedGridPosition | null):
     GridLayout
 {
     const profiler = profileLibraryLayout ? new Profiler(`Calculating layout for ${sectionIds.length} sections`) : null
@@ -47,11 +81,10 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
 
     let inDomMinY: number | null = null
     let inDomMaxY: number | null = null
-    if (nailedSectionId === null) {
+    if (nailedGridPosition === null) {
         inDomMinY = scrollTop - pagesToPreload * viewportHeight
         inDomMaxY = scrollTop + (pagesToPreload + 1) * viewportHeight
     }
-    let nailedSectionLayout: GridSectionLayout | null = null
 
     let sectionTop = 0
     const sectionCount = sectionIds.length
@@ -60,15 +93,18 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         const section = sectionById[sectionId]
 
         const usePlaceholder = !isLoadedPhotoSection(section)
-        const prevLayout = (
-                !prevLayoutIsDirty
-                && (usePlaceholder || section === prevSectionById[prevSectionIds[sectionIndex]])
+        const prevLayout =
+            (
+                usePlaceholder ?
+                sectionId === prevSectionIds[sectionIndex] :
+                section === prevSectionById[prevSectionIds[sectionIndex]]
                     // We have to compare sections, not section IDs in order to detect changes inside the section.
                     // See `createLayoutForLoadedSection`
-            ) ? prevGridLayout.sectionLayouts[sectionIndex] : null
+            ) ?
+                prevGridLayout.sectionLayouts[sectionIndex] : null
 
         let layout: GridSectionLayout | null = null
-        if (prevLayout) {
+        if (prevLayout && !prevLayoutIsDirty) {
             const prevLayoutIsPlaceholder = !prevLayout.boxes
             if (usePlaceholder == prevLayoutIsPlaceholder) {
                 layout = prevLayout
@@ -84,7 +120,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
             sectionsChanged = true
             // We have to update the layout
             if (usePlaceholder) {
-                if (prevLayout) {
+                if (prevLayout && !prevLayoutIsDirty) {
                     // Section data was dropped -> Drop layout boxes as well
                     layout = { sectionTop, containerHeight: prevLayout.containerHeight }
                 } else {
@@ -96,69 +132,73 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
             }
         }
 
-
-        if (sectionId === nailedSectionId) {
-            inDomMinY = sectionTop
-            inDomMaxY = sectionTop + viewportHeight
-        }
-
         const sectionHeight = sectionHeadHeight + layout.containerHeight
         const sectionBottom = sectionTop + sectionHeight
-        if (inDomMinY !== null && inDomMaxY !== null && sectionBottom >= inDomMinY && sectionTop <= inDomMaxY) {
-            // Show section in DOM
-
-            if (fromSectionIndex === null) {
-                fromSectionIndex = sectionIndex
+        if (inDomMinY === null || inDomMaxY === null) {
+            // We have a NailedGridPosition
+            // -> Just keep the previous `fromBoxIndex` and `toBoxIndex`
+            if (layout.boxes && prevLayout && prevLayout.boxes && layout.boxes.length === prevLayout.boxes.length) {
+                layout.fromBoxIndex = prevLayout.fromBoxIndex
+                layout.toBoxIndex = prevLayout.toBoxIndex
             }
+        } else {
+            // We have no NailedGridPosition
+            // -> Set `fromBoxIndex` and `toBoxIndex` in order to control which photos are added to the DOM
+            if (sectionBottom >= inDomMinY && sectionTop <= inDomMaxY) {
+                // Show section in DOM
 
-            if (!layout.boxes) {
-                // Section is not loaded yet, but will be shown in DOM -> Create dummy boxes
-                layout.boxes = createDummyLayoutBoxes(viewportWidth, gridRowHeight, layout.containerHeight, section.count)
-            }
+                if (fromSectionIndex === null) {
+                    fromSectionIndex = sectionIndex
+                }
 
-            const prevFromBoxIndex = layout.fromBoxIndex
-            const prevToBoxIndex = layout.toBoxIndex
-            layout.fromBoxIndex = 0
-            layout.toBoxIndex = section.count
-            if (sectionTop < inDomMinY || sectionBottom > inDomMaxY) {
-                // This section is party visible -> Go throw the boxes and find the correct boundaries
-                const boxes = layout.boxes
-                const boxCount = boxes.length
+                if (!layout.boxes) {
+                    // Section is not loaded yet, but will be shown in DOM -> Create dummy boxes
+                    layout.boxes = createDummyLayoutBoxes(viewportWidth, gridRowHeight, layout.containerHeight, section.count)
+                }
 
-                let searchingStart = true
-                for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
-                    const box = boxes[boxIndex]
-                    const boxTop = sectionTop + sectionHeadHeight + box.top
-                    const boxBottom = boxTop + box.height
-                    if (searchingStart) {
-                        if (boxBottom >= inDomMinY) {
-                            layout.fromBoxIndex = boxIndex
-                            searchingStart = false
+                const prevFromBoxIndex = layout.fromBoxIndex
+                const prevToBoxIndex = layout.toBoxIndex
+                layout.fromBoxIndex = 0
+                layout.toBoxIndex = section.count
+                if (sectionTop < inDomMinY || sectionBottom > inDomMaxY) {
+                    // This section is party visible -> Go throw the boxes and find the correct boundaries
+                    const boxes = layout.boxes
+                    const boxCount = boxes.length
+    
+                    let searchingStart = true
+                    for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
+                        const box = boxes[boxIndex]
+                        const boxTop = sectionTop + sectionHeadHeight + box.top
+                        const boxBottom = boxTop + box.height
+                        if (searchingStart) {
+                            if (boxBottom >= inDomMinY) {
+                                layout.fromBoxIndex = boxIndex
+                                searchingStart = false
+                            }
+                        } else if (boxTop > inDomMaxY) {
+                            layout.toBoxIndex = boxIndex
+                            break
                         }
-                    } else if (boxTop > inDomMaxY) {
-                        layout.toBoxIndex = boxIndex
-                        break
                     }
                 }
-            }
-            if (layout.fromBoxIndex !== prevFromBoxIndex || layout.toBoxIndex !== prevToBoxIndex) {
-                sectionsChanged = true
-            }
-        } else { // isSectionVisible == false
-            if (toSectionIndex === null && fromSectionIndex !== null) {
-                toSectionIndex = sectionIndex
-            }
-            if (layout.boxes) {
-                // This section is fully invisible -> Keep the layout but add no photos to the DOM
-                layout.fromBoxIndex = undefined
-                layout.toBoxIndex = undefined
+                if (layout.fromBoxIndex !== prevFromBoxIndex || layout.toBoxIndex !== prevToBoxIndex) {
+                    sectionsChanged = true
+                }
+            } else {
+                // Remove section from DOM
+                if (toSectionIndex === null && fromSectionIndex !== null) {
+                    // This is the first section to remove from DOM -> Remember its index
+                    toSectionIndex = sectionIndex
+                }
+                if (layout.boxes) {
+                    // This section is fully invisible -> Keep the layout but add no photos to the DOM
+                    layout.fromBoxIndex = undefined
+                    layout.toBoxIndex = undefined
+                }
             }
         }
 
         sectionLayouts.push(layout)
-        if (sectionId === nailedSectionId) {
-            nailedSectionLayout = layout
-        }
 
         // Prepare next iteration
         sectionTop = sectionBottom
@@ -168,8 +208,9 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         toSectionIndex = sectionCount
     }
 
-    const viewportTop = nailedSectionLayout ? nailedSectionLayout.sectionTop : scrollTop
-    forgetAndFetchSections(sectionIds, sectionById, viewportTop, viewportHeight, sectionLayouts)
+    if (nailedGridPosition === null) {
+        forgetAndFetchSections(sectionIds, sectionById, scrollTop, viewportHeight, sectionLayouts)
+    }
 
     if (profiler) {
         profiler.addPoint('Calculated layout')
@@ -193,7 +234,9 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
     prevSectionIds = sectionIds
     prevSectionById = sectionById
     prevGridLayout = nextGridLayout
-    prevScrollTop = scrollTop
+    if (nailedGridPosition === null) {
+        prevScrollTop = scrollTop
+    }
     prevViewportWidth = viewportWidth
     prevViewportHeight = viewportHeight
     prevGridRowHeight = gridRowHeight

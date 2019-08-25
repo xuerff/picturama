@@ -12,7 +12,7 @@ import { bindMany } from 'common/util/LangUtil'
 
 import { setDetailPhotoById } from 'app/controller/DetailController'
 import { getThumbnailSrc } from 'app/controller/ImageProvider'
-import { getGridLayout, setInfoPhoto, createThumbnail } from 'app/controller/LibraryController'
+import { GetGridLayoutFunction, getGridLayout, setInfoPhoto, createThumbnail } from 'app/controller/LibraryController'
 import { fetchTotalPhotoCount, fetchSections, updatePhotoWork, setPhotosFlagged, movePhotosToTrash, restorePhotosFromTrash } from 'app/controller/PhotoController'
 import { fetchTags, setPhotoTags } from 'app/controller/PhotoTagController'
 import { setSelectedPhotosAction, openExportAction, setGridRowHeightAction } from 'app/state/actions'
@@ -26,7 +26,7 @@ import { FetchState } from 'app/UITypes'
 
 import LibraryTopBar from './LibraryTopBar'
 import LibraryBottomBar from './LibraryBottomBar'
-import Grid, { GetGridLayoutFunction } from './Grid'
+import Grid from './Grid'
 
 import './Library.less'
 

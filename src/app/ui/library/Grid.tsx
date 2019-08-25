@@ -8,8 +8,9 @@ import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { isMac } from 'app/UiConstants'
-import { GridSectionLayout, GridLayout } from 'app/UITypes'
+import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from 'app/UITypes'
 import { CommandGroupId, addCommandGroup, setCommandGroupEnabled, removeCommandGroup } from 'app/controller/HotkeyController'
+import { NailedGridPosition, GetGridLayoutFunction, PhotoGridPosition } from 'app/controller/LibraryController'
 import { gridScrollBarWidth } from 'app/style/variables'
 import { getScrollbarSize } from 'app/util/DomUtil'
 
@@ -20,11 +21,6 @@ import './Grid.less'
 
 
 const gridSpacerHeight = 1
-
-export type GetGridLayoutFunction = (
-    sectionIds: PhotoSectionId[], sectionById: PhotoSectionById, scrollTop: number, viewportWidth: number, viewportHeight: number,
-    gridRowHeight: number, nailedSectionId: PhotoSectionId | null)
-    => GridLayout
 
 interface Props {
     className?: any
@@ -52,7 +48,7 @@ export default class Grid extends React.Component<Props, State> {
     private commandGroupId: CommandGroupId
 
     private gridLayout: GridLayout | null = null
-    private nailedSectionId: PhotoSectionId | null = null
+    private nailedGridPosition: NailedGridPosition | null = null
     private releaseNailTimer: NodeJS.Timer | null = null
 
 
@@ -61,9 +57,8 @@ export default class Grid extends React.Component<Props, State> {
 
         this.state = { scrollTop: 0, viewportWidth: 0, viewportHeight: 0 }
 
-        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'onEnter', 'onResize', 'onScroll',
-            'scrollToNailedSection', 'setScrollTop',  'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp',
-            'moveHighlightDown')
+        bindMany(this, 'onPhotoClick', 'onPhotoDoubleClick', 'onEnter', 'onResize', 'onScroll', 'setScrollTop',
+            'moveHighlightLeft', 'moveHighlightRight', 'moveHighlightUp', 'moveHighlightDown')
     }
 
     componentDidMount() {
@@ -88,18 +83,19 @@ export default class Grid extends React.Component<Props, State> {
         if (nextProps.gridRowHeight !== prevProps.gridRowHeight || nextState.viewportWidth !== prevState.viewportWidth ||
             nextProps.sectionIds !== prevProps.sectionIds)
         {
-            // Sizes have changed or content has changed (e.g. during import)
-            // -> Nail the current section (Change the scroll position, so the same section is shown again)
-            if (prevGridLayout) {
-                const nailedSectionIndex = getSectionIndexAtY(prevState.scrollTop, prevState.viewportHeight, prevGridLayout.sectionLayouts)
-                this.nailedSectionId = nailedSectionIndex == null ? null : prevProps.sectionIds[nailedSectionIndex]
+            // Sizes have changed (e.g. window resize, open/close info, change of gridRowHeight)
+            // or content has changed (e.g. during import)
+            // -> Nail the grid position
+            if (prevGridLayout && !this.nailedGridPosition) {
+                this.nailedGridPosition = getNailedGridPosition(prevState.scrollTop, prevState.viewportHeight,
+                    prevGridLayout.sectionLayouts, prevProps.sectionIds, prevProps.sectionById)
             }
         
             if (this.releaseNailTimer) {
                 clearTimeout(this.releaseNailTimer)
             }
             this.releaseNailTimer = setTimeout(() => {
-                this.nailedSectionId = null
+                this.nailedGridPosition = null
             }, 1000)
         }
 
@@ -112,8 +108,15 @@ export default class Grid extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
-        if (this.nailedSectionId !== null) {
-            this.scrollToNailedSection()
+        const { props, state, gridLayout, nailedGridPosition } = this
+        if (nailedGridPosition && gridLayout) {
+            const nextScrollTop = getScrollTopForNailedGridPosition(nailedGridPosition, state.viewportHeight,
+                gridLayout.sectionLayouts, props.sectionIds, props.sectionById)
+
+            this.nailedGridPosition = null
+            if (nextScrollTop !== null && nextScrollTop !== this.state.scrollTop) {
+                this.setScrollTop(nextScrollTop)
+            }
         }
     }
 
@@ -124,7 +127,7 @@ export default class Grid extends React.Component<Props, State> {
     private getGridLayout(props: Props, state: State): GridLayout {
         return props.getGridLayout(props.sectionIds, props.sectionById, state.scrollTop,
             state.viewportWidth - gridScrollBarWidth, state.viewportHeight,
-            props.gridRowHeight, this.nailedSectionId)
+            props.gridRowHeight, this.nailedGridPosition)
     }
 
     private onPhotoClick(event: React.MouseEvent, sectionId: PhotoSectionId, photoId: PhotoId) {
@@ -166,26 +169,6 @@ export default class Grid extends React.Component<Props, State> {
     private onScroll(event: any) {
         const scrollPaneElem = findDOMNode(this.refs.scrollPane) as HTMLElement
         this.setState({ scrollTop: scrollPaneElem.scrollTop })
-    }
-
-    private scrollToNailedSection() {
-        if (this.nailedSectionId === null || !this.gridLayout) {
-            return
-        }
-
-        let nextScrollTop: number | null = null
-        const nailedSectionIndex = this.props.sectionIds.indexOf(this.nailedSectionId)
-        if (nailedSectionIndex !== -1) {
-            const layout = this.gridLayout.sectionLayouts[nailedSectionIndex]
-            if (layout) {
-                nextScrollTop = layout.sectionTop
-            }
-        }
-
-        this.nailedSectionId = null
-        if (nextScrollTop !== null && nextScrollTop !== this.state.scrollTop) {
-            this.setScrollTop(nextScrollTop)
-        }
     }
 
     private setScrollTop(scrollTop: number) {
@@ -353,13 +336,114 @@ export default class Grid extends React.Component<Props, State> {
 }
 
 
-function getSectionIndexAtY(y: number, viewportHeight: number, sectionLayouts: GridSectionLayout[]): number | null {
+function getNailedGridPosition(scrollTop: number, viewportHeight: number, sectionLayouts: GridSectionLayout[],
+    sectionIds: PhotoSectionId[], sectionById: PhotoSectionById): NailedGridPosition | null
+{
+    const positions: PhotoGridPosition[] = []
+
+    const scrollBottom = scrollTop + viewportHeight
+    const scrollCenter = (scrollTop + scrollBottom) / 2
     for (let sectionIndex = 0, sectionCount = sectionLayouts.length; sectionIndex < sectionCount; sectionIndex++) {
-        const layout = sectionLayouts[sectionIndex]
-        const sectionBottom = layout.sectionTop + sectionHeadHeight + layout.containerHeight
-        if (layout.sectionTop >= y || sectionBottom >= y + viewportHeight) {
-            return sectionIndex
+        const sectionLayout = sectionLayouts[sectionIndex]
+        const section = sectionById[sectionIds[sectionIndex]]
+        const sectionBodyTop = sectionLayout.sectionTop + sectionHeadHeight
+        const sectionBottom = sectionLayout.sectionTop + sectionLayout.containerHeight
+        if (sectionBottom >= scrollTop && sectionLayout.boxes && isLoadedPhotoSection(section)) {
+            for (let photoIndex = 0, photoCount = sectionLayout.boxes.length; photoIndex < photoCount; photoIndex++) {
+                const box = sectionLayout.boxes[photoIndex]
+                const photoId = section.photoIds[photoIndex]
+                const boxTopInGrid = sectionBodyTop + box.top
+                const boxBottomInGrid = boxTopInGrid + box.height
+                if (boxBottomInGrid >= scrollTop) {
+                    if (boxTopInGrid <= scrollBottom || !positions.length) {
+                        // This photo is in view
+                        positions.push(getPhotoGridPosition(scrollCenter, sectionBodyTop, box, section.id, photoId))
+                    } else {
+                        // This photo is out of view -> We're done
+                        return { positions }
+                    }
+                }
+            }
         }
     }
-    return null
+
+    if (positions.length) {
+        // Happens if the very last photo is in view
+        return { positions }
+    } else {
+        return null
+    }
+}
+
+
+function getPhotoGridPosition(y: number, sectionBodyTop: number, box: JustifiedLayoutBox, sectionId: PhotoSectionId,
+    photoId: PhotoId, positionToUpdate?: Partial<PhotoGridPosition> | null): PhotoGridPosition
+{
+    if (!positionToUpdate) {
+        positionToUpdate = {}
+    }
+
+    positionToUpdate.sectionId = sectionId
+    positionToUpdate.photoId = photoId
+
+    const yWithinBox = y - sectionBodyTop - box.top
+    let relativeY = yWithinBox / box.height
+    let offsetY = 0
+    if (relativeY < 0) {
+        relativeY = 0
+        offsetY = yWithinBox
+    } else if (relativeY > 1) {
+        relativeY = 1
+        offsetY = yWithinBox - box.height
+    }
+    positionToUpdate.relativeY = relativeY
+    positionToUpdate.offsetY = offsetY
+
+    return positionToUpdate as PhotoGridPosition
+}
+
+
+function getScrollTopForNailedGridPosition(nailedGridPosition: NailedGridPosition, viewportHeight: number,
+    sectionLayouts: GridSectionLayout[], sectionIds: PhotoSectionId[], sectionById: PhotoSectionById): number | null
+{
+    let totalCenterY = 0
+    let centerYCount = 0
+    for (const position of nailedGridPosition.positions) {
+        const centerY = getYForPhotoGridPosition(position, sectionLayouts, sectionIds, sectionById)
+        if (centerY != null) {
+            totalCenterY += centerY
+            centerYCount++
+        }
+    }
+
+    if (centerYCount === 0) {
+        return null
+    }
+
+    const avgCenterY = totalCenterY / centerYCount
+    return Math.round(avgCenterY - viewportHeight / 2)
+}
+
+
+function getYForPhotoGridPosition(position: PhotoGridPosition, sectionLayouts: GridSectionLayout[],
+    sectionIds: PhotoSectionId[], sectionById: PhotoSectionById): number | null
+{
+    const sectionIndex = sectionIds.indexOf(position.sectionId)
+    if (sectionIndex === -1) {
+        return null
+    }
+
+    const section = sectionById[position.sectionId]
+    const sectionLayout = sectionLayouts[sectionIndex]
+    if (!isLoadedPhotoSection(section) || !sectionLayout.boxes) {
+        return null
+    }
+
+    const photoIndex = section.photoIds.indexOf(position.photoId)
+    if (photoIndex === -1) {
+        return null
+    }
+
+    const box = sectionLayout.boxes[photoIndex]
+    return sectionLayout.sectionTop + sectionHeadHeight + box.top + box.height * position.relativeY + position.offsetY
 }
