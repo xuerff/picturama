@@ -12,7 +12,7 @@ function createDefaultProps(context: TestContext): Props {
         style:  { backgroundColor: 'red' },
         width:  800,
         height: 600,
-        src: '../src/test-photos/IMG_9700.JPG',
+        src: '../test-data/photos/IMG_9700.JPG',
         srcPrev: null,
         srcNext: null,
         orientation: ExifOrientation.Up,
