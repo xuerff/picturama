@@ -4,6 +4,7 @@ import { Popover, Position, Button, Spinner, Icon } from '@blueprintjs/core'
 
 import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
+import { formatNumber } from 'common/util/TextUtil'
 import { ImportProgress } from 'common/CommonTypes'
 
 import './ImportProgressButton.less'
@@ -60,7 +61,10 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                         }
                         {progress.phase !== 'cleanup' &&
                             <div className='ImportProgressButton-ratio'>
-                                {spinnerProgress ? msg('ImportProgressButton_ratio', progress.processed, progress.total) : progress.total}
+                                {spinnerProgress ?
+                                    msg('ImportProgressButton_ratio', formatNumber(progress.processed), formatNumber(progress.total)) :
+                                    formatNumber(progress.total)
+                                }
                             </div>
                         }
                     </>

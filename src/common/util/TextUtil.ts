@@ -1,3 +1,12 @@
+import { getLocale } from 'common/i18n/i18n'
+
+
+export function formatNumber(number: number, fractionDigits = 0): string {
+    const locale = getLocale()
+    return number.toLocaleString(locale, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })
+}
+
+
 const parsePathRegex = /^((.*)[/\\])?([^/\\]+?)$/
 
 export interface PathParts {
