@@ -79,8 +79,8 @@ export default {
         return callOnBackground('fetchTotalPhotoCount')
     },
 
-    fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
-        return callOnBackground('fetchSections', { filter })
+    fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?: PhotoSectionId[]): Promise<PhotoSection[]> {
+        return callOnBackground('fetchSections', { filter, sectionIdsToKeepLoaded })
     },
 
     fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<Photo[]> {

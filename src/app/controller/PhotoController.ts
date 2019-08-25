@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
 
-import { PhotoWork, Photo, PhotoFilter } from 'common/CommonTypes'
+import { PhotoWork, PhotoSectionId, Photo, PhotoFilter } from 'common/CommonTypes'
 import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
@@ -18,19 +18,19 @@ export function fetchTotalPhotoCount() {
         .then(totalPhotoCount => store.dispatch(fetchTotalPhotoCountAction(totalPhotoCount)))
 }
 
-export function fetchSections() {
-    internalFetchSections(null)
+export function fetchSections(sectionIdsToKeepLoaded?: PhotoSectionId[]) {
+    internalFetchSections(null, sectionIdsToKeepLoaded)
 }
 
 export function setLibraryFilter(newFilter: PhotoFilter) {
     internalFetchSections(newFilter)
 }
 
-function internalFetchSections(newFilter: PhotoFilter | null) {
+function internalFetchSections(newFilter: PhotoFilter | null, sectionIdsToKeepLoaded?: PhotoSectionId[]) {
     const filter = newFilter || store.getState().library.filter
 
     store.dispatch(fetchSectionsAction.request({ newFilter }))
-    BackgroundClient.fetchSections(filter)
+    BackgroundClient.fetchSections(filter, sectionIdsToKeepLoaded)
         .then(sections => {
             store.dispatch(fetchSectionsAction.success({ sections }))
         })

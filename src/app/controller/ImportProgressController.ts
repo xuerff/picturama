@@ -1,4 +1,4 @@
-import { Tag } from 'common/CommonTypes'
+import { Tag, PhotoSectionId, isLoadedPhotoSection } from 'common/CommonTypes'
 import { ImportProgress } from 'common/CommonTypes'
 
 import { fetchSections, fetchTotalPhotoCount } from 'app/controller/PhotoController'
@@ -40,8 +40,17 @@ export default class ImportProgressController {
 function updateLibrary() {
     const state = store.getState()
     if (state.navigation.mainView === null) {
+        // We want the current loaded sections to stay loaded in order to avoid blinking when the sections are updated.
+        const loadedSectionIds: PhotoSectionId[] = []
+        const sectionsById = state.data.sections.byId
+        for (const sectionId of state.data.sections.ids) {
+            if (isLoadedPhotoSection(sectionsById[sectionId])) {
+                loadedSectionIds.push(sectionId)
+            }
+        }
+
         fetchTotalPhotoCount()
-        fetchSections()
+        fetchSections(loadedSectionIds)
     } else {
         // Workaround: If the detail view is active, the detail view would be closed by `fetchSections` since the
         //             section shown in detail view will get unloaded

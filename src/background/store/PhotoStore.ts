@@ -1,7 +1,7 @@
 import { shell } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 
-import { PhotoId, Photo, PhotoDetail, PhotoFilter, PhotoSection, PhotoSectionId, Version, Tag } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoById, PhotoDetail, PhotoFilter, PhotoSection, LoadedPhotoSection, PhotoSectionId, Version, Tag } from 'common/CommonTypes'
 import { getThumbnailPath, getRenderedRawPath, getMasterPath } from 'common/util/DataUtil'
 
 import ForegroundClient from 'background/ForegroundClient'
@@ -17,10 +17,38 @@ export async function fetchTotalPhotoCount(): Promise<number> {
 }
 
 
-export async function fetchSections(filter: PhotoFilter): Promise<PhotoSection[]> {
+export async function fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?: PhotoSectionId[]):
+    Promise<PhotoSection[]>
+{
     const filterWhere = createWhereForFilter(filter)
     const sql = `select date as id, date as title, count(*) as count from photos where ${filterWhere.sql} group by date order by date desc`
-    return await DB().query<PhotoSection>(sql, ...filterWhere.params)
+    const sections = await DB().query<PhotoSection>(sql, ...filterWhere.params)
+
+    if (sectionIdsToKeepLoaded && sectionIdsToKeepLoaded.length) {
+        const sectionPhotosById: { [K in PhotoSectionId]: Photo[] } = {}
+        const sql = `select * from photos where date = ? and ${filterWhere.sql} order by created_at asc`
+        await Promise.all(sectionIdsToKeepLoaded.map(sectionId =>
+            DB().query<Photo>(sql, sectionId, ...filterWhere.params)
+                .then(sectionPhotos => { sectionPhotosById[sectionId] = sectionPhotos })
+        ))
+
+        for (const section of sections) {
+            const sectionPhotos = sectionPhotosById[section.id]
+            if (sectionPhotos) {
+                const photoIds: PhotoId[] = []
+                const photoData: PhotoById = {}
+                for (const photo of sectionPhotos) {
+                    photoIds.push(photo.id)
+                    photoData[photo.id] = photo
+                }
+                const loadedSection = section as LoadedPhotoSection
+                loadedSection.photoIds = photoIds
+                loadedSection.photoData = photoData
+            }
+        }
+    }
+
+    return sections
 }
 
 

@@ -77,7 +77,7 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
     let fromSectionIndex: number | null = null
     let toSectionIndex: number | null = null
     let sectionLayouts: GridSectionLayout[] = []
-    const prevLayoutIsDirty = (viewportWidth !== prevViewportWidth) || (gridRowHeight !== prevGridRowHeight)
+    const prevGridLayoutIsDirty = (viewportWidth !== prevViewportWidth) || (gridRowHeight !== prevGridRowHeight)
 
     let inDomMinY: number | null = null
     let inDomMaxY: number | null = null
@@ -93,15 +93,11 @@ export function getGridLayout(sectionIds: PhotoSectionId[], sectionById: PhotoSe
         const section = sectionById[sectionId]
 
         const usePlaceholder = !isLoadedPhotoSection(section)
-        const prevLayout =
-            (
-                usePlaceholder ?
-                sectionId === prevSectionIds[sectionIndex] :
-                section === prevSectionById[prevSectionIds[sectionIndex]]
-                    // We have to compare sections, not section IDs in order to detect changes inside the section.
-                    // See `createLayoutForLoadedSection`
-            ) ?
-                prevGridLayout.sectionLayouts[sectionIndex] : null
+        const prevLayout = (sectionId === prevSectionIds[sectionIndex]) ? prevGridLayout.sectionLayouts[sectionIndex] : null
+        const prevLayoutIsDirty = prevGridLayoutIsDirty ||
+            (!usePlaceholder && section !== prevSectionById[prevSectionIds[sectionIndex]])
+                // We have to compare sections, not section IDs in order to detect changes inside the section.
+                // See `createLayoutForLoadedSection`
 
         let layout: GridSectionLayout | null = null
         if (prevLayout && !prevLayoutIsDirty) {
