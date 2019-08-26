@@ -8,6 +8,7 @@ import { Photo, PhotoDetail } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
+import { formatNumber } from 'common/util/TextUtil'
 
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
@@ -204,7 +205,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
 
 function formatImageMegaPixel(width, height): string {
     const sizeMp = width * height / 1000000
-    return `${formatNumber(sizeMp)} MP`
+    return `${formatNumber(sizeMp, 1)} MP`
 }
 
 function formatFileSize(bytes: number | null): string {
@@ -213,16 +214,12 @@ function formatFileSize(bytes: number | null): string {
     } else if (bytes < 1000) {
         return `${bytes} byte`
     } else if (bytes < 1000000) {
-        return `${formatNumber(bytes / 1000)} kB`
+        return `${formatNumber(bytes / 1000, 1)} kB`
     } else {
-        return `${formatNumber(bytes / 1000000)} MB`
+        return `${formatNumber(bytes / 1000000, 1)} MB`
     }
 }
 
 function formatShutterSpeed(exposureTime: number): string {
     return '1/' + Math.round(1 / exposureTime)
-}
-
-function formatNumber(value: number, fractionDigits: number = 1): string {
-    return value.toLocaleString('en', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })
 }

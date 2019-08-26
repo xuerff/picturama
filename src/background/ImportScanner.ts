@@ -12,6 +12,7 @@ import { msg } from 'common/i18n/i18n'
 import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
+import { formatNumber } from 'common/util/TextUtil'
 
 import AppWindowController from 'background/AppWindowController'
 import ForegroundClient from 'background/ForegroundClient'
@@ -143,7 +144,7 @@ class ImportScanner {
                 console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
                 notifier.notify({
                     title: 'Ansel',
-                    message: msg('ImportScanner_importFinished', photoCount, moment.duration(duration).humanize())
+                    message: msg('ImportScanner_importFinished', formatNumber(photoCount), moment.duration(duration).humanize())
                 })
             })
             .catch(error => {

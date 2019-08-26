@@ -3,6 +3,7 @@ import React from 'react'
 import { Slider, MaybeElement } from '@blueprintjs/core'
 
 import { msg } from 'common/i18n/i18n'
+import { formatNumber } from 'common/util/TextUtil'
 
 import { minGridRowHeight, maxGridRowHeight } from 'app/UiConstants'
 import Toolbar from 'app/ui/widget/Toolbar'
@@ -28,7 +29,7 @@ export default class LibraryBottomBar extends React.Component<Props> {
                 {props.leftItem}
                 {props.highlightedCount > 0 &&
                     <div className="LibraryBottomBar-selection">
-                        <span>{msg('LibraryBottomBar_selected', props.highlightedCount)}</span>
+                        <span>{msg('LibraryBottomBar_selected', formatNumber(props.highlightedCount))}</span>
                     
                         <button
                             className="LibraryBottomBar-deselectAll"
@@ -41,7 +42,7 @@ export default class LibraryBottomBar extends React.Component<Props> {
                 {props.photosCount > 0 &&
                     <>
                         <div className="LibraryBottomBar-center">
-                            {props.photosCount === 1 ? msg('LibraryBottomBar_photoCount_one') : msg('LibraryBottomBar_photoCount_more', props.photosCount)}
+                            {props.photosCount === 1 ? msg('LibraryBottomBar_photoCount_one') : msg('LibraryBottomBar_photoCount_more', formatNumber(props.photosCount))}
                         </div>
                         <div className="LibraryBottomBar-right">
                             <Slider

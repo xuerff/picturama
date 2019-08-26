@@ -7,6 +7,7 @@ import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import { rotate } from 'common/util/EffectsUtil'
 import { bindMany } from 'common/util/LangUtil'
+import { formatNumber } from 'common/util/TextUtil'
 
 import toaster from 'app/Toaster'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
@@ -85,7 +86,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         this.props.movePhotosToTrash(selectedPhotos)
         toaster.show({
             icon: 'tick',
-            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_movedToTrash_one') : msg('PhotoActionButtons_movedToTrash_more', selectedPhotos.length),
+            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_movedToTrash_one') : msg('PhotoActionButtons_movedToTrash_more', formatNumber(selectedPhotos.length)),
             intent: 'success'
         })
     }
@@ -95,7 +96,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
         this.props.restorePhotosFromTrash(selectedPhotos)
         toaster.show({
             icon: 'tick',
-            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_restoredFromTrash_one') : msg('PhotoActionButtons_restoredFromTrash_more', selectedPhotos.length),
+            message: selectedPhotos.length === 1 ? msg('PhotoActionButtons_restoredFromTrash_one') : msg('PhotoActionButtons_restoredFromTrash_more', formatNumber(selectedPhotos.length)),
             intent: 'success'
         })
     }
