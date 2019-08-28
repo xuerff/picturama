@@ -33,11 +33,6 @@
           "label": "Enter Fullscreen",
           "accelerator": "F11",
           "click": "fullscreen"
-        },
-        {
-          "label": "Toggle DevTools",
-          "accelerator": "Shift+Ctrl+I",
-          "click": "toggleDevTools"
         }
       ]
     },
