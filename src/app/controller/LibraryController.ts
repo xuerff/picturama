@@ -307,8 +307,7 @@ function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: Photo
 {
     let sectionIdsToProtect: { [index: string]: true } | null = null
     let sectionIdsToForget: { [index: string]: true } | null = null
-    let sectionIdToLoad: PhotoSectionId | null = null
-    let sectionIdToLoadDistance = Number.POSITIVE_INFINITY
+    let sectionIdsToLoad: PhotoSectionId[] | null = null
 
     const isScrollingDown = (viewportTop >= prevScrollTop)
     const keepMinY = viewportTop - pagesToKeep * viewportHeight
@@ -340,16 +339,10 @@ function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: Photo
         } else if (!isFetchingSectionPhotos) {
             const loadSection = sectionBottom > preloadMinY && sectionTop < preloadMaxY
             if (loadSection) {
-                let distanceToViewPort = 0
-                if (sectionBottom < viewportTop) {
-                    distanceToViewPort = viewportTop - sectionBottom
-                } else if (sectionTop > viewportTop + viewportHeight) {
-                    distanceToViewPort = sectionTop - (viewportTop + viewportHeight)
-                }
-
-                if (distanceToViewPort < sectionIdToLoadDistance) {
-                    sectionIdToLoad = sectionId
-                    sectionIdToLoadDistance = distanceToViewPort
+                if (!sectionIdsToLoad) {
+                    sectionIdsToLoad = [ sectionId ]
+                } else {
+                    sectionIdsToLoad.push(sectionId)
                 }
             }
         }
@@ -359,8 +352,8 @@ function forgetAndFetchSections(sectionIds: PhotoSectionId[], sectionById: Photo
         const nailedSectionIdsToForget = sectionIdsToForget
         setTimeout(() => store.dispatch(forgetSectionPhotosAction(nailedSectionIdsToForget)))
     }
-    if (sectionIdToLoad) {
-        fetchSectionPhotos(sectionIdToLoad)
+    if (sectionIdsToLoad) {
+        fetchSectionPhotos(sectionIdsToLoad)
     }
 }
 
@@ -390,7 +383,7 @@ function getSectionIdsToProtect(): { [index: string]: true } {
 }
 
 
-function fetchSectionPhotos(sectionId: PhotoSectionId) {
+function fetchSectionPhotos(sectionIds: PhotoSectionId[]) {
     if (isFetchingSectionPhotos) {
         return
     }
@@ -398,15 +391,15 @@ function fetchSectionPhotos(sectionId: PhotoSectionId) {
     const filter = store.getState().library.filter
 
     isFetchingSectionPhotos = true
-    BackgroundClient.fetchSectionPhotos(sectionId, filter)
-        .then(photos => {
+    BackgroundClient.fetchSectionPhotos(sectionIds, filter)
+        .then(photoSets => {
             isFetchingSectionPhotos = false
-            store.dispatch(fetchSectionPhotosAction(sectionId, photos))
+            store.dispatch(fetchSectionPhotosAction(sectionIds, photoSets))
         })
         .catch(error => {
             isFetchingSectionPhotos = false
             // TODO: Show error in UI
-            console.error(`Fetching photos for section ${sectionId} failed`, error)
+            console.error(`Fetching photos for sections ${sectionIds.join(', ')} failed`, error)
         })
 }
 

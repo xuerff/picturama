@@ -1,7 +1,7 @@
 import { shell } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 
-import { PhotoId, Photo, PhotoById, PhotoDetail, PhotoFilter, PhotoSection, LoadedPhotoSection, PhotoSectionId, Version, Tag } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoById, PhotoDetail, PhotoFilter, PhotoSection, PhotoSet, LoadedPhotoSection, PhotoSectionId, Version, Tag } from 'common/CommonTypes'
 import { getThumbnailPath, getRenderedRawPath, getMasterPath } from 'common/util/DataUtil'
 
 import ForegroundClient from 'background/ForegroundClient'
@@ -9,6 +9,7 @@ import { fsUnlinkIfExists } from 'background/util/FileUtil'
 
 import { deleteTagsOfPhotos, fetchTags } from './TagStore'
 import { removePhotoWork } from './PhotoWorkStore'
+import { toSqlStringCsv } from 'background/util/DbUtil';
 
 
 export async function fetchTotalPhotoCount(): Promise<number> {
@@ -25,25 +26,20 @@ export async function fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?
     const sections = await DB().query<PhotoSection>(sql, ...filterWhere.params)
 
     if (sectionIdsToKeepLoaded && sectionIdsToKeepLoaded.length) {
-        const sectionPhotosById: { [K in PhotoSectionId]: Photo[] } = {}
-        const sql = `select * from photos where date_section = ? and ${filterWhere.sql} order by created_at asc`
-        await Promise.all(sectionIdsToKeepLoaded.map(sectionId =>
-            DB().query<Photo>(sql, sectionId, ...filterWhere.params)
-                .then(sectionPhotos => { sectionPhotosById[sectionId] = sectionPhotos })
-        ))
+        const photos = await fetchSectionPhotos(sectionIdsToKeepLoaded, filter)
+
+        const sectionPhotosById: { [K in PhotoSectionId]: PhotoSet } = {}
+        for (let i = 0, il = sectionIdsToKeepLoaded.length; i < il; i++) {
+            const sectionId = sectionIdsToKeepLoaded[i]
+            sectionPhotosById[sectionId] = photos[i]
+        }
 
         for (const section of sections) {
             const sectionPhotos = sectionPhotosById[section.id]
             if (sectionPhotos) {
-                const photoIds: PhotoId[] = []
-                const photoData: PhotoById = {}
-                for (const photo of sectionPhotos) {
-                    photoIds.push(photo.id)
-                    photoData[photo.id] = photo
-                }
                 const loadedSection = section as LoadedPhotoSection
-                loadedSection.photoIds = photoIds
-                loadedSection.photoData = photoData
+                loadedSection.photoIds = sectionPhotos.photoIds
+                loadedSection.photoData = sectionPhotos.photoData
             }
         }
     }
@@ -52,10 +48,35 @@ export async function fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?
 }
 
 
-export async function fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<Photo[]> {
+export async function fetchSectionPhotos(sectionIds: PhotoSectionId[], filter: PhotoFilter): Promise<PhotoSet[]> {
+    if (!sectionIds.length) {
+        return []
+    }
+
+    const result: PhotoSet[] = []
+    const photoSetBySectionId: { [K in PhotoSectionId]: PhotoSet } = {}
+    for (const sectionId of sectionIds) {
+        const photoSet: PhotoSet = { photoIds: [], photoData: {} }
+        result.push(photoSet)
+        photoSetBySectionId[sectionId] = photoSet
+    }
+
     const filterWhere = createWhereForFilter(filter)
-    const sql = `select * from photos where date_section = ? and ${filterWhere.sql} order by created_at asc`
-    return await DB().query<Photo>(sql, sectionId, ...filterWhere.params)
+    const allPhotos = await DB().query<Photo>(
+        `select * from photos where date_section in (${toSqlStringCsv(sectionIds)}) and ${filterWhere.sql} order by created_at asc`,
+        ...filterWhere.params)
+    for (const photo of allPhotos) {
+        const sectionId: PhotoSectionId = photo.date_section
+        const photoSet = photoSetBySectionId[sectionId]
+        if (!photoSet) {
+            console.warn('Expected photoSet for section ' + sectionId)
+            continue
+        }
+        photoSet.photoIds.push(photo.id)
+        photoSet.photoData[photo.id] = photo
+    }
+
+    return result
 }
 
 

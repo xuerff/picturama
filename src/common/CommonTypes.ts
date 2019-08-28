@@ -125,9 +125,11 @@ export interface PhotoSection {
     title: string
     count: number
 }
-export interface LoadedPhotoSection extends PhotoSection {
+export interface PhotoSet {
     photoIds: PhotoId[]
     photoData: PhotoById
+}
+export interface LoadedPhotoSection extends PhotoSection, PhotoSet {
 }
 export function isLoadedPhotoSection(section: PhotoSection | null | undefined | false): section is LoadedPhotoSection {
     return !!(section && (section as any).photoIds)

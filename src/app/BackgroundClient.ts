@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig, Settings } from 'common/CommonTypes'
+import { UiConfig, Settings, PhotoSet } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
@@ -83,8 +83,8 @@ export default {
         return callOnBackground('fetchSections', { filter, sectionIdsToKeepLoaded })
     },
 
-    fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<Photo[]> {
-        return callOnBackground('fetchSectionPhotos', { sectionId, filter })
+    fetchSectionPhotos(sectionIds: PhotoSectionId[], filter: PhotoFilter): Promise<PhotoSet[]> {
+        return callOnBackground('fetchSectionPhotos', { sectionIds, filter })
     },
 
     updatePhotos(photoIds: PhotoId[], update: Partial<Photo>): Promise<void> {

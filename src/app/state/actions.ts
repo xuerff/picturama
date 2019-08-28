@@ -1,6 +1,6 @@
 import { action, createAsyncAction } from 'typesafe-actions'
 
-import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoFilter, Settings, UiConfig } from 'common/CommonTypes'
+import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoSet, PhotoFilter, Settings, UiConfig } from 'common/CommonTypes'
 import { ImportProgress } from 'common/CommonTypes'
 
 import {
@@ -29,7 +29,7 @@ export const setLibraryInfoPhotoAction = createAsyncAction(SET_LIBRARY_INFO_PHOT
 
 export const fetchTotalPhotoCountAction = (totalPhotoCount: number) => action(FETCH_TOTAL_PHOTO_COUNT, { totalPhotoCount })
 export const fetchSectionsAction = createAsyncAction(FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE)<{ newFilter: PhotoFilter | null }, { sections: PhotoSection[] }, Error>()
-export const fetchSectionPhotosAction = (sectionId: PhotoSectionId, photos: Photo[]) => action(FETCH_SECTION_PHOTOS, { sectionId, photos })
+export const fetchSectionPhotosAction = (sectionIds: PhotoSectionId[], photoSets: PhotoSet[]) => action(FETCH_SECTION_PHOTOS, { sectionIds, photoSets })
 export const forgetSectionPhotosAction = (sectionIds: { [index: string]: true }) => action(FORGET_SECTION_PHOTOS, { sectionIds })
 export const changePhotoWorkAction = (photoId: PhotoId, photoWork: PhotoWork) => action(CHANGE_PHOTOWORK, { photoId, photoWork })
 export const changePhotosAction = (photos: Photo[], update: Partial<Photo>) => action(CHANGE_PHOTOS, { photos, update })

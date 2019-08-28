@@ -136,30 +136,24 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
                 fetchState: FetchState.FAILURE
             }
         case FETCH_SECTION_PHOTOS: {
-            const sectionId = action.payload.sectionId
-            const prevSection = state.byId[sectionId]
-            if (prevSection) {
-                let photoIds: PhotoId[] = []
-                let photoData: PhotoById = {}
-                for (const photo of action.payload.photos) {
-                    photoIds.push(photo.id)
-                    photoData[photo.id] = photo
-                }
-
-                return {
-                    ...state,
-                    byId: {
-                        ...state.byId,
-                        [sectionId]: {
-                            ...prevSection,
-                            count: photoIds.length,  // Should be correct already, but we set it just in case
-                            photoIds,
-                            photoData
-                        }
+            const { sectionIds, photoSets } = action.payload
+            const nextSectionById = { ...state.byId }
+            for (let i = 0, il = sectionIds.length; i < il; i++) {
+                const sectionId = sectionIds[i]
+                const section = nextSectionById[sectionId]
+                if (section) {
+                    const photoSet = photoSets[i]
+                    const nextSection: LoadedPhotoSection = {
+                        ...section,
+                        ...photoSet,
+                        count: photoSet.photoIds.length,  // Should be correct already, but we set it just in case
                     }
+                    nextSectionById[sectionId] = nextSection
                 }
-            } else {
-                return state
+            }
+            return {
+                ...state,
+                byId: nextSectionById
             }
         }
         case FORGET_SECTION_PHOTOS: {

@@ -74,7 +74,7 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'fetchSections') {
         return fetchSections(params.filter, params.sectionIdsToKeepLoaded)
     } else if (action === 'fetchSectionPhotos') {
-        return fetchSectionPhotos(params.sectionId, params.filter)
+        return fetchSectionPhotos(params.sectionIds, params.filter)
     } else if (action === 'updatePhotos') {
         return updatePhotos(params.photoIds, params.update)
     } else if (action === 'fetchPhotoDetail') {
