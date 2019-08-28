@@ -7,7 +7,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
-import { PhotoId, PhotoById, LoadedPhotoSection } from 'common/CommonTypes'
+import { PhotoId, PhotoById, LoadedPhotoSection, Photo } from 'common/CommonTypes'
 import config from 'common/config'
 import { getNonRawPath, getMasterPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
@@ -92,12 +92,19 @@ export class Export extends React.Component<Props, State> {
         )
     }
 
-    processImg(photo, source) {
-        return (sharp(source)
+    processImg(photo: Photo, source) {
+        const sharpObject = sharp(source)
             .rotate()
-            .withMetadata() as any)
-            .quality(this.state.quality)
-            .toFile(`${this.state.folder}/${photo.title}.${this.state.format}`)
+            .withMetadata()
+
+        switch(this.state.format) {
+            case 'png': sharpObject.png({ quality: this.state.quality }); break
+            case 'webp': sharpObject.webp({ quality: this.state.quality }); break
+            default: sharpObject.jpeg({ quality: this.state.quality }); break
+        }
+
+        const filenameParts = parsePath(photo.master_filename)
+        sharpObject.toFile(`${this.state.folder}/${filenameParts.name}.${this.state.format}`)
     }
 
     afterExport() {
