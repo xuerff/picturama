@@ -90,7 +90,7 @@ export default class Grid extends React.Component<Props, State> {
                 this.nailedGridPosition = getNailedGridPosition(prevState.scrollTop, prevState.viewportHeight,
                     prevGridLayout.sectionLayouts, prevProps.sectionIds, prevProps.sectionById)
             }
-        
+
             if (this.releaseNailTimer) {
                 clearTimeout(this.releaseNailTimer)
             }
@@ -114,8 +114,16 @@ export default class Grid extends React.Component<Props, State> {
                 gridLayout.sectionLayouts, props.sectionIds, props.sectionById)
 
             this.nailedGridPosition = null
-            if (nextScrollTop !== null && nextScrollTop !== this.state.scrollTop) {
+            if (nextScrollTop !== null && nextScrollTop !== state.scrollTop) {
+                // Scroll to new position, which will trigger rendering without nailing
                 this.setScrollTop(nextScrollTop)
+            } else {
+                const nextGridLayout = this.getGridLayout(props, state)
+                if (gridLayout !== nextGridLayout) {
+                    this.gridLayout = nextGridLayout
+                    // Render without nailing
+                    this.forceUpdate()
+                }
             }
         }
     }
