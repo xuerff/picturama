@@ -28,7 +28,7 @@ import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExist
 const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.join('|')})$`, 'i')
 const acceptedExtensionRE = new RegExp(`\\.(${config.acceptedNonRawExtensions.join('|')}|${config.acceptedRawExtensions.join('|')})$`, 'i')
 
-const progressUIUpdateInterval = 200  // In ms
+const uiUpdateInterval = 200  // In ms
 
 let nextTempRawConversionId = 1
 
@@ -57,9 +57,12 @@ class ImportScanner {
     private state: 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos' = 'idle'
 
     private importStartTime = 0
+
     private progress: ImportProgress
-    private lastProgressUIUpdateTime = 0
     private shouldFetchTags = false
+    private lastUIUpdateTime = 0
+    private isUIUpdateRunning = false
+    private needsFollowupUIUpdate = false
 
 
     constructor() {
@@ -349,30 +352,48 @@ class ImportScanner {
         }
     }
 
-    private async onProgressChange(forceSendingNow?: boolean) {
+    private onProgressChange(forceSendingNow?: boolean) {
         const now = Date.now()
-        if (forceSendingNow || now > this.lastProgressUIUpdateTime + progressUIUpdateInterval) {
-            const { state, progress } = this
-
-            this.lastProgressUIUpdateTime = now
-
-            let updatedTags: Tag[] | null = null
-            if (this.shouldFetchTags) {
-                updatedTags = await fetchTags()
-                this.shouldFetchTags = false
-            }
-
-            let progressBarProgress = 0
-            if (state === 'idle') {
-                progressBarProgress = -1  // Don't show progress
-            } else if (state === 'import-photos') {
-                progressBarProgress = progress.processed / (progress.total || 1)
+        if (forceSendingNow || now > this.lastUIUpdateTime + uiUpdateInterval) {
+            if (this.isUIUpdateRunning) {
+                this.needsFollowupUIUpdate = true
             } else {
-                progressBarProgress = 2  // indeterminate
-            }
-            AppWindowController.getAppWindow().setProgressBar(progressBarProgress)
+                this.isUIUpdateRunning = true
+                this.needsFollowupUIUpdate = false
+                this.lastUIUpdateTime = now
+                Promise.resolve()
+                    .then(async () => {
+                        const { state, progress } = this
 
-            ForegroundClient.setImportProgress(state === 'idle' ? null : progress, updatedTags)
+                        let updatedTags: Tag[] | null = null
+                        if (this.shouldFetchTags) {
+                            updatedTags = await fetchTags()
+                            this.shouldFetchTags = false
+                        }
+
+                        let progressBarProgress = 0
+                        if (state === 'idle') {
+                            progressBarProgress = -1  // Don't show progress
+                        } else if (state === 'import-photos') {
+                            progressBarProgress = progress.processed / (progress.total || 1)
+                        } else {
+                            progressBarProgress = 2  // indeterminate
+                        }
+                        AppWindowController.getAppWindow().setProgressBar(progressBarProgress)
+
+                        await ForegroundClient.setImportProgress(state === 'idle' ? null : progress, updatedTags)
+
+                        this.isUIUpdateRunning = false
+                        if (this.needsFollowupUIUpdate) {
+                            this.onProgressChange(true)
+                        }
+                    })
+                    .catch(error => {
+                        this.isUIUpdateRunning = false
+                        // TODO: Show error in UI
+                        console.error('Notifying progress failed', error)
+                    })
+            }
         }
     }
 
