@@ -41,14 +41,14 @@
     "postinstall": "electron-builder install-app-deps",
     "clean": "rm -rf dist dist-package",
     "clean-package": "rm -rf dist-package",
-    "start": "npm run build && npm run start-no-build",
+    "start": "yarn run build && yarn run start-no-build",
     "watch": "NODE_ENV=development webpack -w",
     "build": "NODE_ENV=development webpack",
     "build-production": "NODE_ENV=production webpack",
     "start-no-build": "ANSEL_DEV_MODE=true electron .",
     "package-dir": "electron-builder --dir",
     "package": "electron-builder",
-    "release": "npm run clean && npm run build-production && npm run package"
+    "release": "yarn run clean && yarn run build-production && yarn run package"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",
