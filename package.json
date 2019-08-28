@@ -62,7 +62,7 @@
     "gl-matrix": "^3.0.0",
     "json-stringify-pretty-compact": "^2.0.0",
     "justified-layout": "^3.0.0",
-    "libraw": "0.1.4",
+    "libraw": "file:submodules/node-libraw",
     "moment": "^2.24.0",
     "node-notifier": "5.4.0",
     "node-pre-gyp": "^0.13.0",

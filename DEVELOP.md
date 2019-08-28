@@ -27,6 +27,11 @@ Prerequirements:
       [getting smaller distributable packages](https://github.com/electron-userland/electron-builder/issues/1147#issuecomment-276284477)
   - Mac OS: Install Xcode and start it once. You can close Xcode after the "required components" have been installed.
 
+Fetch git submodules:
+
+    git submodule update --init --recursive
+
+Fetch dependnencies and build and start Ansel:
 
 ```bash
 yarn

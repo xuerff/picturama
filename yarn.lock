@@ -3465,7 +3465,7 @@ less@^3.9.0:
     request "^2.83.0"
     source-map "~0.6.0"
 
-"libraw@file:../node-libraw":
+"libraw@file:submodules/node-libraw":
   version "0.1.4"
   dependencies:
     nan "^2.2.1"
