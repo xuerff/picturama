@@ -21,12 +21,12 @@ export async function fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?
     Promise<PhotoSection[]>
 {
     const filterWhere = createWhereForFilter(filter)
-    const sql = `select date as id, date as title, count(*) as count from photos where ${filterWhere.sql} group by date order by date desc`
+    const sql = `select date_section as id, date_section as title, count(*) as count from photos where ${filterWhere.sql} group by date_section order by date_section desc`
     const sections = await DB().query<PhotoSection>(sql, ...filterWhere.params)
 
     if (sectionIdsToKeepLoaded && sectionIdsToKeepLoaded.length) {
         const sectionPhotosById: { [K in PhotoSectionId]: Photo[] } = {}
-        const sql = `select * from photos where date = ? and ${filterWhere.sql} order by created_at asc`
+        const sql = `select * from photos where date_section = ? and ${filterWhere.sql} order by created_at asc`
         await Promise.all(sectionIdsToKeepLoaded.map(sectionId =>
             DB().query<Photo>(sql, sectionId, ...filterWhere.params)
                 .then(sectionPhotos => { sectionPhotosById[sectionId] = sectionPhotos })
@@ -54,7 +54,7 @@ export async function fetchSections(filter: PhotoFilter, sectionIdsToKeepLoaded?
 
 export async function fetchSectionPhotos(sectionId: PhotoSectionId, filter: PhotoFilter): Promise<Photo[]> {
     const filterWhere = createWhereForFilter(filter)
-    const sql = `select * from photos where date = ? and ${filterWhere.sql} order by created_at asc`
+    const sql = `select * from photos where date_section = ? and ${filterWhere.sql} order by created_at asc`
     return await DB().query<Photo>(sql, sectionId, ...filterWhere.params)
 }
 

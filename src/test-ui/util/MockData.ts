@@ -14,6 +14,7 @@ export const testBigPhoto: Photo = {
     master_width: 5184,
     master_height: 3456,
     master_is_raw: 0,
+    date_section: '2016-09-18',
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
@@ -23,7 +24,6 @@ export const testBigPhoto: Photo = {
     iso: 1600,
     focal_length: 55,
     aperture: 5.6,
-    date: '2016-09-18',
     flag: 0,
     trashed: 0
 }
@@ -35,11 +35,11 @@ export const testLandscapePhoto: Photo = {
     master_width: 800,
     master_height: 530,
     master_is_raw: 0,
+    date_section: '2018-05-15',
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
     orientation: 1,
-    date: '2018-05-15',
     flag: 0,
     trashed: 0
 }
@@ -51,11 +51,11 @@ export const testPortraitPhoto: Photo = {
     master_width: 785,
     master_height: 1024,
     master_is_raw: 0,
+    date_section: '2018-05-15',
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
     orientation: 1,
-    date: '2018-05-15',
     flag: 1,
     trashed: 0
 }
@@ -67,11 +67,11 @@ export const testPanoramaPhoto: Photo = {
     master_width: 1024,
     master_height: 225,
     master_is_raw: 0,
+    date_section: '2018-05-15',
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
     orientation: 1,
-    date: '2018-05-15',
     flag: 0,
     trashed: 0
 }
@@ -96,11 +96,11 @@ export const testPhotos: Photo[] = [
     master_width: info.width,
     master_height: info.height,
     master_is_raw: 0,
+    date_section: '2018-05-15',
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
     orientation: 1,
-    date: '2018-05-15',
     flag: 0,
     trashed: 0
 }))

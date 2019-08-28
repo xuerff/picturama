@@ -7,6 +7,7 @@ CREATE TABLE "photos" (
     "master_width"    integer NOT NULL,
     "master_height"   integer NOT NULL,
     "master_is_raw"   boolean NOT NULL DEFAULT '0',
+    "date_section"    text NOT NULL,
     "created_at"      datetime NOT NULL,
     "updated_at"      datetime NOT NULL,
     "imported_at"     datetime NOT NULL,
@@ -16,7 +17,6 @@ CREATE TABLE "photos" (
     "iso"             integer,
     "focal_length"    integer,
     "aperture"        float,
-    "date"            date,
     "flag"            boolean NOT NULL DEFAULT '0',
     "trashed"         boolean NOT NULL DEFAULT '0'
 );

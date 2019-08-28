@@ -14,6 +14,8 @@ export interface Photo {
     master_height: number | null
     /** Whether the master image has a raw format */
     master_is_raw: 0 | 1,
+    /** Example: '2016-09-18' */
+    date_section: string,
     /** The timestamp when the photo was created */
     created_at: number,
     /** The timestamp when the photo was modified */
@@ -32,8 +34,6 @@ export interface Photo {
     focal_length?: number,
     /** Example: 5.6 */
     aperture?: number,
-    /** Example: '2016-09-18' */
-    date?: string,
     /** Whether the image is flagged. */
     flag: 0 | 1,
     /** Example: 0 */

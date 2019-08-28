@@ -299,18 +299,18 @@ class ImportScanner {
                 master_width:  switchSides ? master_height : master_width,
                 master_height: switchSides ? master_width : master_height,
                 master_is_raw: isRaw ? 1 : 0,
-                orientation: metaData.orientation,
-                date: moment(createdAt).format('YYYY-MM-DD'),
-                flag: photoWork.flagged ? 1 : 0,
-                trashed: 0,
+                date_section: moment(createdAt).format('YYYY-MM-DD'),
                 created_at: createdAt.getTime(),
                 updated_at: fileStats.mtime.getTime(),
                 imported_at: this.importStartTime,
+                orientation: metaData.orientation,
                 camera: metaData.camera,
                 exposure_time: metaData.exposureTime,
                 iso: metaData.iso,
+                focal_length: metaData.focalLength,
                 aperture: metaData.aperture,
-                focal_length: metaData.focalLength
+                flag: photoWork.flagged ? 1 : 0,
+                trashed: 0,
             }
             photo.id = await DB().insert('photos', photo)
             if (tempNonRawImgPath) {
