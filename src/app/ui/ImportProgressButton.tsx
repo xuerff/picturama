@@ -54,7 +54,7 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                                 {progress.currentPath}
                             </div>
                         }
-                        {spinnerProgress &&
+                        {spinnerProgress !== undefined &&
                             <div className='ImportProgressButton-percent'>
                                 {`${Math.round(spinnerProgress * 100)}%`}
                             </div>

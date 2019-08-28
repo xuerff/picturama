@@ -22,9 +22,14 @@ addSection('ImportProgressButton')
             progress={{ phase: 'cleanup', total: 10442, processed: 0, added: 0, removed: 15, currentPath: null }}
         />
     ))
-    .add('importing photos', context => (
+    .add('import-photos', context => (
         <ImportProgressButton
             progress={{ phase: 'import-photos', total: 10542, processed: 1250, added: 440, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
+        />
+    ))
+    .add('import-photos 0%', context => (
+        <ImportProgressButton
+            progress={{ phase: 'import-photos', total: 0, processed: 0, added: 0, removed: 21, currentPath: null }}
         />
     ))
     .add('error', context => (
