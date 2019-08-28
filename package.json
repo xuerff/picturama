@@ -17,6 +17,7 @@
       "category": "Graphics",
       "asar": false
     },
+    "publish": null,
     "directories": {
       "app": ".",
       "output": "dist-package",
@@ -48,7 +49,8 @@
     "start-no-build": "ANSEL_DEV_MODE=true electron .",
     "package-dir": "electron-builder --dir",
     "package": "electron-builder",
-    "release": "yarn run clean && yarn run build-production && yarn run package"
+    "release": "yarn run clean && yarn run build-production && yarn run package",
+    "release:windows": "yarn run clean && set \"NODE_ENV=production\" && webpack && yarn run package"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",

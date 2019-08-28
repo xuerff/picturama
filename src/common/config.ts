@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 
-let dotAnsel = `${process.env.HOME}/.ansel`
+let dotAnsel = `${os.homedir()}/.ansel`
 let dbMigrationsFolder = `${process.resourcesPath}/app/migrations`
 let anselFolder = `${process.resourcesPath}/app`
 const cwd = process.cwd()
@@ -13,7 +13,7 @@ if (process.env.ANSEL_DEV_MODE) {
 }
 
 if (process.env.ANSEL_TEST_MODE) {
-    const testsPath = '/tmp/ansel-tests'
+    const testsPath = `${os.tmpdir()}/ansel-tests`
 
     if (!fs.existsSync(testsPath)) {
         fs.mkdirSync(testsPath)
@@ -42,7 +42,7 @@ export default {
     settings: `${dotAnsel}/settings.json`,
     nonRawPath: `${dotAnsel}/non-raw`,
     thumbnailPath: `${dotAnsel}/thumbnails`,
-    tmp: '/tmp/ansel',
+    tmp: `${os.tmpdir()}/ansel`,
     concurrency: 3,
 
     // TODO: Revive Legacy code of 'version' feature
