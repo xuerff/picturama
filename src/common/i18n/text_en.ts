@@ -4,7 +4,7 @@ export default {
     common_close: 'Close',
     common_backToLibrary: 'Back to library',
 
-    ImportProgressButton_phase_scan_dirs: 'Scanning directories',
+    ImportProgressButton_phase_scan_dirs: 'Scanning folders',
     ImportProgressButton_phase_cleanup: 'Cleaning up',
     ImportProgressButton_phase_import_photos: 'Importing',
     ImportProgressButton_phase_error: 'Scanning failed',
@@ -12,9 +12,9 @@ export default {
 
     ImportScanner_importFinished: 'Scanned {0} photos in {1}',
 
-    Library_noPhotos_title: 'No photos imported',
+    Library_noPhotos_title: 'No photos added',
     Library_noSettings_message: 'Click on the {0} above to open the settings.',
-    Library_noPhotos_message: 'Press {0} or button below to start scanning.',
+    Library_noPhotos_message: 'Press {0} or button below to start scanning the folders for photos.',
     Library_startScanning: 'Start scanning',
     Library_emptyTrash: 'Trash is empty',
     Library_emptyFavorites: "You didn't mark any photo as favorite yet",
@@ -29,10 +29,10 @@ export default {
     LibraryFilterButton_shown: 'Shown: {0}',
     LibraryFilterButton_filter_all: 'All photos',
     LibraryFilterButton_filter_flagged: 'Favorites',
-    LibraryFilterButton_filter_processed: 'Processed',
+    LibraryFilterButton_filter_processed: 'Edited',
     LibraryFilterButton_filter_trash: 'Trash',
-    LibraryFilterButton_filter_tag: 'With Tag "{0}"',
-    LibraryFilterButton_tag_title: 'With Tag:',
+    LibraryFilterButton_filter_tag: 'With tag "{0}"',
+    LibraryFilterButton_tag_title: 'With tag:',
 
     LibraryTopBar_emptyTrashQuestion: 'Are you sure you want to empty the trash?',
     LibraryTopBar_moveToTrash: 'Move to trash of operating system',
@@ -48,7 +48,7 @@ export default {
     PhotoActionButtons_addFavorite: 'Add to favorites',
     PhotoActionButtons_trash: 'Move to trash',
     PhotoActionButtons_restoreFromTrash: 'Restore from trash',
-    PhotoActionButtons_photoInfo: 'Show informationen about selected photo',
+    PhotoActionButtons_photoInfo: 'Show information about selected photo',
     PhotoActionButtons_export: 'Export',
 
     PhotoInfo_title: 'Info',
