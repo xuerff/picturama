@@ -1,5 +1,4 @@
 import sharp from 'sharp'
-import libraw from 'libraw'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import DB from 'sqlite3-helper/no-generators'
@@ -29,6 +28,8 @@ const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.jo
 const acceptedExtensionRE = new RegExp(`\\.(${config.acceptedNonRawExtensions.join('|')}|${config.acceptedRawExtensions.join('|')})$`, 'i')
 
 const uiUpdateInterval = 200  // In ms
+
+let libraw: any | false | null = null
 
 let nextTempRawConversionId = 1
 
@@ -96,6 +97,15 @@ class ImportScanner {
         this.importStartTime = Date.now()
         this.progress.phase = 'scan-dirs'
         this.onProgressChange(true)
+
+        if (libraw === null) {
+            try {
+                libraw = require('libraw')
+            } catch (error) {
+                libraw = false
+                console.warn('libraw is not supported', error)
+            }
+        }
 
         const dirs: DirectoryInfo[] = []
         return BluebirdPromise.cast(fetchSettings())
@@ -240,6 +250,11 @@ class ImportScanner {
         const profiler = profileScanner ? new Profiler(`Importing ${masterFullPath}`) : null
 
         try {
+            const isRaw = acceptedRawExtensionRE.test(masterFileName)
+            if (isRaw && !libraw) {
+                return false
+            }
+
             // Fetch meta data and PhotoWork
 
             const [ fileStats, metaData, photoWork ] = await Promise.all([
@@ -261,7 +276,6 @@ class ImportScanner {
 
             // Store non-raw version of the photo (only if photo is raw)
 
-            const isRaw = acceptedRawExtensionRE.test(masterFileName)
             let tempNonRawImgPath: string | null = null
             if (isRaw) {
                 const tempRawConversionId = nextTempRawConversionId++

@@ -2,7 +2,6 @@ import { remote } from 'electron'
 import fs from 'fs'
 import BluebirdPromise from 'bluebird'
 import notifier from 'node-notifier'
-import libraw from 'libraw'
 import sharp from 'sharp'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
@@ -23,6 +22,8 @@ import Progress from './Progress'
 
 
 const fsReadFile = BluebirdPromise.promisify(fs.readFile)
+
+let libraw: any | false | null = null
 
 
 interface OwnProps {
@@ -132,9 +133,21 @@ export class Export extends React.Component<Props, State> {
         }
 
         if (config.acceptedRawExtensions.indexOf(extension) !== -1) {
-            return libraw.extract(getMasterPath(photo), `${config.tmp}/ansel-export-temp-${photo.id}`)
-                .then(imgPath => fsReadFile(imgPath))
-                .then(img => this.processImg(photo, img))
+            if (libraw !== false) {
+                if (!libraw) {
+                    try {
+                        libraw = require('libraw')
+                    } catch (error) {
+                        libraw = false
+                        console.log('libraw is not supported', error)
+                    }
+                }
+                if (libraw) {
+                    return libraw.extract(getMasterPath(photo), `${config.tmp}/ansel-export-temp-${photo.id}`)
+                        .then(imgPath => fsReadFile(imgPath))
+                        .then(img => this.processImg(photo, img))
+                }
+            }
         }
 
         return this.processImg(photo, getNonRawPath(photo))

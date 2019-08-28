@@ -62,7 +62,6 @@
     "gl-matrix": "^3.0.0",
     "json-stringify-pretty-compact": "^2.0.0",
     "justified-layout": "^3.0.0",
-    "libraw": "file:submodules/node-libraw",
     "moment": "^2.24.0",
     "node-notifier": "5.4.0",
     "node-pre-gyp": "^0.13.0",
@@ -80,6 +79,9 @@
     "sqlite3": "^4.0.9",
     "sqlite3-helper": "1.2.1",
     "typesafe-actions": "^4.4.2"
+  },
+  "optionalDependencies": {
+    "libraw": "file:submodules/node-libraw"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.27",
