@@ -160,7 +160,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
                         onClick={this.restoreFromTrash}
                     >
                         <MdRestoreFromTrash/>
-                        <span className={Classes.BUTTON_TEXT}>Restore</span>
+                        <span className={Classes.BUTTON_TEXT}>{msg('PhotoActionButtons_restore')}</span>
                     </Button>
                 }
                 <Button

@@ -48,6 +48,7 @@ export default {
     PhotoActionButtons_addFavorite: 'Zu Favoriten hinzufügen',
     PhotoActionButtons_trash: 'In Papierkorb legen',
     PhotoActionButtons_restoreFromTrash: 'Aus dem Papierkorb holen',
+    PhotoActionButtons_restore: 'Wiederherstellen',
     PhotoActionButtons_photoInfo: 'Informationen über ausgewähltes Foto anzeigen',
     PhotoActionButtons_export: 'Exportieren',
 
