@@ -4,9 +4,13 @@ Digital image organizer powered by the web
 
 ![](doc/ansel-screenshot.jpg)
 
-## Download
+## Download version 1.0.0
 
-<a href="https://github.com/ansel-app/ansel/releases" style="font-weigth:bold;font-size:20px;color:white;background:#28a745;padding:10px 30px;border:1px solid rgba(27,31,35,.2);border-radius:5px">Download</a>
+[![](doc/download-mac.svg)](https://github.com/ansel-app/ansel/releases/download/v1.0.0/Ansel-1.0.0.dmg)
+
+[![](doc/download-windows.svg)](https://github.com/ansel-app/ansel/releases/download/v1.0.0/Ansel.Setup.1.0.0.exe)
+
+[![](doc/download-linux.svg)](https://github.com/ansel-app/ansel/releases/download/v1.0.0/Ansel-1.0.0.AppImage)
 
 ## Features
 
