@@ -12,7 +12,7 @@
     "npm": ">=6.0.0"
   },
   "build": {
-    "appId": "github.ansel_app",
+    "appId": "github.ansel",
     "linux": {
       "category": "Graphics",
       "asar": false
