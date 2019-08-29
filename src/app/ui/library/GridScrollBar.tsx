@@ -1,6 +1,7 @@
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 import classnames from 'classnames'
+import moment = require('moment')
 
 import { PhotoSectionId, PhotoSectionById } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
@@ -15,11 +16,16 @@ import './GridScrollBar.less'
 interface ScaleItem {
     y: number
     type: 'year' | 'month'
-    title: string
+    /** E.g. '2019' for a year or '2019-08' for a month */
+    id: string
+    /** E.g. '2019' for a year or 'Aug' for a month */
+    label: string
 }
 
-const minMonthScaleItemGap = 8
-const minYearScaleItemGap = 15
+const minMonthScaleItemGap = 15
+const minYearScaleItemGap = 16
+
+let monthLabels: string[] | null = null
 
 
 export interface Props {
@@ -55,6 +61,13 @@ export default class GridScrollBar extends React.Component<Props, State> {
             scaleItems: [],
         }
         bindMany(this, 'onMouseDown', 'onWindowMouseMove', 'onWindowMouseUp', 'onMouseMove', 'onMouseOut', 'onWheel')
+
+        if (!monthLabels) {
+            monthLabels = []
+            for (let month = 0; month < 12; month++) {
+                monthLabels[month] = moment(new Date(2000, month)).format('MMM')
+            }
+        }
     }
 
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
@@ -157,12 +170,12 @@ export default class GridScrollBar extends React.Component<Props, State> {
                 />
                 {state.scaleItems.map(scaleItem =>
                     <div
-                        key={scaleItem.title}
-                        data-title={scaleItem.title}
+                        key={scaleItem.id}
+                        data-id={scaleItem.id}
                         className={`GridScrollBar-scaleItem hasType_${scaleItem.type}`}
                         style={{ top: scaleItem.y }}
                     >
-                        {scaleItem.type === 'year' && scaleItem.title}
+                        {scaleItem.label}
                     </div>
                 )}
                 <div
@@ -228,7 +241,8 @@ function generateScaleItems(sectionLayouts: GridSectionLayout[], sectionIds: Pho
         const scaleItem: ScaleItem = {
             y,
             type: isNewYear ? 'year' : 'month',
-            title: isNewYear ? year : month
+            id: isNewYear ? year : month,
+            label: isNewYear ? year : monthLabels![parseInt(month.substr(5)) - 1]
         }
         if (overlapsLastItem) {
             result.pop()

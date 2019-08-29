@@ -2,7 +2,7 @@
 
 
 @hintBarHeight: 2px;
-@monthDotSize: 4px;
+@monthHeight: 12px;
 @yearHeight: 14px;
 
 .GridScrollBar {
@@ -22,22 +22,21 @@
 .GridScrollBar-scaleItem {
     position: absolute;
 
+    left: 0;
+    right: 0;
+    text-align: center;
+
     &.hasType_month {
-        left: 50%;
-        width: @monthDotSize;
-        height: @monthDotSize;
-        margin: (-@monthDotSize / 2) 0 0 (-@monthDotSize / 2);
-        background-color: @blue-grey-400;
-        border-radius: 50%;
+        margin-top: -2px;  // Make Top line of text match the top of the div
+        font-size: @monthHeight;
+        line-height: @monthHeight;
+        color: @blue-grey-300;
     }
     &.hasType_year {
-        left: 0;
-        right: 0;
         margin-top: -2px;  // Make Top line of text match the top of the div
-        text-align: center;
         font-size: @yearHeight;
         line-height: @yearHeight;
-        color: @blue-grey-400;
+        color: @blue-grey-600;
     }
 }
 
@@ -66,6 +65,7 @@
     bottom: @hintBarHeight;
     padding: 2px 0;
     text-align: center;
+    background-color: fadeout(@blue-grey-100, 50%);
 
     &.isBelow {
         bottom: auto;
