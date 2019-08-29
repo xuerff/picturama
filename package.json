@@ -1,7 +1,7 @@
 {
   "name": "ansel",
   "productName": "Ansel",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "description": "Digital image organizer powered by the web",
   "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
   "license": "MIT",
@@ -13,6 +13,10 @@
   },
   "build": {
     "appId": "github.ansel",
+    "mac": {
+      "category": "public.app-category.photography",
+      "electronLanguages": [ "de", "en" ]
+    },
     "linux": {
       "category": "Graphics",
       "asar": false
@@ -25,7 +29,6 @@
     },
     "files": [
       "dist/**",
-      "package.json",
       "!**/node_modules/sharp/docs",
       "!**/node_modules/sharp/src",
       "!**/node_modules/sqlite3/src"

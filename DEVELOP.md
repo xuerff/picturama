@@ -51,7 +51,7 @@ Build distributable package
 
 Build distributable package:
 
-    yarn package
+    yarn run package
 
 Cross-build linux package on Mac OS or Windows:
 
@@ -69,7 +69,7 @@ Cross-build linux package on Mac OS or Windows:
 
   2.  Build `dist-package/Ansel-xyz.deb` for Linux (in docker container):
 
-          yarn && yarn package
+          yarn && yarn run package
 
 Cross-build windows package on Mac OS or Linux:
 

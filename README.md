@@ -1,69 +1,26 @@
 # Ansel
 
-![](ansel.jpg)
+Digital image organizer powered by the web
 
-## Introduction
+![](doc/ansel-screenshot.jpg)
 
-...
+## Download
+
+<a href="https://github.com/ansel-app/ansel/releases" style="font-weigth:bold;font-size:20px;color:white;background:#28a745;padding:10px 30px;border:1px solid rgba(27,31,35,.2);border-radius:5px">Download</a>
 
 ## Features
 
-- [x] Scan for local files
-- [x] Non destructive editing
-- [x] Before & after diff view
-- [x] Browse by dates
-- [ ] Tags
-- [ ] Collections
-- [ ] Import window
-- [x] Flag
-- [ ] Delete photo(s)
-- [ ] File versioning
-- [x] Export to external editor
-- [ ] Export
-
-Searching for USB support on Linux? Check out the [Branch linux](https://github.com/ansel-app/ansel/tree/linux).
-
-## Install
-
-```bash
-cd path/to/ansel
-npm install
-npm start
-```
-
-## Supported cameras
-
-- [x] Fuji X100
-- [x] Fuji X100S
-- [x] Fuji X100T
-- [x] Canon 5D Mark I
-- [ ] Canon EOS 700D
+- Scan local files - Keep your privacy, don't upload your personal photos to a cloud service
+- Non-Destructive - The original images won't be touched (unless you purge the trash)
+- Read raw formats of [a whole bunch of cameras](https://www.libraw.org/supported-cameras) (only on Mac and Linux, see [Issue #25](https://github.com/ansel-app/ansel/issues/25))
+- Browse photos by dates
+- View photo in detail (zoomable)
+- View EXIF information
+- Tags
+- Favorites
+- Rotate photos
+- Delete photos
 
 ## Develop
 
-See [DEVELOP.md](DEVELOP.md) for details about how to develop Ansel.
-
-## Technologies & libraries
-
-### Core
-
-- [Electron.js](http://electron.atom.io/)
-- [React](https://facebook.github.io/react/) / [Redux](http://redux.js.org/)
-- [Sharp](http://sharp.dimens.io)
-- [SQLite](https://www.sqlite.org) - [node bindings](https://github.com/mapbox/node-sqlite3)
-- [Bookshelf.js](http://bookshelfjs.org/) / [Knex.js](http://knexjs.org/)
-- [Bluebird.js](http://bluebirdjs.com/)
-- [Chokidar](https://github.com/paulmillr/chokidar)
-- [Libraw](http://www.libraw.org/) - [node bindings](https://github.com/m0g/node-libraw)
-- [Moment.js](http://momentjs.com/)
-- [Font Awesome](http://fontawesome.io/)
-
-### Testing, building & transpiling
-
-- [TypeScript](https://www.typescriptlang.org/)
-- [Spectron](http://electron.atom.io/spectron/)
-- [Gulp](http://gulpjs.com/)
-- [Mocha](http://mochajs.org/)
-- [Electron-packager](https://github.com/electron-userland/electron-packager)
-- [Less](http://lesscss.org/)
-- [Eslint](http://eslint.org/)
+See [DEVELOP.md](DEVELOP.md) for details about how to build Ansel.
