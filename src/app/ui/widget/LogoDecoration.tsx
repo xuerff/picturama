@@ -22,6 +22,8 @@ interface State {
 
 export default class LogoDecoration extends React.Component<Props, State> {
 
+    private resizeObserver: ResizeObserver | null
+
     constructor(props: Props) {
         super(props)
         this.state = { decorationWidth: 0 }
@@ -30,11 +32,19 @@ export default class LogoDecoration extends React.Component<Props, State> {
 
     componentDidMount() {
         this.onResize()
-        window.addEventListener('resize', this.onResize)
+
+        const mainElem = findDOMNode(this.refs.main) as HTMLElement
+        const parentElement = mainElem && mainElem.parentElement!
+
+        this.resizeObserver = new ResizeObserver(this.onResize)
+        this.resizeObserver.observe(parentElement)
     }
 
     componentWillUnmount() {
-        window.removeEventListener('resize', this.onResize)
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect()
+            this.resizeObserver = null
+        }
     }
 
     private onResize() {

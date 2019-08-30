@@ -15,6 +15,7 @@ Directory structure
         +-- package/          Resources needed for creating distributable packages (used by `electron-builder`)
         +-- static/           Static files to be copied directly to `dist`
         +-- test-ui/          Code running in renderer electron process of UI Tester
+        +-- typings/          TypeScript type definitions
 
 
 Build from sources
