@@ -2,11 +2,13 @@ How to develop Ansel
 ====================
 
 
+
 Directory structure
 -------------------
 
     +-- dist/                 Build artifacts of the app (filled by `webpack`)
     +-- dist-package/         Build artifacts when creating distributable packages (filled by `electron-builder`)
+    +-- doc/                  Resources used by documentation
     +-- migrations/           DB migration scripts
     +-- src/
         +-- app/              Code running in renderer electron process of main UI
@@ -16,6 +18,9 @@ Directory structure
         +-- static/           Static files to be copied directly to `dist`
         +-- test-ui/          Code running in renderer electron process of UI Tester
         +-- typings/          TypeScript type definitions
+    +-- submodules/           Third-party projects fetched as git submodules
+    +-- test-data/            Data used for testing
+
 
 
 Build from sources
@@ -45,6 +50,7 @@ If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try ag
 rm -rf ~/.node-gyp
 yarn
 ```
+
 
 
 Build distributable package
@@ -84,6 +90,7 @@ For more details see:
 
   - https://www.electron.build/multi-platform-build
   - https://github.com/appveyor/ci/issues/1089#issuecomment-264549196
+
 
 
 UI Tester
