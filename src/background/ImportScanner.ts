@@ -47,8 +47,7 @@ export function startImport(): void {
     }
     importScanner.scanPhotos()
         .catch(error => {
-            // TODO: Show error in UI
-            console.error('Scanning photos failed', error)
+            ForegroundClient.showError('Scanning photos failed', error)
         })
 }
 
@@ -356,7 +355,7 @@ class ImportScanner {
             if (profiler) profiler.logResult()
             return true
         } catch (error) {
-            // TODO: Show error in UI
+            // TODO: Show error in UI (in progress info, not using `ForegroundClient.showError`)
             console.error('Importing photo failed', masterFullPath, error)
             if (profiler) {
                 profiler.addPoint('Caught error')
@@ -404,8 +403,7 @@ class ImportScanner {
                     })
                     .catch(error => {
                         this.isUIUpdateRunning = false
-                        // TODO: Show error in UI
-                        console.error('Notifying progress failed', error)
+                        ForegroundClient.showError('Notifying progress failed', error)
                     })
             }
         }

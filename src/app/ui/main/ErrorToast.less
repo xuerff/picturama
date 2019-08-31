@@ -1,0 +1,41 @@
+@toastPaddingLeft: 56px;
+@toastWidth: 500px;
+@reportCollapseMarginX: 12px;
+@reportCollapseWidth: (@toastWidth - 2 * @reportCollapseMarginX);
+
+.ErrorToast {
+    width: @toastWidth;
+}
+
+.ErrorToast-icon {
+    color: white;
+    font-size: 24px !important;
+    margin: 9px 12px;
+}
+
+.ErrorToast-toggleReport {
+    float: right;
+    margin: -6px -5px -6px 0 !important;
+}
+
+.ErrorToast-reportCollapse {
+    margin-left: (@reportCollapseMarginX - @toastPaddingLeft);
+    margin-right: -@reportCollapseWidth;  // Don't move top buttons
+    width: @reportCollapseWidth;
+}
+
+.ErrorToast-report {
+    margin-top: 16px;
+    padding: 15px;
+    color: #333;
+    background-color: white;
+    width: 100%;
+    max-height: 150px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.ErrorToast-reportBottomBar {
+    text-align: center;   
+}

@@ -4,6 +4,7 @@ import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
+import { showError } from 'app/ErrorPresenter'
 import { setDetailPhotoAction, closeDetailAction } from 'app/state/actions'
 import { getPhotoByIndex, getLoadedSectionById } from 'app/state/selectors'
 import store from 'app/state/store'
@@ -47,8 +48,7 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
         })
         .catch(error => {
             if (!isCancelError(error)) {
-                // TODO: Show error to the user
-                console.error('Fetching photo work failed: ' + getMasterPath(photo), error)
+                showError('Fetching photo work failed: ' + getMasterPath(photo), error)
                 store.dispatch(setDetailPhotoAction.failure(error))
             }
         })

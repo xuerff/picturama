@@ -7,6 +7,7 @@ import { profileDetailView } from 'common/LogConstants'
 import Profiler from 'common/util/Profiler'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
+import { showError } from 'app/ErrorPresenter'
 import PhotoCanvas, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 
@@ -213,7 +214,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         this.tryToFetchTexture(props.srcPrev)
 
         if (this.texturesWithError[props.src]) {
-            // TODO: Show error
+            showError('Showing photo failed: ' + props.src)
             canvas.getElement().style.display = 'none'
             this.setLoading(false)
             return

@@ -1,6 +1,9 @@
 import fs from 'fs'
 import os from 'os'
 
+import npmPackage from '../../package.json'
+
+
 let dotAnsel = `${os.homedir()}/.ansel`
 let dbMigrationsFolder = `${process.resourcesPath}/app/migrations`
 let anselFolder = `${process.resourcesPath}/app`
@@ -27,6 +30,7 @@ const menusFolder = `${anselFolder}/menus`
 const platform = os.platform()
 
 export default {
+    version: npmPackage.version,
     platform,
     acceptedRawExtensions: [ 'raf', 'cr2', 'arw', 'dng' ],
     acceptedNonRawExtensions: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],

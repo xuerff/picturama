@@ -13,6 +13,7 @@ import 'test-ui/tests/ExportTest'
 import 'test-ui/tests/GridSectionTest'
 import 'test-ui/tests/PhotoPaneTest'
 import 'test-ui/tests/IconTest'
+import 'test-ui/tests/ErrorToastTest'
 
 import 'app/entry.less'
 import 'test-ui/entry.less'

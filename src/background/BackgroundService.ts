@@ -4,6 +4,7 @@ import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
 import AppWindowController from 'background/AppWindowController'
+import ForegroundClient from 'background/ForegroundClient'
 import { startImport } from 'background/ImportScanner'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
@@ -28,8 +29,7 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
     ipcMain.on('empty-trash', () => {
         emptyTrash()
             .catch(error => {
-                // TODO: Show error in UI
-                console.error('Emptying trash failed', error)
+                ForegroundClient.showError('Emptying trash failed', error)
             })
     })
 

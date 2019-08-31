@@ -4,6 +4,13 @@ export default {
     common_close: 'Close',
     common_backToLibrary: 'Back to library',
 
+    ErrorController_copied: 'Copied report to clipboard.',
+
+    ErrorToast_title: 'Oh no! Something went wrong.',
+    ErrorToast_hideReport: 'Hide report',
+    ErrorToast_showReport: 'Show report',
+    ErrorToast_copy: 'Copy',
+
     ImportProgressButton_phase_scan_dirs: 'Scanning folders',
     ImportProgressButton_phase_cleanup: 'Cleaning up',
     ImportProgressButton_phase_import_photos: 'Importing',

@@ -8,6 +8,7 @@ import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
+import { showError } from 'app/ErrorPresenter'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 import List from 'app/ui/widget/List'
@@ -154,8 +155,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
                     }
                 })
                 .catch(error => {
-                    // TODO: Show in UI
-                    console.error('Applying new settings failed', error)
+                    showError('Applying new settings failed', error)
                 })
         },
     })

@@ -7,6 +7,7 @@ import { PhotoId, Photo, PhotoSectionId, PhotoSectionById, isLoadedPhotoSection 
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany, cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
+import { showError } from 'app/ErrorPresenter'
 import { isMac } from 'app/UiConstants'
 import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from 'app/UITypes'
 import { CommandGroupId, addCommandGroup, setCommandGroupEnabled, removeCommandGroup } from 'app/controller/HotkeyController'
@@ -272,8 +273,7 @@ export default class Grid extends React.Component<Props, State> {
             const layout = gridLayout.sectionLayouts[sectionIndex]
             if (!layout) {
                 // This should not happen, but in some rare cases it might happen (had it on 2018-09-02 after empty trash)
-                // TODO: Show error in UI
-                console.warn(`Expected to have a layout for section #${sectionIndex} (${sectionId})`)
+                showError(`Expected to have a layout for section #${sectionIndex} (${sectionId})`)
                 continue
             }
             result.push(

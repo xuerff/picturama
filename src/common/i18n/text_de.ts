@@ -4,6 +4,13 @@ export default {
     common_close: 'Schließen',
     common_backToLibrary: 'Zurück zur Bibliothek',
 
+    ErrorController_copied: 'Report wurde in die Zwischenablage kopiert.',
+
+    ErrorToast_title: 'Oh nein! Da ging was schief.',
+    ErrorToast_hideReport: 'Report ausblenden',
+    ErrorToast_showReport: 'Report anzeigen',
+    ErrorToast_copy: 'Kopieren',
+
     ImportProgressButton_phase_scan_dirs: 'Scanne Ordner',
     ImportProgressButton_phase_cleanup: 'Räume auf',
     ImportProgressButton_phase_import_photos: 'Importiere',

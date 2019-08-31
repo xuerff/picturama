@@ -5,6 +5,7 @@ import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
+import { showError } from 'app/ErrorPresenter'
 import store from 'app/state/store'
 import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from 'app/state/actions'
 
@@ -81,8 +82,7 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
             })
             .catch(error => {
                 delete pendingUpdates[photoPath]
-                // TODO: Show error message in UI
-                console.error('Updating photo work failed: ' + photoPath, error)
+                showError('Updating photo work failed: ' + photoPath, error)
             })
     }
 }
@@ -147,7 +147,6 @@ export function updatePhotos(photos: Photo[], update: Partial<Photo>) {
         store.dispatch(changePhotosAction(changedPhotos, update))
     })
     .catch(error => {
-        // TODO: Show error in UI
-        console.error('Updating photos failed', error)
+        showError('Updating photos failed', error)
     })
 }

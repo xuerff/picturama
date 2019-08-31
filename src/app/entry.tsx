@@ -13,6 +13,7 @@ import store from 'app/state/store'
 import './entry.less'
 
 import pkgs from '../../package.json'
+import { showError } from 'app/ErrorPresenter'
 
 
 if (process.env.ANSEL_DEV_MODE) {
@@ -45,6 +46,5 @@ Promise
             document.getElementById('app'))
     })
     .catch(error => {
-        // TODO: Show error in UI
-        console.error('Initializing UI failed', error)
+        showError('Initializing UI failed', error)
     })

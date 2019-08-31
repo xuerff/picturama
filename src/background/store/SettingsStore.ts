@@ -4,6 +4,7 @@ import { Settings } from 'common/CommonTypes'
 import config from 'common/config'
 import { isArray, isObject } from 'common/util/LangUtil'
 
+import ForegroundClient from 'background/ForegroundClient'
 import { fsReadFile, fsExists, fsWriteFile } from 'background/util/FileUtil'
 
 
@@ -29,8 +30,7 @@ export function fetchSettings(): Promise<Settings> {
                     }
                 }
             } catch (error) {
-                // TODO: Show error in UI
-                console.error('Reading settings.json failed', error)
+                ForegroundClient.showError('Reading settings.json failed', error)
                 settings = null
             }
             if (settings == null) {

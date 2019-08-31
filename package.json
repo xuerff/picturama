@@ -15,7 +15,10 @@
     "appId": "github.ansel",
     "mac": {
       "category": "public.app-category.photography",
-      "electronLanguages": [ "de", "en" ]
+      "electronLanguages": [
+        "de",
+        "en"
+      ]
     },
     "linux": {
       "category": "Graphics",
@@ -61,6 +64,7 @@
     "bluebird": "^3.5.5",
     "chokidar": "3.0.2",
     "classnames": "^2.2.6",
+    "copy-text-to-clipboard": "^2.1.0",
     "exif-parser": "^0.1.12",
     "font-awesome": "^4.7.0",
     "fs.extra": "^1.3.2",
@@ -71,7 +75,6 @@
     "node-notifier": "5.4.0",
     "node-pre-gyp": "^0.13.0",
     "normalize.css": "^8.0.1",
-    "pretty-error": "^2.1.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-icons": "^3.7.0",
@@ -81,6 +84,7 @@
     "redux-thunk": "^2.3.0",
     "sharp": "0.23.0",
     "source-map-support": "^0.5.13",
+    "sourcemapped-stacktrace": "^1.1.9",
     "sqlite3": "^4.0.9",
     "sqlite3-helper": "1.2.1",
     "typesafe-actions": "^4.4.2"

@@ -1,8 +1,6 @@
 import fs from 'fs'
 import { ipcMain, Menu, MenuItemConstructorOptions, BrowserWindow } from 'electron'
 
-import npmPackage from '../../package.json'
-
 import config from 'common/config'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -48,7 +46,7 @@ class MainMenu {
                         submenu.click = this[submenu.click]
 
                     if (submenu.label.toLowerCase() === 'version')
-                        submenu.label = `Version ${npmPackage.version}`
+                        submenu.label = `Version ${config.version}`
 
                     return submenu as any as MenuItemConstructorOptions
                 })

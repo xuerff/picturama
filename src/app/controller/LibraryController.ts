@@ -8,6 +8,7 @@ import Profiler from 'common/util/Profiler'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 
 import BackgroundClient from 'app/BackgroundClient'
+import { showError } from 'app/ErrorPresenter'
 import { GridSectionLayout, GridLayout, JustifiedLayoutBox } from 'app/UITypes'
 import { sectionHeadHeight } from 'app/ui/library/GridSection'
 import { forgetSectionPhotosAction, fetchSectionPhotosAction, setLibraryInfoPhotoAction } from 'app/state/actions'
@@ -398,8 +399,7 @@ function fetchSectionPhotos(sectionIds: PhotoSectionId[]) {
         })
         .catch(error => {
             isFetchingSectionPhotos = false
-            // TODO: Show error in UI
-            console.error(`Fetching photos for sections ${sectionIds.join(', ')} failed`, error)
+            showError(`Fetching photos for sections ${sectionIds.join(', ')} failed`, error)
         })
 }
 
@@ -419,8 +419,7 @@ export function setInfoPhoto(sectionId: PhotoSectionId | null, photoId: PhotoId 
             .catch(error => {
                 if (!isCancelError(error)) {
                     store.dispatch(setLibraryInfoPhotoAction.failure(error))
-                    // TODO: Show error in UI
-                    console.error('Fetching photo detail failed', error)
+                    showError('Fetching photo detail failed', error)
                 }
             })
     }

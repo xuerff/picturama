@@ -3,6 +3,7 @@ import { ipcRenderer } from 'electron'
 import { Device } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
+import { showExternalError } from 'app/ErrorPresenter'
 import ImportProgressController from 'app/controller/ImportProgressController'
 import { setTags } from 'app/controller/PhotoTagController'
 import { setFullScreenAction, initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, openSettingsAction } from 'app/state/actions'
@@ -34,7 +35,9 @@ export function init() {
 
 
 async function executeForegroundAction(action: string, params: any): Promise<any> {
-    if (action === 'onFullScreenChange') {
+    if (action === 'showError') {
+        showExternalError(params.processName, params.msg, params.errorStack)
+    } else if (action === 'onFullScreenChange') {
         store.dispatch(setFullScreenAction(params.isFullScreen))
     } else if (action === 'showSettings') {
         store.dispatch(openSettingsAction())

@@ -43,6 +43,15 @@ export default {
         })
     },
 
+    showError(msg: string, error?: Error) {
+        console.error(msg, error)
+        const errorStack = error && error.stack
+        callOnForeground('showError', { processName: 'background', msg, errorStack })
+            .catch(error => {
+                console.error('Showing background error failed', error)
+            })
+    },
+
     async onFullScreenChange(isFullScreen: boolean): Promise<void> {
         return callOnForeground('onFullScreenChange', { isFullScreen })
     },

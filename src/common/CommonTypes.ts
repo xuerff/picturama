@@ -80,6 +80,7 @@ export interface Settings {
 
 
 export interface UiConfig {
+    version: string
     platform: NodeJS.Platform
     locale: string
 }

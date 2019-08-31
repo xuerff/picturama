@@ -3,7 +3,6 @@ import { app, screen, BrowserWindow } from 'electron'
 import DB from 'sqlite3-helper/no-generators'
 import { DBOptions } from 'sqlite3-helper'
 import { install as initSourceMapSupport } from 'source-map-support'
-import { start as initPrettyError } from 'pretty-error'
 
 import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
@@ -18,7 +17,6 @@ import { fsUnlink, fsUnlinkDeep, fsMkDirIfNotExists } from 'background/util/File
 
 
 initSourceMapSupport()
-initPrettyError()
 
 let initDbPromise: Promise<any> | null = null
 let mainWindow: BrowserWindow | null = null
@@ -67,7 +65,7 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Ansel')
     AppWindowController.init(mainWindow)
-    initBackgroundService(mainWindow, { platform, locale })
+    initBackgroundService(mainWindow, { version: config.version, platform, locale })
     ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()
@@ -95,8 +93,7 @@ app.on('ready', () => {
             onBackgroundReady()
         })
         .catch(error => {
-            // TODO: Show error in UI
-            console.error('Initializing failed', error)
+            ForegroundClient.showError('Initializing failed', error)
         })
 })
 

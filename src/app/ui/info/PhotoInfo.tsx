@@ -10,6 +10,7 @@ import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 import { formatNumber } from 'common/util/TextUtil'
 
+import { showError } from 'app/ErrorPresenter'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 
@@ -78,8 +79,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
                 })
                 .catch(error => {
                     this.isFetchingMasterFileSize = false
-                    // TODO: Show error in UI
-                    console.error('Fetching master file size failed', error)
+                    showError('Fetching master file size failed', error)
                 })
         }
     }
