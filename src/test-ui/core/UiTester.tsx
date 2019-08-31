@@ -184,18 +184,23 @@ export default class UiTester extends React.Component<Props, State> {
                         )}
                     </ButtonGroup>
                     {sections.map((section, sectionIndex) =>
-                        <div className="form-group" key={sectionIndex}>
-                            <label>{section.title}</label>
-                            <div className="btn-group-vertical btn-block" role="group">
-                                {section.tests.map((test, testIndex) =>
-                                    <button key={testIndex}
-                                            className={classnames('btn btn-default', { active: test == state.currentTest })}
-                                            onClick={() => this._showTest(section, test)}
-                                    >
-                                        {test.title}
-                                    </button>
-                                )}
+                        <div key={sectionIndex}>
+                            <div className='UITester-sectionTitle'>
+                                {section.title}
                             </div>
+                            <ButtonGroup
+                                className='UITester-sectionButtons'
+                                vertical={true}
+                            >
+                                {section.tests.map((test, testIndex) =>
+                                    <Button
+                                        key={testIndex}
+                                        active={test == state.currentTest}
+                                        text={test.title}
+                                        onClick={() => this._showTest(section, test)}
+                                    />
+                                )}
+                            </ButtonGroup>
                         </div>
                     )}
                 </div>
