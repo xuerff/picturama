@@ -104,6 +104,7 @@ function onGlobalKeyDown(event: KeyboardEvent) {
                 }
                 if (comboMatches(combo, command.parsedCombo) && isCommandEnabled(command)) {
                     try {
+                        event.preventDefault()
                         command.onAction()
                     } catch (error) {
                         console.error(`Handling hotkey ${getKeyComboString(event)} failed` +

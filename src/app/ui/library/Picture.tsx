@@ -68,14 +68,20 @@ export default class Picture extends React.Component<Props, State> {
 
         if (props.isHighlighted && props.isHighlighted !== prevProps.isHighlighted) {
             const pictureElem = findDOMNode(this.refs.picture) as HTMLElement
-            let rect = pictureElem.getBoundingClientRect()
-            let containerElem = pictureElem.parentNode!.parentNode!.parentNode as Element
-            let containerRect = containerElem.getBoundingClientRect()
+            const rect = pictureElem.getBoundingClientRect()
+            let scrollParentElem = pictureElem.parentElement
+            while (scrollParentElem && scrollParentElem.scrollHeight <= scrollParentElem.clientHeight) {
+                scrollParentElem = scrollParentElem.parentElement
+            }
 
-            if (rect.bottom > containerRect.bottom) {
-                containerElem.scrollTop += rect.bottom - containerRect.bottom
-            } else if (rect.top < 0) {
-                containerElem.scrollTop += rect.top
+            if (scrollParentElem) {
+                const scrollParentRect = scrollParentElem.getBoundingClientRect()
+                const extraSpacing = 10
+                if (rect.bottom > scrollParentRect.bottom) {
+                    scrollParentElem.scrollTop += rect.bottom - scrollParentRect.bottom + extraSpacing
+                } else if (rect.top < scrollParentRect.top) {
+                    scrollParentElem.scrollTop += rect.top - scrollParentRect.top - extraSpacing
+                }
             }
         }
     }
