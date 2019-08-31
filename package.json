@@ -1,7 +1,7 @@
 {
   "name": "ansel",
   "productName": "Ansel",
-  "version": "1.0.0",
+  "version": "1.1.0-dev",
   "description": "Digital image organizer powered by the web",
   "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
   "license": "MIT",
