@@ -21,9 +21,13 @@ import 'test-ui/entry.less'
 
 window['UiTester'] = {
     start(elem: HTMLElement) {
-        setLocale('en')
+        const localeParam = 'locale='
+        const localePos = location.href.indexOf(localeParam)
+        const locale = (localePos === -1) ? 'en' : location.href.substr(localePos + localeParam.length, 2)
+
+        setLocale(locale)
         render(
-            <UiTester/>,
+            <UiTester locales={[ 'de', 'en' ]}/>,
             elem)
     }
 }

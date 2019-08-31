@@ -1,5 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
+import { ButtonGroup, Button } from '@blueprintjs/core'
+
+import { getLocale } from 'common/i18n/i18n'
 
 import './UiTester.less'
 
@@ -88,6 +91,7 @@ export function action(name: string) {
 
 interface Props {
     className?: any
+    locales: string[]
 }
 
 interface State {
@@ -145,6 +149,7 @@ export default class UiTester extends React.Component<Props, State> {
     render() {
         const props = this.props
         const state = this.state
+        const locale = getLocale()
 
         let testView: JSX.Element | null = null
         let arenaStyle: any = undefined
@@ -162,6 +167,22 @@ export default class UiTester extends React.Component<Props, State> {
         return (
             <div className={classnames(props.className, 'UITester')}>
                 <div className="UITester-sidebar">
+                    <ButtonGroup className='UITester-localeSwitch'>
+                        {props.locales.map(loc =>
+                            <Button
+                                key={loc}
+                                text={loc}
+                                active={loc === locale}
+                                disabled={loc === locale}
+                                onClick={
+                                    loc === locale ? undefined :
+                                    () => {
+                                        location.href = location.origin + location.pathname + '?locale=' + loc + location.hash
+                                    }
+                                }
+                            />
+                        )}
+                    </ButtonGroup>
                     {sections.map((section, sectionIndex) =>
                         <div className="form-group" key={sectionIndex}>
                             <label>{section.title}</label>
