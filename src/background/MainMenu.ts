@@ -5,7 +5,7 @@ import config from 'common/config'
 import { bindMany } from 'common/util/LangUtil'
 
 import ForegroundClient from 'background/ForegroundClient'
-import { startImport } from 'background/ImportScanner'
+import { startImport } from 'background/ImportController'
 import AppWindowController from 'background/AppWindowController'
 
 

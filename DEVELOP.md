@@ -53,69 +53,6 @@ yarn
 
 
 
-Build distributable package
----------------------------
-
-Build distributable package:
-
-    yarn run package
-
-Cross-build linux package on Mac OS or Windows:
-
-  1.  Run docker container:
-
-          docker run --rm -ti \
-          --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|  CIRCLETRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|  TRAVIS_BRANCHTRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|  STRIP|BUILD_') \
-          --env ELECTRON_CACHE="/root/.cache/electron" \
-          --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
-          -v ${PWD}:/project \
-          -v ${PWD##*/}-node-modules:/project/node_modules \
-          -v ~/.cache/electron:/root/.cache/electron \
-          -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-          electronuserland/builder
-
-  2.  Build `dist-package/Ansel-xyz.deb` for Linux (in docker container):
-
-          yarn && yarn run package
-
-Cross-build windows package on Mac OS or Linux:
-
-  - Log in to [AppYeyor](https://www.appveyor.com/)
-  - Create a project for Ansel:
-    - Type: "Git"
-    - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/ansel-app/ansel/master/appveyor.yml`
-  - Click "New build" on the project details screen.
-
-For more details see:
-
-  - https://www.electron.build/multi-platform-build
-  - https://github.com/appveyor/ci/issues/1089#issuecomment-264549196
-
-
-
-UI Tester
----------
-
-1. Run watch build:
-    ```bash
-    yarn run watch
-    ```
-
-2. Run Ansel (in extra console):
-    ```bash
-    yarn run start-no-build
-    ```
-
-3. Open the UI Tester: `Shift`+`Ctrl`+`T` (On Mac: `Alt`+`Cmd`+`T`)
-
-4. Change some React code and save
-
-5. Wait for the watch build to build the changes
-
-6. Reload UI Tester: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
-
-
-
 Developing main process code
 ----------------------------
 
@@ -149,6 +86,42 @@ So debugging is easy:
 
 
 
+Unit tests
+----------
+
+Run unit tests:
+
+    yarn run test
+
+Run test directories:
+
+    yarn run test:clean
+
+
+
+UI Tester
+---------
+
+1. Run watch build:
+    ```bash
+    yarn run watch
+    ```
+
+2. Run Ansel (in extra console):
+    ```bash
+    yarn run start-no-build
+    ```
+
+3. Open the UI Tester: `Shift`+`Ctrl`+`T` (On Mac: `Alt`+`Cmd`+`T`)
+
+4. Change some React code and save
+
+5. Wait for the watch build to build the changes
+
+6. Reload UI Tester: `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
+
+
+
 Build distributable package
 ---------------------------
 
@@ -166,6 +139,37 @@ Only generate the package directory without really packaging it (This is useful 
 
 **Hint:** In order check what is packed, add a `"asar": false` to the `build`-Object of `package.json`, then run
 `yarn run package-dir` and check the folder `dist-package/mac/Ansel.app/Contents/Resources/app`
+
+Cross-build linux package on Mac OS or Windows:
+
+  1.  Run docker container:
+
+          docker run --rm -ti \
+          --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|  CIRCLETRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|  TRAVIS_BRANCHTRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|  STRIP|BUILD_') \
+          --env ELECTRON_CACHE="/root/.cache/electron" \
+          --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+          -v ${PWD}:/project \
+          -v ${PWD##*/}-node-modules:/project/node_modules \
+          -v ~/.cache/electron:/root/.cache/electron \
+          -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+          electronuserland/builder
+
+  2.  Build `dist-package/Ansel-xyz.deb` for Linux (in docker container):
+
+          yarn && yarn run package
+
+Cross-build windows package on Mac OS or Linux:
+
+  - Log in to [AppYeyor](https://www.appveyor.com/)
+  - Create a project for Ansel:
+    - Type: "Git"
+    - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/ansel-app/ansel/master/appveyor.yml`
+  - Click "New build" on the project details screen.
+
+For more details see:
+
+  - https://www.electron.build/multi-platform-build
+  - https://github.com/appveyor/ci/issues/1089#issuecomment-264549196
 
 
 

@@ -1,5 +1,6 @@
 /dist/
 /dist-package/
+/dist-test/
 /dot-ansel*/
 /node_modules/
 /*.patch

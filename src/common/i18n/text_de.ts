@@ -17,7 +17,7 @@ export default {
     ImportProgressButton_phase_error: 'Fehler beim Scannen',
     ImportProgressButton_ratio: '{0} von {1}',
 
-    ImportScanner_importFinished: '{0} Fotos in {1} gescannt',
+    ImportController_importFinished: '{0} Fotos in {1} gescannt',
 
     Library_noPhotos_title: 'Keine Fotos hinzugefügt',
     Library_noSettings_message: 'Klicke oben auf {0}, um die Einstellungen zu öffnen.',

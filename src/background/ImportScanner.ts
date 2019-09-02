@@ -1,27 +1,16 @@
 import sharp from 'sharp'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
-import DB from 'sqlite3-helper/no-generators'
-import notifier from 'node-notifier'
 
-import { Photo, Tag, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
+import { Photo, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
 import { profileScanner } from 'common/LogConstants'
 import config from 'common/config'
-import { msg } from 'common/i18n/i18n'
-import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
-import { formatNumber } from 'common/util/TextUtil'
 
-import AppWindowController from 'background/AppWindowController'
-import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
-import { deletePhotos } from 'background/store/PhotoStore'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
-import { fetchSettings } from 'background/store/SettingsStore'
-import { storePhotoTags, fetchTags } from 'background/store/TagStore'
-import { toSqlStringCsv } from 'background/util/DbUtil'
-import { fsReadDirWithFileTypes, fsReadFile, fsRename, fsStat, fsUnlink, fsExists } from 'background/util/FileUtil'
+import { fsReadDirWithFileTypes, fsReadFile, fsStat, fsUnlink, fsExists } from 'background/util/FileUtil'
 
 
 const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.join('|')})$`, 'i')
@@ -31,41 +20,39 @@ const uiUpdateInterval = 200  // In ms
 
 let libraw: any | false | null = null
 
-let nextTempRawConversionId = 1
-
 interface DirectoryInfo {
     path: string
     photoFilenames: string[]
 }
 
-let importScanner: ImportScanner | null = null
 
+export type PhotoOfDirectoryInfo = { id: PhotoId, master_filename: string }
 
-export function startImport(): void {
-    if (!importScanner) {
-        importScanner = new ImportScanner()
-    }
-    importScanner.scanPhotos()
-        .catch(error => {
-            ForegroundClient.showError('Scanning photos failed', error)
-        })
+export interface ImportScannerDelegate {
+    deletePhotosOfRemovedDirsFromDb(existingDirs: string[]): Promise<number>
+    deletePhotosFromDb(photoIds: PhotoId[]): Promise<void>
+    fetchPhotosOfDirectoryFromDb(dir: string): Promise<PhotoOfDirectoryInfo[]>
+    nextTempRawConversionPaths(): { tempExtractThumbPath: string, tempNonRawImgPath: string }
+    storePhotoInDb(masterFullPath: string, photo: Photo, tempNonRawImgPath: string | null, tags: string[]): Promise<void>
+    updateProgressInUi(state: ImportScannerState, progress: ImportProgress): Promise<void>
+    showError(msg: string, error?: Error): void
 }
 
+export type ImportScannerState = 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos'
 
-class ImportScanner {
+export default class ImportScanner {
 
-    private state: 'idle' | 'scan-dirs' | 'cleanup' | 'import-photos' = 'idle'
+    private state: ImportScannerState = 'idle'
 
     private importStartTime = 0
 
     private progress: ImportProgress
-    private shouldFetchTags = false
     private lastUIUpdateTime = 0
     private isUIUpdateRunning = false
     private needsFollowupUIUpdate = false
 
 
-    constructor() {
+    constructor(private delegate: ImportScannerDelegate) {
         bindMany(this, 'processDirectory')
         this.reset()
     }
@@ -82,10 +69,10 @@ class ImportScanner {
         }
     }
 
-    scanPhotos(): BluebirdPromise<void> {
+    scanPhotos(photoDirs: string[]): BluebirdPromise<ImportProgress | null> {
         if (this.state != 'idle') {
             // Already scanning
-            return BluebirdPromise.resolve()
+            return BluebirdPromise.resolve(null)
         }
 
         const startTime = Date.now()
@@ -107,8 +94,7 @@ class ImportScanner {
         }
 
         const dirs: DirectoryInfo[] = []
-        return BluebirdPromise.cast(fetchSettings())
-            .then(settings => removeSubdirectories(settings.photoDirs))
+        return BluebirdPromise.resolve(removeSubdirectories(photoDirs))
             .reduce(async (result: DirectoryInfo[], path) => {
                 const pathExists = await fsExists(path)
                 if (!pathExists) {
@@ -135,10 +121,10 @@ class ImportScanner {
                 this.progress.phase = 'cleanup'
                 this.onProgressChange(true)
 
-                const dirsCsv = toSqlStringCsv(dirs.map(dirInfo => dirInfo.path))
-                let photoIds = await DB().queryColumn<PhotoId>('id', `select id from photos where master_dir not in (${dirsCsv})`)
-                await this.deletePhotos(photoIds)
-                if (profiler) { profiler.addPoint(`Deleted ${photoIds.length} photos of removed directories`) }
+                const deletedPhotoCount = await this.delegate.deletePhotosOfRemovedDirsFromDb(dirs.map(dirInfo => dirInfo.path))
+                this.progress.removed += deletedPhotoCount
+                this.onProgressChange()
+                if (profiler) { profiler.addPoint(`Deleted ${deletedPhotoCount} photos of removed directories`) }
 
                 this.state = 'import-photos'
                 this.progress.phase = 'import-photos'
@@ -148,16 +134,14 @@ class ImportScanner {
             })
             .map(this.processDirectory, { concurrency: config.concurrency })
             .then(() => {
-                const photoCount = this.progress.total
+                const finalProgress = this.progress
+                const photoCount = finalProgress.total
                 if (profiler) profiler.addPoint(`Scanned ${photoCount} images`)
                 this.reset()
 
                 const duration = Date.now() - startTime
                 console.log(`Finished scanning ${photoCount} photos in ${duration} ms`)
-                notifier.notify({
-                    title: 'Ansel',
-                    message: msg('ImportScanner_importFinished', formatNumber(photoCount), moment.duration(duration).humanize())
-                })
+                return finalProgress
             })
             .catch(error => {
                 if (profiler) profiler.addPoint('Scanning failed')
@@ -194,28 +178,13 @@ class ImportScanner {
         }
     }
 
-    private async deletePhotos(photoIds: PhotoId[]): Promise<void> {
-        if (!photoIds.length) {
-            return
-        }
-
-        const shouldFetchTags = await deletePhotos(photoIds)
-        if (shouldFetchTags) {
-            this.shouldFetchTags = shouldFetchTags
-        }
-
-        this.progress.removed += photoIds.length
-        this.onProgressChange()
-    }
-
     private async processDirectory(dirInfo: DirectoryInfo) {
         this.progress.currentPath = dirInfo.path
 
-        type PhotoInfo = { id: PhotoId, master_filename: string }
-        const photosInDb = await DB().query<PhotoInfo>(
-            'select id, master_filename from photos where master_dir = ?', dirInfo.path)
+        type PhotoOfDirectoryInfo = { id: PhotoId, master_filename: string }
+        const photosInDb = await this.delegate.fetchPhotosOfDirectoryFromDb(dirInfo.path)
 
-        const remainingPhotosMap: { [K in string]: PhotoInfo } = {}
+        const remainingPhotosMap: { [K in string]: PhotoOfDirectoryInfo } = {}
         for (const photo of photosInDb) {
             remainingPhotosMap[photo.master_filename] = photo
         }
@@ -241,7 +210,10 @@ class ImportScanner {
         this.onProgressChange()
 
         const removedIds = Object.values(remainingPhotosMap).map(photo => photo.id)
-        await this.deletePhotos(removedIds)
+        if (removedIds.length) {
+            await this.delegate.deletePhotosFromDb(removedIds)
+            this.progress.removed += removedIds.length
+        }
     }
 
     private async importPhoto(masterDir: string, masterFileName: string): Promise<boolean> {
@@ -277,10 +249,10 @@ class ImportScanner {
 
             let tempNonRawImgPath: string | null = null
             if (isRaw) {
-                const tempRawConversionId = nextTempRawConversionId++
-                tempNonRawImgPath = `${config.nonRawPath}/temp-${tempRawConversionId}.${config.workExt}`
+                const tempRawConversionPaths = this.delegate.nextTempRawConversionPaths()
+                tempNonRawImgPath = tempRawConversionPaths.tempNonRawImgPath
 
-                const tempExtractedThumbPath = await libraw.extractThumb(masterFullPath, `${config.tmp}/non-raw-${tempRawConversionId}.jpg`)
+                const tempExtractedThumbPath = await libraw.extractThumb(masterFullPath, tempRawConversionPaths.tempExtractThumbPath)
                 if (profiler) profiler.addPoint('Extracted non-raw image')
 
                 const imgBuffer = await fsReadFile(tempExtractedThumbPath)
@@ -328,27 +300,10 @@ class ImportScanner {
                 flag: photoWork.flagged ? 1 : 0,
                 trashed: 0,
             }
-            photo.id = await DB().insert('photos', photo)
-            if (tempNonRawImgPath) {
-                const nonRawPath = getNonRawPath(photo)
-                if (nonRawPath === masterFullPath) {
-                    // Should not happen - but we check this just to be shure...
-                    throw new Error(`Expected non-raw path to differ original image path: ${nonRawPath}`)
-                }
-                await fsRename(tempNonRawImgPath, nonRawPath)
-            }
-            if (profiler) profiler.addPoint('Stored photo to DB')
-
-            // Store tags in DB
 
             const tags = photoWork.tags || metaData.tags
-            if (tags && tags.length) {
-                const shouldUpdateTags = await storePhotoTags(photo.id, tags)
-                if (shouldUpdateTags) {
-                    this.shouldFetchTags = true
-                }
-                if (profiler) profiler.addPoint(`Added ${tags.length} tags`)
-            }
+            this.delegate.storePhotoInDb(masterFullPath, photo, tempNonRawImgPath, tags)
+            if (profiler) profiler.addPoint('Stored photo to DB')
 
             // Done
 
@@ -378,23 +333,7 @@ class ImportScanner {
                     .then(async () => {
                         const { state, progress } = this
 
-                        let updatedTags: Tag[] | null = null
-                        if (this.shouldFetchTags) {
-                            updatedTags = await fetchTags()
-                            this.shouldFetchTags = false
-                        }
-
-                        let progressBarProgress = 0
-                        if (state === 'idle') {
-                            progressBarProgress = -1  // Don't show progress
-                        } else if (state === 'import-photos') {
-                            progressBarProgress = progress.processed / (progress.total || 1)
-                        } else {
-                            progressBarProgress = 2  // indeterminate
-                        }
-                        AppWindowController.getAppWindow().setProgressBar(progressBarProgress)
-
-                        await ForegroundClient.setImportProgress(state === 'idle' ? null : progress, updatedTags)
+                        await this.delegate.updateProgressInUi(state, progress)
 
                         this.isUIUpdateRunning = false
                         if (this.needsFollowupUIUpdate) {
@@ -403,7 +342,7 @@ class ImportScanner {
                     })
                     .catch(error => {
                         this.isUIUpdateRunning = false
-                        ForegroundClient.showError('Notifying progress failed', error)
+                        this.delegate.showError('Notifying progress failed', error)
                     })
             }
         }

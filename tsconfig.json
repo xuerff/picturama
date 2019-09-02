@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "noEmit": true,
         "typeRoots": [ "./node_modules/@types", "src/typings" ],
         "target": "es6",
         "module": "commonjs",
@@ -9,6 +10,7 @@
         "outDir": "dist",
         "sourceMap": true,
         "jsx": "react",
+        "esModuleInterop": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "removeComments": true,
