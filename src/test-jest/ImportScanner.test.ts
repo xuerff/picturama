@@ -64,6 +64,30 @@ testImportScanner('simple import',
     })
 
 
+testImportScanner('import png',
+    async testDir => {
+        await copyFile('src/package/icon.png', `${testDir}/icon.png`)
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: testDir,
+                master_filename: 'icon.png',
+                master_width: 256,
+                master_height: 256,
+                master_is_raw: 0,
+                orientation: 1,
+                camera: undefined,
+                exposure_time: undefined,
+                iso: undefined,
+                focal_length: undefined,
+                aperture: undefined,
+                flag: 0
+            }
+        ])
+    })
+
+
 function testImportScanner(testName: string, prepareTestDir: (testDir: string) => Promise<void>,
     checkResult: (result: { testDir: string, storedPhotos: Photo[], finalProgress: ImportProgress }) => Promise<void>)
 {
