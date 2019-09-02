@@ -15,20 +15,38 @@ const testBaseDir = 'dist-test'
 
 testImportScanner('simple import',
     async testDir => {
+        await copyFile('test-data/photos/IMG_9700.JPG', `${testDir}/IMG_9700.JPG`)
         await copyFile('test-data/photos/800/door-knocker.jpg', `${testDir}/door-knocker.jpg`)
     },
     async ({ testDir, storedPhotos, finalProgress }) => {
         expect(finalProgress).toEqual({
             phase: 'import-photos',
-            total: 1,
-            processed: 1,
-            added: 1,
+            total: 2,
+            processed: 2,
+            added: 2,
             removed: 0,
             currentPath: testDir
         })
 
-        expect(storedPhotos).toMatchObject([
+        expectPhotos(storedPhotos, [
             {
+                // Has a "normal" ISO value in EXIF data
+                master_dir: testDir,
+                master_filename: 'IMG_9700.JPG',
+                master_width: 5184,
+                master_height: 3456,
+                master_is_raw: 0,
+                orientation: 1,
+                camera: 'Canon EOS 700D',
+                exposure_time: 0.016666666666666666,
+                iso: 1600,
+                focal_length: 55,
+                aperture: 5.6,
+                flag: 0,
+                trashed: 0
+            },
+            {
+                // Has a ISO value of `[ 200, 0 ]` in EXIF data
                 master_dir: testDir,
                 master_filename: 'door-knocker.jpg',
                 master_width: 800,
@@ -37,7 +55,7 @@ testImportScanner('simple import',
                 orientation: 1,
                 camera: 'Olympus E-M10',
                 exposure_time: 0.005,
-                iso: [ 200, 0 ],
+                iso: 200,
                 focal_length: 31,
                 aperture: 5.6,
                 flag: 0,
@@ -71,6 +89,18 @@ function testImportScanner(testName: string, prepareTestDir: (testDir: string) =
         const { storedPhotos } = testImportScannerDelegate
         await checkResult({ testDir, storedPhotos, finalProgress })
     })
+}
+
+
+function expectPhotos(actualPhotos: Photo[], expectedPhotos: (Partial<Photo> & { master_filename: string })[]) {
+    function comparePhotos(photo1: { master_filename: string }, photo2: { master_filename: string }) {
+        return photo1.master_filename.localeCompare(photo2.master_filename)
+    }
+
+    actualPhotos.sort(comparePhotos)
+    expectedPhotos.sort(comparePhotos)
+
+    expect(actualPhotos).toMatchObject(expectedPhotos)
 }
 
 

@@ -1,6 +1,7 @@
 import ExifParser from 'exif-parser'
 
 import { ExifOrientation } from 'common/CommonTypes'
+import { isArray } from 'common/util/LangUtil'
 
 import { fsStat, fsReadFile } from 'background/util/FileUtil'
 
@@ -72,12 +73,20 @@ function extractMetaDataFromExif(exifData): MetaData {
         camera = `${cameraBrand} ${cameraModel}`
     }
 
+    let iso: number | undefined = undefined
+    if (typeof exifTags.ISO === 'number') {
+        iso = exifTags.ISO
+    } else if (isArray(exifTags.ISO) && typeof exifTags.ISO[0] === 'number') {
+        // Sometimes `exifTags.ISO` is something like `[ 200, 0 ]`
+        iso = exifTags.ISO[0]
+    }
+
     const metaData: MetaData = {
         imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
         imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
         camera:       camera || undefined,
         exposureTime: exifTags.ExposureTime,
-        iso:          exifTags.ISO,
+        iso,
         aperture:     exifTags.FNumber,
         focalLength:  exifTags.FocalLength,
         createdAt:    rawDate ? new Date(rawDate * 1000) : undefined,
