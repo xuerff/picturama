@@ -1,7 +1,6 @@
 export default {
 
     common_cancel: 'Abbrechen',
-    common_close: 'Schließen',
     common_backToLibrary: 'Zurück zur Bibliothek',
 
     ErrorController_copied: 'Report wurde in die Zwischenablage kopiert.',
@@ -74,7 +73,7 @@ export default {
     Settings_selectPhotoDirs: 'Bitte wähle die Ordner aus, die nach Fotos gescannt werden sollen.',
     Settings_photoDirs: 'Ordner, die nach Fotos gescannt werden sollen:',
     Settings_addPhotoDir: 'Foto-Ordner hinzufügen',
-    Settings_closeAndImport: 'Schließen und nach Fotos scannen',
+    Settings_startScan: 'Nach Fotos scannen',
 
     TagEditor_addTag: 'Schlagwort hinzufügen...',
     TagEditor_error_tagExists: 'Bitte neues Schlagwort eingeben',

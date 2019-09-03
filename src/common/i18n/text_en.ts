@@ -1,7 +1,6 @@
 export default {
 
     common_cancel: 'Cancel',
-    common_close: 'Close',
     common_backToLibrary: 'Back to library',
 
     ErrorController_copied: 'Copied report to clipboard.',
@@ -74,7 +73,7 @@ export default {
     Settings_selectPhotoDirs: 'Please select the folders to scan for images.',
     Settings_photoDirs: 'Folders to scan for images:',
     Settings_addPhotoDir: 'Add photo folder',
-    Settings_closeAndImport: 'Close and scan for images',
+    Settings_startScan: 'Scan for images',
 
     TagEditor_addTag: 'Add tag...',
     TagEditor_error_tagExists: 'Please enter a new tag',

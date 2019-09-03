@@ -112,13 +112,8 @@ export class SettingsPane extends React.Component<Props> {
                 <div className='SettingsPane-buttonBar'>
                     <Button
                         large={true}
-                        text={msg('common_close')}
-                        onClick={this.onClose}
-                    />
-                    <Button
-                        large={true}
                         intent='primary'
-                        text={msg('Settings_closeAndImport')}
+                        text={msg('Settings_startScan')}
                         onClick={this.onCloseAndImport}
                     />
                 </div>
