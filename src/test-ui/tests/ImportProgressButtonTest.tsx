@@ -6,7 +6,7 @@ import ImportProgressButton, { Props } from 'app/ui/ImportProgressButton'
 import Toolbar from 'app/ui/widget/Toolbar'
 
 
-export const defaultProps: Props = {
+const defaultProps: Props = {
     progress: { phase: 'scan-dirs', isPaused: false, total: 0, processed: 0, added: 0, removed: 0, currentPath: null },
     toggleImportPaused: action('toggleImportPaused'),
     cancelImport: action('cancelImport'),
