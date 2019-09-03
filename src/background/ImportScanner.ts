@@ -27,6 +27,13 @@ let libraw: any | false | null = null
 interface DirectoryInfo {
     path: string
     photoFilenames: string[]
+    picasaOriginalSubDirs: PicasaOriginalDirectoryInfo[] | null
+}
+
+type PicasaOriginalDirectoryName = '.picasaoriginals' | 'Originals'
+interface PicasaOriginalDirectoryInfo {
+    dirName: PicasaOriginalDirectoryName
+    photoFilenames: string[]
 }
 
 
@@ -162,12 +169,23 @@ export default class ImportScanner {
 
     private async scanDirectory(result: DirectoryInfo[], dir: string): Promise<void> {
         const photoFilenames: string[] = []
+        let picasaOriginalSubDirs: PicasaOriginalDirectoryInfo[] | null = null
         const files = await fsReadDirWithFileTypes(dir)
         await Promise.all(files.map(async fileInfo => {
             const filename = fileInfo.name
             const filePath = `${dir}/${filename}`
             if (fileInfo.isDirectory()) {
-                await this.scanDirectory(result, filePath)
+                const picasaOriginalSubDir = await this.detectPicasaOriginalDirectory(dir, filename)
+                if (picasaOriginalSubDir) {
+                    if (!picasaOriginalSubDirs) {
+                        picasaOriginalSubDirs = [ picasaOriginalSubDir ]
+                    } else {
+                        picasaOriginalSubDirs.push(picasaOriginalSubDir)
+                    }
+                    this.progress.total += picasaOriginalSubDir.photoFilenames.length
+                } else {
+                    await this.scanDirectory(result, filePath)
+                }
             } else if (fileInfo.isFile()) {
                 if (acceptedExtensionRE.test(filename)) {
                     photoFilenames.push(filename)
@@ -176,13 +194,63 @@ export default class ImportScanner {
         }))
 
         if (photoFilenames.length) {
-            result.push({ path: dir, photoFilenames })
+            result.push({ path: dir, photoFilenames, picasaOriginalSubDirs })
             this.progress.total += photoFilenames.length
             this.onProgressChange()
         }
     }
 
+    /**
+     * Detects whether there is a subdirectory with Picasa originals.
+     *
+     * A "Picasa original" is the original version of a photo saved by Picasa. When a photo is saved in Picasa, it
+     * stores the original in a subdirectory called `.picasaoriginals` (or `Originals` in older versions) and it stores
+     * the edited image in the parent directory.
+     */
+    private async detectPicasaOriginalDirectory(parentDirPath: string, dirName: string):
+        Promise<PicasaOriginalDirectoryInfo | null>
+    {
+        if (dirName !== '.picasaoriginals' && dirName !== 'Originals') {
+            return null
+        }
+
+        const dirPath = `${parentDirPath}/${dirName}`
+        const files = await fsReadDirWithFileTypes(dirPath)
+        let hasPicasaIni = false
+        const photoFilenames: string[] = []
+        for (const fileInfo of files) {
+            const filename = fileInfo.name
+            if (fileInfo.isFile()) {
+                if (filename === '.picasa.ini' || filename === 'Picasa.ini') {
+                    hasPicasaIni = true
+                } else if (acceptedExtensionRE.test(filename)) {
+                    photoFilenames.push(filename)
+                }
+            }
+        }
+
+        if (!hasPicasaIni || !photoFilenames.length) {
+            return null
+        } else {
+            return { dirName, photoFilenames }
+        }
+    }
+
     private async processDirectory(dirInfo: DirectoryInfo) {
+        const fileNamesToIgnore: { [K in string]: true } = {}
+        if (dirInfo.picasaOriginalSubDirs) {
+            for (const picasaOriginalSubDir of dirInfo.picasaOriginalSubDirs) {
+                for (const fileName of picasaOriginalSubDir.photoFilenames) {
+                    fileNamesToIgnore[fileName] = true
+                }
+                await this.processDirectory({
+                    path: `${dirInfo.path}/${picasaOriginalSubDir.dirName}`,
+                    photoFilenames: picasaOriginalSubDir.photoFilenames,
+                    picasaOriginalSubDirs: null
+                })
+            }
+        }
+
         this.progress.currentPath = dirInfo.path
 
         type PhotoOfDirectoryInfo = { id: PhotoId, master_filename: string }
@@ -196,18 +264,20 @@ export default class ImportScanner {
         for (const filename of dirInfo.photoFilenames) {
             this.progress.processed++
 
-            const photo = remainingPhotosMap[filename]
-            if (photo) {
-                // This photo already exists in the DB
-                delete remainingPhotosMap[filename]
-
-                // Don't call `onProgressChange` - delete is too fast (progress will be updated after the next "real" operation)
-            } else {
-                // This is a new photo -> Import it
-                const importSucceed = await this.importPhoto(dirInfo.path, filename)
-                if (importSucceed) {
-                    this.progress.added++
-                    this.onProgressChange()
+            if (!fileNamesToIgnore[filename]) {
+                const photo = remainingPhotosMap[filename]
+                if (photo) {
+                    // This photo already exists in the DB
+                    delete remainingPhotosMap[filename]
+    
+                    // Don't call `onProgressChange` - delete is too fast (progress will be updated after the next "real" operation)
+                } else {
+                    // This is a new photo -> Import it
+                    const importSucceed = await this.importPhoto(dirInfo.path, filename)
+                    if (importSucceed) {
+                        this.progress.added++
+                        this.onProgressChange()
+                    }
                 }
             }
         }

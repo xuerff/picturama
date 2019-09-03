@@ -8,6 +8,7 @@ import { rotate } from 'common/util/EffectsUtil'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 import { fsExists, fsUnlink, fsWriteFile, fsReadFile } from 'background/util/FileUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
+import { parsePath } from 'common/util/TextUtil'
 
 
 declare global {
@@ -196,6 +197,15 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
         }
     }
 
+    let editedPicasaData: PicasaData | null = null
+        // The picasa data of the edited images of which this directory holds the originals
+    const directoryParts = parsePath(directoryPath)
+    if (directoryParts.base === '.picasaoriginals' || directoryParts.base === 'Originals') {
+        // This is a Picasa originals directory
+        // -> Fetch the `.picasa.ini` of the parent directory (which holds the edited versions of the originals in this directory)
+        editedPicasaData = await fetchPicasaIni(directoryParts.dir)
+    }
+
     return await new Promise<PicasaData>(
         (resolve, reject) => {
             const picasaData: PicasaData = { photos: {} }
@@ -206,15 +216,26 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
 
             let currentSectionKey: string | null = null
             let currentSectionRules: string[] = []
+
+            function flushCurrentSection() {
+                if (currentSectionKey) {
+                    const editedSectionRules = editedPicasaData && editedPicasaData.photos[currentSectionKey]
+                    if (editedSectionRules) {
+                        currentSectionRules.push(...editedSectionRules)
+                    }
+
+                    picasaData.photos[currentSectionKey] = currentSectionRules
+                    currentSectionKey = null
+                    currentSectionRules = []
+                }
+            }
+
             lineReader.on('line', line => {
                 try {
                     const match = sectionStartRegExp.exec(line)
                     if (match) {
-                        if (currentSectionKey) {
-                            picasaData.photos[currentSectionKey] = currentSectionRules
-                        }
+                        flushCurrentSection()
                         currentSectionKey = match[1]
-                        currentSectionRules = []
                     } else {
                         currentSectionRules.push(line)
                     }
@@ -224,9 +245,7 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
             })
             lineReader.on('close', () => {
                 try {
-                    if (currentSectionKey) {
-                        picasaData.photos[currentSectionKey] = currentSectionRules
-                    }
+                    flushCurrentSection()
                     console.log('Fetched ' + picasaFile)
                     resolve(picasaData)
                 } catch (error) {
@@ -238,7 +257,7 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
 
 
 const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
-const ignoredRulesRegExp = /^([ \t]*$|backuphash=)/
+const ignoredRulesRegExp = /^([ \t]*$|backuphash=|width=|height=|moddate=|textactive=0)/
 
 function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string): PhotoWork {
     const photoWork: PhotoWork = {}

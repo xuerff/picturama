@@ -5,9 +5,10 @@ import { PhotoId, Photo, ImportProgress } from 'common/CommonTypes'
 
 import ImportScanner, { ImportScannerDelegate, PhotoOfDirectoryInfo, ImportScannerState } from 'background/ImportScanner'
 
+const copyFile = util.promisify(fs.copyFile)
 const exists = util.promisify(fs.exists)
 const mkdir = util.promisify(fs.mkdir)
-const copyFile = util.promisify(fs.copyFile)
+const writeFile = util.promisify(fs.writeFile)
 
 
 const testBaseDir = 'dist-test'
@@ -83,6 +84,107 @@ testImportScanner('import png',
                 focal_length: undefined,
                 aperture: undefined,
                 flag: 0
+            }
+        ])
+    })
+
+
+testImportScanner('import Picasa originals #1',
+    async testDir => {
+        // This is what happens if you select "Save" on an image in Picasa:
+        // - Picasa moves the original image to a subdirectory called `.picasaoriginals` or `Originals`
+        // - Picasa saves the changes to the `.picasa.ini` of the subdirectory
+        // - Picasa saves the altered image to the main directory
+        // - Picasa saves a `backuphash` to the `.picasa.ini` of the main directory
+
+        await mkdir(`${testDir}/.picasaoriginals`)
+        await Promise.all([
+            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/.picasaoriginals/ice-cubes.jpg`),
+            writeFile(`${testDir}/.picasaoriginals/.picasa.ini`,
+                '[ice-cubes.jpg]\n' +
+                'filters=crop64=1,b3d66180e8f5bad5;finetune2=1,0.000000,0.000000,0.480000,00000000,0.000000;\n' +
+                'crop=rect64(b3d66180e8f5bad5)\n' +
+                'moddate=0000d4ff92d906a7\n' +
+                'width=800\n' +
+                'height=533\n' +
+                'textactive=0\n'),
+            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            writeFile(`${testDir}/.picasa.ini`,
+                '[ice-cubes.jpg]\n' +
+                'backuphash=15177\n'),
+        ])
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: `${testDir}/.picasaoriginals`,
+                master_filename: 'ice-cubes.jpg',
+                master_width: 800,
+                master_height: 533,
+                master_is_raw: 0,
+                date_section: '2018-06-28',
+                created_at: 1530214626000,
+                orientation: 1,
+                camera: 'FUJIFILM X-T2',
+                exposure_time: 0.05,
+                iso: 200,
+                focal_length: 80,
+                aperture: 11,
+                flag: 0,
+                trashed: 0
+            }
+        ])
+    })
+
+
+testImportScanner('import Picasa originals #2',
+    async testDir => {
+        // This test simulates the following actions in Picasa:
+        // - Add star
+        // - Tilt image at maximum to the right
+        // - Save image
+        //   The saved image has the same size as the original, but its content is tilted and zoomed
+        //   (in order to keep the tilted edges inside the original image).
+        // - Crop image
+        // - Add tags "Ice" and "Cube" (which are only stored to the DB, not to `.picasa.ini`)
+
+        await mkdir(`${testDir}/.picasaoriginals`)
+        await Promise.all([
+            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/.picasaoriginals/ice-cubes.jpg`),
+            writeFile(`${testDir}/.picasaoriginals/.picasa.ini`,
+                '[ice-cubes.jpg]\r\n' +
+                'filters=tilt=1,1.000000,0.000000;\r\n' +
+                'moddate=0000dd9893d9c304\r\n' +
+                'width=800\r\n' +
+                'height=533\r\n' +
+                'textactive=0\r\n'),
+            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            writeFile(`${testDir}/.picasa.ini`,
+                '[ice-cubes.jpg]\r\n' +
+                'backuphash=56337\r\n' +
+                'moddate=00001f098cd9c29f\r\n' +
+                'star=yes\r\n' +
+                'crop=rect64(6dc24aedceb8c9b9)\r\n' +
+                'filters=crop64=1,6dc24aedceb8c9b9;\r\n'),
+        ])
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: `${testDir}/.picasaoriginals`,
+                master_filename: 'ice-cubes.jpg',
+                master_width: 800,
+                master_height: 533,
+                master_is_raw: 0,
+                date_section: '2018-06-28',
+                created_at: 1530214626000,
+                orientation: 1,
+                camera: 'FUJIFILM X-T2',
+                exposure_time: 0.05,
+                iso: 200,
+                focal_length: 80,
+                aperture: 11,
+                flag: 1   // Important! This comes from the parent directory
             }
         ])
     })
