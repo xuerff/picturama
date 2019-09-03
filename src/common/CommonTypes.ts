@@ -87,6 +87,7 @@ export interface UiConfig {
 
 export type ImportProgress = {
     phase: 'scan-dirs' | 'cleanup' | 'import-photos' | 'error'
+    isPaused: boolean
     /** Total number of photos found in file system */
     total: number
     /** Number of processed photos (photos which exist in file system and have been checked) */

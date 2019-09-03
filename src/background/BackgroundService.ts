@@ -5,7 +5,7 @@ import { assertMainProcess } from 'common/util/ElectronUtil'
 
 import AppWindowController from 'background/AppWindowController'
 import ForegroundClient from 'background/ForegroundClient'
-import { startImport } from 'background/ImportController'
+import { startImport, toggleImportPaused, cancelImport } from 'background/ImportController'
 import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
 import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
@@ -69,6 +69,10 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         )
     } else if (action === 'startImport') {
         startImport()
+    } else if (action === 'toggleImportPaused') {
+        toggleImportPaused()
+    } else if (action === 'cancelImport') {
+        cancelImport()
     } else if (action === 'fetchTotalPhotoCount') {
         return fetchTotalPhotoCount()
     } else if (action === 'fetchSections') {

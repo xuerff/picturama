@@ -43,6 +43,18 @@ export function startImport(): void {
         })
 }
 
+export function toggleImportPaused() {
+    if (importScanner) {
+        importScanner.setPaused(!importScanner.isPaused())
+    }
+}
+
+export function cancelImport() {
+    if (importScanner) {
+        importScanner.cancel()
+    }
+}
+
 
 class ImportScannerDelegateImpl implements ImportScannerDelegate {
 

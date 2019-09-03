@@ -13,18 +13,21 @@ import './ImportProgressButton.less'
 export interface Props {
     className?: any
     progress: ImportProgress
+    toggleImportPaused(): void
+    cancelImport(): void
 }
 
 interface State {
     isShowingPopover: boolean
+    isCancelling: boolean
 }
 
 export default class ImportProgressButton extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        this.state = { isShowingPopover: false }
-        bindMany(this, 'onOpening', 'onClosed')
+        this.state = { isShowingPopover: false, isCancelling: false }
+        bindMany(this, 'onOpening', 'onClosed', 'onCancelImport')
     }
 
     private onOpening() {
@@ -33,6 +36,11 @@ export default class ImportProgressButton extends React.Component<Props, State> 
 
     private onClosed() {
         this.setState({ isShowingPopover: false })
+    }
+
+    private onCancelImport() {
+        this.setState({ isCancelling: true })
+        this.props.cancelImport()
     }
 
     render() {
@@ -67,6 +75,21 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                                 }
                             </div>
                         }
+                        {!hasError &&
+                            <div className='ImportProgressButton-buttons'>
+                                <Button
+                                    text={msg(progress.isPaused ? 'ImportProgressButton_resume' : 'ImportProgressButton_pause')}
+                                    disabled={state.isCancelling}
+                                    onClick={props.toggleImportPaused}
+                                />
+                                <Button
+                                    text={msg('common_cancel')}
+                                    disabled={state.isCancelling}
+                                    loading={state.isCancelling}
+                                    onClick={this.onCancelImport}
+                                />
+                            </div>
+                        }
                     </>
                 }
             </div>
@@ -81,8 +104,11 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                 onClosed={this.onClosed}
             >
                 <Button minimal={true} rightIcon='caret-up'>
-                    {!hasError &&
+                    {!hasError && !progress.isPaused &&
                         <Spinner size={20} value={spinnerProgress} />
+                    }
+                    {!hasError && progress.isPaused &&
+                        <Icon className='ImportProgressButton-pauseIcon' icon='pause' iconSize={20} />
                     }
                     {hasError &&
                         <Icon className='ImportProgressButton-error' icon='error' iconSize={20} />

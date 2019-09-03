@@ -16,6 +16,8 @@ export default {
     ImportProgressButton_phase_import_photos: 'Importiere',
     ImportProgressButton_phase_error: 'Fehler beim Scannen',
     ImportProgressButton_ratio: '{0} von {1}',
+    ImportProgressButton_resume: 'Fortsetzen',
+    ImportProgressButton_pause: 'Pause',
 
     ImportController_importFinished: '{0} Fotos in {1} gescannt',
 

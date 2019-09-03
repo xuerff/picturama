@@ -22,6 +22,7 @@ testImportScanner('simple import',
     async ({ testDir, storedPhotos, finalProgress }) => {
         expect(finalProgress).toEqual({
             phase: 'import-photos',
+            isPaused: false,
             total: 2,
             processed: 2,
             added: 2,

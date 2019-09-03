@@ -37,6 +37,8 @@ interface StateProps {
 interface DispatchProps {
     toggleFullScreen(): void
     openSettings(): void
+    toggleImportPaused(): void
+    cancelImport(): void
 }
 
 interface Props extends OwnProps, StateProps, DispatchProps {
@@ -88,7 +90,11 @@ class App extends React.Component<Props> {
                         </>
                     }
                     bottomBarLeftItem={props.importProgress &&
-                        <ImportProgressButton progress={props.importProgress} />
+                        <ImportProgressButton
+                            progress={props.importProgress}
+                            toggleImportPaused={props.toggleImportPaused}
+                            cancelImport={props.cancelImport}
+                        />
                     }
                     isActive={!mainView && !modalView}
                 />
@@ -113,6 +119,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     },
     dispatch => ({
         toggleFullScreen() { BackgroundClient.toggleFullScreen() },
+        toggleImportPaused() { BackgroundClient.toggleImportPaused() },
+        cancelImport() { BackgroundClient.cancelImport() },
         ...bindActionCreators({
             openSettings: openSettingsAction
         }, dispatch)

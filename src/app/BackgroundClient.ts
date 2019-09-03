@@ -75,6 +75,14 @@ export default {
         return callOnBackground('startImport')
     },
 
+    toggleImportPaused(): Promise<void> {
+        return callOnBackground('toggleImportPaused')
+    },
+
+    cancelImport(): Promise<void> {
+        return callOnBackground('cancelImport')
+    },
+
     fetchTotalPhotoCount(): Promise<number> {
         return callOnBackground('fetchTotalPhotoCount')
     },

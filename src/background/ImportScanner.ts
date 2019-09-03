@@ -54,6 +54,9 @@ export type ImportScannerState = 'idle' | 'scan-dirs' | 'cleanup' | 'import-pho
 export default class ImportScanner {
 
     private state: ImportScannerState = 'idle'
+    private shouldCancel = false
+    private pausePromise: Promise<void> | null = null
+    private resolvePause: (() => void) | null = null
 
     private importStartTime = 0
 
@@ -70,8 +73,11 @@ export default class ImportScanner {
 
     private reset() {
         this.state = 'idle'
+        this.shouldCancel = false
+        this.pausePromise = null
         this.progress = {
             phase: 'scan-dirs',
+            isPaused: false,
             total: 0,
             processed: 0,
             added: 0,
@@ -155,10 +161,20 @@ export default class ImportScanner {
                 return finalProgress
             })
             .catch(error => {
-                if (profiler) profiler.addPoint('Scanning failed')
-                this.progress.phase = 'error'
-                this.onProgressChange(true)
-                throw error
+                if (error['isCancelImport']) {
+                    const finalProgress = this.progress
+                    if (profiler) profiler.addPoint(`Cancelled import`)
+                    this.reset()
+
+                    const duration = Date.now() - startTime
+                    console.log(`Cancelled scanning after ${duration} ms`)
+                    return finalProgress
+                } else {
+                    if (profiler) profiler.addPoint('Scanning failed')
+                    this.progress.phase = 'error'
+                    this.onProgressChange(true)
+                    throw error
+                }
             })
             .lastly(() => {
                 if (profiler) profiler.logResult()
@@ -167,7 +183,46 @@ export default class ImportScanner {
             })
     }
 
+    isPaused(): boolean {
+        return !!this.pausePromise
+    }
+
+    setPaused(paused: boolean) {
+        if (paused) {
+            if (!this.pausePromise && this.state !== 'idle') {
+                this.pausePromise = new Promise(resolve => this.resolvePause = resolve)
+                    .then(() => {
+                        this.pausePromise = null
+                        this.resolvePause = null
+                        this.onProgressChange(true)
+                    })
+                this.onProgressChange(true)
+            }
+        } else {
+            if (this.pausePromise && this.resolvePause) {
+                this.resolvePause()
+            }
+        }
+    }
+
+    cancel() {
+        this.shouldCancel = true
+    }
+
+    private async checkPauseAndCancel(): Promise<void> {
+        if (this.shouldCancel) {
+            const cancelError = new Error('cancel import')
+            cancelError['isCancelImport'] = true
+            throw cancelError
+        }
+        if (this.pausePromise) {
+            await this.pausePromise
+        }
+    }
+
     private async scanDirectory(result: DirectoryInfo[], dir: string): Promise<void> {
+        await this.checkPauseAndCancel()
+
         const photoFilenames: string[] = []
         let picasaOriginalSubDirs: PicasaOriginalDirectoryInfo[] | null = null
         const files = await fsReadDirWithFileTypes(dir)
@@ -237,6 +292,8 @@ export default class ImportScanner {
     }
 
     private async processDirectory(dirInfo: DirectoryInfo) {
+        await this.checkPauseAndCancel()
+
         const fileNamesToIgnore: { [K in string]: true } = {}
         if (dirInfo.picasaOriginalSubDirs) {
             for (const picasaOriginalSubDir of dirInfo.picasaOriginalSubDirs) {
@@ -291,6 +348,8 @@ export default class ImportScanner {
     }
 
     private async importPhoto(masterDir: string, masterFileName: string): Promise<boolean> {
+        await this.checkPauseAndCancel()
+
         const masterFullPath = `${masterDir}/${masterFileName}`
         const profiler = profileScanner ? new Profiler(`Importing ${masterFullPath}`) : null
 
@@ -418,6 +477,7 @@ export default class ImportScanner {
                 Promise.resolve()
                     .then(async () => {
                         const { state, progress } = this
+                        progress.isPaused = this.isPaused()
 
                         await this.delegate.updateProgressInUi(state, progress)
 

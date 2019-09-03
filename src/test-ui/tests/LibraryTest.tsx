@@ -16,6 +16,8 @@ import { addSection, action, TestContext } from 'test-ui/core/UiTester'
 import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'test-ui/util/MockData'
 import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'test-ui/util/TestUtil'
 
+import { defaultProps as defaultImportProgressButtonProps } from './ImportProgressButtonTest'
+
 
 const defaultSectionId: PhotoSectionId = '2018-08-15'
 const defaultPhotos = testPhotos
@@ -191,7 +193,8 @@ addSection('Library')
             {...createDefaultProps(context)}
             bottomBarLeftItem={
                 <ImportProgressButton
-                    progress={{ phase: 'import-photos', total: 1042, processed: 120, added: 40, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
+                    {...defaultImportProgressButtonProps}
+                    progress={{ phase: 'import-photos', isPaused: false, total: 1042, processed: 120, added: 40, removed: 21, currentPath: '/user/me/documents/mypics/2018/summer vacation' }}
                 />
             }
             isImporting={true}
@@ -202,7 +205,8 @@ addSection('Library')
             {...createDefaultProps(context)}
             bottomBarLeftItem={
                 <ImportProgressButton
-                    progress={{ phase: 'scan-dirs', total: 120, processed: 0, added: 0, removed: 0, currentPath: '/user/me/documents/mypics/2016/birthday party' }}
+                    {...defaultImportProgressButtonProps}
+                    progress={{ phase: 'scan-dirs', isPaused: false, total: 120, processed: 0, added: 0, removed: 0, currentPath: '/user/me/documents/mypics/2016/birthday party' }}
                 />
             }
             isImporting={true}
