@@ -93,7 +93,11 @@ Run unit tests:
 
     yarn run test
 
-Run test directories:
+Run a single test in watch mode (example runs test `simple import`):
+
+    npx jest -t 'simple import' --watch
+
+Clean test cache:
 
     yarn run test:clean
 

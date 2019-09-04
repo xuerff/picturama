@@ -191,6 +191,32 @@ testImportScanner('import Picasa originals #2',
     })
 
 
+// Test importing a broken (0 byte) jpg
+testImportScanner('broken image',
+    async testDir => {
+        writeFile(`${testDir}/broken.jpg`, '')
+    },
+    async ({ testDir, storedPhotos, finalProgress }) => {
+        expectPhotos(storedPhotos, [])
+        expect(finalProgress).toEqual({
+            phase: 'import-photos',
+            isPaused: false,
+            total: 1,
+            processed: 1,
+            added: 0,
+            removed: 0,
+            currentPath: testDir
+        })
+    })
+
+
+//test('scan test-data', async () => {
+//    const testImportScannerDelegate = new TestImportScannerDelegate()
+//    const importScanner = new ImportScanner(testImportScannerDelegate)
+//    await importScanner.scanPhotos([ '/Users/til/Temp/Ansel_Bilder' ])
+//})
+
+
 function testImportScanner(testName: string, prepareTestDir: (testDir: string) => Promise<void>,
     checkResult: (result: { testDir: string, storedPhotos: Photo[], finalProgress: ImportProgress }) => Promise<void>)
 {
