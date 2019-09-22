@@ -3,17 +3,19 @@ import 'moment/locale/de'
 
 import text_de from './text_de'
 import text_en from './text_en'
+import text_es from './text_es'
 
 
-export type Locale = 'de' | 'en'
-export const locales = [ 'de', 'en' ]
+export type Locale = 'de' | 'en' | 'es'
+export const locales = [ 'de', 'en', 'es' ]
 
-const fallbackLocale: Locale = 'en'
+export const fallbackLocale: Locale = 'en'
 export type I18nKey = keyof typeof text_en
 
 const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
     de: text_de,
     en: text_en,
+    es: text_es,
 }
 
 const msgFormatRe = /\{(\d+)\}/g

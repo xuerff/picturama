@@ -17,7 +17,8 @@
       "category": "public.app-category.photography",
       "electronLanguages": [
         "de",
-        "en"
+        "en",
+        "es"
       ]
     },
     "linux": {

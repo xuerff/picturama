@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { setLocale } from 'common/i18n/i18n'
+import { setLocale, locales, fallbackLocale } from 'common/i18n/i18n'
 
 import UiTester from 'test-ui/core/UiTester'
 import 'test-ui/tests/LibraryTest'
@@ -23,11 +23,11 @@ window['UiTester'] = {
     start(elem: HTMLElement) {
         const localeParam = 'locale='
         const localePos = location.href.indexOf(localeParam)
-        const locale = (localePos === -1) ? 'en' : location.href.substr(localePos + localeParam.length, 2)
+        const locale = (localePos === -1) ? fallbackLocale : location.href.substr(localePos + localeParam.length, 2)
 
         setLocale(locale)
         render(
-            <UiTester locales={[ 'de', 'en' ]}/>,
+            <UiTester locales={locales}/>,
             elem)
     }
 }

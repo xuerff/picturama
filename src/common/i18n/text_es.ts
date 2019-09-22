@@ -32,7 +32,7 @@ export default {
     LibraryBottomBar_selected: '{0} selectionados',
     LibraryBottomBar_deselect: 'Deseleccionar',
     LibraryBottomBar_photoCount_one: '1 foto',
-    LibraryBottomBar_photoCount_more: '{0} photos',
+    LibraryBottomBar_photoCount_more: '{0} fotos',
 
     LibraryFilterButton_shown: 'Mostrado: {0}',
     LibraryFilterButton_filter_all: 'Todoas las fotos',
