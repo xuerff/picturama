@@ -15,8 +15,7 @@ import Library from 'app/ui/library/Library'
 import LibraryFilterButton from 'app/ui/library/LibraryFilterButton'
 import ImportProgressButton from 'app/ui/ImportProgressButton'
 import { openSettingsAction } from 'app/state/actions'
-import { AppState } from 'app/state/reducers'
-import { MainViewState } from 'app/state/reducers/navigation'
+import { AppState, MainViewState } from 'app/state/StateTypes'
 
 import './App.less'
 

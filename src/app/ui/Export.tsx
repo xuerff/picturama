@@ -16,7 +16,7 @@ import { parsePath } from 'common/util/TextUtil'
 import BackgroundClient from 'app/BackgroundClient'
 import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'app/controller/HotkeyController'
 import { closeExportAction } from 'app/state/actions'
-import { AppState } from 'app/state/reducers'
+import { AppState } from 'app/state/StateTypes'
 
 import Progress from './Progress'
 

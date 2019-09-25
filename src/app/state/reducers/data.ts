@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoById, TagId, TagById, Device, LoadedPhotoSection, isLoadedPhotoSection, PhotoSectionId, PhotoSectionById, Settings, UiConfig} from 'common/CommonTypes'
+import { PhotoById, TagId, TagById, LoadedPhotoSection, isLoadedPhotoSection, PhotoSectionId, PhotoSectionById, Settings, UiConfig} from 'common/CommonTypes'
 import { cloneArrayWithItemRemoved } from 'common/util/LangUtil'
 
 import { Action } from 'app/state/ActionType'
@@ -9,6 +9,7 @@ import {
     CHANGE_PHOTOS, EMPTY_TRASH,
     FETCH_TAGS, INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, FORGET_SECTION_PHOTOS, FETCH_SECTION_PHOTOS
 } from 'app/state/actionTypes'
+import { DataState, TagsState, DevicesState, SectionsState } from 'app/state/StateTypes'
 import { FetchState } from 'app/UITypes'
 
 
@@ -36,11 +37,6 @@ const settings = (state: Settings | undefined, action: Action): Settings => {
 }
 
 
-type TagsState = {
-    readonly ids: TagId[]
-    readonly byId: TagById
-}
-
 const initialTagsState: TagsState = {
     ids: [],
     byId: {}
@@ -63,8 +59,6 @@ const tags = (state: TagsState = initialTagsState, action: Action): TagsState =>
 }
 
 
-type DevicesState = Device[]
-
 const devices = (state: DevicesState = [], action: Action): DevicesState => {
     switch (action.type) {
         case INIT_DEVICES:
@@ -81,16 +75,6 @@ const devices = (state: DevicesState = [], action: Action): DevicesState => {
     }
 }
 
-
-type SectionsState = {
-    readonly fetchState: FetchState
-    /** The total number of photos (when no filter is applied). Is null before fetched for the first time. */
-    readonly totalPhotoCount: number | null
-    /** The number of photos with the current filter applied */
-    readonly photoCount: number
-    readonly ids: PhotoSectionId[]
-    readonly byId: PhotoSectionById
-}
 
 const initialSectionsState: SectionsState = {
     fetchState: FetchState.IDLE,
@@ -242,14 +226,6 @@ const sections = (state: SectionsState = initialSectionsState, action: Action): 
     }
 }
 
-
-export type DataState = {
-    readonly uiConfig: UiConfig
-    readonly settings: Settings
-    readonly tags: TagsState
-    readonly devices: DevicesState
-    readonly sections: SectionsState
-}
 
 export const data = combineReducers<DataState>({
     uiConfig,

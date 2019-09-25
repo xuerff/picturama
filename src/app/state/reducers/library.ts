@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { PhotoId, PhotoSectionId, PhotoFilter, PhotoDetail } from 'common/CommonTypes'
+import { PhotoFilter } from 'common/CommonTypes'
 
 import { defaultGridRowHeight } from 'app/UiConstants'
 import { Action } from 'app/state/ActionType'
@@ -8,12 +8,8 @@ import {
     SET_GRID_ROW_HEIGHT, SET_SELECTED_PHOTOS, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     CHANGE_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_PHOTO_TAGS, EMPTY_TRASH
 } from 'app/state/actionTypes'
+import { LibraryState, DisplayState, SelectionState, InfoState } from 'app/state/StateTypes'
 
-
-type DisplayState = {
-    /** The target row height of the grid. The grid won't hit this value exactly, as it depends on the layout. */
-    readonly gridRowHeight: number
-}
 
 const initialDisplayState: DisplayState = {
     gridRowHeight: defaultGridRowHeight
@@ -48,11 +44,6 @@ const filter = (state: PhotoFilter = initialFilterState, action: Action): PhotoF
     }
 }
 
-
-type SelectionState = {
-    readonly sectionId: PhotoSectionId | null
-    readonly photoIds: PhotoId[]
-}
 
 const initialSelectionState: SelectionState = {
     sectionId: null,
@@ -93,13 +84,6 @@ const selection = (state: SelectionState = initialSelectionState, action: Action
 }
 
 
-type InfoState = {
-    readonly sectionId: PhotoSectionId
-    readonly photoId: PhotoId
-    /** Is `null` while loading */
-    readonly photoDetail: PhotoDetail | null
-} | null
-
 const info = (state: InfoState = null, action: Action): InfoState => {
     switch (action.type) {
         case SET_LIBRARY_INFO_PHOTO_REQUEST:
@@ -135,13 +119,6 @@ const info = (state: InfoState = null, action: Action): InfoState => {
     }
 }
 
-
-export type LibraryState = {
-    readonly display: DisplayState
-    readonly filter: PhotoFilter
-    readonly selection: SelectionState
-    readonly info: InfoState
-}
 
 export const library = combineReducers<LibraryState>({
     display,

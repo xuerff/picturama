@@ -1,15 +1,8 @@
 import { Action } from 'app/state/ActionType'
 import { SET_FULL_SCREEN, OPEN_SETTINGS, CLOSE_SETTINGS, OPEN_DIFF, CLOSE_DIFF } from 'app/state/actionTypes'
 
-import { DetailState } from './detail'
+import { NavigationState, DetailState } from 'app/state/StateTypes'
 
-
-export type MainViewState = 'settings' | 'detail' | 'diff' | null
-
-export type NavigationState = {
-    isFullScreen: boolean
-    mainView: MainViewState
-}
 
 const initialNavigationState: NavigationState = {
     isFullScreen: false,

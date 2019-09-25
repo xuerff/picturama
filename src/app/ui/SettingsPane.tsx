@@ -14,7 +14,7 @@ import FaIcon from 'app/ui/widget/icon/FaIcon'
 import List from 'app/ui/widget/List'
 import LogoDecoration from 'app/ui/widget/LogoDecoration'
 import { setSettingsAction, closeSettingsAction } from 'app/state/actions'
-import { AppState } from 'app/state/reducers'
+import { AppState } from 'app/state/StateTypes'
 
 import './SettingsPane.less'
 

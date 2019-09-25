@@ -8,8 +8,8 @@ import { getNonRawUrl } from 'common/util/DataUtil'
 
 import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'app/controller/HotkeyController'
 import { closeDiffAction } from 'app/state/actions'
-import { AppState } from 'app/state/reducers'
 import { getPhotoById } from 'app/state/selectors'
+import { AppState } from 'app/state/StateTypes'
 
 
 let rotation = {}

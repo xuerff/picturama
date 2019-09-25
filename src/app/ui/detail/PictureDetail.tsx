@@ -18,8 +18,8 @@ import { Command, getCommandButtonProps, CommandGroupId, addCommandGroup, setCom
 import { updatePhotoWork, movePhotosToTrash, setPhotosFlagged, restorePhotosFromTrash } from 'app/controller/PhotoController'
 import { setPhotoTags } from 'app/controller/PhotoTagController'
 import { openExportAction, openDiffAction } from 'app/state/actions'
-import { AppState } from 'app/state/reducers'
 import { getPhotoById, getPhotoByIndex, getLoadedSectionById, getTagTitles } from 'app/state/selectors'
+import { AppState } from 'app/state/StateTypes'
 import BackgroundClient from 'app/BackgroundClient'
 
 import PhotoPane from './PhotoPane'

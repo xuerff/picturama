@@ -1,12 +1,7 @@
-import { ImportProgress } from 'common/CommonTypes'
-
 import { Action } from 'app/state/ActionType'
-import { SET_IMPORT_PROGRESS, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE } from 'app/state/actionTypes'
+import { SET_IMPORT_PROGRESS } from 'app/state/actionTypes'
+import { ImportState } from 'app/state/StateTypes'
 
-
-export type ImportState = {
-    readonly progress: ImportProgress
-} | null
 
 export const importReducer = (state: ImportState = null, action: Action): ImportState => {
     switch (action.type) {

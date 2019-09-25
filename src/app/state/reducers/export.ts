@@ -1,13 +1,7 @@
-import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
-
 import { Action } from 'app/state/ActionType'
 import { OPEN_EXPORT, CLOSE_EXPORT } from 'app/state/actionTypes'
+import { ExportState } from 'app/state/StateTypes'
 
-
-export type ExportState = {
-    readonly sectionId: PhotoSectionId
-    readonly photoIds: PhotoId[]
-} | null
 
 export const exportReducer = (state: ExportState = null, action: Action): ExportState => {
     switch (action.type) {

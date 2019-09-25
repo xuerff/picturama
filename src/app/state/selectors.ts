@@ -1,6 +1,6 @@
-import { PhotoId, Photo, PhotoSectionId, PhotoSection, TagId, isLoadedPhotoSection, LoadedPhotoSection } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoSectionId, TagId, isLoadedPhotoSection, LoadedPhotoSection } from 'common/CommonTypes'
 
-import { AppState } from './reducers'
+import { AppState } from './StateTypes'
 
 
 export function getPhotoByIndex(state: AppState, sectionId: PhotoSectionId, photoIndex: number): Photo | null {

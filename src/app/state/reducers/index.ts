@@ -1,21 +1,14 @@
 import { Action } from 'app/state/ActionType'
 
-import { NavigationState, navigation } from './navigation'
-import { DataState, data } from './data'
-import { LibraryState, library } from './library'
-import { DetailState, detail } from './detail'
-import { ImportState, importReducer } from './import'
-import { ExportState, exportReducer } from './export'
+import { AppState } from 'app/state/StateTypes'
 
+import { navigation } from './navigation'
+import { data } from './data'
+import { library } from './library'
+import { detail } from './detail'
+import { importReducer } from './import'
+import { exportReducer } from './export'
 
-export type AppState = {
-    readonly navigation: NavigationState
-    readonly data: DataState
-    readonly library: LibraryState
-    readonly detail: DetailState
-    readonly import: ImportState
-    readonly export: ExportState
-}
 
 export default (state: AppState = {} as AppState, action: Action) => {
     const detailState = detail(state.detail, action)

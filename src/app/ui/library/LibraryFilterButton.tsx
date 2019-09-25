@@ -8,8 +8,7 @@ import { TagId, TagById, Device, PhotoFilter } from 'common/CommonTypes'
 
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 import { setLibraryFilter } from 'app/controller/PhotoController'
-import { fetchTags } from 'app/controller/PhotoTagController'
-import { AppState } from 'app/state/reducers'
+import { AppState } from 'app/state/StateTypes'
 
 import './LibraryFilterButton.less'
 

@@ -1,25 +1,11 @@
-import { PhotoId, PhotoWork, PhotoDetail, PhotoSectionId } from 'common/CommonTypes'
-
 import { FetchState } from 'app/UITypes'
 import { Action } from 'app/state/ActionType'
 import {
     SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE, CLOSE_DETAIL, CHANGE_PHOTOWORK,
     FETCH_SECTIONS_SUCCESS, SET_PHOTO_TAGS, CHANGE_PHOTOS, EMPTY_TRASH, FETCH_SECTIONS_FAILURE
 } from 'app/state/actionTypes'
+import { DetailState } from 'app/state/StateTypes'
 
-
-export type DetailState = {
-    readonly currentPhoto: {
-        readonly fetchState: FetchState
-        readonly sectionId: PhotoSectionId
-        readonly photoIndex: number
-        readonly photoId: PhotoId
-        /** Is `null` while loading */
-        readonly photoDetail: PhotoDetail | null
-        /** Is `null` while loading */
-        readonly photoWork: PhotoWork | null
-    }
-} | null
 
 export const detail = (state: DetailState = null, action: Action): DetailState => {
     switch (action.type) {
