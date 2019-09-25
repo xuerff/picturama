@@ -5,7 +5,7 @@ import { ImportProgress } from 'common/CommonTypes'
 
 import {
     INIT, SET_FULL_SCREEN, OPEN_SETTINGS, SET_SETTINGS, CLOSE_SETTINGS, SET_GRID_ROW_HEIGHT,
-    SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE,
+    SET_DETAIL_PHOTO, FETCH_DETAIL_PHOTO_DATA_REQUEST, FETCH_DETAIL_PHOTO_DATA_SUCCESS, FETCH_DETAIL_PHOTO_DATA_FAILURE,
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_LIBRARY_INFO_PHOTO_FAILURE,FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, SET_IMPORT_PROGRESS, FETCH_TAGS, SET_PHOTO_TAGS,
@@ -21,7 +21,8 @@ export const closeSettingsAction = () => action(CLOSE_SETTINGS)
 
 export const setGridRowHeightAction = (gridRowHeight: number) => action(SET_GRID_ROW_HEIGHT, { gridRowHeight })
 
-export const setDetailPhotoAction = createAsyncAction(SET_DETAIL_PHOTO_REQUEST, SET_DETAIL_PHOTO_SUCCESS, SET_DETAIL_PHOTO_FAILURE)<{ sectionId: PhotoSectionId, photoIndex: number, photoId: PhotoId }, { photoDetail: PhotoDetail, photoWork: PhotoWork }, Error>()
+export const setDetailPhotoAction = (sectionId: PhotoSectionId, photoIndex: number, photoId: PhotoId) => action(SET_DETAIL_PHOTO, { sectionId, photoIndex, photoId })
+export const fetchDetailPhotoDataAction = createAsyncAction(FETCH_DETAIL_PHOTO_DATA_REQUEST, FETCH_DETAIL_PHOTO_DATA_SUCCESS, FETCH_DETAIL_PHOTO_DATA_FAILURE)<{ photoId: PhotoId }, { photoId: PhotoId, photoDetail: PhotoDetail, photoWork: PhotoWork }, { photoId: PhotoId, error: Error }>()
 export const closeDetailAction = () => action(CLOSE_DETAIL)
 
 export const setSelectedPhotosAction = (sectionId: PhotoSectionId, photoIds: PhotoId[]) => action(SET_SELECTED_PHOTOS, { sectionId, photoIds })

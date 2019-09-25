@@ -11,10 +11,11 @@ import { exportReducer } from './export'
 
 
 export default (state: AppState = {} as AppState, action: Action) => {
-    const detailState = detail(state.detail, action)
+    const dataState = data(state.data, action)
+    const detailState = detail(state.detail, dataState, action)
     return {
         navigation: navigation(state.navigation, detailState, action),
-        data: data(state.data, action),
+        data: dataState,
         library: library(state.library, action),
         detail: detailState,
         import: importReducer(state.import, action),

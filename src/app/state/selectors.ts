@@ -1,11 +1,11 @@
 import { PhotoId, Photo, PhotoSectionId, TagId, isLoadedPhotoSection, LoadedPhotoSection } from 'common/CommonTypes'
 
-import { AppState } from './StateTypes'
+import { AppState, DataState } from './StateTypes'
 
 
 export function getPhotoByIndex(state: AppState, sectionId: PhotoSectionId, photoIndex: number): Photo | null {
     const section = getLoadedSectionById(state, sectionId)
-    return section ? section.photoData[section.photoIds[photoIndex]] : null
+    return (section && section.photoData[section.photoIds[photoIndex]]) || null
 }
 
 export function getPhotoById(state: AppState, sectionId: PhotoSectionId, photoId: PhotoId): Photo | null {
@@ -14,7 +14,11 @@ export function getPhotoById(state: AppState, sectionId: PhotoSectionId, photoId
 }
 
 export function getLoadedSectionById(state: AppState, sectionId: PhotoSectionId): LoadedPhotoSection | null {
-    const section = state.data.sections.byId[sectionId]
+    return getLoadedSectionByIdFromDataState(state.data, sectionId)
+}
+
+export function getLoadedSectionByIdFromDataState(dataState: DataState, sectionId: PhotoSectionId): LoadedPhotoSection | null {
+    const section = dataState.sections.byId[sectionId]
     return isLoadedPhotoSection(section) ? section : null
 }
 

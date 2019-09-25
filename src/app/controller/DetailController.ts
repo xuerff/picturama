@@ -1,13 +1,16 @@
-import { PhotoId, PhotoSectionId, isLoadedPhotoSection } from 'common/CommonTypes'
+import { PhotoId, PhotoSectionId } from 'common/CommonTypes'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import { getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
 import { showError } from 'app/ErrorPresenter'
-import { setDetailPhotoAction, closeDetailAction } from 'app/state/actions'
-import { getPhotoByIndex, getLoadedSectionById } from 'app/state/selectors'
+import { setDetailPhotoAction, fetchDetailPhotoDataAction, closeDetailAction } from 'app/state/actions'
+import { getPhotoByIndex, getLoadedSectionById, getPhotoById } from 'app/state/selectors'
 import store from 'app/state/store'
+import { AppState } from 'app/state/StateTypes'
+import SerialUpdater from 'app/util/SerialUpdater'
+import { FetchState } from 'app/UITypes'
 
 
 assertRendererProcess()
@@ -19,7 +22,6 @@ export function setDetailPhotoById(sectionId: PhotoSectionId, photoId: PhotoId |
     setDetailPhotoByIndex(sectionId, (photoIndex === -1) ? null : photoIndex)
 }
 
-let runningDetailPhotoFetch: CancelablePromise<any> | null = null
 export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIndex: number | null) {
     if (sectionId == null || photoIndex == null) {
         store.dispatch(closeDetailAction())
@@ -29,33 +31,45 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
     const state = store.getState()
     const photo = getPhotoByIndex(state, sectionId, photoIndex)
     if (!photo) {
-        store.dispatch(setDetailPhotoAction.failure(new Error(`No photo at index ${photoIndex}`)))
+        showError(`No photo at index ${photoIndex}`)
         return
     }
 
-    store.dispatch(setDetailPhotoAction.request({ sectionId, photoIndex, photoId: photo.id }))
-
-    if (runningDetailPhotoFetch) {
-        runningDetailPhotoFetch.cancel()
-    }
-
-    runningDetailPhotoFetch = new CancelablePromise(Promise.all(
-        [
-            BackgroundClient.fetchPhotoDetail(photo.id),
-            BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
-        ]))
-        .then(results => {
-            const [ photoDetail, photoWork ] = results
-            store.dispatch(setDetailPhotoAction.success({ photoDetail, photoWork }))
-        })
-        .catch(error => {
-            if (!isCancelError(error)) {
-                showError('Fetching photo work failed: ' + getMasterPath(photo), error)
-                store.dispatch(setDetailPhotoAction.failure(error))
-            }
-        })
-        .then(() => runningDetailPhotoFetch = null)
+    store.dispatch(setDetailPhotoAction(sectionId, photoIndex, photo.id))
 }
+
+
+new SerialUpdater({
+    getUpdateParameters(state: AppState) {
+        const detailState = state.detail
+        return {
+            photo: detailState && getPhotoById(state, detailState.currentPhoto.sectionId, detailState.currentPhoto.photoId),
+            needsData: !!(detailState && !detailState.currentPhoto.photoDetail && detailState.currentPhoto.fetchState === FetchState.IDLE)
+        }
+    },
+    async runUpdate({ photo, needsData }) {
+        if (photo && needsData) {
+            const photoId = photo.id
+            store.dispatch(fetchDetailPhotoDataAction.request({ photoId }))
+            return new CancelablePromise(Promise.all(
+                [
+                    BackgroundClient.fetchPhotoDetail(photo.id),
+                    BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
+                ]))
+                .then(results => {
+                    const [ photoDetail, photoWork ] = results
+                    store.dispatch(fetchDetailPhotoDataAction.success({ photoId, photoDetail, photoWork }))
+                })
+                .catch(error => {
+                    if (!isCancelError(error)) {
+                        showError('Fetching photo data failed: ' + getMasterPath(photo), error)
+                        store.dispatch(fetchDetailPhotoDataAction.failure({ photoId, error }))
+                    }
+                })
+        }
+    }
+})
+
 
 export function setPreviousDetailPhoto() {
     const state = store.getState()
