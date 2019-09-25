@@ -307,7 +307,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             selectedPhotoIds: state.library.selection.photoIds,
             infoPhoto,
             infoPhotoDetail: libraryInfo && libraryInfo.photoDetail,
-            tags: getTagTitles(),
+            tags: getTagTitles(state),
             gridRowHeight: state.library.display.gridRowHeight,
         }
     },

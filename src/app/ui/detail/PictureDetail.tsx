@@ -265,16 +265,16 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state: AppState, props) => {
         const currentPhoto = state.detail!.currentPhoto
         const sectionId = currentPhoto.sectionId
-        const section = getLoadedSectionById(sectionId)
+        const section = getLoadedSectionById(state, sectionId)
         return {
             ...props,
             sectionId: currentPhoto.sectionId,
-            photo: getPhotoById(sectionId, currentPhoto.photoId)!,
-            photoPrev: getPhotoByIndex(sectionId, currentPhoto.photoIndex - 1),
-            photoNext: getPhotoByIndex(sectionId, currentPhoto.photoIndex + 1),
+            photo: getPhotoById(state, sectionId, currentPhoto.photoId)!,
+            photoPrev: getPhotoByIndex(state, sectionId, currentPhoto.photoIndex - 1),
+            photoNext: getPhotoByIndex(state, sectionId, currentPhoto.photoIndex + 1),
             photoDetail: currentPhoto.photoDetail,
             photoWork: currentPhoto.photoWork,
-            tags: getTagTitles(),
+            tags: getTagTitles(state),
             isFirst: currentPhoto.photoIndex === 0,
             isLast: !section || currentPhoto.photoIndex === section.photoIds.length - 1
         }

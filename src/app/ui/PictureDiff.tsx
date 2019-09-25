@@ -123,7 +123,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         const currentPhoto = state.detail!.currentPhoto
         return {
             ...props,
-            photo: getPhotoById(currentPhoto.sectionId, currentPhoto.photoId)!,
+            photo: getPhotoById(state, currentPhoto.sectionId, currentPhoto.photoId)!,
             photoDetail: state.detail!.currentPhoto.photoDetail!
         }
     },

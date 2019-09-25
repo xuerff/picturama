@@ -13,7 +13,8 @@ import store from 'app/state/store'
 assertRendererProcess()
 
 export function setDetailPhotoById(sectionId: PhotoSectionId, photoId: PhotoId | null) {
-    const section = getLoadedSectionById(sectionId)
+    const state = store.getState()
+    const section = getLoadedSectionById(state, sectionId)
     const photoIndex = (section && photoId != null) ? section.photoIds.indexOf(photoId) : -1
     setDetailPhotoByIndex(sectionId, (photoIndex === -1) ? null : photoIndex)
 }
@@ -25,7 +26,8 @@ export function setDetailPhotoByIndex(sectionId: PhotoSectionId | null, photoIn
         return
     }
 
-    const photo = getPhotoByIndex(sectionId, photoIndex)
+    const state = store.getState()
+    const photo = getPhotoByIndex(state, sectionId, photoIndex)
     if (!photo) {
         store.dispatch(setDetailPhotoAction.failure(new Error(`No photo at index ${photoIndex}`)))
         return
@@ -71,7 +73,7 @@ export function setNextDetailPhoto() {
     if (state.detail) {
         const currentPhoto = state.detail.currentPhoto
         const currentIndex = currentPhoto.photoIndex
-        const section = getLoadedSectionById(currentPhoto.sectionId)
+        const section = getLoadedSectionById(state, currentPhoto.sectionId)
         if (section && currentIndex < section.photoIds.length - 1) {
             setDetailPhotoByIndex(currentPhoto.sectionId, currentIndex + 1)
         }
