@@ -6,6 +6,7 @@ import Profiler from 'common/util/Profiler'
 
 import { updatePhoto } from 'app/controller/PhotoController'
 
+import PhotoCameraHelper from './PhotoCameraHelper'
 import PhotoCanvas from './PhotoCanvas'
 
 
@@ -24,6 +25,8 @@ const queue = new SerialJobQueue(
 const maxThumbnailWidth = 1024
 const maxThumbnailHeight = 320
 
+let photoCameraHelper = new PhotoCameraHelper()
+    .setCanvasSize({ width: maxThumbnailWidth, height: maxThumbnailHeight })
 let canvas: PhotoCanvas | null = null
 
 
@@ -39,8 +42,6 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
 
     if (canvas === null) {
         canvas = new PhotoCanvas()
-            .setSize({ width: maxThumbnailWidth, height: maxThumbnailHeight })
-            .setPhotoPosition('adjust-canvas')
         if (profiler) profiler.addPoint('Created canvas')
     }
 
@@ -57,10 +58,15 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
     if (profiler) profiler.addPoint('Checked photo size in DB')
 
     // Render thumbnail
-    canvas
-        .setBaseTexture(texture)
+    photoCameraHelper
+        .setTextureSize({ width: texture.width, height: texture.height })
         .setExifOrientation(photo.orientation)
         .setPhotoWork(photoWork)
+    canvas
+        .setBaseTexture(texture)
+        .setSize(photoCameraHelper.getAdjustedCanvasSize())
+        .setRotationTurns(photoCameraHelper.getRotationTurns())
+        .setCameraMatrix(photoCameraHelper.getCameraMatrix())
         .update()
     if (profiler) profiler.addPoint('Rendered canvas')
 

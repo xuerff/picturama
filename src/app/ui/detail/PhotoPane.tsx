@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
+import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
@@ -8,8 +9,10 @@ import Profiler from 'common/util/Profiler'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { showError } from 'app/ErrorPresenter'
-import PhotoCanvas, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'app/renderer/PhotoCanvas'
+import PhotoCameraHelper, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'app/renderer/PhotoCameraHelper'
+import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
+import { Size } from 'app/UITypes'
 
 import './PhotoPane.less'
 
@@ -40,14 +43,19 @@ export interface Props {
 }
 
 interface State {
-    canvas: PhotoCanvas | null
+    photoCameraHelper: PhotoCameraHelper
     prevSrc: string | null
+    prevCanvasSize: Size
+    textureSize: Size | null
     photoPosition: RequestedPhotoPosition
+    rotationTurns: number
+    cameraMatrix: mat4
     dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null
 }
 
 export default class PhotoPane extends React.Component<Props, State> {
 
+    private photoCameraHelper: PhotoCameraHelper
     private canvas: PhotoCanvas | null = null
 
     private isLoadingTexture = false
@@ -63,27 +71,58 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        this.state = { canvas: null, prevSrc: null, photoPosition: 'contain', dragStart: null }
         bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel')
+        this.photoCameraHelper = new PhotoCameraHelper()
+        this.state = {
+            photoCameraHelper: this.photoCameraHelper,
+            prevSrc: null,
+            prevCanvasSize: { width: 0, height: 0 },
+            textureSize: null,
+            photoPosition: 'contain',
+            rotationTurns: 0,
+            cameraMatrix: this.photoCameraHelper.getCameraMatrix(),
+            dragStart: null
+        }
     }
 
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
+        const { photoCameraHelper } = prevState
+        let nextState: Partial<State> | null = null
+
+        let nextPhotoPosition = prevState.photoPosition
         if (nextProps.src !== prevState.prevSrc) {
-            return { prevSrc: nextProps.src, photoPosition: 'contain' }
+            nextState = { prevSrc: nextProps.src, textureSize: null, photoPosition: 'contain' }
         } else {
-            const { canvas } = prevState
-            if (canvas) {
-                const photoPosition = canvas.getFinalPhotoPosition()
-                if (photoPosition && nextProps.zoom !== photoPosition.zoom) {
-                    let nextPhotoPosition: RequestedPhotoPosition = canvas.limitPhotoPosition({ ...photoPosition, zoom: nextProps.zoom }, false)
-                    if (nextPhotoPosition.zoom <= canvas.getMinZoom()) {
-                        nextPhotoPosition = 'contain'
-                    }
-                    return { photoPosition: nextPhotoPosition }
+            const photoPosition = photoCameraHelper.getFinalPhotoPosition()
+            if (photoPosition && nextProps.zoom !== photoPosition.zoom) {
+                nextPhotoPosition = photoCameraHelper.limitPhotoPosition({ ...photoPosition, zoom: nextProps.zoom }, false)
+                if (nextPhotoPosition.zoom <= photoCameraHelper.getMinZoom()) {
+                    nextPhotoPosition = 'contain'
                 }
+                nextState = { photoPosition: nextPhotoPosition }
             }
         }
-        return null
+
+        if (nextProps.width !== prevState.prevCanvasSize.width || nextProps.height !== prevState.prevCanvasSize.height) {
+            const canvasSize = { width: nextProps.width, height: nextProps.height }
+            photoCameraHelper.setCanvasSize(canvasSize)
+            nextState = { ...nextState, prevCanvasSize: canvasSize }
+        }
+
+        if (prevState.textureSize && nextProps.photoWork) {
+            photoCameraHelper
+                .setTextureSize(prevState.textureSize)
+                .setExifOrientation(nextProps.orientation)
+                .setPhotoWork(nextProps.photoWork)
+                .setPhotoPosition(nextPhotoPosition)
+            const rotationTurns = photoCameraHelper.getRotationTurns() 
+            const cameraMatrix = photoCameraHelper.getCameraMatrix()
+            if (rotationTurns !== prevState.rotationTurns || cameraMatrix !== prevState.cameraMatrix) {
+                nextState = { ...nextState, rotationTurns, cameraMatrix }
+            }
+        }
+
+        return nextState
     }
 
     componentDidMount() {
@@ -94,7 +133,6 @@ export default class PhotoPane extends React.Component<Props, State> {
         const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
         mainElem.appendChild(canvasElem)
 
-        this.setState({ canvas: this.canvas })
         this.updateCanvas({}, {})
     }
 
@@ -109,6 +147,15 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     componentDidUpdate(prevProps: Props, prevState: State) {
         this.updateCanvas(prevProps, prevState)
+
+        const { photoCameraHelper } = this
+        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
+        const minZoom = photoCameraHelper.getMinZoom()
+        if (photoPosition && (photoPosition.zoom !== this.prevZoom || minZoom !== this.prevMinZoom)) {
+            this.prevZoom = photoPosition.zoom
+            this.prevMinZoom = minZoom
+            this.props.onZoomChange(photoPosition.zoom, minZoom, maxZoom)
+        }
     }
 
     private setLoading(loading: boolean) {
@@ -123,8 +170,8 @@ export default class PhotoPane extends React.Component<Props, State> {
             return
         }
 
-        const { canvas } = this
-        const photoPosition = canvas && canvas.getFinalPhotoPosition()
+        const { photoCameraHelper } = this
+        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
         if (photoPosition) {
             this.setState({ dragStart: { x: event.clientX, y: event.clientY, photoPosition } })
             window.addEventListener('mousemove', this.onMouseMove)
@@ -138,17 +185,17 @@ export default class PhotoPane extends React.Component<Props, State> {
     }
 
     private onMouseMove(event: MouseEvent) {
-        const { canvas } = this
+        const { photoCameraHelper } = this
         const { dragStart } = this.state
-        if (canvas && dragStart) {
+        if (dragStart) {
             const startPhotoPosition = dragStart.photoPosition
             const zoom = startPhotoPosition.zoom
 
             let centerX = startPhotoPosition.centerX - (event.clientX - dragStart.x) / zoom
             let centerY = startPhotoPosition.centerY - (event.clientY - dragStart.y) / zoom
-            const nextPhotoPosition = canvas.limitPhotoPosition({ centerX, centerY, zoom }, true)
+            const nextPhotoPosition = photoCameraHelper.limitPhotoPosition({ centerX, centerY, zoom }, true)
 
-            if (!isShallowEqual(nextPhotoPosition, canvas.getFinalPhotoPosition())) {
+            if (!isShallowEqual(nextPhotoPosition, photoCameraHelper.getFinalPhotoPosition())) {
                 this.setState({ photoPosition: nextPhotoPosition })
             }
         }
@@ -163,12 +210,8 @@ export default class PhotoPane extends React.Component<Props, State> {
     }
 
     private onWheel(event: React.WheelEvent<HTMLDivElement>) {
-        const { canvas } = this
-        if (!canvas) {
-            return
-        }
-
-        const photoPosition = canvas.getFinalPhotoPosition()
+        const { photoCameraHelper } = this
+        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
         if (!photoPosition) {
             return
         }
@@ -177,7 +220,7 @@ export default class PhotoPane extends React.Component<Props, State> {
             // One wheel tick has a deltaY of ~ 4
         if (zoom === photoPosition.zoom) {
             // Nothing to do
-        } else if (zoom < canvas.getMinZoom()) {
+        } else if (zoom < photoCameraHelper.getMinZoom()) {
             this.setState({ photoPosition: 'contain' })
         } else {
             const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
@@ -221,6 +264,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         }
 
         let canvasChanged = false
+
         if (this.canvasSrc !== props.src) {
             let textureToShow: Texture | null = null
             const textureInfo = this.textureCache[props.src]
@@ -238,22 +282,14 @@ export default class PhotoPane extends React.Component<Props, State> {
             canvasChanged = true
         }
 
-        if (props.orientation !== prevProps.orientation) {
-            canvas.setExifOrientation(props.orientation)
+        if (state.rotationTurns !== prevState.rotationTurns || state.cameraMatrix !== prevState.cameraMatrix) {
+            canvas
+                .setRotationTurns(state.rotationTurns)
+                .setCameraMatrix(state.cameraMatrix)
             canvasChanged = true
         }
 
-        if (props.photoWork !== prevProps.photoWork) {
-            canvas.setPhotoWork(props.photoWork)
-            canvasChanged = true
-        }
-
-        if (state.photoPosition !== prevState.photoPosition) {
-            canvas.setPhotoPosition(state.photoPosition)
-            canvasChanged = true
-        }
-
-        if (canvasChanged) {
+        if (canvasChanged && state.textureSize) {
             if (canvas.isValid()) {
                 if (this.deferredHideCanvasTimeout) {
                     clearTimeout(this.deferredHideCanvasTimeout)
@@ -262,14 +298,6 @@ export default class PhotoPane extends React.Component<Props, State> {
                 canvas.update()
                 canvas.getElement().style.display = null
                 this.setLoading(false)
-
-                const photoPosition = canvas.getFinalPhotoPosition()
-                const minZoom = canvas.getMinZoom()
-                if (photoPosition && (photoPosition.zoom !== this.prevZoom || minZoom !== this.prevMinZoom)) {
-                    this.prevZoom = photoPosition.zoom
-                    this.prevMinZoom = minZoom
-                    props.onZoomChange(photoPosition.zoom, minZoom, maxZoom)
-                }
             } else if (!this.deferredHideCanvasTimeout) {
                 // We hide the old image of an invalid canvas with a little delay,
                 // in order to avoid blinking if loading the next texture and photo work is fast
@@ -286,6 +314,10 @@ export default class PhotoPane extends React.Component<Props, State> {
         const { canvas, textureCache } = this
 
         if (!canvas || !src || textureCache[src] || this.isLoadingTexture || this.texturesWithError[src]) {
+            if (src === this.props.src && !this.state.textureSize && textureCache[src]) {
+                const texture = textureCache[src].texture
+                this.setState({ textureSize: { width: texture.width, height: texture.height } })
+            }
             return
         }
 
@@ -312,7 +344,11 @@ export default class PhotoPane extends React.Component<Props, State> {
                 }
 
                 this.isLoadingTexture = false
-                this.updateCanvas(this.props, this.state)
+                if (src === this.props.src && !this.state.textureSize) {
+                    this.setState({ textureSize: { width: texture.width, height: texture.height } })
+                } else {
+                    this.updateCanvas(this.props, this.state)
+                }
                 if (profiler) profiler.addPoint('Updated canvas')
 
                 if (profiler) profiler.logResult()
