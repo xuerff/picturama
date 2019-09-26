@@ -5,7 +5,6 @@ import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
-import Profiler from 'common/util/Profiler'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { showError } from 'app/ErrorPresenter'
@@ -14,17 +13,9 @@ import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 import { Size } from 'app/UITypes'
 
+import TextureCache from './TextureCache'
+
 import './PhotoPane.less'
-
-
-const textureCacheMaxSize = 5
-
-
-interface TextureInfo {
-    src: string
-    texture: Texture
-    lastUse: number
-}
 
 
 export interface Props {
@@ -57,11 +48,9 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     private photoCameraHelper: PhotoCameraHelper
     private canvas: PhotoCanvas | null = null
+    private textureCache: TextureCache | null = null
 
-    private isLoadingTexture = false
-    private texturesWithError: { [index: string]: boolean } = {}
     private canvasSrc: string | null = null
-    private textureCache: { [key:string]: TextureInfo } = {}
     private deferredHideCanvasTimeout: NodeJS.Timer | null
 
     private prevLoading: boolean | null = null
@@ -71,7 +60,7 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel')
+        bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel', 'onTextureFetched')
         this.photoCameraHelper = new PhotoCameraHelper()
         this.state = {
             photoCameraHelper: this.photoCameraHelper,
@@ -132,6 +121,13 @@ export default class PhotoPane extends React.Component<Props, State> {
         canvasElem.style.display = 'none'
         const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
         mainElem.appendChild(canvasElem)
+
+        this.textureCache = new TextureCache({
+            canvas: this.canvas,
+            maxCacheSize: 5,
+            profile: profileDetailView,
+            onTextureFetched: this.onTextureFetched
+        })
 
         this.updateCanvas({}, {})
     }
@@ -242,21 +238,23 @@ export default class PhotoPane extends React.Component<Props, State> {
         }
     }
 
+    private onTextureFetched(src: string, texture: Texture | null) {
+        if (src === this.props.src && !this.state.textureSize && texture) {
+            this.setState({ textureSize: { width: texture.width, height: texture.height } })
+        } else {
+            this.updateCanvas(this.props, this.state)
+        }
+    }
+
     private updateCanvas(prevProps: Partial<Props>, prevState: Partial<State>) {
-        const { props, state, canvas } = this
-        if (!canvas) {
+        const { props, state, canvas, textureCache } = this
+        if (!canvas || !textureCache) {
             return
         }
 
-        if (props.src !== prevProps.src || props.srcNext !== prevProps.srcNext || props.srcPrev !== prevProps.srcPrev) {
-            this.texturesWithError = {}
-        }
+        textureCache.setSourcesToFetch([ props.src, props.srcNext, props.srcPrev ])
 
-        this.tryToFetchTexture(props.src)
-        this.tryToFetchTexture(props.srcNext)
-        this.tryToFetchTexture(props.srcPrev)
-
-        if (this.texturesWithError[props.src]) {
+        if (textureCache.hasTextureError(props.src)) {
             showError('Showing photo failed: ' + props.src)
             canvas.getElement().style.display = 'none'
             this.setLoading(false)
@@ -266,12 +264,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         let canvasChanged = false
 
         if (this.canvasSrc !== props.src) {
-            let textureToShow: Texture | null = null
-            const textureInfo = this.textureCache[props.src]
-            if (textureInfo) {
-                textureInfo.lastUse = Date.now()
-                textureToShow = textureInfo.texture
-            }
+            let textureToShow = textureCache.getTexture(props.src)
             canvas.setBaseTexture(textureToShow, false)
             this.canvasSrc = textureToShow ? props.src : null
             canvasChanged = true
@@ -308,57 +301,13 @@ export default class PhotoPane extends React.Component<Props, State> {
                 }, 100)
             }
         }
-    }
 
-    private tryToFetchTexture(src?: string | null) {
-        const { canvas, textureCache } = this
-
-        if (!canvas || !src || textureCache[src] || this.isLoadingTexture || this.texturesWithError[src]) {
-            if (src === this.props.src && !this.state.textureSize && textureCache[src]) {
-                const texture = textureCache[src].texture
+        if (!state.textureSize) {
+            const texture = textureCache.getTexture(props.src)
+            if (texture) {
                 this.setState({ textureSize: { width: texture.width, height: texture.height } })
             }
-            return
         }
-
-        const profiler = profileDetailView ? new Profiler(`Fetching texture for ${src}`) : null
-        this.isLoadingTexture = true
-        canvas.createTextureFromSrc(src, profiler)
-            .then(texture => {
-                if (profiler) profiler.addPoint('Loaded texture')
-                textureCache[src] = { src, texture, lastUse: Date.now() }
-
-                const cachedSrcs = Object.keys(textureCache)
-                if (cachedSrcs.length > textureCacheMaxSize) {
-                    let oldestTextureInfo: TextureInfo | null = null
-                    for (const src of cachedSrcs) {
-                        const textureInfo = textureCache[src]
-                        if (!oldestTextureInfo || textureInfo.lastUse < oldestTextureInfo.lastUse) {
-                            oldestTextureInfo = textureInfo
-                        }
-                    }
-                    if (oldestTextureInfo) {
-                        oldestTextureInfo.texture.destroy()
-                        delete textureCache[oldestTextureInfo.src]
-                    }
-                }
-
-                this.isLoadingTexture = false
-                if (src === this.props.src && !this.state.textureSize) {
-                    this.setState({ textureSize: { width: texture.width, height: texture.height } })
-                } else {
-                    this.updateCanvas(this.props, this.state)
-                }
-                if (profiler) profiler.addPoint('Updated canvas')
-
-                if (profiler) profiler.logResult()
-            })
-            .catch(error => {
-                console.error(`Loading ${src} failed`, error)
-                this.isLoadingTexture = false
-                this.texturesWithError[src] = true
-                this.updateCanvas(this.props, this.state)
-            })
     }
 
     render() {
