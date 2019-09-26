@@ -70,6 +70,10 @@ export default class PhotoCameraHelper {
         return this
     }
 
+    getRequestedPhotoPosition(): RequestedPhotoPosition {
+        return this.requestedPhotoPosition
+    }
+
     setExifOrientation(exifOrientation: ExifOrientation): this {
         if (this.exifOrientation !== exifOrientation) {
             this.exifOrientation = exifOrientation

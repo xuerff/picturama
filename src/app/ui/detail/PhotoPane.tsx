@@ -5,7 +5,7 @@ import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
-import { bindMany, isShallowEqual } from 'common/util/LangUtil'
+import { bindMany } from 'common/util/LangUtil'
 
 import { showError } from 'app/ErrorPresenter'
 import PhotoCameraHelper, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'app/renderer/PhotoCameraHelper'
@@ -13,6 +13,7 @@ import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 import { Size } from 'app/UITypes'
 
+import PanZoomController from './PanZoomController'
 import TextureCache from './TextureCache'
 
 import './PhotoPane.less'
@@ -41,11 +42,12 @@ interface State {
     photoPosition: RequestedPhotoPosition
     rotationTurns: number
     cameraMatrix: mat4
-    dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null
+    isDragging: boolean
 }
 
 export default class PhotoPane extends React.Component<Props, State> {
 
+    private panZoomController: PanZoomController | undefined = undefined
     private photoCameraHelper: PhotoCameraHelper
     private canvas: PhotoCanvas | null = null
     private textureCache: TextureCache | null = null
@@ -60,7 +62,7 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel', 'onTextureFetched')
+        bindMany(this, 'onPhotoPositionChange', 'onDraggingChange', 'onTextureFetched')
         this.photoCameraHelper = new PhotoCameraHelper()
         this.state = {
             photoCameraHelper: this.photoCameraHelper,
@@ -70,7 +72,7 @@ export default class PhotoPane extends React.Component<Props, State> {
             photoPosition: 'contain',
             rotationTurns: 0,
             cameraMatrix: this.photoCameraHelper.getCameraMatrix(),
-            dragStart: null
+            isDragging: false,
         }
     }
 
@@ -122,6 +124,13 @@ export default class PhotoPane extends React.Component<Props, State> {
         const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
         mainElem.appendChild(canvasElem)
 
+        this.panZoomController = new PanZoomController({
+            mainElem,
+            photoCameraHelper: this.photoCameraHelper,
+            onPhotoPositionChange: this.onPhotoPositionChange,
+            onDraggingChange: this.onDraggingChange,
+        })
+
         this.textureCache = new TextureCache({
             canvas: this.canvas,
             maxCacheSize: 5,
@@ -138,7 +147,10 @@ export default class PhotoPane extends React.Component<Props, State> {
             canvasElem.parentNode!.removeChild(canvasElem)
             this.canvas = null
         }
-        this.removeDragListeners()
+        if (this.panZoomController) {
+            this.panZoomController.close()
+            this.panZoomController = undefined
+        }
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
@@ -161,81 +173,12 @@ export default class PhotoPane extends React.Component<Props, State> {
         }
     }
 
-    private onMouseDown(event: React.MouseEvent) {
-        if (this.state.photoPosition === 'contain' || this.state.dragStart) {
-            return
-        }
-
-        const { photoCameraHelper } = this
-        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
-        if (photoPosition) {
-            this.setState({ dragStart: { x: event.clientX, y: event.clientY, photoPosition } })
-            window.addEventListener('mousemove', this.onMouseMove)
-            window.addEventListener('mouseup', this.onMouseUp)
-        }
+    private onPhotoPositionChange(photoPosition: PhotoPosition) {
+        this.setState({ photoPosition })
     }
 
-    private removeDragListeners() {
-        window.removeEventListener('mousemove', this.onMouseMove)
-        window.removeEventListener('mouseup', this.onMouseUp)
-    }
-
-    private onMouseMove(event: MouseEvent) {
-        const { photoCameraHelper } = this
-        const { dragStart } = this.state
-        if (dragStart) {
-            const startPhotoPosition = dragStart.photoPosition
-            const zoom = startPhotoPosition.zoom
-
-            let centerX = startPhotoPosition.centerX - (event.clientX - dragStart.x) / zoom
-            let centerY = startPhotoPosition.centerY - (event.clientY - dragStart.y) / zoom
-            const nextPhotoPosition = photoCameraHelper.limitPhotoPosition({ centerX, centerY, zoom }, true)
-
-            if (!isShallowEqual(nextPhotoPosition, photoCameraHelper.getFinalPhotoPosition())) {
-                this.setState({ photoPosition: nextPhotoPosition })
-            }
-        }
-    }
-
-    private onMouseUp() {
-        this.removeDragListeners()
-
-        if (this.state.dragStart) {
-            this.setState({ dragStart: null })
-        }
-    }
-
-    private onWheel(event: React.WheelEvent<HTMLDivElement>) {
-        const { photoCameraHelper } = this
-        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
-        if (!photoPosition) {
-            return
-        }
-
-        const zoom = Math.min(maxZoom, photoPosition.zoom * Math.pow(1.01, -event.deltaY))
-            // One wheel tick has a deltaY of ~ 4
-        if (zoom === photoPosition.zoom) {
-            // Nothing to do
-        } else if (zoom < photoCameraHelper.getMinZoom()) {
-            this.setState({ photoPosition: 'contain' })
-        } else {
-            const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
-            const mainRect = mainElem.getBoundingClientRect()
-
-            // The mouse position in the canvas (in device pixels, relative to the center of the canvas)
-            const mouseX = event.clientX - mainRect.left - mainRect.width / 2
-            const mouseY = event.clientY - mainRect.top - mainRect.height / 2
-
-            // The photo pixel where the mouse is aiming relativ (in photo pixels, relative to the top/left corner of the photo)
-            const mousePhotoX = photoPosition.centerX + mouseX / photoPosition.zoom
-            const mousePhotoY = photoPosition.centerY + mouseY / photoPosition.zoom
-
-            // The new center (in photo pixels)
-            const centerX = mousePhotoX - mouseX / zoom
-            const centerY = mousePhotoY - mouseY / zoom
-
-            this.setState({ photoPosition: { centerX, centerY, zoom } })
-        }
+    private onDraggingChange(isDragging: boolean) {
+        this.setState({ isDragging })
     }
 
     private onTextureFetched(src: string, texture: Texture | null) {
@@ -311,14 +254,14 @@ export default class PhotoPane extends React.Component<Props, State> {
     }
 
     render() {
-        const { props, state } = this
+        const { props, state, panZoomController } = this
         return (
             <div
                 ref="main"
-                className={classNames(props.className, 'PhotoPane', { isZoomed: state.photoPosition !== 'contain', isDragging: state.dragStart })}
+                className={classNames(props.className, 'PhotoPane', { isZoomed: state.photoPosition !== 'contain', isDragging: state.isDragging })}
                 style={{ ...props.style, width: props.width, height: props.height }}
-                onWheel={this.onWheel}
-                onMouseDown={this.onMouseDown}
+                onWheel={panZoomController && panZoomController.onWheel}
+                onMouseDown={panZoomController && panZoomController.onMouseDown}
             />
         )
     }
