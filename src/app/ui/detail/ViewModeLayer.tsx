@@ -1,46 +1,47 @@
+import React from 'react'
+import { findDOMNode } from 'react-dom'
+import classnames from 'classnames'
+
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
-import { CameraMetrics, zeroCameraMetrics, PhotoPosition, maxZoom, RequestedPhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
+import { CameraMetrics, PhotoPosition, maxZoom, RequestedPhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
 
+import './ViewModeLayer.less'
 
-export interface PanZoomControllerOptions {
-    mainElem: HTMLElement,
-    onPhotoPositionChange(photoPosition: RequestedPhotoPosition): void
-    onDraggingChange(isDragging: boolean): void
-}
 
 export interface Props {
-    cameraMetrics: CameraMetrics
+    className?: any
+    cameraMetrics: CameraMetrics | null
+    onPhotoPositionChange(photoPosition: RequestedPhotoPosition): void
 }
 
-export default class PanZoomController {
+interface State {
+    dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null
+}
 
-    private props = {
-        cameraMetrics: zeroCameraMetrics
-    }
-    private dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null = null
+export default class ViewModeLayer extends React.Component<Props, State> {
 
-    constructor(private options: PanZoomControllerOptions) {
+    constructor(props: Props) {
+        super(props)
+        this.state = { dragStart: null }
         bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel')
     }
 
-    setProps(props: Props) {
-        this.props = props
+    componentWillUnmount() {
+        this.removeDragListeners()
     }
 
-    onMouseDown(event: React.MouseEvent) {
+    private onMouseDown(event: React.MouseEvent) {
         const { cameraMetrics } = this.props
-        if (this.dragStart || cameraMetrics.requestedPhotoPosition === 'contain') {
+        if (this.state.dragStart || !cameraMetrics || cameraMetrics.requestedPhotoPosition === 'contain') {
             return
         }
 
-        this.dragStart = { x: event.clientX, y: event.clientY, photoPosition: cameraMetrics.photoPosition }
         window.addEventListener('mousemove', this.onMouseMove)
         window.addEventListener('mouseup', this.onMouseUp)
-    }
 
-    close() {
-        this.removeDragListeners()
+        const dragStart = { x: event.clientX, y: event.clientY, photoPosition: cameraMetrics.photoPosition }
+        this.setState({ dragStart })
     }
 
     private removeDragListeners() {
@@ -49,9 +50,9 @@ export default class PanZoomController {
     }
 
     private onMouseMove(event: MouseEvent) {
-        const { dragStart } = this
+        const { dragStart } = this.state
         const { cameraMetrics } = this.props
-        if (dragStart) {
+        if (dragStart && cameraMetrics) {
             const startPhotoPosition = dragStart.photoPosition
             const zoom = startPhotoPosition.zoom
 
@@ -60,7 +61,7 @@ export default class PanZoomController {
             const nextPhotoPosition = limitPhotoPosition(cameraMetrics, { centerX, centerY, zoom }, true)
 
             if (!isShallowEqual(nextPhotoPosition, cameraMetrics.photoPosition)) {
-                this.options.onPhotoPositionChange(nextPhotoPosition)
+                this.props.onPhotoPositionChange(nextPhotoPosition)
             }
         }
     }
@@ -68,22 +69,27 @@ export default class PanZoomController {
     private onMouseUp() {
         this.removeDragListeners()
 
-        if (this.dragStart) {
-            this.dragStart = null
+        if (this.state.dragStart) {
+            this.setState({ dragStart: null })
         }
     }
 
-    onWheel(event: React.WheelEvent<HTMLDivElement>) {
+    private onWheel(event: React.WheelEvent<HTMLDivElement>) {
         const { cameraMetrics } = this.props
+        if (!cameraMetrics) {
+            return
+        }
+
         const { photoPosition } = cameraMetrics
         const zoom = Math.min(maxZoom, photoPosition.zoom * Math.pow(1.01, -event.deltaY))
             // One wheel tick has a deltaY of ~ 4
         if (zoom === photoPosition.zoom) {
             // Nothing to do
         } else if (zoom < cameraMetrics.minZoom) {
-            this.options.onPhotoPositionChange('contain')
+            this.props.onPhotoPositionChange('contain')
         } else {
-            const mainRect = this.options.mainElem.getBoundingClientRect()
+            const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
+            const mainRect = mainElem.getBoundingClientRect()
 
             // The mouse position in the canvas (in device pixels, relative to the center of the canvas)
             const mouseX = event.clientX - mainRect.left - mainRect.width / 2
@@ -97,8 +103,22 @@ export default class PanZoomController {
             const centerX = mousePhotoX - mouseX / zoom
             const centerY = mousePhotoY - mouseY / zoom
 
-            this.options.onPhotoPositionChange({ centerX, centerY, zoom })
+            this.props.onPhotoPositionChange({ centerX, centerY, zoom })
         }
+    }
+
+    render() {
+        const { props, state } = this
+        const requestedPhotoPosition = props.cameraMetrics && props.cameraMetrics.requestedPhotoPosition
+        const isZoomed = requestedPhotoPosition && requestedPhotoPosition !== 'contain'
+        return (
+            <div
+                ref='main'
+                className={classnames(props.className, 'ViewModeLayer', { isZoomed, isDragging: state.dragStart })}
+                onMouseDown={this.onMouseDown}
+                onWheel={this.onWheel}
+            />
+        )
     }
 
 }
