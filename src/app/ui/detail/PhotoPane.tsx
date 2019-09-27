@@ -8,7 +8,7 @@ import { profileDetailView } from 'common/LogConstants'
 import { bindMany } from 'common/util/LangUtil'
 
 import { showError } from 'app/ErrorPresenter'
-import PhotoCameraHelper, { RequestedPhotoPosition, PhotoPosition, maxZoom } from 'app/renderer/PhotoCameraHelper'
+import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 import { Size } from 'app/UITypes'
@@ -35,20 +35,18 @@ export interface Props {
 }
 
 interface State {
-    photoCameraHelper: PhotoCameraHelper
+    cameraMetricsBuilder: CameraMetricsBuilder
     prevSrc: string | null
     prevCanvasSize: Size
     textureSize: Size | null
     photoPosition: RequestedPhotoPosition
-    rotationTurns: number
-    cameraMatrix: mat4
+    cameraMetrics: CameraMetrics
     isDragging: boolean
 }
 
 export default class PhotoPane extends React.Component<Props, State> {
 
     private panZoomController: PanZoomController | undefined = undefined
-    private photoCameraHelper: PhotoCameraHelper
     private canvas: PhotoCanvas | null = null
     private textureCache: TextureCache | null = null
 
@@ -63,31 +61,30 @@ export default class PhotoPane extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         bindMany(this, 'onPhotoPositionChange', 'onDraggingChange', 'onTextureFetched')
-        this.photoCameraHelper = new PhotoCameraHelper()
+        const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
-            photoCameraHelper: this.photoCameraHelper,
+            cameraMetricsBuilder,
             prevSrc: null,
             prevCanvasSize: { width: 0, height: 0 },
             textureSize: null,
             photoPosition: 'contain',
-            rotationTurns: 0,
-            cameraMatrix: this.photoCameraHelper.getCameraMatrix(),
+            cameraMetrics: cameraMetricsBuilder.getCameraMetrics(),
             isDragging: false,
         }
     }
 
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
-        const { photoCameraHelper } = prevState
+        const { cameraMetricsBuilder } = prevState
         let nextState: Partial<State> | null = null
 
         let nextPhotoPosition = prevState.photoPosition
         if (nextProps.src !== prevState.prevSrc) {
             nextState = { prevSrc: nextProps.src, textureSize: null, photoPosition: 'contain' }
         } else {
-            const photoPosition = photoCameraHelper.getFinalPhotoPosition()
-            if (photoPosition && nextProps.zoom !== photoPosition.zoom) {
-                nextPhotoPosition = photoCameraHelper.limitPhotoPosition({ ...photoPosition, zoom: nextProps.zoom }, false)
-                if (nextPhotoPosition.zoom <= photoCameraHelper.getMinZoom()) {
+            const prevCameraMetrics = prevState.cameraMetrics
+            if (nextProps.zoom !== prevCameraMetrics.photoPosition.zoom) {
+                nextPhotoPosition = limitPhotoPosition(prevCameraMetrics, { ...prevCameraMetrics.photoPosition, zoom: nextProps.zoom }, false)
+                if (nextPhotoPosition.zoom <= prevCameraMetrics.minZoom) {
                     nextPhotoPosition = 'contain'
                 }
                 nextState = { photoPosition: nextPhotoPosition }
@@ -96,20 +93,19 @@ export default class PhotoPane extends React.Component<Props, State> {
 
         if (nextProps.width !== prevState.prevCanvasSize.width || nextProps.height !== prevState.prevCanvasSize.height) {
             const canvasSize = { width: nextProps.width, height: nextProps.height }
-            photoCameraHelper.setCanvasSize(canvasSize)
+            cameraMetricsBuilder.setCanvasSize(canvasSize)
             nextState = { ...nextState, prevCanvasSize: canvasSize }
         }
 
         if (prevState.textureSize && nextProps.photoWork) {
-            photoCameraHelper
+            const cameraMetrics = cameraMetricsBuilder
                 .setTextureSize(prevState.textureSize)
                 .setExifOrientation(nextProps.orientation)
                 .setPhotoWork(nextProps.photoWork)
                 .setPhotoPosition(nextPhotoPosition)
-            const rotationTurns = photoCameraHelper.getRotationTurns() 
-            const cameraMatrix = photoCameraHelper.getCameraMatrix()
-            if (rotationTurns !== prevState.rotationTurns || cameraMatrix !== prevState.cameraMatrix) {
-                nextState = { ...nextState, rotationTurns, cameraMatrix }
+                .getCameraMetrics()
+            if (cameraMetrics !== prevState.cameraMetrics) {
+                nextState = { ...nextState, cameraMetrics }
             }
         }
 
@@ -126,7 +122,6 @@ export default class PhotoPane extends React.Component<Props, State> {
 
         this.panZoomController = new PanZoomController({
             mainElem,
-            photoCameraHelper: this.photoCameraHelper,
             onPhotoPositionChange: this.onPhotoPositionChange,
             onDraggingChange: this.onDraggingChange,
         })
@@ -156,9 +151,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         this.updateCanvas(prevProps, prevState)
 
-        const { photoCameraHelper } = this
-        const photoPosition = photoCameraHelper.getFinalPhotoPosition()
-        const minZoom = photoCameraHelper.getMinZoom()
+        const { photoPosition, minZoom, maxZoom } = this.state.cameraMetrics
         if (photoPosition && (photoPosition.zoom !== this.prevZoom || minZoom !== this.prevMinZoom)) {
             this.prevZoom = photoPosition.zoom
             this.prevMinZoom = minZoom
@@ -218,10 +211,10 @@ export default class PhotoPane extends React.Component<Props, State> {
             canvasChanged = true
         }
 
-        if (state.rotationTurns !== prevState.rotationTurns || state.cameraMatrix !== prevState.cameraMatrix) {
+        if (state.cameraMetrics !== prevState.cameraMetrics) {
             canvas
-                .setRotationTurns(state.rotationTurns)
-                .setCameraMatrix(state.cameraMatrix)
+                .setRotationTurns(state.cameraMetrics.rotationTurns)
+                .setCameraMatrix(state.cameraMetrics.cameraMatrix)
             canvasChanged = true
         }
 
@@ -255,6 +248,9 @@ export default class PhotoPane extends React.Component<Props, State> {
 
     render() {
         const { props, state, panZoomController } = this
+        if (panZoomController) {
+            panZoomController.setProps({ cameraMetrics: state.cameraMetrics })
+        }
         return (
             <div
                 ref="main"

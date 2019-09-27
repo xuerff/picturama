@@ -7,6 +7,8 @@ export interface Size {
     height: number
 }
 
+export const zeroSize: Size = { width: 0, height: 0 }
+
 /** The result of 'justified-layout' */
 export interface JustifiedLayoutResult {
     containerHeight: number
