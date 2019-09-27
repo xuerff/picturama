@@ -11,6 +11,7 @@ import './CropOverlay.less'
 
 
 const borderWidth = 1
+const hintStrokeWidth = 1
 const edgeWidth = 3
 const edgeSize = 20
 
@@ -32,14 +33,19 @@ export interface Props {
     onEdgeDrag(edge: Edge, point: Point, isFinished: boolean): void
 }
 
-export default class CropOverlay extends React.Component<Props> {
+interface State {
+    edgeDragInfo: { edge: Edge, anchor: Point } | null
+}
+
+export default class CropOverlay extends React.Component<Props, State> {
 
     private edgeDragDropController: DragDropController
-    private edgeDragInfo: { edge: Edge, anchor: Point } | null = null
 
     constructor(props: Props) {
         super(props)
         bindMany(this, 'renderEdge')
+        this.state = { edgeDragInfo: null }
+
         this.edgeDragDropController = new DragDropController({
             onDragStart: (point: Point, event: React.MouseEvent) => {
                 const targetElem = event.target as SVGElement
@@ -49,10 +55,10 @@ export default class CropOverlay extends React.Component<Props> {
                     x: event.clientX - targetRect.left - edgeSize,
                     y: event.clientY - targetRect.top - edgeSize,
                 }
-                this.edgeDragInfo = { edge, anchor }
+                this.setState({ edgeDragInfo: { edge, anchor } })
             },
             onDrag: (point: Point, isFinished: boolean, event: MouseEvent) => {
-                const { edgeDragInfo } = this
+                const { edgeDragInfo } = this.state
                 if (edgeDragInfo) {
                     const edgePoint = {
                         x: point.x - edgeDragInfo.anchor.x,
@@ -61,16 +67,37 @@ export default class CropOverlay extends React.Component<Props> {
                     this.props.onEdgeDrag(edgeDragInfo.edge, edgePoint, isFinished)
                 }
                 if (isFinished) {
-                    this.edgeDragInfo = null
+                    this.setState({ edgeDragInfo: null })
                 }
             }
         })
-        this.state = {}
     }
 
     componentDidMount() {
         const mainElem = findDOMNode(this.refs.main) as SVGElement
         this.edgeDragDropController.setContainerElem(mainElem)
+    }
+
+    private renderHintLines(xPartCount: number, yPartCount: number) {
+        const { rect } = this.props
+
+        let pathParts: string[] = []
+        for (let xPart = 1; xPart < xPartCount; xPart++) {
+            const x = Math.round(rect.x + rect.width * xPart / xPartCount)
+            pathParts.push(`M${x - hintStrokeWidth / 2},${rect.y} l0,${rect.height}`)
+        }
+        for (let yPart = 1; yPart < yPartCount; yPart++) {
+            const y = Math.round(rect.y + rect.height * yPart / yPartCount)
+            pathParts.push(`M${rect.x},${y - hintStrokeWidth / 2} l${rect.width},0`)
+        }
+
+        return (
+            <path
+                className='CropOverlay-hint'
+                d={pathParts.join(' ')}
+                strokeWidth={hintStrokeWidth}
+            />
+        )
     }
 
     private renderEdge(edge: Edge) {
@@ -104,7 +131,7 @@ export default class CropOverlay extends React.Component<Props> {
     }
 
     render() {
-        const { props } = this
+        const { props, state } = this
         const { rect } = props
 
         let width = Math.max(0, props.width)
@@ -123,6 +150,9 @@ export default class CropOverlay extends React.Component<Props> {
                     fillRule='evenodd'
                     d={`M0,0 l${width},0 l0,${height} l${-width},0 z M${rect.x},${rect.y} l0,${rect.height} l${rect.width},0 l0,${-rect.height} z`}
                 />
+                {state.edgeDragInfo &&
+                    this.renderHintLines(3, 3)
+                }
                 <rect
                     className='CropOverlay-border'
                     x={rect.x - borderWidth / 2}
