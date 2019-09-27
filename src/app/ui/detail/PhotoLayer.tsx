@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
-import { mat4 } from 'gl-matrix'
 
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
@@ -11,26 +10,25 @@ import { showError } from 'app/ErrorPresenter'
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
-import { Size } from 'app/UITypes'
+import { Size, zeroSize } from 'app/UITypes'
 
 import PanZoomController from './PanZoomController'
 import TextureCache from './TextureCache'
 
-import './PhotoPane.less'
+import './PhotoLayer.less'
 
 
 export interface Props {
     className?: any
     style?: any
-    width: number
-    height: number
+    canvasSize: Size
     src: string
     srcPrev: string | null
     srcNext: string | null
     orientation: ExifOrientation
     photoWork: PhotoWork | null
     zoom: number
-    setLoading(loading: boolean): void
+    onLoadingChange(loading: boolean): void
     onZoomChange(zoom: number, minZoom: number, maxZoom: number): void
 }
 
@@ -44,7 +42,7 @@ interface State {
     isDragging: boolean
 }
 
-export default class PhotoPane extends React.Component<Props, State> {
+export default class PhotoLayer extends React.Component<Props, State> {
 
     private panZoomController: PanZoomController | undefined = undefined
     private canvas: PhotoCanvas | null = null
@@ -65,7 +63,7 @@ export default class PhotoPane extends React.Component<Props, State> {
         this.state = {
             cameraMetricsBuilder,
             prevSrc: null,
-            prevCanvasSize: { width: 0, height: 0 },
+            prevCanvasSize: zeroSize,
             textureSize: null,
             photoPosition: 'contain',
             cameraMetrics: cameraMetricsBuilder.getCameraMetrics(),
@@ -91,10 +89,9 @@ export default class PhotoPane extends React.Component<Props, State> {
             }
         }
 
-        if (nextProps.width !== prevState.prevCanvasSize.width || nextProps.height !== prevState.prevCanvasSize.height) {
-            const canvasSize = { width: nextProps.width, height: nextProps.height }
-            cameraMetricsBuilder.setCanvasSize(canvasSize)
-            nextState = { ...nextState, prevCanvasSize: canvasSize }
+        if (nextProps.canvasSize !== prevState.prevCanvasSize) {
+            cameraMetricsBuilder.setCanvasSize(nextProps.canvasSize)
+            nextState = { ...nextState, prevCanvasSize: nextProps.canvasSize }
         }
 
         if (prevState.textureSize && nextProps.photoWork) {
@@ -115,7 +112,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     componentDidMount() {
         this.canvas = new PhotoCanvas()
         const canvasElem = this.canvas.getElement()
-        canvasElem.className = 'PhotoPane-canvas'
+        canvasElem.className = 'PhotoLayer-canvas'
         canvasElem.style.display = 'none'
         const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
         mainElem.appendChild(canvasElem)
@@ -162,7 +159,7 @@ export default class PhotoPane extends React.Component<Props, State> {
     private setLoading(loading: boolean) {
         if (loading !== this.prevLoading) {
             this.prevLoading = loading
-            this.props.setLoading(loading)
+            this.props.onLoadingChange(loading)
         }
     }
 
@@ -206,8 +203,8 @@ export default class PhotoPane extends React.Component<Props, State> {
             canvasChanged = true
         }
 
-        if (props.width !== prevProps.width || props.height !== prevProps.height) {
-            canvas.setSize({ width: props.width, height: props.height })
+        if (props.canvasSize !== prevProps.canvasSize) {
+            canvas.setSize(props.canvasSize)
             canvasChanged = true
         }
 
@@ -218,8 +215,12 @@ export default class PhotoPane extends React.Component<Props, State> {
             canvasChanged = true
         }
 
-        if (canvasChanged && state.textureSize) {
-            if (canvas.isValid()) {
+        if (props.photoWork !== prevProps.photoWork || state.textureSize !== prevState.textureSize) {
+            canvasChanged = true
+        }
+
+        if (canvasChanged) {
+            if (canvas.isValid() && props.photoWork && state.textureSize) {
                 if (this.deferredHideCanvasTimeout) {
                     clearTimeout(this.deferredHideCanvasTimeout)
                     this.deferredHideCanvasTimeout = null
@@ -254,8 +255,8 @@ export default class PhotoPane extends React.Component<Props, State> {
         return (
             <div
                 ref="main"
-                className={classNames(props.className, 'PhotoPane', { isZoomed: state.photoPosition !== 'contain', isDragging: state.isDragging })}
-                style={{ ...props.style, width: props.width, height: props.height }}
+                className={classNames(props.className, 'PhotoLayer', { isZoomed: state.photoPosition !== 'contain', isDragging: state.isDragging })}
+                style={{ ...props.style, width: props.canvasSize.width, height: props.canvasSize.height }}
                 onWheel={panZoomController && panZoomController.onWheel}
                 onMouseDown={panZoomController && panZoomController.onMouseDown}
             />

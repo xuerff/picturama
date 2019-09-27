@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, ButtonGroup, Spinner, ResizeSensor, IResizeEntry, Slider } from '@blueprintjs/core'
+import { Button, ButtonGroup, Slider } from '@blueprintjs/core'
 
 import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
@@ -22,7 +22,7 @@ import { getPhotoById, getPhotoByIndex, getLoadedSectionById, getTagTitles } fro
 import { AppState } from 'app/state/StateTypes'
 import BackgroundClient from 'app/BackgroundClient'
 
-import PhotoPane from './PhotoPane'
+import PhotoDetailBody from './PhotoDetailBody'
 
 import './PhotoDetailPane.less'
 
@@ -64,9 +64,6 @@ export interface Props extends OwnProps, StateProps, DispatchProps {
 
 interface State {
     bound: boolean,
-    loading: boolean,
-    bodyWidth: number
-    bodyHeight: number
     zoom: number
     minZoom: number
     maxZoom: number
@@ -82,11 +79,8 @@ export class PhotoDetailPane extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-
-        this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, loading: true, bodyWidth: 0, bodyHeight: 0, isShowingInfo: false }
-
-        bindMany(this, 'setLoading', 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange',
-            'onZoomChange', 'onBodyResize')
+        bindMany(this, 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange')
+        this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, isShowingInfo: false }
 
         this.commands = {
             close: { combo: 'esc', label: msg('common_backToLibrary'), onAction: props.closeDetail },
@@ -132,12 +126,6 @@ export class PhotoDetailPane extends React.Component<Props, State> {
         this.setState({ isShowingInfo: !this.state.isShowingInfo })
     }
 
-    setLoading(loading: boolean) {
-        if (loading !== this.state.loading) {
-            this.setState({ loading })
-        }
-    }
-
     private onZoomSliderChange(sliderScale: number) {
         const { minZoom, maxZoom } = this.state
         const percentage = fromSliderScale(sliderScale)
@@ -147,18 +135,6 @@ export class PhotoDetailPane extends React.Component<Props, State> {
 
     private onZoomChange(zoom: number, minZoom: number, maxZoom: number) {
         this.setState({ zoom, minZoom, maxZoom })
-    }
-
-    onBodyResize(entries: IResizeEntry[]) {
-        const state = this.state
-
-        const contentRect = entries[0].contentRect
-        const bodyWidth  = contentRect.width
-        const bodyHeight = contentRect.height
-
-        if (state.bodyWidth !== bodyWidth || state.bodyHeight !== bodyHeight) {
-            this.setState({ bodyWidth, bodyHeight })
-        }
     }
 
     render() {
@@ -210,26 +186,16 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     </span>
                 </Toolbar>
 
-                <ResizeSensor onResize={this.onBodyResize}>
-                    <div className="PhotoDetailPane-body bp3-dark">
-                        <PhotoPane
-                            className="PhotoDetailPane-image"
-                            width={state.bodyWidth}
-                            height={state.bodyHeight}
-                            src={getNonRawUrl(props.photo)}
-                            srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
-                            srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
-                            orientation={props.photo.orientation}
-                            photoWork={props.photoWork}
-                            zoom={state.zoom}
-                            setLoading={this.setLoading}
-                            onZoomChange={this.onZoomChange}
-                        />
-                        {state.loading &&
-                            <Spinner className="PhotoDetailPane-spinner" size={Spinner.SIZE_LARGE} />
-                        }
-                    </div>
-                </ResizeSensor>
+                <PhotoDetailBody
+                    className='PhotoDetailPane-body'
+                    src={getNonRawUrl(props.photo)}
+                    srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
+                    srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
+                    orientation={props.photo.orientation}
+                    photoWork={props.photoWork}
+                    zoom={state.zoom}
+                    onZoomChange={this.onZoomChange}
+                />
 
                 <PhotoInfo
                     className="PhotoDetailPane-rightSidebar"

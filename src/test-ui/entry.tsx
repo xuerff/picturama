@@ -11,7 +11,6 @@ import 'test-ui/tests/PhotoInfoTest'
 import 'test-ui/tests/ImportProgressButtonTest'
 import 'test-ui/tests/ExportTest'
 import 'test-ui/tests/GridSectionTest'
-import 'test-ui/tests/PhotoPaneTest'
 import 'test-ui/tests/IconTest'
 import 'test-ui/tests/ErrorToastTest'
 
