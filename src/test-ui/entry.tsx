@@ -5,7 +5,7 @@ import { setLocale, locales, fallbackLocale } from 'common/i18n/i18n'
 
 import UiTester from 'test-ui/core/UiTester'
 import 'test-ui/tests/LibraryTest'
-import 'test-ui/tests/PictureDetailTest'
+import 'test-ui/tests/PhotoDetailPaneTest'
 import 'test-ui/tests/SettingsPaneTest'
 import 'test-ui/tests/PhotoInfoTest'
 import 'test-ui/tests/ImportProgressButtonTest'

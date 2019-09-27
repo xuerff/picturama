@@ -66,8 +66,8 @@ export default {
     PhotoInfo_noSelection_title: 'Kein Foto ausgewählt',
     PhotoInfo_noSelection_message: 'Bitte wähle links ein Foto aus.',
 
-    PictureDetail_prevPhoto: 'Vorheriges Foto',
-    PictureDetail_nextPhoto: 'Nächstes Foto',
+    PhotoDetailPane_prevPhoto: 'Vorheriges Foto',
+    PhotoDetailPane_nextPhoto: 'Nächstes Foto',
 
     Settings_title: 'Einstellungen',
     Settings_selectPhotoDirs: 'Bitte wähle die Ordner aus, die nach Fotos gescannt werden sollen.',

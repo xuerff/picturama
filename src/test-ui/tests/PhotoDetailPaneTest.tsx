@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PictureDetail, Props } from 'app/ui/detail/PictureDetail'
+import { PhotoDetailPane, Props } from 'app/ui/detail/PhotoDetailPane'
 
 import {addSection, action} from 'test-ui/core/UiTester'
 import { testBigPhoto } from 'test-ui/util/MockData'
@@ -32,16 +32,16 @@ const defaultProps: Props = {
 }
 
 
-addSection('Detail')
+addSection('PhotoDetailPane')
     .add('loading', context => (
-        <PictureDetail
+        <PhotoDetailPane
             {...defaultProps}
             photoWork={null}
             photoDetail={null}
         />
     ))
     .add('done', context => (
-        <PictureDetail
+        <PhotoDetailPane
             {...defaultProps}
         />
     ))

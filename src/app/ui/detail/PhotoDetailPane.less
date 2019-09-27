@@ -2,24 +2,24 @@
 
 // --- Layout ---
 
-.PictureDetail {
+.PhotoDetailPane {
     position: relative;
 }
-.PictureDetail-topBar,
-.PictureDetail-body {
+.PhotoDetailPane-topBar,
+.PhotoDetailPane-body {
     position: absolute;
     left: 0;
     right: 0;
     transition: right @transition-time ease-out;
 
-    .PictureDetail.hasRightSidebar & {
+    .PhotoDetailPane.hasRightSidebar & {
         right: @sidebarWidth;
     }
 }
-.PictureDetail-topBar {
+.PhotoDetailPane-topBar {
     top: 0;
 }
-.PictureDetail-zoomPane {
+.PhotoDetailPane-zoomPane {
     position: relative;
     display: inline-block;
     margin-right: 8px;
@@ -28,10 +28,10 @@
     min-width: 0;
     vertical-align: middle;
 }
-.PictureDetail-zoomSlider {
+.PhotoDetailPane-zoomSlider {
     min-width: 0 !important;
 }
-.PictureDetail-zoomValue {
+.PhotoDetailPane-zoomValue {
     // Use `position: absolute` in order to take no height
     position: absolute;
     left: 0;
@@ -43,11 +43,11 @@
     font-size: 9px;
     line-height: 9px;
 }
-.PictureDetail-body {
+.PhotoDetailPane-body {
     top: @toolbarHeight;
     bottom: 0;
 }
-.PictureDetail-rightSidebar {
+.PhotoDetailPane-rightSidebar {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -55,28 +55,28 @@
     width: @sidebarWidth;
     transition: right @transition-time ease-out;
 
-    .PictureDetail.hasRightSidebar & {
+    .PhotoDetailPane.hasRightSidebar & {
         right: 0;
     }
 }
 
 // --- Styling ---
 
-.PictureDetail {
+.PhotoDetailPane {
     background: black;
 }
 
-.PictureDetail-body {
+.PhotoDetailPane-body {
     overflow: hidden;
 }
 
-.PictureDetail-image {
+.PhotoDetailPane-image {
     position: absolute;
     left: 0;
     top: 0;
 }
 
-.PictureDetail-spinner {
+.PhotoDetailPane-spinner {
     position: absolute;
 
     left: 50%;

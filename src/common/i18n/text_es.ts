@@ -66,8 +66,8 @@ export default {
     PhotoInfo_noSelection_title: 'No hay fotos seleccionadas',
     PhotoInfo_noSelection_message: 'Por favor, selecciona una foto de la izquierda.',
 
-    PictureDetail_prevPhoto: 'Anterior foto',
-    PictureDetail_nextPhoto: 'Siguiente foto',
+    PhotoDetailPane_prevPhoto: 'Anterior foto',
+    PhotoDetailPane_nextPhoto: 'Siguiente foto',
 
     Settings_title: 'Ajustes',
     Settings_selectPhotoDirs: 'Por favor, selecciona carpetas para escanear imágenes.',

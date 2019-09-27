@@ -8,7 +8,7 @@ import { ImportProgress } from 'common/CommonTypes'
 
 import BackgroundClient from 'app/BackgroundClient'
 import Export from 'app/ui/Export'
-import PictureDetail from 'app/ui//detail/PictureDetail'
+import PhotoDetailPane from 'app/ui//detail/PhotoDetailPane'
 import PictureDiff from 'app/ui/PictureDiff'
 import SettingsPane from 'app/ui/SettingsPane'
 import Library from 'app/ui/library/Library'
@@ -62,7 +62,7 @@ class App extends React.Component<Props> {
         if (props.mainView === 'settings') {
             mainView = <SettingsPane className='App-mainView'/>
         } else if (props.mainView === 'detail') {
-            mainView = <PictureDetail className='App-mainView' isActive={!modalView} />
+            mainView = <PhotoDetailPane className='App-mainView' isActive={!modalView} />
         } else if (props.mainView === 'diff') {
             mainView = <PictureDiff className='App-mainView' />
         }

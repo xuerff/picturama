@@ -66,8 +66,8 @@ export default {
     PhotoInfo_noSelection_title: 'No photo selected',
     PhotoInfo_noSelection_message: 'Please select a photo on the left.',
 
-    PictureDetail_prevPhoto: 'Previous photo',
-    PictureDetail_nextPhoto: 'Next photo',
+    PhotoDetailPane_prevPhoto: 'Previous photo',
+    PhotoDetailPane_nextPhoto: 'Next photo',
 
     Settings_title: 'Settings',
     Settings_selectPhotoDirs: 'Please select the folders to scan for images.',

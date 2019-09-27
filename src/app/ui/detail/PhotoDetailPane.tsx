@@ -24,7 +24,7 @@ import BackgroundClient from 'app/BackgroundClient'
 
 import PhotoPane from './PhotoPane'
 
-import './PictureDetail.less'
+import './PhotoDetailPane.less'
 
 
 interface OwnProps {
@@ -75,7 +75,7 @@ interface State {
 
 type CommandKeys = 'close' | 'toggleDiff' | 'prevPhoto' | 'nextPhoto'
 
-export class PictureDetail extends React.Component<Props, State> {
+export class PhotoDetailPane extends React.Component<Props, State> {
 
     private commands: { [K in CommandKeys]: Command }
     private commandGroupId: CommandGroupId
@@ -91,8 +91,8 @@ export class PictureDetail extends React.Component<Props, State> {
         this.commands = {
             close: { combo: 'esc', label: msg('common_backToLibrary'), onAction: props.closeDetail },
             toggleDiff: { combo: 'd', label: 'Toggle diff' /* TODO: I18N */, onAction: this.toggleDiff },
-            prevPhoto: { combo: 'left', enabled: () => !this.props.isFirst, label: msg('PictureDetail_prevPhoto'), onAction: props.setPreviousDetailPhoto },
-            nextPhoto: { combo: 'right', enabled: () => !this.props.isLast, label: msg('PictureDetail_nextPhoto'), onAction: props.setNextDetailPhoto },
+            prevPhoto: { combo: 'left', enabled: () => !this.props.isFirst, label: msg('PhotoDetailPane_prevPhoto'), onAction: props.setPreviousDetailPhoto },
+            nextPhoto: { combo: 'right', enabled: () => !this.props.isLast, label: msg('PhotoDetailPane_nextPhoto'), onAction: props.setNextDetailPhoto },
         }
     }
 
@@ -166,10 +166,10 @@ export class PictureDetail extends React.Component<Props, State> {
 
         return (
             <div
-                className={classNames(props.className, 'PictureDetail', { hasRightSidebar: state.isShowingInfo })}
+                className={classNames(props.className, 'PhotoDetailPane', { hasRightSidebar: state.isShowingInfo })}
                 style={props.style}
             >
-                <Toolbar className="PictureDetail-topBar" isLeft={true}>
+                <Toolbar className="PhotoDetailPane-topBar" isLeft={true}>
                     <Button onClick={commands.close.onAction}>
                         <FaIcon name="chevron-left"/>
                         <span>{commands.close.label}</span>
@@ -183,8 +183,8 @@ export class PictureDetail extends React.Component<Props, State> {
                         </Button>
                     </ButtonGroup>
                     <span className="pull-right">
-                        <div className='PictureDetail-zoomPane'>
-                            <Slider className='PictureDetail-zoomSlider'
+                        <div className='PhotoDetailPane-zoomPane'>
+                            <Slider className='PhotoDetailPane-zoomSlider'
                                 value={toSliderScale((state.zoom - state.minZoom) / (state.maxZoom - state.minZoom))}
                                 min={0}
                                 max={1}
@@ -193,7 +193,7 @@ export class PictureDetail extends React.Component<Props, State> {
                                 showTrackFill={false}
                                 onChange={this.onZoomSliderChange}
                             />
-                            <div className='PictureDetail-zoomValue'>{state.zoom < state.minZoom + 0.00001 ? '' : `${Math.round(state.zoom * 100)}%`}</div>
+                            <div className='PhotoDetailPane-zoomValue'>{state.zoom < state.minZoom + 0.00001 ? '' : `${Math.round(state.zoom * 100)}%`}</div>
                         </div>
                         <PhotoActionButtons
                             selectedSectionId={props.sectionId}
@@ -211,9 +211,9 @@ export class PictureDetail extends React.Component<Props, State> {
                 </Toolbar>
 
                 <ResizeSensor onResize={this.onBodyResize}>
-                    <div className="PictureDetail-body bp3-dark">
+                    <div className="PhotoDetailPane-body bp3-dark">
                         <PhotoPane
-                            className="PictureDetail-image"
+                            className="PhotoDetailPane-image"
                             width={state.bodyWidth}
                             height={state.bodyHeight}
                             src={getNonRawUrl(props.photo)}
@@ -226,13 +226,13 @@ export class PictureDetail extends React.Component<Props, State> {
                             onZoomChange={this.onZoomChange}
                         />
                         {state.loading &&
-                            <Spinner className="PictureDetail-spinner" size={Spinner.SIZE_LARGE} />
+                            <Spinner className="PhotoDetailPane-spinner" size={Spinner.SIZE_LARGE} />
                         }
                     </div>
                 </ResizeSensor>
 
                 <PhotoInfo
-                    className="PictureDetail-rightSidebar"
+                    className="PhotoDetailPane-rightSidebar"
                     isActive={state.isShowingInfo}
                     photo={(state.isShowingInfo && props.photo) || null}
                     photoDetail={state.isShowingInfo && props.photoDetail || null}
@@ -292,6 +292,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         openDiff: () => dispatch(openDiffAction()),
         closeDetail: () => setDetailPhotoByIndex(null, null)
     })
-)(PictureDetail)
+)(PhotoDetailPane)
 
 export default Connected
