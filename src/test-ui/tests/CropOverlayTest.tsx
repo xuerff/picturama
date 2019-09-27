@@ -4,34 +4,71 @@ import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
 import { bindMany } from 'common/util/LangUtil'
 
-import CropOverlay, { Props as CropOverlayProps } from 'app/ui/detail/CropOverlay'
+import CropOverlay, { Props as CropOverlayProps, Edge } from 'app/ui/detail/CropOverlay'
+import { Point, Rect } from 'app/UITypes'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
-
-
-function createDefaultProps(width: number, height: number): CropOverlayProps {
-    const insets = 50
-    return {
-        width,
-        height,
-        rect: {
-            x: insets,
-            y: insets,
-            width: width - 2 * insets,
-            height: height - 2 * insets
-        },
-    }
-}
 
 
 addSection('CropOverlay')
     .add('normal', context => (
         <CropOverlayTester
             createTestProps={(width: number, height: number) => ({
-                ...createDefaultProps(width, height)
+                ...createDefaultProps(context, width, height)
             })}
         />
     ))
+
+
+function createDefaultProps(context: TestContext, width: number, height: number): CropOverlayProps {
+    const { state } = context
+    const minRectSize = 45
+
+    let rect: Rect
+    if (!state.rect || width !== state.prevWidth || height !== state.prevHeight) {
+        const insets = 50
+        rect = {
+            x: insets,
+            y: insets,
+            width:  Math.max(minRectSize, width - 2 * insets),
+            height: Math.max(minRectSize, height - 2 * insets)
+        }
+        state.prevWidth = width
+        state.prevHeight = height
+        state.rect = rect
+    } else {
+        rect = state.rect
+    }
+
+    return {
+        width,
+        height,
+        rect,
+        onEdgeDrag(edge: Edge, point: Point, isFinished: boolean) {
+            const prevRect: Rect = state.rect
+            const nextRect: Rect = { ...prevRect }
+
+            if (edge === 'nw' || edge === 'sw') {
+                const prevRight = prevRect.x + prevRect.width
+                nextRect.x = Math.min(prevRight - minRectSize, point.x)
+                nextRect.width = prevRight - nextRect.x
+            } else {
+                nextRect.width = Math.max(minRectSize, point.x - nextRect.x)
+            }
+
+            if (edge === 'nw' || edge === 'ne') {
+                const prevBottom = prevRect.y + prevRect.height
+                nextRect.y = Math.min(prevBottom - minRectSize, point.y)
+                nextRect.height = prevBottom - nextRect.y
+            } else {
+                nextRect.height = Math.max(minRectSize, point.y - nextRect.y)
+            }
+
+            state.rect = nextRect
+            context.forceUpdate()
+        },
+    }
+}
 
 
 interface CropOverlayTesterProps {

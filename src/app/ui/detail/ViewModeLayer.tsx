@@ -5,6 +5,8 @@ import classnames from 'classnames'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, PhotoPosition, maxZoom, RequestedPhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
+import DragDropController from 'app/util/DragDropController'
+import { Point } from 'app/UITypes'
 
 import './ViewModeLayer.less'
 
@@ -21,57 +23,48 @@ interface State {
 
 export default class ViewModeLayer extends React.Component<Props, State> {
 
+    private dragDropController: DragDropController
+
     constructor(props: Props) {
         super(props)
+        bindMany(this, 'onWheel')
         this.state = { dragStart: null }
-        bindMany(this, 'onMouseDown', 'onMouseMove', 'onMouseUp', 'onWheel')
+
+        this.dragDropController = new DragDropController({
+            onDragStart: (point: Point) => {
+                const { cameraMetrics } = this.props
+                if (this.state.dragStart || !cameraMetrics || cameraMetrics.requestedPhotoPosition === 'contain') {
+                    return
+                }
+        
+                const dragStart = { ...point, photoPosition: cameraMetrics.photoPosition }
+                this.setState({ dragStart })
+            },
+            onDrag: (point: Point, isFinished: boolean) => {
+                const { dragStart } = this.state
+                const { cameraMetrics } = this.props
+                if (dragStart && cameraMetrics) {
+                    const startPhotoPosition = dragStart.photoPosition
+                    const zoom = startPhotoPosition.zoom
+        
+                    let centerX = startPhotoPosition.centerX - (point.x - dragStart.x) / zoom
+                    let centerY = startPhotoPosition.centerY - (point.y - dragStart.y) / zoom
+                    const nextPhotoPosition = limitPhotoPosition(cameraMetrics, { centerX, centerY, zoom }, true)
+        
+                    if (!isShallowEqual(nextPhotoPosition, cameraMetrics.photoPosition)) {
+                        this.props.onPhotoPositionChange(nextPhotoPosition)
+                    }
+                }
+
+                if (isFinished) {
+                    this.setState({ dragStart: null })
+                }
+            }
+        })
     }
 
     componentWillUnmount() {
-        this.removeDragListeners()
-    }
-
-    private onMouseDown(event: React.MouseEvent) {
-        const { cameraMetrics } = this.props
-        if (this.state.dragStart || !cameraMetrics || cameraMetrics.requestedPhotoPosition === 'contain') {
-            return
-        }
-
-        window.addEventListener('mousemove', this.onMouseMove)
-        window.addEventListener('mouseup', this.onMouseUp)
-
-        const dragStart = { x: event.clientX, y: event.clientY, photoPosition: cameraMetrics.photoPosition }
-        this.setState({ dragStart })
-    }
-
-    private removeDragListeners() {
-        window.removeEventListener('mousemove', this.onMouseMove)
-        window.removeEventListener('mouseup', this.onMouseUp)
-    }
-
-    private onMouseMove(event: MouseEvent) {
-        const { dragStart } = this.state
-        const { cameraMetrics } = this.props
-        if (dragStart && cameraMetrics) {
-            const startPhotoPosition = dragStart.photoPosition
-            const zoom = startPhotoPosition.zoom
-
-            let centerX = startPhotoPosition.centerX - (event.clientX - dragStart.x) / zoom
-            let centerY = startPhotoPosition.centerY - (event.clientY - dragStart.y) / zoom
-            const nextPhotoPosition = limitPhotoPosition(cameraMetrics, { centerX, centerY, zoom }, true)
-
-            if (!isShallowEqual(nextPhotoPosition, cameraMetrics.photoPosition)) {
-                this.props.onPhotoPositionChange(nextPhotoPosition)
-            }
-        }
-    }
-
-    private onMouseUp() {
-        this.removeDragListeners()
-
-        if (this.state.dragStart) {
-            this.setState({ dragStart: null })
-        }
+        this.dragDropController.cancel()
     }
 
     private onWheel(event: React.WheelEvent<HTMLDivElement>) {
@@ -115,7 +108,7 @@ export default class ViewModeLayer extends React.Component<Props, State> {
             <div
                 ref='main'
                 className={classnames(props.className, 'ViewModeLayer', { isZoomed, isDragging: state.dragStart })}
-                onMouseDown={this.onMouseDown}
+                onMouseDown={this.dragDropController.onMouseDown}
                 onWheel={this.onWheel}
             />
         )
