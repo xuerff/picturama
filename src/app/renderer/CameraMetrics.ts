@@ -4,7 +4,7 @@ import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { isShallowEqual } from 'common/util/LangUtil'
 import { getTotalRotationTurns } from 'common/util/DataUtil'
 
-import { Size, zeroSize, Rect, zeroRect } from 'app/util/GeometryTypes'
+import { Size, zeroSize, Rect, zeroRect, Insets, zeroInsets } from 'app/util/GeometryTypes'
 
 
 export const maxZoom = 2
@@ -59,8 +59,9 @@ export class CameraMetricsBuilder {
 
     private canvasSize: Size = zeroSize
     private textureSize: Size = zeroSize
-    private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
+    private insets: Insets = zeroInsets
     private adjustCanvasSize = false
+    private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
     private exifOrientation: ExifOrientation
     private photoWork: PhotoWork
 
@@ -88,16 +89,15 @@ export class CameraMetricsBuilder {
         return this
     }
 
-    setPhotoPosition(photoPosition: RequestedPhotoPosition): this {
-        if (!isShallowEqual(this.requestedPhotoPosition, photoPosition)) {
-            this.requestedPhotoPosition = photoPosition
+    /**
+     * Sets insets to apply when requestedPhotoPosition is `contain`.
+     */
+    setInsets(insets: Insets): this {
+        if (!isShallowEqual(this.insets, insets)) {
+            this.insets = insets
             this.isDirty = true
         }
         return this
-    }
-
-    getRequestedPhotoPosition(): RequestedPhotoPosition {
-        return this.requestedPhotoPosition
     }
 
     /**
@@ -113,6 +113,18 @@ export class CameraMetricsBuilder {
             this.isDirty = true
         }
         return this
+    }
+
+    setPhotoPosition(photoPosition: RequestedPhotoPosition): this {
+        if (!isShallowEqual(this.requestedPhotoPosition, photoPosition)) {
+            this.requestedPhotoPosition = photoPosition
+            this.isDirty = true
+        }
+        return this
+    }
+
+    getRequestedPhotoPosition(): RequestedPhotoPosition {
+        return this.requestedPhotoPosition
     }
 
     setExifOrientation(exifOrientation: ExifOrientation): this {
@@ -136,7 +148,7 @@ export class CameraMetricsBuilder {
             return this.cameraMetrics
         }
 
-        const { textureSize, photoWork, exifOrientation, requestedPhotoPosition } = this
+        const { textureSize, photoWork, exifOrientation, insets, requestedPhotoPosition } = this
         let { canvasSize } = this
 
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
@@ -144,13 +156,22 @@ export class CameraMetricsBuilder {
         const rotatedWidth  = switchSides ? textureSize.height : textureSize.width
         const rotatedHeight = switchSides ? textureSize.width : textureSize.height
         const cropRect = { x: -rotatedWidth / 2, y: -rotatedHeight / 2, width: rotatedWidth, height: rotatedHeight }
+        const insetsWidth = insets.left + insets.right
+        const insetsHeight = insets.top + insets.bottom
 
         let photoPosition: PhotoPosition
-        const minZoom = (rotatedWidth === 0 || rotatedHeight === 0) ? 0.0000001 :
-            Math.min(maxZoom, canvasSize.width / rotatedWidth, canvasSize.height / rotatedHeight)
-        if (typeof requestedPhotoPosition === 'string') {
+        const minZoom = (rotatedWidth === 0 || rotatedHeight === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?
+            0.0000001 :
+            Math.min(maxZoom, (canvasSize.width - insetsWidth) / rotatedWidth, (canvasSize.height - insetsHeight) / rotatedHeight)
+        if (requestedPhotoPosition === 'contain') {
             const zoom = minZoom
-            photoPosition = { centerX: rotatedWidth / 2, centerY: rotatedHeight / 2, zoom }
+            const insetsOffsetX = (insets.right - insets.left) / 2
+            const insetsOffsetY = (insets.bottom - insets.top) / 2
+            photoPosition = {
+                centerX: rotatedWidth / 2 + insetsOffsetX / zoom,
+                centerY: rotatedHeight / 2 + insetsOffsetY / zoom,
+                zoom
+            }
             if (this.adjustCanvasSize) {
                 canvasSize = {
                     width:  Math.floor(cropRect.width  * zoom),

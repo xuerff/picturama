@@ -8,6 +8,7 @@ import CropOverlay, { Props as CropOverlayProps } from 'app/ui/detail/CropOverla
 import { Point, Rect, Corner } from 'app/util/GeometryTypes'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
+import { cropModeInsets } from 'app/ui/detail/PhotoDetailBody'
 
 
 addSection('CropOverlay')
@@ -26,13 +27,11 @@ function createDefaultProps(context: TestContext, width: number, height: number)
 
     let rect: Rect
     if (!state.rect || width !== state.prevWidth || height !== state.prevHeight) {
-        const insetsX = 120
-        const insetsY = 60
         rect = {
-            x: insetsX,
-            y: insetsY,
-            width:  Math.max(minRectSize, width - 2 * insetsX),
-            height: Math.max(minRectSize, height - 2 * insetsY)
+            x: cropModeInsets.left,
+            y: cropModeInsets.top,
+            width:  Math.max(minRectSize, width - cropModeInsets.left - cropModeInsets.right),
+            height: Math.max(minRectSize, height - cropModeInsets.top - cropModeInsets.bottom)
         }
         state.prevWidth = width
         state.prevHeight = height

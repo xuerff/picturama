@@ -6,7 +6,7 @@ import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, limitPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
-import { Size, zeroSize } from 'app/util/GeometryTypes'
+import { Size, zeroSize, Insets, zeroInsets } from 'app/util/GeometryTypes'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
@@ -14,6 +14,9 @@ import PhotoLayer from './PhotoLayer'
 import ViewModeLayer from './ViewModeLayer'
 
 import './PhotoDetailBody.less'
+
+
+export const cropModeInsets: Insets = { left: 40, right: 80, top: 40, bottom: 40 }
 
 
 export interface Props {
@@ -30,8 +33,9 @@ export interface Props {
 }
 
 interface State {
-    loading: boolean
+    prevMode: DetailMode | null
     prevSrc: string | null
+    loading: boolean
     canvasSize: Size
     textureSize: Size | null
     photoPosition: RequestedPhotoPosition
@@ -49,8 +53,9 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         bindMany(this, 'onLoadingChange', 'onResize', 'onTextureSizeChange', 'onPhotoPositionChange')
         const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
-            loading: true,
+            prevMode: null,
             prevSrc: null,
+            loading: true,
             canvasSize: zeroSize,
             textureSize: null,
             photoPosition: 'contain',
@@ -74,6 +79,16 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     nextPhotoPosition = 'contain'
                 }
                 nextState = { photoPosition: nextPhotoPosition }
+            }
+        }
+
+        if (nextProps.mode !== prevState.prevMode) {
+            const isCropMode = nextProps.mode === 'crop'
+            cameraMetricsBuilder
+                .setInsets(isCropMode ? cropModeInsets : zeroInsets)
+            nextState = { ...nextState, prevMode: nextProps.mode }
+            if (isCropMode) {
+                nextState.photoPosition = 'contain'
             }
         }
 
