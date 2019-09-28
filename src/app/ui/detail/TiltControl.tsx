@@ -37,7 +37,7 @@ export interface Props {
     x: number
     centerY: number
     tilt: number
-    onTiltChange(tilt: number): void
+    onTiltChange(tilt: number, isFinished: boolean): void
 }
 
 export default class TiltControl extends React.Component<Props> {
@@ -51,7 +51,9 @@ export default class TiltControl extends React.Component<Props> {
         this.state = {}
         this.dragDropController = new DragDropController({
             onDragStart: (point: Point, event: React.MouseEvent) => {
-                let scaleY = this.props.tilt * tickSpacing
+                const { tilt } = this.props
+
+                let scaleY = tilt * tickSpacing
                 if (scaleY < 0) {
                     scaleY -= originSnapMargin
                 } else if (scaleY > 0) {
@@ -59,6 +61,8 @@ export default class TiltControl extends React.Component<Props> {
                 }
 
                 this.dragOriginDistance = point.y - scaleY
+
+                this.props.onTiltChange(tilt, false)
             },
             onDrag: (point: Point, isFinished: boolean, event: MouseEvent) => {
                 const { dragOriginDistance } = this
@@ -73,9 +77,8 @@ export default class TiltControl extends React.Component<Props> {
                 }
 
                 const tilt = Math.max(-maxDegrees, Math.min(maxDegrees, scaleY / tickSpacing))
-                if (tilt !== this.props.tilt) {
-                    this.props.onTiltChange(tilt)
-                }
+
+                this.props.onTiltChange(tilt, isFinished)
             }
         })
     }

@@ -17,6 +17,7 @@ const hintStrokeWidth = 1
 const cornerWidth = 3
 const cornerSize = 20
 const tiltControlMargin = 20
+const minTiltHintGap = 50
 
 export type Corner = 'nw' | 'ne' | 'sw' | 'se'
 const corners: Corner[] = [ 'nw', 'ne', 'sw', 'se' ]
@@ -40,6 +41,7 @@ export interface Props {
 
 interface State {
     cornerDragInfo: { corner: Corner, anchor: Point } | null
+    isTilting: boolean
 }
 
 export default class CropOverlay extends React.Component<Props, State> {
@@ -48,8 +50,8 @@ export default class CropOverlay extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'renderCorner')
-        this.state = { cornerDragInfo: null }
+        bindMany(this, 'onTiltChange', 'renderCorner')
+        this.state = { cornerDragInfo: null, isTilting: false }
 
         this.cornerDragDropController = new DragDropController({
             onDragStart: (point: Point, event: React.MouseEvent) => {
@@ -81,6 +83,15 @@ export default class CropOverlay extends React.Component<Props, State> {
     componentDidMount() {
         const mainElem = findDOMNode(this.refs.main) as SVGElement
         this.cornerDragDropController.setContainerElem(mainElem)
+    }
+
+    private onTiltChange(tilt: number, isFinished: boolean) {
+        this.props.onTiltChange(tilt)
+
+        const isTilting = !isFinished
+        if (isTilting !== this.state.isTilting) {
+            this.setState({ isTilting })
+        }
     }
 
     private renderHintLines(xPartCount: number, yPartCount: number) {
@@ -158,6 +169,9 @@ export default class CropOverlay extends React.Component<Props, State> {
                 {state.cornerDragInfo &&
                     this.renderHintLines(3, 3)
                 }
+                {state.isTilting &&
+                    this.renderHintLines(Math.floor(rect.width / minTiltHintGap), Math.floor(rect.height / minTiltHintGap))
+                }
                 <rect
                     className='CropOverlay-border'
                     x={rect.x - borderWidth / 2}
@@ -172,7 +186,7 @@ export default class CropOverlay extends React.Component<Props, State> {
                         x={rect.x + rect.width + tiltControlMargin}
                         centerY={props.height / 2}
                         tilt={props.tilt}
-                        onTiltChange={props.onTiltChange}
+                        onTiltChange={this.onTiltChange}
                     />
                 }
             </svg>
