@@ -1,0 +1,34 @@
+@disabledOpacity: 0.3;
+
+.TiltControl-tickOrigin {
+    fill: white;
+}
+
+.TiltControl-tickMajor {
+    fill: rgba(255, 255, 255, 0.8);
+    &.isDisabled {
+        fill: rgba(255, 255, 255, (0.8 * @disabledOpacity));
+    }
+}
+
+.TiltControl-tickMinor {
+    fill: rgba(255, 255, 255, 0.5);
+    &.isDisabled {
+        fill: rgba(255, 255, 255, (0.5 * @disabledOpacity));
+    }
+}
+
+.TiltControl-arrow {
+    fill: white;
+}
+
+.TiltControl-label {
+    fill: white;
+    font-size: 12px;
+}
+
+.TiltControl-handle {
+    stroke: none;
+    fill: transparent;
+    cursor: ns-resize;
+}

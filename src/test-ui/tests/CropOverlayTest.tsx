@@ -26,12 +26,13 @@ function createDefaultProps(context: TestContext, width: number, height: number)
 
     let rect: Rect
     if (!state.rect || width !== state.prevWidth || height !== state.prevHeight) {
-        const insets = 50
+        const insetsX = 120
+        const insetsY = 60
         rect = {
-            x: insets,
-            y: insets,
-            width:  Math.max(minRectSize, width - 2 * insets),
-            height: Math.max(minRectSize, height - 2 * insets)
+            x: insetsX,
+            y: insetsY,
+            width:  Math.max(minRectSize, width - 2 * insetsX),
+            height: Math.max(minRectSize, height - 2 * insetsY)
         }
         state.prevWidth = width
         state.prevHeight = height
@@ -44,6 +45,7 @@ function createDefaultProps(context: TestContext, width: number, height: number)
         width,
         height,
         rect,
+        tilt: state.tilt || 0,
         onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
             const prevRect: Rect = state.rect
             const nextRect: Rect = { ...prevRect }
@@ -65,6 +67,10 @@ function createDefaultProps(context: TestContext, width: number, height: number)
             }
 
             state.rect = nextRect
+            context.forceUpdate()
+        },
+        onTiltChange(tilt: number) {
+            state.tilt = tilt
             context.forceUpdate()
         },
     }

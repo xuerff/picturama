@@ -43,6 +43,8 @@ export default class DragDropController {
             return
         }
 
+        event.preventDefault()
+
         this.isDragging = true
         window.addEventListener('mousemove', this.onMouseMove)
         window.addEventListener('mouseup', this.onMouseUp)

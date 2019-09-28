@@ -4,8 +4,10 @@ import classnames from 'classnames'
 
 import { bindMany } from 'common/util/LangUtil'
 
-import { Rect, Point } from 'app/UITypes'
 import DragDropController from 'app/util/DragDropController'
+import { Rect, Point } from 'app/UITypes'
+
+import TiltControl from './TiltControl'
 
 import './CropOverlay.less'
 
@@ -14,6 +16,7 @@ const borderWidth = 1
 const hintStrokeWidth = 1
 const cornerWidth = 3
 const cornerSize = 20
+const tiltControlMargin = 20
 
 export type Corner = 'nw' | 'ne' | 'sw' | 'se'
 const corners: Corner[] = [ 'nw', 'ne', 'sw', 'se' ]
@@ -30,7 +33,9 @@ export interface Props {
     width: number
     height: number
     rect: Rect
+    tilt: number
     onCornerDrag(corner: Corner, point: Point, isFinished: boolean): void
+    onTiltChange(tilt: number): void
 }
 
 interface State {
@@ -162,6 +167,14 @@ export default class CropOverlay extends React.Component<Props, State> {
                     strokeWidth={borderWidth}
                 />
                 {corners.map(this.renderCorner)}
+                {!state.cornerDragInfo &&
+                    <TiltControl
+                        x={rect.x + rect.width + tiltControlMargin}
+                        centerY={props.height / 2}
+                        tilt={props.tilt}
+                        onTiltChange={props.onTiltChange}
+                    />
+                }
             </svg>
         )
     }
