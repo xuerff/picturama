@@ -4,7 +4,7 @@ import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
 import { bindMany } from 'common/util/LangUtil'
 
-import CropOverlay, { Props as CropOverlayProps, Edge } from 'app/ui/detail/CropOverlay'
+import CropOverlay, { Props as CropOverlayProps, Corner } from 'app/ui/detail/CropOverlay'
 import { Point, Rect } from 'app/UITypes'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
@@ -44,11 +44,11 @@ function createDefaultProps(context: TestContext, width: number, height: number)
         width,
         height,
         rect,
-        onEdgeDrag(edge: Edge, point: Point, isFinished: boolean) {
+        onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
             const prevRect: Rect = state.rect
             const nextRect: Rect = { ...prevRect }
 
-            if (edge === 'nw' || edge === 'sw') {
+            if (corner === 'nw' || corner === 'sw') {
                 const prevRight = prevRect.x + prevRect.width
                 nextRect.x = Math.min(prevRight - minRectSize, point.x)
                 nextRect.width = prevRight - nextRect.x
@@ -56,7 +56,7 @@ function createDefaultProps(context: TestContext, width: number, height: number)
                 nextRect.width = Math.max(minRectSize, point.x - nextRect.x)
             }
 
-            if (edge === 'nw' || edge === 'ne') {
+            if (corner === 'nw' || corner === 'ne') {
                 const prevBottom = prevRect.y + prevRect.height
                 nextRect.y = Math.min(prevBottom - minRectSize, point.y)
                 nextRect.height = prevBottom - nextRect.y

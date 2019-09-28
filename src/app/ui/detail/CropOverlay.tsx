@@ -12,17 +12,17 @@ import './CropOverlay.less'
 
 const borderWidth = 1
 const hintStrokeWidth = 1
-const edgeWidth = 3
-const edgeSize = 20
+const cornerWidth = 3
+const cornerSize = 20
 
-export type Edge = 'nw' | 'ne' | 'sw' | 'se'
-const edges: Edge[] = [ 'nw', 'ne', 'sw', 'se' ]
+export type Corner = 'nw' | 'ne' | 'sw' | 'se'
+const corners: Corner[] = [ 'nw', 'ne', 'sw', 'se' ]
 
-const edgePaths: { [K in Edge]: string } = {
-    nw: `m${-edgeWidth/2},${edgeSize - edgeWidth/2} l0,${-edgeSize} l${edgeSize},0`,
-    ne: `m${-edgeSize + edgeWidth/2},${-edgeWidth/2} l${edgeSize},0 l0,${edgeSize}`,
-    sw: `m${-edgeWidth/2},${-edgeSize + edgeWidth/2} l0,${edgeSize} l${edgeSize},0`,
-    se: `m${-edgeSize + edgeWidth/2},${edgeWidth/2} l${edgeSize},0 l0,${-edgeSize}`,
+const cornerPaths: { [K in Corner]: string } = {
+    nw: `m${-cornerWidth/2},${cornerSize - cornerWidth/2} l0,${-cornerSize} l${cornerSize},0`,
+    ne: `m${-cornerSize + cornerWidth/2},${-cornerWidth/2} l${cornerSize},0 l0,${cornerSize}`,
+    sw: `m${-cornerWidth/2},${-cornerSize + cornerWidth/2} l0,${cornerSize} l${cornerSize},0`,
+    se: `m${-cornerSize + cornerWidth/2},${cornerWidth/2} l${cornerSize},0 l0,${-cornerSize}`,
 }
 
 export interface Props {
@@ -30,44 +30,44 @@ export interface Props {
     width: number
     height: number
     rect: Rect
-    onEdgeDrag(edge: Edge, point: Point, isFinished: boolean): void
+    onCornerDrag(corner: Corner, point: Point, isFinished: boolean): void
 }
 
 interface State {
-    edgeDragInfo: { edge: Edge, anchor: Point } | null
+    cornerDragInfo: { corner: Corner, anchor: Point } | null
 }
 
 export default class CropOverlay extends React.Component<Props, State> {
 
-    private edgeDragDropController: DragDropController
+    private cornerDragDropController: DragDropController
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'renderEdge')
-        this.state = { edgeDragInfo: null }
+        bindMany(this, 'renderCorner')
+        this.state = { cornerDragInfo: null }
 
-        this.edgeDragDropController = new DragDropController({
+        this.cornerDragDropController = new DragDropController({
             onDragStart: (point: Point, event: React.MouseEvent) => {
                 const targetElem = event.target as SVGElement
                 const targetRect = targetElem.getBoundingClientRect()
-                const edge = targetElem.dataset.edge as Edge
+                const corner = targetElem.dataset.corner as Corner
                 const anchor: Point = {
-                    x: event.clientX - targetRect.left - edgeSize,
-                    y: event.clientY - targetRect.top - edgeSize,
+                    x: event.clientX - targetRect.left - cornerSize,
+                    y: event.clientY - targetRect.top - cornerSize,
                 }
-                this.setState({ edgeDragInfo: { edge, anchor } })
+                this.setState({ cornerDragInfo: { corner, anchor } })
             },
             onDrag: (point: Point, isFinished: boolean, event: MouseEvent) => {
-                const { edgeDragInfo } = this.state
-                if (edgeDragInfo) {
-                    const edgePoint = {
-                        x: point.x - edgeDragInfo.anchor.x,
-                        y: point.y - edgeDragInfo.anchor.y,
+                const { cornerDragInfo } = this.state
+                if (cornerDragInfo) {
+                    const cornerPoint = {
+                        x: point.x - cornerDragInfo.anchor.x,
+                        y: point.y - cornerDragInfo.anchor.y,
                     }
-                    this.props.onEdgeDrag(edgeDragInfo.edge, edgePoint, isFinished)
+                    this.props.onCornerDrag(cornerDragInfo.corner, cornerPoint, isFinished)
                 }
                 if (isFinished) {
-                    this.setState({ edgeDragInfo: null })
+                    this.setState({ cornerDragInfo: null })
                 }
             }
         })
@@ -75,7 +75,7 @@ export default class CropOverlay extends React.Component<Props, State> {
 
     componentDidMount() {
         const mainElem = findDOMNode(this.refs.main) as SVGElement
-        this.edgeDragDropController.setContainerElem(mainElem)
+        this.cornerDragDropController.setContainerElem(mainElem)
     }
 
     private renderHintLines(xPartCount: number, yPartCount: number) {
@@ -100,31 +100,31 @@ export default class CropOverlay extends React.Component<Props, State> {
         )
     }
 
-    private renderEdge(edge: Edge) {
+    private renderCorner(corner: Corner) {
         const { rect } = this.props
 
         let cursor: string
         let transform: string
-        switch (edge) {
+        switch (corner) {
             case 'nw': cursor = 'nwse-resize'; transform = `translate(${rect.x},${rect.y})`; break
             case 'ne': cursor = 'nesw-resize'; transform = `translate(${rect.x + rect.width},${rect.y})`; break
             case 'sw': cursor = 'nesw-resize'; transform = `translate(${rect.x},${rect.y + rect.height})`; break
             case 'se': cursor = 'nwse-resize'; transform = `translate(${rect.x + rect.width},${rect.y + rect.height})`; break
-            default: throw new Error('Unepected edge: ' + edge)
+            default: throw new Error('Unepected corner: ' + corner)
         }
 
         return (
-            <g key={edge} transform={transform}>
-                <path className='CropOverlay-edge' strokeWidth={edgeWidth} d={edgePaths[edge]} />
+            <g key={corner} transform={transform}>
+                <path className='CropOverlay-corner' strokeWidth={cornerWidth} d={cornerPaths[corner]} />
                 <rect
-                    data-edge={edge}
-                    className='CropOverlay-edgeHandle'
+                    data-corner={corner}
+                    className='CropOverlay-cornerHandle'
                     style={{ cursor }}
-                    x={-edgeSize}
-                    y={-edgeSize}
-                    width={2 * edgeSize}
-                    height={2 * edgeSize}
-                    onMouseDown={this.edgeDragDropController.onMouseDown}
+                    x={-cornerSize}
+                    y={-cornerSize}
+                    width={2 * cornerSize}
+                    height={2 * cornerSize}
+                    onMouseDown={this.cornerDragDropController.onMouseDown}
                 />
             </g>
         )
@@ -150,7 +150,7 @@ export default class CropOverlay extends React.Component<Props, State> {
                     fillRule='evenodd'
                     d={`M0,0 l${width},0 l0,${height} l${-width},0 z M${rect.x},${rect.y} l0,${rect.height} l${rect.width},0 l0,${-rect.height} z`}
                 />
-                {state.edgeDragInfo &&
+                {state.cornerDragInfo &&
                     this.renderHintLines(3, 3)
                 }
                 <rect
@@ -161,7 +161,7 @@ export default class CropOverlay extends React.Component<Props, State> {
                     height={rect.height + borderWidth}
                     strokeWidth={borderWidth}
                 />
-                {edges.map(this.renderEdge)}
+                {corners.map(this.renderCorner)}
             </svg>
         )
     }
