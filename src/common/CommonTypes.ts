@@ -117,6 +117,8 @@ export interface PhotoDetail {
 
 export interface PhotoWork {
     rotationTurns?: 1 | 2 | 3
+    /** The number of degrees the photo is tilted (= rotated around the z axis) */
+    tilt?: number
     flagged?: true
     tags?: string[]
 }

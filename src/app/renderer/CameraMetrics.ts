@@ -200,6 +200,10 @@ export class CameraMetricsBuilder {
 
         const projectionMatrix = mat4.create()
         // We have projected coordinates here
+        // Apply tilt
+        if (photoWork.tilt) {
+            mat4.rotateZ(projectionMatrix, projectionMatrix, photoWork.tilt * Math.PI / 180)
+        }
         // Apply 90° rotation
         mat4.rotateZ(projectionMatrix, projectionMatrix, rotationTurns * Math.PI / 2)
         // Move texture to the center

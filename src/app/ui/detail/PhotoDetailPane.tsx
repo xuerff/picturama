@@ -65,11 +65,14 @@ export interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
+    prevPhotoWork: PhotoWork | null,
     mode: DetailMode,
     bound: boolean,
     zoom: number
     minZoom: number
     maxZoom: number
+    /** The PhotoWork which is changed in crop mode but not yet saved */
+    editedPhotoWork: PhotoWork | null
     isShowingInfo: boolean
 }
 
@@ -83,8 +86,17 @@ export class PhotoDetailPane extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         bindMany(this, 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange',
-            'onZoomChange', 'onEdit', 'onEditDone')
-        this.state = { mode: 'view', zoom: 0, minZoom: 0, maxZoom: 2, bound: false, isShowingInfo: false }
+            'onZoomChange', 'onEdit', 'onEditDone', 'onPhotoWorkEdited')
+        this.state = {
+            prevPhotoWork: null,
+            mode: 'view',
+            zoom: 0,
+            minZoom: 0,
+            maxZoom: 2,
+            bound: false,
+            editedPhotoWork: null,
+            isShowingInfo: false,
+        }
 
         this.commands = {
             close: { combo: 'esc', label: msg('common_backToLibrary'), onAction: props.closeDetail },
@@ -93,6 +105,13 @@ export class PhotoDetailPane extends React.Component<Props, State> {
             nextPhoto: { combo: 'right', enabled: () => !this.props.isLast, label: msg('PhotoDetailPane_nextPhoto'), onAction: props.setNextDetailPhoto },
             edit: { combo: 'enter', label: msg('PhotoDetailPane_edit'), onAction: this.onEdit },
         }
+    }
+
+    static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
+        if (nextProps.photoWork !== prevState.prevPhotoWork) {
+            return { prevPhotoWork: nextProps.photoWork, editedPhotoWork: null }
+        }
+        return null
     }
 
     componentDidMount() {
@@ -147,7 +166,24 @@ export class PhotoDetailPane extends React.Component<Props, State> {
     }
 
     private onEditDone() {
+        const editedPhotoWork = this.state.editedPhotoWork
+        if (editedPhotoWork) {
+            this.props.updatePhotoWork(this.props.photo, photoWork => {
+                for (const key of Object.keys(photoWork)) {
+                    delete photoWork[key]
+                }
+                for (const key of Object.keys(editedPhotoWork)) {
+                    photoWork[key] = editedPhotoWork[key]
+                }
+            })
+        }
+        // NOTE: editedPhotoWork will be set to null when the new photoWork is set.
+        //       This is important in order to avoid flickering (the old photoWork would be shown for a short time).
         this.setState({ mode: 'view' })
+    }
+
+    private onPhotoWorkEdited(photoWork: PhotoWork) {
+        this.setState({ editedPhotoWork: photoWork })
     }
 
     render() {
@@ -217,9 +253,10 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
                     srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
                     orientation={props.photo.orientation}
-                    photoWork={props.photoWork}
+                    photoWork={state.editedPhotoWork || props.photoWork}
                     zoom={state.zoom}
                     onZoomChange={this.onZoomChange}
+                    onPhotoWorkChange={this.onPhotoWorkEdited}
                 />
 
                 <PhotoInfo

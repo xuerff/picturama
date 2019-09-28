@@ -66,7 +66,9 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
                 delete pendingUpdates[photoPath]
 
                 // Ignore changes on meta data (like flagged or tags)
-                const thumbnailNeedsUpdate = photoWork.rotationTurns !== photoWorkBefore.rotationTurns
+                const thumbnailNeedsUpdate =
+                    photoWork.rotationTurns !== photoWorkBefore.rotationTurns ||
+                    photoWork.tilt !== photoWorkBefore.tilt
 
                 // We do all in parallel:
                 //   - Show the new effects in UI

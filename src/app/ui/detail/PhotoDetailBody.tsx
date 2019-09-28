@@ -30,6 +30,7 @@ export interface Props {
     photoWork: PhotoWork | null
     zoom: number
     onZoomChange(zoom: number, minZoom: number, maxZoom: number): void
+    onPhotoWorkChange(photoWork: PhotoWork): void
 }
 
 interface State {
@@ -169,10 +170,12 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                             onPhotoPositionChange={this.onPhotoPositionChange}
                         />
                     }
-                    {props.mode === 'crop' && state.cameraMetrics &&
+                    {props.mode === 'crop' && props.photoWork && state.cameraMetrics &&
                         <CropModeLayer
                             className='PhotoDetailBody-layer'
+                            photoWork={props.photoWork}
                             cameraMetrics={state.cameraMetrics}
+                            onPhotoWorkChange={props.onPhotoWorkChange}
                         />
                     }
                     {state.loading &&
