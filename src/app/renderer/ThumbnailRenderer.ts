@@ -66,7 +66,7 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
     canvas
         .setBaseTexture(texture)
         .setSize(cameraMetricsBuilder.getAdjustedCanvasSize())
-        .setRotationTurns(cameraMetrics.rotationTurns)
+        .setProjectionMatrix(cameraMetrics.projectionMatrix)
         .setCameraMatrix(cameraMetrics.cameraMatrix)
         .update()
     if (profiler) profiler.addPoint('Rendered canvas')

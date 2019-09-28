@@ -14,6 +14,7 @@ export interface Size {
 export const zeroSize: Size = { width: 0, height: 0 }
 
 export type Rect = Point & Size
+export const zeroRect: Rect = { x: 0, y: 0, width: 0, height: 0 }
 
 /** The result of 'justified-layout' */
 export interface JustifiedLayoutResult {

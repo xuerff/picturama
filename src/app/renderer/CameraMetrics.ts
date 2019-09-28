@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix'
 
-import { Size, zeroSize } from 'app/UITypes'
+import { Size, zeroSize, Rect, zeroRect } from 'app/UITypes'
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { isShallowEqual } from 'common/util/LangUtil'
 import { getTotalRotationTurns } from 'common/util/DataUtil'
@@ -13,20 +13,17 @@ export interface CameraMetrics {
     textureSize: Size
     requestedPhotoPosition: RequestedPhotoPosition
     photoPosition: PhotoPosition
-    /**
-     * The number of clock-wise rotation turns to apply to the texture.
-     *
-     * This translates texture coordinates (-textureSize/2 .. textureSize/2) into
-     * photo coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2).
-     */
-    rotationTurns: number
-    rotatedWidth: number
-    rotatedHeight: number
     minZoom: number
     maxZoom: number
+    cropRect: Rect
     /**
-     * The camera matrix translating from photo coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2)
-     * to canvas coordinates (-canvasSize/2 .. canvasSize/2).
+     * The projection matrix translating from texture coordinates to projected coordinates.
+     * See: `doc/geometry-concept.md`
+     */
+    projectionMatrix: mat4
+    /**
+     * The camera matrix translating projected coordinates to screen coordinates.
+     * See: `doc/geometry-concept.md`
      */
     cameraMatrix: mat4
 }
@@ -36,11 +33,10 @@ export const zeroCameraMetrics: CameraMetrics = {
     textureSize: zeroSize,
     requestedPhotoPosition: 'contain',
     photoPosition: { centerX: 0, centerY: 0, zoom: 0 },
-    rotationTurns: 0,
-    rotatedWidth: 0,
-    rotatedHeight: 0,
+    cropRect: zeroRect,
     minZoom: 0,
     maxZoom,
+    projectionMatrix: mat4.create(),
     cameraMatrix: mat4.create(),
 }
 
@@ -129,6 +125,7 @@ export class CameraMetricsBuilder {
         const switchSides = rotationTurns % 2 === 1
         const rotatedWidth  = switchSides ? textureSize.height : textureSize.width
         const rotatedHeight = switchSides ? textureSize.width : textureSize.height
+        const cropRect = { x: -rotatedWidth / 2, y: -rotatedHeight / 2, width: rotatedWidth, height: rotatedHeight }
 
         let photoPosition: PhotoPosition
         const minZoom = (rotatedWidth === 0 || rotatedHeight === 0) ? 0.0000001 :
@@ -144,24 +141,32 @@ export class CameraMetricsBuilder {
         }
 
         // Important for matrix: Build it backwards (first operation last)
+
         const cameraMatrix = mat4.create()
-        // We have canvas coordinates (-canvasSize/2 .. canvasSize/2) here
-        // Zoom texture
+        // We have canvas coordinates here
+        // Scale from texture pixels to screen pixels
         mat4.scale(cameraMatrix, cameraMatrix, [ photoPosition.zoom, photoPosition.zoom, 1 ])
         // Translate texture
-        mat4.translate(cameraMatrix, cameraMatrix, [ rotatedWidth / 2 - photoPosition.centerX, rotatedHeight / 2 - photoPosition.centerY, 0 ])
-        // We have texture coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2) here
+        mat4.translate(cameraMatrix, cameraMatrix, [ -cropRect.x - photoPosition.centerX, -cropRect.y - photoPosition.centerY, 0 ])
+        // We have projected coordinates here
+
+        const projectionMatrix = mat4.create()
+        // We have projected coordinates here
+        // Apply 90° rotation
+        mat4.rotateZ(projectionMatrix, projectionMatrix, rotationTurns * Math.PI / 2)
+        // Move texture to the center
+        mat4.translate(projectionMatrix, projectionMatrix, [ -textureSize.width / 2, -textureSize.height / 2, 0 ])
+        // We have texture coordinates here
 
         this.cameraMetrics = {
             canvasSize: this.canvasSize,
             textureSize: this.textureSize,
             requestedPhotoPosition: this.requestedPhotoPosition,
             photoPosition,
-            rotationTurns,
-            rotatedWidth,
-            rotatedHeight,
             minZoom,
             maxZoom,
+            cropRect,
+            projectionMatrix,
             cameraMatrix,
         }
         this.isDirty = false
@@ -174,8 +179,8 @@ export class CameraMetricsBuilder {
     getAdjustedCanvasSize(): Size {
         const cameraMetrics = this.getCameraMetrics()
         return {
-            width:  Math.floor(cameraMetrics.rotatedWidth  * cameraMetrics.minZoom),
-            height: Math.floor(cameraMetrics.rotatedHeight * cameraMetrics.minZoom)
+            width:  Math.floor(cameraMetrics.cropRect.width  * cameraMetrics.minZoom),
+            height: Math.floor(cameraMetrics.cropRect.height * cameraMetrics.minZoom)
         }
     }
 
@@ -191,15 +196,15 @@ export class CameraMetricsBuilder {
  *      the photo won't jump when panned, but panning back so far won't work.
  */
 export function limitPhotoPosition(cameraMetrics: CameraMetrics, photoPosition: PhotoPosition, allowExceedingToCurrentPosition: boolean): PhotoPosition {
-    const { canvasSize, rotatedWidth, photoPosition: prevPhotoPosition, rotatedHeight } = cameraMetrics
+    const { canvasSize, photoPosition: prevPhotoPosition, cropRect } = cameraMetrics
     const { zoom } = photoPosition
 
     const halfCanvasWidthInPhotoPix = canvasSize.width / 2 / zoom
     const halfCanvasHeightInPhotoPix = canvasSize.height / 2 / zoom
-    let minCenterX = Math.min(halfCanvasWidthInPhotoPix, rotatedWidth - halfCanvasWidthInPhotoPix)
-    let minCenterY = Math.min(halfCanvasHeightInPhotoPix, rotatedHeight - halfCanvasHeightInPhotoPix)
-    let maxCenterX = rotatedWidth - minCenterX
-    let maxCenterY = rotatedHeight - minCenterY
+    let minCenterX = Math.min(halfCanvasWidthInPhotoPix, cropRect.width - halfCanvasWidthInPhotoPix)
+    let minCenterY = Math.min(halfCanvasHeightInPhotoPix, cropRect.height - halfCanvasHeightInPhotoPix)
+    let maxCenterX = cropRect.width - minCenterX
+    let maxCenterY = cropRect.height - minCenterY
 
     if (allowExceedingToCurrentPosition && prevPhotoPosition && photoPosition.zoom === prevPhotoPosition.zoom) {
         minCenterX = Math.min(minCenterX, prevPhotoPosition.centerX)

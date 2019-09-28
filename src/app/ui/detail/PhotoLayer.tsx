@@ -134,7 +134,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
         if (props.cameraMetrics !== prevProps.cameraMetrics) {
             if (props.cameraMetrics) {
                 canvas
-                    .setRotationTurns(props.cameraMetrics.rotationTurns)
+                    .setProjectionMatrix(props.cameraMetrics.projectionMatrix)
                     .setCameraMatrix(props.cameraMetrics.cameraMatrix)
             }
             canvasChanged = true

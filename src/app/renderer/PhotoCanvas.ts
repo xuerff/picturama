@@ -18,7 +18,7 @@ export default class PhotoCanvas {
 
     private size: Size = { width: 0, height: 0 }
 
-    private rotationTurns: number
+    private projectionMatrix: mat4
     private cameraMatrix: mat4
 
     private baseTexturePromise: CancelablePromise<void> | null = null
@@ -59,19 +59,17 @@ export default class PhotoCanvas {
     }
 
     /**
-     * Sets the number of clock-wise rotation turns to apply to the texture.
-     *
-     * This translates texture coordinates (-textureSize/2 .. textureSize/2) into
-     * photo coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2).
+     * Sets the projection matrix translating from texture coordinates to projected coordinates.
+     * See: `doc/geometry-concept.md`
      */
-    setRotationTurns(rotationTurns: number): this {
-        this.rotationTurns = rotationTurns
+    setProjectionMatrix(projectionMatrix: mat4): this {
+        this.projectionMatrix = projectionMatrix
         return this
     }
 
     /**
-     * Sets the camera matrix translating from photo coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2)
-     * to canvas coordinates (-canvasSize/2 .. canvasSize/2).
+     * Sets the camera matrix translating projected coordinates to screen coordinates.
+     * See: `doc/geometry-concept.md`
      */
     setCameraMatrix(cameraMatrix: mat4): this {
         this.cameraMatrix = cameraMatrix
@@ -124,16 +122,14 @@ export default class PhotoCanvas {
 
         // Important for matrix: Build it backwards (first operation last)
         const matrix = mat4.create()
-        // Scale from from canvas coordinates (-canvasSize/2 .. canvasSize/2) to clipspace coordinates (-1 .. 1)
+        // Scale from from screen coordinates (-canvasSize/2 .. canvasSize/2) to clipspace coordinates (-1 .. 1)
         mat4.scale(matrix, matrix, [ 1 / (size.width / 2), -1 / (size.height / 2), 1 ])
         // Apply camera
         mat4.multiply(matrix, matrix, this.cameraMatrix)
-        // Apply 90° rotation - This translates to photo coordinates (-rotatedPhotoSize/2 .. rotatedPhotoSize/2)
-        mat4.rotateZ(matrix, matrix, this.rotationTurns * Math.PI / 2)
-        // Scale to texture coordinates (-textureSize/2 .. textureSize/2)
+        // Apply projection
+        mat4.multiply(matrix, matrix, this.projectionMatrix)
+        // Scale from unit coordinates (0 .. 1) to texture coordinates (0 .. textureSize)
         mat4.scale(matrix, matrix, [ baseTexture.width, baseTexture.height, 1 ])
-        // Move texture to the center
-        mat4.translate(matrix, matrix, [ -0.5, -0.5, 0 ])
 
         // ===== Draw =====
 
