@@ -154,9 +154,10 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                             onPhotoPositionChange={this.onPhotoPositionChange}
                         />
                     }
-                    {props.mode === 'crop' &&
+                    {props.mode === 'crop' && state.cameraMetrics &&
                         <CropModeLayer
                             className='PhotoDetailBody-layer'
+                            cameraMetrics={state.cameraMetrics}
                         />
                     }
                     {state.loading &&
