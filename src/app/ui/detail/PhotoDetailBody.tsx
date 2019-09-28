@@ -8,6 +8,8 @@ import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, limitPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
 import { Size, zeroSize } from 'app/UITypes'
 
+import CropModeLayer from './CropModeLayer'
+import { DetailMode } from './DetailTypes'
 import PhotoLayer from './PhotoLayer'
 import ViewModeLayer from './ViewModeLayer'
 
@@ -17,6 +19,7 @@ import './PhotoDetailBody.less'
 export interface Props {
     className?: any
     style?: any
+    mode: DetailMode
     src: string
     srcPrev: string | null
     srcNext: string | null
@@ -144,11 +147,18 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                         onLoadingChange={this.onLoadingChange}
                         onTextureSizeChange={this.onTextureSizeChange}
                     />
-                    <ViewModeLayer
-                        className='PhotoDetailBody-layer'
-                        cameraMetrics={state.cameraMetrics}
-                        onPhotoPositionChange={this.onPhotoPositionChange}
-                    />
+                    {props.mode === 'view' &&
+                        <ViewModeLayer
+                            className='PhotoDetailBody-layer'
+                            cameraMetrics={state.cameraMetrics}
+                            onPhotoPositionChange={this.onPhotoPositionChange}
+                        />
+                    }
+                    {props.mode === 'crop' &&
+                        <CropModeLayer
+                            className='PhotoDetailBody-layer'
+                        />
+                    }
                     {state.loading &&
                         <Spinner className='PhotoDetailBody-spinner' size={Spinner.SIZE_LARGE} />
                     }

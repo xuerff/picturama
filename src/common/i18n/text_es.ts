@@ -3,6 +3,8 @@ export default {
     common_cancel: 'Cancelar',
     common_backToLibrary: 'Volver a la biblioteca',
 
+    CropModeToolbar_done: 'Hecho',
+
     ErrorController_copied: 'Informe copiado al portapapeles.',
 
     ErrorToast_title: 'Oh no! Algo ha ido mal.',
@@ -68,6 +70,7 @@ export default {
 
     PhotoDetailPane_prevPhoto: 'Anterior foto',
     PhotoDetailPane_nextPhoto: 'Siguiente foto',
+    PhotoDetailPane_edit: 'Editar',
 
     Settings_title: 'Ajustes',
     Settings_selectPhotoDirs: 'Por favor, selecciona carpetas para escanear imágenes.',

@@ -3,6 +3,8 @@ export default {
     common_cancel: 'Cancel',
     common_backToLibrary: 'Back to library',
 
+    CropModeToolbar_done: 'Done',
+
     ErrorController_copied: 'Copied report to clipboard.',
 
     ErrorToast_title: 'Oh no! Something went wrong.',
@@ -68,6 +70,7 @@ export default {
 
     PhotoDetailPane_prevPhoto: 'Previous photo',
     PhotoDetailPane_nextPhoto: 'Next photo',
+    PhotoDetailPane_edit: 'Edit',
 
     Settings_title: 'Settings',
     Settings_selectPhotoDirs: 'Please select the folders to scan for images.',

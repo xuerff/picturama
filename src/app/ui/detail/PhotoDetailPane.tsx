@@ -22,6 +22,8 @@ import { getPhotoById, getPhotoByIndex, getLoadedSectionById, getTagTitles } fro
 import { AppState } from 'app/state/StateTypes'
 import BackgroundClient from 'app/BackgroundClient'
 
+import CropModeToolbar from './CropModeToolbar'
+import { DetailMode } from './DetailTypes'
 import PhotoDetailBody from './PhotoDetailBody'
 
 import './PhotoDetailPane.less'
@@ -63,6 +65,7 @@ export interface Props extends OwnProps, StateProps, DispatchProps {
 }
 
 interface State {
+    mode: DetailMode,
     bound: boolean,
     zoom: number
     minZoom: number
@@ -70,7 +73,7 @@ interface State {
     isShowingInfo: boolean
 }
 
-type CommandKeys = 'close' | 'toggleDiff' | 'prevPhoto' | 'nextPhoto'
+type CommandKeys = 'close' | 'toggleDiff' | 'prevPhoto' | 'nextPhoto' | 'edit'
 
 export class PhotoDetailPane extends React.Component<Props, State> {
 
@@ -79,14 +82,16 @@ export class PhotoDetailPane extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        bindMany(this, 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange', 'onZoomChange')
-        this.state = { zoom: 0, minZoom: 0, maxZoom: 2, bound: false, isShowingInfo: false }
+        bindMany(this, 'openExport', 'toggleDiff', 'toggleShowInfo', 'moveToTrash', 'onZoomSliderChange',
+            'onZoomChange', 'onEdit', 'onEditDone')
+        this.state = { mode: 'view', zoom: 0, minZoom: 0, maxZoom: 2, bound: false, isShowingInfo: false }
 
         this.commands = {
             close: { combo: 'esc', label: msg('common_backToLibrary'), onAction: props.closeDetail },
             toggleDiff: { combo: 'd', label: 'Toggle diff' /* TODO: I18N */, onAction: this.toggleDiff },
             prevPhoto: { combo: 'left', enabled: () => !this.props.isFirst, label: msg('PhotoDetailPane_prevPhoto'), onAction: props.setPreviousDetailPhoto },
             nextPhoto: { combo: 'right', enabled: () => !this.props.isLast, label: msg('PhotoDetailPane_nextPhoto'), onAction: props.setNextDetailPhoto },
+            edit: { combo: 'enter', label: msg('PhotoDetailPane_edit'), onAction: this.onEdit },
         }
     }
 
@@ -137,6 +142,14 @@ export class PhotoDetailPane extends React.Component<Props, State> {
         this.setState({ zoom, minZoom, maxZoom })
     }
 
+    private onEdit() {
+        this.setState({ mode: 'crop' })
+    }
+
+    private onEditDone() {
+        this.setState({ mode: 'view' })
+    }
+
     render() {
         const { props, state, commands } = this
 
@@ -145,49 +158,61 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                 className={classNames(props.className, 'PhotoDetailPane', { hasRightSidebar: state.isShowingInfo })}
                 style={props.style}
             >
-                <Toolbar className="PhotoDetailPane-topBar" isLeft={true}>
-                    <Button onClick={commands.close.onAction}>
-                        <FaIcon name="chevron-left"/>
-                        <span>{commands.close.label}</span>
-                    </Button>
-                    <ButtonGroup>
-                        <Button minimal={true} {...getCommandButtonProps(commands.prevPhoto)}>
-                            <FaIcon name="arrow-left"/>
+                {state.mode === 'view' &&
+                    <Toolbar className="PhotoDetailPane-topBar" isLeft={true}>
+                        <Button onClick={commands.close.onAction}>
+                            <FaIcon name="chevron-left"/>
+                            <span>{commands.close.label}</span>
                         </Button>
-                        <Button minimal={true} {...getCommandButtonProps(commands.nextPhoto)}>
-                            <FaIcon name="arrow-right"/>
-                        </Button>
-                    </ButtonGroup>
-                    <span className="pull-right">
-                        <div className='PhotoDetailPane-zoomPane'>
-                            <Slider className='PhotoDetailPane-zoomSlider'
-                                value={toSliderScale((state.zoom - state.minZoom) / (state.maxZoom - state.minZoom))}
-                                min={0}
-                                max={1}
-                                stepSize={0.000001}
-                                labelRenderer={false}
-                                showTrackFill={false}
-                                onChange={this.onZoomSliderChange}
+                        <ButtonGroup>
+                            <Button minimal={true} {...getCommandButtonProps(commands.prevPhoto)}>
+                                <FaIcon name="arrow-left"/>
+                            </Button>
+                            <Button minimal={true} {...getCommandButtonProps(commands.nextPhoto)}>
+                                <FaIcon name="arrow-right"/>
+                            </Button>
+                        </ButtonGroup>
+                        <span className="pull-right">
+                            <div className='PhotoDetailPane-zoomPane'>
+                                <Slider className='PhotoDetailPane-zoomSlider'
+                                    value={toSliderScale((state.zoom - state.minZoom) / (state.maxZoom - state.minZoom))}
+                                    min={0}
+                                    max={1}
+                                    stepSize={0.000001}
+                                    labelRenderer={false}
+                                    showTrackFill={false}
+                                    onChange={this.onZoomSliderChange}
+                                />
+                                <div className='PhotoDetailPane-zoomValue'>{state.zoom < state.minZoom + 0.00001 ? '' : `${Math.round(state.zoom * 100)}%`}</div>
+                            </div>
+                            <Button minimal={true} {...getCommandButtonProps(commands.edit)}>
+                                <FaIcon name='crop'/>
+                            </Button>
+                            <PhotoActionButtons
+                                selectedSectionId={props.sectionId}
+                                selectedPhotos={[ props.photo ]}
+                                isShowingTrash={!!props.photo.trashed}
+                                isShowingInfo={state.isShowingInfo}
+                                openExport={props.openExport}
+                                updatePhotoWork={props.updatePhotoWork}
+                                setPhotosFlagged={props.setPhotosFlagged}
+                                movePhotosToTrash={props.movePhotosToTrash}
+                                restorePhotosFromTrash={props.restorePhotosFromTrash}
+                                toggleShowInfo={this.toggleShowInfo}
                             />
-                            <div className='PhotoDetailPane-zoomValue'>{state.zoom < state.minZoom + 0.00001 ? '' : `${Math.round(state.zoom * 100)}%`}</div>
-                        </div>
-                        <PhotoActionButtons
-                            selectedSectionId={props.sectionId}
-                            selectedPhotos={[ props.photo ]}
-                            isShowingTrash={!!props.photo.trashed}
-                            isShowingInfo={state.isShowingInfo}
-                            openExport={props.openExport}
-                            updatePhotoWork={props.updatePhotoWork}
-                            setPhotosFlagged={props.setPhotosFlagged}
-                            movePhotosToTrash={props.movePhotosToTrash}
-                            restorePhotosFromTrash={props.restorePhotosFromTrash}
-                            toggleShowInfo={this.toggleShowInfo}
-                        />
-                    </span>
-                </Toolbar>
+                        </span>
+                    </Toolbar>
+                }
+                {state.mode === 'crop' &&
+                    <CropModeToolbar
+                        className='PhotoDetailPane-topBar'
+                        onDone={this.onEditDone}
+                    />
+                }
 
                 <PhotoDetailBody
                     className='PhotoDetailPane-body'
+                    mode={state.mode}
                     src={getNonRawUrl(props.photo)}
                     srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
                     srcNext={props.photoNext && getNonRawUrl(props.photoNext)}

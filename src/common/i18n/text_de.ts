@@ -3,6 +3,8 @@ export default {
     common_cancel: 'Abbrechen',
     common_backToLibrary: 'Zurück zur Bibliothek',
 
+    CropModeToolbar_done: 'Fertig',
+
     ErrorController_copied: 'Report wurde in die Zwischenablage kopiert.',
 
     ErrorToast_title: 'Oh nein! Da ging was schief.',
@@ -68,6 +70,7 @@ export default {
 
     PhotoDetailPane_prevPhoto: 'Vorheriges Foto',
     PhotoDetailPane_nextPhoto: 'Nächstes Foto',
+    PhotoDetailPane_edit: 'Bearbeiten',
 
     Settings_title: 'Einstellungen',
     Settings_selectPhotoDirs: 'Bitte wähle die Ordner aus, die nach Fotos gescannt werden sollen.',
