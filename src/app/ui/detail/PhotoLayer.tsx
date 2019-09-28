@@ -10,7 +10,7 @@ import { showError } from 'app/ErrorPresenter'
 import { CameraMetrics } from 'app/renderer/CameraMetrics'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
-import { Size, zeroSize } from 'app/UITypes'
+import { Size, zeroSize } from 'app/util/GeometryTypes'
 
 import TextureCache from './TextureCache'
 

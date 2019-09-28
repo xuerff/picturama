@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import { bindMany } from 'common/util/LangUtil'
 
 import DragDropController from 'app/util/DragDropController'
-import { Rect, Point } from 'app/UITypes'
+import { Rect, Point, Corner, corners } from 'app/util/GeometryTypes'
 
 import TiltControl from './TiltControl'
 
@@ -18,9 +18,6 @@ const cornerWidth = 3
 const cornerSize = 20
 const tiltControlMargin = 20
 const minTiltHintGap = 50
-
-export type Corner = 'nw' | 'ne' | 'sw' | 'se'
-const corners: Corner[] = [ 'nw', 'ne', 'sw', 'se' ]
 
 const cornerPaths: { [K in Corner]: string } = {
     nw: `m${-cornerWidth/2},${cornerSize - cornerWidth/2} l0,${-cornerSize} l${cornerSize},0`,

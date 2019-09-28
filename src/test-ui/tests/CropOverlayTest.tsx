@@ -4,8 +4,8 @@ import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
 import { bindMany } from 'common/util/LangUtil'
 
-import CropOverlay, { Props as CropOverlayProps, Corner } from 'app/ui/detail/CropOverlay'
-import { Point, Rect } from 'app/UITypes'
+import CropOverlay, { Props as CropOverlayProps } from 'app/ui/detail/CropOverlay'
+import { Point, Rect, Corner } from 'app/util/GeometryTypes'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
 

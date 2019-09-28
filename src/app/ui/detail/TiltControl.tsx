@@ -3,7 +3,7 @@ import { findDOMNode } from 'react-dom'
 import classnames from 'classnames'
 
 import DragDropController from 'app/util/DragDropController'
-import { Point } from 'app/UITypes'
+import { Point } from 'app/util/GeometryTypes'
 
 import './TiltControl.less'
 

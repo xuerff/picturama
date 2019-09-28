@@ -3,7 +3,7 @@ import { mat4 } from 'gl-matrix'
 import CancelablePromise from 'common/util/CancelablePromise'
 import Profiler from 'common/util/Profiler'
 
-import { Size } from 'app/UITypes'
+import { Size } from 'app/util/GeometryTypes'
 
 import WebGLCanvas, { GraphicBuffer, Texture } from './WebGLCanvas'
 import { TransformationShader } from './Shaders'

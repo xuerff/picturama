@@ -1,9 +1,10 @@
 import { mat4 } from 'gl-matrix'
 
-import { Size, zeroSize, Rect, zeroRect } from 'app/UITypes'
 import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { isShallowEqual } from 'common/util/LangUtil'
 import { getTotalRotationTurns } from 'common/util/DataUtil'
+
+import { Size, zeroSize, Rect, zeroRect } from 'app/util/GeometryTypes'
 
 
 export const maxZoom = 2

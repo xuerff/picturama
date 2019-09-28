@@ -2,20 +2,6 @@ export enum FetchState { IDLE, FETCHING, FAILURE }
 
 export type DateTree = { years: { id: string, months: { id: string, days: { id: string }[] }[] }[] }
 
-export interface Point {
-    x: number
-    y: number
-}
-
-export interface Size {
-    width: number
-    height: number
-}
-export const zeroSize: Size = { width: 0, height: 0 }
-
-export type Rect = Point & Size
-export const zeroRect: Rect = { x: 0, y: 0, width: 0, height: 0 }
-
 /** The result of 'justified-layout' */
 export interface JustifiedLayoutResult {
     containerHeight: number

@@ -6,7 +6,7 @@ import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, limitPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
-import { Size, zeroSize } from 'app/UITypes'
+import { Size, zeroSize } from 'app/util/GeometryTypes'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
