@@ -27,6 +27,7 @@ const maxThumbnailHeight = 320
 
 let cameraMetricsBuilder = new CameraMetricsBuilder()
     .setCanvasSize({ width: maxThumbnailWidth, height: maxThumbnailHeight })
+    .setAdjustCanvasSize(true)
 let canvas: PhotoCanvas | null = null
 
 
@@ -65,7 +66,7 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
         .getCameraMetrics()
     canvas
         .setBaseTexture(texture)
-        .setSize(cameraMetricsBuilder.getAdjustedCanvasSize())
+        .setSize(cameraMetrics.canvasSize)
         .setProjectionMatrix(cameraMetrics.projectionMatrix)
         .setCameraMatrix(cameraMetrics.cameraMatrix)
         .update()

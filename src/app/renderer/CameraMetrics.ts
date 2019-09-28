@@ -60,6 +60,7 @@ export class CameraMetricsBuilder {
     private canvasSize: Size = zeroSize
     private textureSize: Size = zeroSize
     private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
+    private adjustCanvasSize = false
     private exifOrientation: ExifOrientation
     private photoWork: PhotoWork
 
@@ -99,6 +100,21 @@ export class CameraMetricsBuilder {
         return this.requestedPhotoPosition
     }
 
+    /**
+     * Sets whether the `canvasSize` of the CameraMetrics should be adjusted in order to show the whole photo without
+     * borders.
+     * This will only be done if `requestedPhotoPosition` is `'contain'`.
+     * This only changes the `canvasSize` of the CameraMetrics returned by `getCameraMetrics` it does not change the
+     * canvas size set by `setCanvasSize`.
+     */
+    setAdjustCanvasSize(adjustCanvasSize: boolean): this {
+        if (this.adjustCanvasSize !== adjustCanvasSize) {
+            this.adjustCanvasSize = adjustCanvasSize
+            this.isDirty = true
+        }
+        return this
+    }
+
     setExifOrientation(exifOrientation: ExifOrientation): this {
         if (this.exifOrientation !== exifOrientation) {
             this.exifOrientation = exifOrientation
@@ -120,7 +136,8 @@ export class CameraMetricsBuilder {
             return this.cameraMetrics
         }
 
-        const { canvasSize, textureSize, photoWork, exifOrientation, requestedPhotoPosition } = this
+        const { textureSize, photoWork, exifOrientation, requestedPhotoPosition } = this
+        let { canvasSize } = this
 
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
         const switchSides = rotationTurns % 2 === 1
@@ -132,7 +149,14 @@ export class CameraMetricsBuilder {
         const minZoom = (rotatedWidth === 0 || rotatedHeight === 0) ? 0.0000001 :
             Math.min(maxZoom, canvasSize.width / rotatedWidth, canvasSize.height / rotatedHeight)
         if (typeof requestedPhotoPosition === 'string') {
-            photoPosition = { centerX: rotatedWidth / 2, centerY: rotatedHeight / 2, zoom: minZoom }
+            const zoom = minZoom
+            photoPosition = { centerX: rotatedWidth / 2, centerY: rotatedHeight / 2, zoom }
+            if (this.adjustCanvasSize) {
+                canvasSize = {
+                    width:  Math.floor(cropRect.width  * zoom),
+                    height: Math.floor(cropRect.height * zoom)
+                }
+            }
         } else {
             photoPosition = requestedPhotoPosition
             const zoom = photoPosition.zoom
@@ -145,6 +169,8 @@ export class CameraMetricsBuilder {
 
         const cameraMatrix = mat4.create()
         // We have canvas coordinates here
+        // Move origin to left-top corner
+        mat4.translate(cameraMatrix, cameraMatrix, [ canvasSize.width / 2, canvasSize.height / 2, 0 ])
         // Scale from texture pixels to screen pixels
         mat4.scale(cameraMatrix, cameraMatrix, [ photoPosition.zoom, photoPosition.zoom, 1 ])
         // Translate texture
@@ -160,9 +186,9 @@ export class CameraMetricsBuilder {
         // We have texture coordinates here
 
         this.cameraMetrics = {
-            canvasSize: this.canvasSize,
-            textureSize: this.textureSize,
-            requestedPhotoPosition: this.requestedPhotoPosition,
+            canvasSize,
+            textureSize,
+            requestedPhotoPosition,
             photoPosition,
             minZoom,
             maxZoom,
@@ -172,17 +198,6 @@ export class CameraMetricsBuilder {
         }
         this.isDirty = false
         return this.cameraMetrics
-    }
-
-    /**
-     * Returns the size the canvas must have in order to show the whole photo without borders.
-     */
-    getAdjustedCanvasSize(): Size {
-        const cameraMetrics = this.getCameraMetrics()
-        return {
-            width:  Math.floor(cameraMetrics.cropRect.width  * cameraMetrics.minZoom),
-            height: Math.floor(cameraMetrics.cropRect.height * cameraMetrics.minZoom)
-        }
     }
 
 }

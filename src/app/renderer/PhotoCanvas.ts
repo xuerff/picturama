@@ -122,8 +122,12 @@ export default class PhotoCanvas {
 
         // Important for matrix: Build it backwards (first operation last)
         const matrix = mat4.create()
-        // Scale from from screen coordinates (-canvasSize/2 .. canvasSize/2) to clipspace coordinates (-1 .. 1)
-        mat4.scale(matrix, matrix, [ 1 / (size.width / 2), -1 / (size.height / 2), 1 ])
+        // Move origin to the center (0 .. 2) to clipspace coordinates (-1/1 .. 1/-1)
+        mat4.translate(matrix, matrix, [ -1, 1, 0 ])
+        // Scale to clipspace units (0 .. canvasWidth/canvasHeight) -> (0/2 .. 2/0)
+        //   - 2 because clipspace coordinates are (-1 .. 1)
+        //   - flip y, because clipspace's y axis goes from bottom to top
+        mat4.scale(matrix, matrix, [ 2 / size.width, -2 / size.height, 1 ])
         // Apply camera
         mat4.multiply(matrix, matrix, this.cameraMatrix)
         // Apply projection
