@@ -28,6 +28,7 @@ Projected coordinates:
   - Origin: The center of the photo
     - Why the center? All geometry operations are applied around the center. So the center is the only point which
       always corresponds to the same texture pixel (the texture's center).
+    - The center is rounded, so projected coordinates correspond to whole texture pixels even if width or height is odd.
   - Unit: texture pixels
 
 Screen coordinates:

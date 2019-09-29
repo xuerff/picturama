@@ -181,15 +181,7 @@ export class CameraMetricsBuilder {
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
         const insetsWidth = insets.left + insets.right
         const insetsHeight = insets.top + insets.bottom
-
-        const switchSides = rotationTurns % 2 === 1
-        const rotatedWidth  = switchSides ? textureSize.height : textureSize.width
-        const rotatedHeight = switchSides ? textureSize.width : textureSize.height
-        let neutralCropRect = this.cameraMetrics && this.cameraMetrics.neutralCropRect
-        if (!neutralCropRect || neutralCropRect.width !== rotatedWidth || neutralCropRect.height !== rotatedHeight) {
-            neutralCropRect = { x: -rotatedWidth / 2, y: -rotatedHeight / 2, width: rotatedWidth, height: rotatedHeight }
-        }
-
+        const neutralCropRect = updateNeutralCropRect(rotationTurns, textureSize, this.cameraMetrics && this.cameraMetrics.neutralCropRect)
         const cropRect = photoWork.cropRect || neutralCropRect
         const boundsRect = this.boundsRect || cropRect
 
@@ -241,7 +233,8 @@ export class CameraMetricsBuilder {
         // Apply 90° rotation
         mat4.rotateZ(projectionMatrix, projectionMatrix, rotationTurns * Math.PI / 2)
         // Move texture to the center
-        mat4.translate(projectionMatrix, projectionMatrix, [ -textureSize.width / 2, -textureSize.height / 2, 0 ])
+        // The center is rounded so projected pixels corresponded to whole texture pixels (even if width or height is odd)
+        mat4.translate(projectionMatrix, projectionMatrix, [ Math.round(-textureSize.width / 2), Math.round(-textureSize.height / 2), 0 ])
         // We have texture coordinates here
 
         this.cameraMetrics = {
@@ -261,6 +254,28 @@ export class CameraMetricsBuilder {
         return this.cameraMetrics
     }
 
+}
+
+
+function updateNeutralCropRect(rotationTurns: number, textureSize: Size, prevNeutralCropRect: Rect | null): Rect {
+    const switchSides = rotationTurns % 2 === 1
+    const neutralWidth  = switchSides ? textureSize.height : textureSize.width
+    const neutralHeight = switchSides ? textureSize.width : textureSize.height
+    let neutralX = -neutralWidth / 2
+    let neutralY = -neutralHeight / 2
+
+    // correct x and y to the rounded origin of projected coordinates
+    neutralX = (rotationTurns === 0 || rotationTurns === 3) ? Math.ceil(neutralX) : Math.floor(neutralX)
+    neutralY = (rotationTurns === 0 || rotationTurns === 1) ? Math.ceil(neutralY) : Math.floor(neutralY)
+
+    let neutralCropRect = prevNeutralCropRect
+    if (!neutralCropRect || neutralCropRect.x !== neutralX || neutralCropRect.y !== neutralY ||
+        neutralCropRect.width !== neutralWidth || neutralCropRect.height !== neutralHeight)
+    {
+        neutralCropRect = { x: neutralX, y: neutralY, width: neutralWidth, height: neutralHeight }
+    }
+
+    return neutralCropRect
 }
 
 
