@@ -52,8 +52,6 @@ export default {
     PhotoActionButtons_movedToTrash_more: '{0} Fotos wurden in den Papierkorb gelegt',
     PhotoActionButtons_restoredFromTrash_one: 'Foto wurde aus dem Papierkorb geholt',
     PhotoActionButtons_restoredFromTrash_more: '{0} Fotos wurden aus dem Papierkorb geholt',
-    PhotoActionButtons_rotateLeft: 'Nach links drehen',
-    PhotoActionButtons_rotateRight: 'Nach rechts drehen',
     PhotoActionButtons_removeFavorite: 'Aus Favoriten entfernen',
     PhotoActionButtons_addFavorite: 'Zu Favoriten hinzufügen',
     PhotoActionButtons_trash: 'In Papierkorb legen',
@@ -71,6 +69,9 @@ export default {
     PhotoDetailPane_prevPhoto: 'Vorheriges Foto',
     PhotoDetailPane_nextPhoto: 'Nächstes Foto',
     PhotoDetailPane_edit: 'Bearbeiten',
+
+    RotateButtonGroup_rotateLeft: 'Nach links drehen',
+    RotateButtonGroup_rotateRight: 'Nach rechts drehen',
 
     Settings_title: 'Einstellungen',
     Settings_selectPhotoDirs: 'Bitte wähle die Ordner aus, die nach Fotos gescannt werden sollen.',

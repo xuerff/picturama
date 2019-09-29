@@ -242,6 +242,8 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                 {state.mode === 'crop' &&
                     <CropModeToolbar
                         className='PhotoDetailPane-topBar'
+                        photoWork={state.editedPhotoWork || props.photoWork}
+                        onPhotoWorkChange={this.onPhotoWorkEdited}
                         onDone={this.onEditDone}
                     />
                 }

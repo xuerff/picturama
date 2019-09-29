@@ -52,8 +52,6 @@ export default {
     PhotoActionButtons_movedToTrash_more: 'Moved {0} photos to trash',
     PhotoActionButtons_restoredFromTrash_one: 'Restored photo from trash',
     PhotoActionButtons_restoredFromTrash_more: 'Restored {0} photos from trash',
-    PhotoActionButtons_rotateLeft: 'Rotate left',
-    PhotoActionButtons_rotateRight: 'Rotate right',
     PhotoActionButtons_removeFavorite: 'Remove from favorites',
     PhotoActionButtons_addFavorite: 'Add to favorites',
     PhotoActionButtons_trash: 'Move to trash',
@@ -71,6 +69,9 @@ export default {
     PhotoDetailPane_prevPhoto: 'Previous photo',
     PhotoDetailPane_nextPhoto: 'Next photo',
     PhotoDetailPane_edit: 'Edit',
+
+    RotateButtonGroup_rotateLeft: 'Rotate left',
+    RotateButtonGroup_rotateRight: 'Rotate right',
 
     Settings_title: 'Settings',
     Settings_selectPhotoDirs: 'Please select the folders to scan for images.',

@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { MdRotateLeft, MdRotateRight } from 'react-icons/md'
-import { Button, ButtonGroup, Classes } from '@blueprintjs/core'
+import { Button, Classes } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
@@ -11,8 +10,9 @@ import { formatNumber } from 'common/util/TextUtil'
 
 import toaster from 'app/Toaster'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
-import { SVG_ICON_CLASS } from 'app/ui/widget/icon/SvgIcon'
 import MdRestoreFromTrash from 'app/ui/widget/icon/MdRestoreFromTrash'
+
+import RotateButtonGroup from './RotateButtonGroup'
 
 import './PhotoActionButtons.less'
 
@@ -34,22 +34,13 @@ export default class PhotoActionButtons extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-
-        bindMany(this, 'rotateLeft', 'rotateRight', 'toggleFlagged', 'moveToTrash', 'restoreFromTrash', 'openExport')
+        bindMany(this, 'onRotate', 'toggleFlagged', 'moveToTrash', 'restoreFromTrash', 'openExport')
     }
 
-    rotateLeft() {
-        this.rotate(-1)
-    }
-
-    rotateRight() {
-        this.rotate(1)
-    }
-
-    rotate(turns: number) {
+    private onRotate(turns: number) {
         const props = this.props
         for (const photo of props.selectedPhotos) {
-            props.updatePhotoWork(photo, photoWorks => rotate(photoWorks, turns))
+            props.updatePhotoWork(photo, photoWork => rotate(photoWork, turns))
         }
     }
 
@@ -131,14 +122,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
 
         return (
             <>
-                <ButtonGroup>
-                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateLeft} title={msg('PhotoActionButtons_rotateLeft')}>
-                        <MdRotateLeft className={SVG_ICON_CLASS}/>
-                    </Button>
-                    <Button minimal={true} disabled={!hasSelection} onClick={this.rotateRight} title={msg('PhotoActionButtons_rotateRight')}>
-                        <MdRotateRight className={SVG_ICON_CLASS}/>
-                    </Button>
-                </ButtonGroup>
+                <RotateButtonGroup disabled={!hasSelection} onRotate={this.onRotate}/>
                 <Button
                     className={classNames('PhotoActionButtons-flagButton', { isActive: selectedAreFlagged })}
                     minimal={true}

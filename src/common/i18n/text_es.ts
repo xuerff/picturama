@@ -52,8 +52,6 @@ export default {
     PhotoActionButtons_movedToTrash_more: 'Movidas {0} fotos a la papelera',
     PhotoActionButtons_restoredFromTrash_one: 'Foto restaurada de la papelera',
     PhotoActionButtons_restoredFromTrash_more: 'Restauradas {0} fotos de la papelera',
-    PhotoActionButtons_rotateLeft: 'Rotar a la izquierda',
-    PhotoActionButtons_rotateRight: 'Rotar a la derecha',
     PhotoActionButtons_removeFavorite: 'Elminar de favoritos',
     PhotoActionButtons_addFavorite: 'Añadir a favoritos',
     PhotoActionButtons_trash: 'Mover a la papelera',
@@ -71,6 +69,9 @@ export default {
     PhotoDetailPane_prevPhoto: 'Anterior foto',
     PhotoDetailPane_nextPhoto: 'Siguiente foto',
     PhotoDetailPane_edit: 'Editar',
+
+    RotateButtonGroup_rotateLeft: 'Rotar a la izquierda',
+    RotateButtonGroup_rotateRight: 'Rotar a la derecha',
 
     Settings_title: 'Ajustes',
     Settings_selectPhotoDirs: 'Por favor, selecciona carpetas para escanear imágenes.',
