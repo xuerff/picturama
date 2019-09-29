@@ -288,15 +288,17 @@ function updateNeutralCropRect(rotationTurns: number, textureSize: Size, prevNeu
  *      the photo won't jump when panned, but panning back so far won't work.
  */
 export function limitPhotoPosition(cameraMetrics: CameraMetrics, photoPosition: PhotoPosition, allowExceedingToCurrentPosition: boolean): PhotoPosition {
-    const { canvasSize, photoPosition: prevPhotoPosition, cropRect } = cameraMetrics
+    const { canvasSize, boundsRect, photoPosition: prevPhotoPosition, cropRect } = cameraMetrics
     const { zoom } = photoPosition
 
     const halfCanvasWidthInPhotoPix = canvasSize.width / 2 / zoom
     const halfCanvasHeightInPhotoPix = canvasSize.height / 2 / zoom
-    let minCenterX = Math.min(halfCanvasWidthInPhotoPix, cropRect.width - halfCanvasWidthInPhotoPix)
-    let minCenterY = Math.min(halfCanvasHeightInPhotoPix, cropRect.height - halfCanvasHeightInPhotoPix)
-    let maxCenterX = cropRect.width - minCenterX
-    let maxCenterY = cropRect.height - minCenterY
+    const panLimitX = Math.min(halfCanvasWidthInPhotoPix, cropRect.width - halfCanvasWidthInPhotoPix)
+    const panLimitY = Math.min(halfCanvasHeightInPhotoPix, cropRect.height - halfCanvasHeightInPhotoPix)
+    let minCenterX = boundsRect.x + panLimitX
+    let minCenterY = boundsRect.y + panLimitY
+    let maxCenterX = boundsRect.x + boundsRect.width - panLimitX
+    let maxCenterY = boundsRect.y + boundsRect.height - panLimitY
 
     if (allowExceedingToCurrentPosition && prevPhotoPosition && photoPosition.zoom === prevPhotoPosition.zoom) {
         minCenterX = Math.min(minCenterX, prevPhotoPosition.centerX)
