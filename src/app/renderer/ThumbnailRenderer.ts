@@ -48,22 +48,21 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
 
     const texture = await canvas.createTextureFromSrc(nonRawUrl, profiler)
 
-    // Update photo size in DB (asynchronously)
-    const rotationTurns = getTotalRotationTurns(photo.orientation, photoWork)
-    const switchSides = (rotationTurns % 2) === 1
-    const master_width = switchSides ? texture.height : texture.width
-    const master_height = switchSides ? texture.width : texture.height
-    if (master_width !== photo.master_width || photo.master_height !== master_height) {
-        updatePhoto(photo, { master_width, master_height })
-    }
-    if (profiler) profiler.addPoint('Checked photo size in DB')
-
-    // Render thumbnail
+    // Get camera metrics
     const cameraMetrics = cameraMetricsBuilder
         .setTextureSize({ width: texture.width, height: texture.height })
         .setExifOrientation(photo.orientation)
         .setPhotoWork(photoWork)
         .getCameraMetrics()
+
+    // Update photo size in DB (asynchronously)
+    const { cropRect } = cameraMetrics
+    if (photo.master_width !== cropRect.width || photo.master_height !== cropRect.height) {
+        updatePhoto(photo, { master_width: cropRect.width, master_height: cropRect.height })
+    }
+    if (profiler) profiler.addPoint('Checked photo size in DB')
+
+    // Render thumbnail
     canvas
         .setBaseTexture(texture)
         .setSize(cameraMetrics.canvasSize)

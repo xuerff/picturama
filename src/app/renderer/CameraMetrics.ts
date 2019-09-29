@@ -12,11 +12,21 @@ export const maxZoom = 2
 export interface CameraMetrics {
     canvasSize: Size
     textureSize: Size
+    /**
+     * The camera bounds. Pan and zoom actions are limited to this area.
+     * In projected coordinates.
+     */
+    boundsRect: Rect
     requestedPhotoPosition: RequestedPhotoPosition
     photoPosition: PhotoPosition
     minZoom: number
     maxZoom: number
     cropRect: Rect
+    /**
+     * The crop rect which shows the whole texture.
+     * Only valid if no tilt is applied.
+     */
+    neutralCropRect: Rect
     /**
      * The projection matrix translating from texture coordinates to projected coordinates.
      * See: `doc/geometry-concept.md`
@@ -27,14 +37,17 @@ export interface CameraMetrics {
      * See: `doc/geometry-concept.md`
      */
     cameraMatrix: mat4
+    invertedCameraMatrix?: mat4
 }
 
 export const zeroCameraMetrics: CameraMetrics = {
     canvasSize: zeroSize,
     textureSize: zeroSize,
+    boundsRect: zeroRect,
     requestedPhotoPosition: 'contain',
     photoPosition: { centerX: 0, centerY: 0, zoom: 0 },
     cropRect: zeroRect,
+    neutralCropRect: zeroRect,
     minZoom: 0,
     maxZoom,
     projectionMatrix: mat4.create(),
@@ -60,6 +73,7 @@ export class CameraMetricsBuilder {
     private canvasSize: Size = zeroSize
     private textureSize: Size = zeroSize
     private insets: Insets = zeroInsets
+    private boundsRect: Rect | null = null
     private adjustCanvasSize = false
     private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
     private exifOrientation: ExifOrientation
@@ -95,6 +109,19 @@ export class CameraMetricsBuilder {
     setInsets(insets: Insets): this {
         if (!isShallowEqual(this.insets, insets)) {
             this.insets = insets
+            this.isDirty = true
+        }
+        return this
+    }
+
+    /**
+     * Sets the camera bounds. Pan and zoom actions are limited to this area.
+     * In projected coordinates.
+     * If set to `null` the `clipRect` will be used.
+     */
+    setBoundsRect(boundsRect: Rect | null): this {
+        if (!isShallowEqual(this.boundsRect, boundsRect)) {
+            this.boundsRect = boundsRect
             this.isDirty = true
         }
         return this
@@ -152,30 +179,37 @@ export class CameraMetricsBuilder {
         let { canvasSize } = this
 
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
-        const switchSides = rotationTurns % 2 === 1
-        const rotatedWidth  = switchSides ? textureSize.height : textureSize.width
-        const rotatedHeight = switchSides ? textureSize.width : textureSize.height
-        const cropRect = { x: -rotatedWidth / 2, y: -rotatedHeight / 2, width: rotatedWidth, height: rotatedHeight }
         const insetsWidth = insets.left + insets.right
         const insetsHeight = insets.top + insets.bottom
 
+        const switchSides = rotationTurns % 2 === 1
+        const rotatedWidth  = switchSides ? textureSize.height : textureSize.width
+        const rotatedHeight = switchSides ? textureSize.width : textureSize.height
+        let neutralCropRect = this.cameraMetrics && this.cameraMetrics.neutralCropRect
+        if (!neutralCropRect || neutralCropRect.width !== rotatedWidth || neutralCropRect.height !== rotatedHeight) {
+            neutralCropRect = { x: -rotatedWidth / 2, y: -rotatedHeight / 2, width: rotatedWidth, height: rotatedHeight }
+        }
+
+        const cropRect = photoWork.cropRect || neutralCropRect
+        const boundsRect = this.boundsRect || cropRect
+
         let photoPosition: PhotoPosition
-        const minZoom = (rotatedWidth === 0 || rotatedHeight === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?
+        const minZoom = (boundsRect.width === 0 || boundsRect.height === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?
             0.0000001 :
-            Math.min(maxZoom, (canvasSize.width - insetsWidth) / rotatedWidth, (canvasSize.height - insetsHeight) / rotatedHeight)
+            Math.min(maxZoom, (canvasSize.width - insetsWidth) / boundsRect.width, (canvasSize.height - insetsHeight) / boundsRect.height)
         if (requestedPhotoPosition === 'contain') {
             const zoom = minZoom
             const insetsOffsetX = (insets.right - insets.left) / 2
             const insetsOffsetY = (insets.bottom - insets.top) / 2
             photoPosition = {
-                centerX: rotatedWidth / 2 + insetsOffsetX / zoom,
-                centerY: rotatedHeight / 2 + insetsOffsetY / zoom,
+                centerX: boundsRect.x + boundsRect.width / 2 + insetsOffsetX / zoom,
+                centerY: boundsRect.y + boundsRect.height / 2 + insetsOffsetY / zoom,
                 zoom
             }
             if (this.adjustCanvasSize) {
                 canvasSize = {
-                    width:  Math.floor(cropRect.width  * zoom),
-                    height: Math.floor(cropRect.height * zoom)
+                    width:  Math.floor(boundsRect.width  * zoom),
+                    height: Math.floor(boundsRect.height * zoom)
                 }
             }
         } else {
@@ -195,7 +229,7 @@ export class CameraMetricsBuilder {
         // Scale from texture pixels to screen pixels
         mat4.scale(cameraMatrix, cameraMatrix, [ photoPosition.zoom, photoPosition.zoom, 1 ])
         // Translate texture
-        mat4.translate(cameraMatrix, cameraMatrix, [ -cropRect.x - photoPosition.centerX, -cropRect.y - photoPosition.centerY, 0 ])
+        mat4.translate(cameraMatrix, cameraMatrix, [ -photoPosition.centerX, -photoPosition.centerY, 0 ])
         // We have projected coordinates here
 
         const projectionMatrix = mat4.create()
@@ -213,11 +247,13 @@ export class CameraMetricsBuilder {
         this.cameraMetrics = {
             canvasSize,
             textureSize,
+            boundsRect,
             requestedPhotoPosition,
             photoPosition,
             minZoom,
             maxZoom,
             cropRect,
+            neutralCropRect,
             projectionMatrix,
             cameraMatrix,
         }
@@ -262,4 +298,15 @@ export function limitPhotoPosition(cameraMetrics: CameraMetrics, photoPosition: 
     } else {
         return { centerX, centerY, zoom }
     }
+}
+
+
+export function getInvertedCameraMatrix(cameraMetrics: CameraMetrics): mat4 {
+    let { invertedCameraMatrix } = cameraMetrics
+    if (!invertedCameraMatrix) {
+        invertedCameraMatrix = mat4.create()
+        mat4.invert(invertedCameraMatrix, cameraMetrics.cameraMatrix)
+        cameraMetrics.invertedCameraMatrix = invertedCameraMatrix
+    }
+    return invertedCameraMatrix
 }

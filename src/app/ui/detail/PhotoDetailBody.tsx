@@ -94,9 +94,11 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         }
 
         if (prevState.textureSize && nextProps.photoWork) {
+            const prevCameraMetrics = prevState.cameraMetrics
             const cameraMetrics = cameraMetricsBuilder
                 .setCanvasSize(prevState.canvasSize)
                 .setTextureSize(prevState.textureSize)
+                .setBoundsRect(nextProps.mode === 'crop' && prevCameraMetrics ? prevCameraMetrics.neutralCropRect : null)
                 .setExifOrientation(nextProps.orientation)
                 .setPhotoWork(nextProps.photoWork)
                 .setPhotoPosition(nextPhotoPosition)

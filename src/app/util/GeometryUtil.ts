@@ -1,7 +1,23 @@
 import { mat4, vec2 } from 'gl-matrix'
 
+import { round } from 'common/util/LangUtil'
+
 import { Point, Rect, Corner } from './GeometryTypes'
 
+
+export const oppositeCorner: { [K in Corner]: Corner } = {
+    nw: 'se',
+    ne: 'sw',
+    sw: 'ne',
+    se: 'nw'
+}
+
+export function roundPoint(point: Point, fractionDigits: number = 0): Point {
+    return {
+        x: round(point.x, fractionDigits),
+        y: round(point.y, fractionDigits)
+    }
+}
 
 export function transformRect(rect: Rect, matrix: mat4): Rect {
     const point1 = transformPoint(getCornerPointOfRect(rect, 'nw'), matrix)

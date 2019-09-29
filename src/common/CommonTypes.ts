@@ -1,3 +1,6 @@
+import { Rect } from 'app/util/GeometryTypes'
+
+
 // ----- Database types -----
 
 
@@ -119,6 +122,11 @@ export interface PhotoWork {
     rotationTurns?: 1 | 2 | 3
     /** The number of degrees the photo is tilted (= rotated around the z axis) */
     tilt?: number
+    /**
+     * The rectangle where the photo should be cropped.
+     * In projected coordinates (see `doc/geometry-concept.md`).
+     */
+    cropRect?: Rect
     flagged?: true
     tags?: string[]
 }

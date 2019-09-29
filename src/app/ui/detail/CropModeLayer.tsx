@@ -3,11 +3,12 @@ import classnames from 'classnames'
 
 import { PhotoWork } from 'common/CommonTypes'
 
-import { CameraMetrics } from 'app/renderer/CameraMetrics'
-import { transformRect } from 'app/util/GeometryUtil'
+import { CameraMetrics, getInvertedCameraMatrix } from 'app/renderer/CameraMetrics'
+import { Point, Corner } from 'app/util/GeometryTypes'
+import { transformRect, transformPoint, getCornerPointOfRect, oppositeCorner, getRectFromPoints, roundPoint } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
-import { bindMany } from 'common/util/LangUtil'
+import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 
 export interface Props {
@@ -21,8 +22,27 @@ export default class CropModeLayer extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onTiltChange')
+        bindMany(this, 'onCornerDrag', 'onTiltChange')
         this.state = {}
+    }
+
+    private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
+        const { props } = this
+        const { cameraMetrics } = props
+
+        const invertedCameraMatrix = getInvertedCameraMatrix(cameraMetrics)
+        const pointInProjectedCoordinates = roundPoint(transformPoint(point, invertedCameraMatrix))
+        const oppositePoint = getCornerPointOfRect(cameraMetrics.cropRect, oppositeCorner[corner])
+
+        const cropRect = getRectFromPoints(pointInProjectedCoordinates, oppositePoint)
+
+        const photoWork = { ...props.photoWork }
+        if (isShallowEqual(cropRect, cameraMetrics.neutralCropRect)) {
+            delete photoWork.cropRect
+        } else {
+            photoWork.cropRect = cropRect
+        }
+        props.onPhotoWorkChange(photoWork)
     }
 
     private onTiltChange(tilt: number) {
@@ -52,7 +72,7 @@ export default class CropModeLayer extends React.Component<Props> {
                 height={cameraMetrics.canvasSize.height}
                 rect={cropRectInViewCoords}
                 tilt={props.photoWork.tilt || 0}
-                onCornerDrag={() => {}}
+                onCornerDrag={this.onCornerDrag}
                 onTiltChange={this.onTiltChange}
             />
         )
