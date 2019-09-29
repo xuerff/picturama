@@ -156,6 +156,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                 <div className={classnames(props.className, 'PhotoDetailBody bp3-dark')}>
                     <PhotoLayer
                         className='PhotoDetailBody-layer'
+                        mode={props.mode}
                         canvasSize={state.canvasSize}
                         src={props.src}
                         srcPrev={props.srcPrev}

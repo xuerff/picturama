@@ -3,6 +3,7 @@ export interface Point {
     x: number
     y: number
 }
+export const zeroPoint: Point = { x: 0, y: 0 }
 
 export interface Size {
     width: number

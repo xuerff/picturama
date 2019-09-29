@@ -12,6 +12,7 @@ import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 import { Size, zeroSize } from 'app/util/GeometryTypes'
 
+import { DetailMode } from './DetailTypes'
 import TextureCache from './TextureCache'
 
 import './PhotoLayer.less'
@@ -20,6 +21,7 @@ import './PhotoLayer.less'
 export interface Props {
     className?: any
     style?: any
+    mode: DetailMode
     canvasSize: Size
     src: string
     srcPrev: string | null
@@ -128,6 +130,11 @@ export default class PhotoLayer extends React.Component<Props, State> {
 
         if (props.canvasSize !== prevProps.canvasSize) {
             canvas.setSize(props.canvasSize)
+            canvasChanged = true
+        }
+
+        if (props.mode !== prevProps.mode || props.cameraMetrics !== prevProps.cameraMetrics) {
+            canvas.setClipRect((props.mode === 'view' && props.cameraMetrics) ? props.cameraMetrics.cropRect : null)
             canvasChanged = true
         }
 
