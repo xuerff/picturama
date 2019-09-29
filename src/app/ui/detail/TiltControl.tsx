@@ -4,6 +4,7 @@ import classnames from 'classnames'
 
 import DragDropController from 'app/util/DragDropController'
 import { Point } from 'app/util/GeometryTypes'
+import { round } from 'common/util/LangUtil'
 
 import './TiltControl.less'
 
@@ -76,7 +77,7 @@ export default class TiltControl extends React.Component<Props> {
                     scaleY = 0
                 }
 
-                const tilt = Math.max(-maxDegrees, Math.min(maxDegrees, scaleY / tickSpacing))
+                const tilt = Math.max(-maxDegrees, Math.min(maxDegrees, round(scaleY / tickSpacing, 1)))
 
                 this.props.onTiltChange(tilt, isFinished)
             }

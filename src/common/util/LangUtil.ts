@@ -1,3 +1,12 @@
+export function round(value: number, fractionDigits: number = 0) {
+    if (fractionDigits <= 0) {
+        return Math.round(value)
+    } else {
+        return parseFloat(value.toFixed(fractionDigits))
+    }
+}
+
+
 export function bindMany(object: object, ...keys: string[]) {
     for (const key of keys) {
         const value = object[key]
