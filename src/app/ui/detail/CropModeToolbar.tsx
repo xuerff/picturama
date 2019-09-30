@@ -22,7 +22,7 @@ export default class CropModeToolbar extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onRotate')
+        bindMany(this, 'onRotate', 'onReset')
     }
 
     private onRotate(turns: number) {
@@ -34,16 +34,30 @@ export default class CropModeToolbar extends React.Component<Props> {
         }
     }
 
+    private onReset() {
+        const prevPhotoWork = this.props.photoWork
+        if (prevPhotoWork) {
+            const photoWork = { ...prevPhotoWork }
+            delete photoWork.rotationTurns
+            delete photoWork.tilt
+            delete photoWork.cropRect
+            this.props.onPhotoWorkEdited(photoWork)
+        }
+    }
+
     render() {
         const { props } = this
+        const { photoWork } = props
+        const hasGeometryOperations = !!(photoWork && (photoWork.rotationTurns || photoWork.tilt || photoWork.cropRect))
+
         return (
             <Toolbar className={classnames(props.className, 'CropModeToolbar')} isLeft={true}>
                 <span className='pull-right'>
                     <RotateButtonGroup disabled={!props.photoWork} onRotate={this.onRotate}/>
-                    <Button
-                        intent='success'
-                        onClick={props.onDone}
-                    >
+                    <Button disabled={!hasGeometryOperations} onClick={this.onReset}>
+                        <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_reset')}</span>
+                    </Button>
+                    <Button intent='success' onClick={props.onDone}>
                         <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_done')}</span>
                     </Button>
                 </span>

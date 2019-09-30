@@ -3,6 +3,7 @@ export default {
     common_cancel: 'Cancelar',
     common_backToLibrary: 'Volver a la biblioteca',
 
+    CropModeToolbar_reset: 'Reiniciar',
     CropModeToolbar_done: 'Hecho',
 
     ErrorController_copied: 'Informe copiado al portapapeles.',

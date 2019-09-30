@@ -3,6 +3,7 @@ export default {
     common_cancel: 'Abbrechen',
     common_backToLibrary: 'Zurück zur Bibliothek',
 
+    CropModeToolbar_reset: 'Zurücksetzen',
     CropModeToolbar_done: 'Fertig',
 
     ErrorController_copied: 'Report wurde in die Zwischenablage kopiert.',
