@@ -14,7 +14,7 @@ import { rotate } from 'common/util/EffectsUtil'
 export interface Props {
     className?: any
     photoWork: PhotoWork | null
-    onPhotoWorkChange(photoWork: PhotoWork): void
+    onPhotoWorkEdited(photoWork: PhotoWork): void
     onDone(): void
 }
 
@@ -30,7 +30,7 @@ export default class CropModeToolbar extends React.Component<Props> {
         if (prevPhotoWork) {
             const photoWork = { ...prevPhotoWork }
             rotate(photoWork, turns, true)
-            this.props.onPhotoWorkChange(photoWork)
+            this.props.onPhotoWorkEdited(photoWork)
         }
     }
 

@@ -2,16 +2,16 @@ import React from 'react'
 import classnames from 'classnames'
 import { ResizeSensor, IResizeEntry, Spinner } from '@blueprintjs/core'
 
-import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
+import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId } from 'common/CommonTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
-import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, limitPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
+import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
 import { Size, zeroSize, Insets, zeroInsets } from 'app/util/GeometryTypes'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
 import PhotoLayer from './PhotoLayer'
-import ViewModeOverlay from './ViewModeOverlay'
+import ViewModeLayer from './ViewModeLayer'
 
 import './PhotoDetailBody.less'
 
@@ -22,44 +22,63 @@ export const cropModeInsets: Insets = { left: 40, right: 80, top: 40, bottom: 40
 export interface Props {
     className?: any
     style?: any
+    topBarClassName: string
+    bodyClassName: string
+    isActive: boolean
     mode: DetailMode
+    isShowingInfo: boolean
+    sectionId: PhotoSectionId
+    photo: Photo
+    isFirst: boolean
+    isLast: boolean
     src: string
     srcPrev: string | null
     srcNext: string | null
     orientation: ExifOrientation
     photoWork: PhotoWork | null
-    zoom: number
-    onZoomChange(zoom: number, minZoom: number, maxZoom: number): void
-    onPhotoWorkChange(photoWork: PhotoWork): void
+    setMode(mode: DetailMode): void
+    setPreviousDetailPhoto(): void
+    setNextDetailPhoto(): void
+    toggleDiff(): void
+    toggleShowInfo(): void
+    updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
+    setPhotosFlagged: (photos: Photo[], flag: boolean) => void
+    movePhotosToTrash: (photos: Photo[]) => void
+    restorePhotosFromTrash: (photos: Photo[]) => void
+    openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
+    closeDetail(): void
 }
 
 interface State {
     prevMode: DetailMode | null
     prevSrc: string | null
+    prevPhotoWork: PhotoWork | null
     loading: boolean
     canvasSize: Size
     textureSize: Size | null
     photoPosition: RequestedPhotoPosition
+    /** The PhotoWork which is changed in crop mode but not yet saved */
+    editedPhotoWork: PhotoWork | null
     cameraMetricsBuilder: CameraMetricsBuilder
     cameraMetrics: CameraMetrics | null
 }
 
 export default class PhotoDetailBody extends React.Component<Props, State> {
 
-    private prevMinZoom: number | null = null
-
-
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onLoadingChange', 'onResize', 'onTextureSizeChange', 'onPhotoPositionChange')
+        bindMany(this, 'onLoadingChange', 'onResize', 'onTextureSizeChange', 'setPhotoPosition', 'enterCropMode',
+            'onPhotoWorkEdited', 'onCropDone')
         const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
             prevMode: null,
             prevSrc: null,
+            prevPhotoWork: null,
             loading: true,
             canvasSize: zeroSize,
             textureSize: null,
             photoPosition: 'contain',
+            editedPhotoWork: null,
             cameraMetricsBuilder,
             cameraMetrics: null,
         }
@@ -68,19 +87,11 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
         const { cameraMetricsBuilder } = prevState
         let nextState: Partial<State> | null = null
-
         let nextPhotoPosition = prevState.photoPosition
+        let nextEditedPhotoWork = prevState.editedPhotoWork
+
         if (nextProps.src !== prevState.prevSrc) {
             nextState = { prevSrc: nextProps.src, textureSize: null, photoPosition: 'contain' }
-        } else {
-            const prevCameraMetrics = prevState.cameraMetrics
-            if (prevCameraMetrics && nextProps.zoom !== prevCameraMetrics.photoPosition.zoom) {
-                nextPhotoPosition = limitPhotoPosition(prevCameraMetrics, { ...prevCameraMetrics.photoPosition, zoom: nextProps.zoom }, false)
-                if (nextPhotoPosition.zoom <= prevCameraMetrics.minZoom) {
-                    nextPhotoPosition = 'contain'
-                }
-                nextState = { photoPosition: nextPhotoPosition }
-            }
         }
 
         if (nextProps.mode !== prevState.prevMode) {
@@ -89,7 +100,19 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                 .setInsets(isCropMode ? cropModeInsets : zeroInsets)
             nextState = { ...nextState, prevMode: nextProps.mode }
             if (isCropMode) {
+                nextPhotoPosition = 'contain'
                 nextState.photoPosition = 'contain'
+            }
+        }
+
+        if (nextProps.photoWork !== prevState.prevPhotoWork) {
+            nextEditedPhotoWork = null
+            nextPhotoPosition = 'contain'
+            nextState = {
+                ...nextState,
+                prevPhotoWork: nextProps.photoWork,
+                photoPosition: nextPhotoPosition,
+                editedPhotoWork: nextEditedPhotoWork
             }
         }
 
@@ -100,7 +123,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                 .setTextureSize(prevState.textureSize)
                 .setBoundsRect(nextProps.mode === 'crop' && prevCameraMetrics ? prevCameraMetrics.neutralCropRect : null)
                 .setExifOrientation(nextProps.orientation)
-                .setPhotoWork(nextProps.photoWork)
+                .setPhotoWork(nextEditedPhotoWork || nextProps.photoWork)
                 .setPhotoPosition(nextPhotoPosition)
                 .getCameraMetrics()
             if (cameraMetrics !== prevState.cameraMetrics) {
@@ -111,18 +134,6 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         }
 
         return nextState
-    }
-
-    componentDidUpdate(prevProps: Props, prevState: State) {
-        const { cameraMetrics } = this.state
-        if (cameraMetrics) {
-            const { photoPosition, minZoom, maxZoom } = cameraMetrics
-            if (photoPosition && (photoPosition.zoom !== prevProps.zoom || minZoom !== this.prevMinZoom)) {
-                // maxZoom is constant (so wo don't have to check it)
-                this.prevMinZoom = minZoom
-                this.props.onZoomChange(photoPosition.zoom, minZoom, maxZoom)
-            }
-        }
     }
 
     private onLoadingChange(loading: boolean) {
@@ -145,47 +156,94 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         }
     }
 
-    private onPhotoPositionChange(photoPosition: PhotoPosition) {
+    private setPhotoPosition(photoPosition: PhotoPosition) {
         this.setState({ photoPosition })
+    }
+
+    private enterCropMode() {
+        this.props.setMode('crop')
+    }
+
+    private onPhotoWorkEdited(photoWork: PhotoWork) {
+        this.setState({ editedPhotoWork: photoWork })
+    }
+
+    private onCropDone() {
+        const { editedPhotoWork } = this.state
+        if (editedPhotoWork) {
+            this.props.updatePhotoWork(this.props.photo, photoWork => {
+                for (const key of Object.keys(photoWork)) {
+                    delete photoWork[key]
+                }
+                for (const key of Object.keys(editedPhotoWork)) {
+                    photoWork[key] = editedPhotoWork[key]
+                }
+            })
+        }
+
+        // NOTE: editedPhotoWork will be set to null when the new photoWork is set.
+        //       This is important in order to avoid flickering (the old photoWork would be shown for a short time).
+        this.props.setMode('view')
     }
 
     render() {
         const { props, state } = this
         return (
-            <ResizeSensor onResize={this.onResize}>
-                <div className={classnames(props.className, 'PhotoDetailBody bp3-dark')}>
-                    <PhotoLayer
-                        className='PhotoDetailBody-layer'
-                        mode={props.mode}
-                        canvasSize={state.canvasSize}
-                        src={props.src}
-                        srcPrev={props.srcPrev}
-                        srcNext={props.srcNext}
-                        orientation={props.orientation}
+            <div className={classnames(props.className, 'PhotoDetailBody')}>
+                <ResizeSensor onResize={this.onResize}>
+                    <div className={classnames(props.bodyClassName, 'PhotoDetailBody-sizer')} />
+                </ResizeSensor>
+                <PhotoLayer
+                    className={props.bodyClassName}
+                    mode={props.mode}
+                    canvasSize={state.canvasSize}
+                    src={props.src}
+                    srcPrev={props.srcPrev}
+                    srcNext={props.srcNext}
+                    orientation={props.orientation}
+                    cameraMetrics={state.cameraMetrics}
+                    onLoadingChange={this.onLoadingChange}
+                    onTextureSizeChange={this.onTextureSizeChange}
+                />
+                {props.mode === 'view' &&
+                    <ViewModeLayer
+                        topBarClassName={props.topBarClassName}
+                        bodyClassName={props.bodyClassName}
+                        isActive={props.isActive}
+                        sectionId={props.sectionId}
+                        photo={props.photo}
+                        isFirst={props.isFirst}
+                        isLast={props.isLast}
                         cameraMetrics={state.cameraMetrics}
-                        onLoadingChange={this.onLoadingChange}
-                        onTextureSizeChange={this.onTextureSizeChange}
+                        isShowingInfo={props.isShowingInfo}
+                        setPreviousDetailPhoto={props.setPreviousDetailPhoto}
+                        setNextDetailPhoto={props.setNextDetailPhoto}
+                        setPhotoPosition={this.setPhotoPosition}
+                        toggleDiff={props.toggleDiff}
+                        enterCropMode={this.enterCropMode}
+                        toggleShowInfo={props.toggleShowInfo}
+                        updatePhotoWork={props.updatePhotoWork}
+                        setPhotosFlagged={props.setPhotosFlagged}
+                        movePhotosToTrash={props.movePhotosToTrash}
+                        restorePhotosFromTrash={props.restorePhotosFromTrash}
+                        openExport={props.openExport}
+                        closeDetail={props.closeDetail}
                     />
-                    {props.mode === 'view' &&
-                        <ViewModeOverlay
-                            className='PhotoDetailBody-layer'
-                            cameraMetrics={state.cameraMetrics}
-                            onPhotoPositionChange={this.onPhotoPositionChange}
-                        />
-                    }
-                    {props.mode === 'crop' && props.photoWork && state.cameraMetrics &&
-                        <CropModeLayer
-                            className='PhotoDetailBody-layer'
-                            photoWork={props.photoWork}
-                            cameraMetrics={state.cameraMetrics}
-                            onPhotoWorkChange={props.onPhotoWorkChange}
-                        />
-                    }
-                    {state.loading &&
-                        <Spinner className='PhotoDetailBody-spinner' size={Spinner.SIZE_LARGE} />
-                    }
-                </div>
-            </ResizeSensor>
+                }
+                {props.mode === 'crop' && props.photoWork && state.cameraMetrics &&
+                    <CropModeLayer
+                        topBarClassName={props.topBarClassName}
+                        bodyClassName={props.bodyClassName}
+                        photoWork={state.editedPhotoWork || props.photoWork}
+                        cameraMetrics={state.cameraMetrics}
+                        onPhotoWorkEdited={this.onPhotoWorkEdited}
+                        onDone={this.onCropDone}
+                    />
+                }
+                {state.loading &&
+                    <Spinner className='PhotoDetailBody-spinner' size={Spinner.SIZE_LARGE} />
+                }
+            </div>
         )
     }
 

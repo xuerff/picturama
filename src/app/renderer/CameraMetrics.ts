@@ -7,6 +7,7 @@ import { getTotalRotationTurns } from 'common/util/DataUtil'
 import { Size, zeroSize, Rect, zeroRect, Insets, zeroInsets } from 'app/util/GeometryTypes'
 
 
+const globalMinZoom = 0.0000001
 export const maxZoom = 2
 
 export interface CameraMetrics {
@@ -48,7 +49,7 @@ export const zeroCameraMetrics: CameraMetrics = {
     photoPosition: { centerX: 0, centerY: 0, zoom: 0 },
     cropRect: zeroRect,
     neutralCropRect: zeroRect,
-    minZoom: 0,
+    minZoom: globalMinZoom,
     maxZoom,
     projectionMatrix: mat4.create(),
     cameraMatrix: mat4.create(),
@@ -187,7 +188,7 @@ export class CameraMetricsBuilder {
 
         let photoPosition: PhotoPosition
         const minZoom = (boundsRect.width === 0 || boundsRect.height === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?
-            0.0000001 :
+            globalMinZoom :
             Math.min(maxZoom, (canvasSize.width - insetsWidth) / boundsRect.width, (canvasSize.height - insetsHeight) / boundsRect.height)
         if (requestedPhotoPosition === 'contain') {
             const zoom = minZoom

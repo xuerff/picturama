@@ -14,7 +14,7 @@ import './ViewModeOverlay.less'
 export interface Props {
     className?: any
     cameraMetrics: CameraMetrics | null
-    onPhotoPositionChange(photoPosition: RequestedPhotoPosition): void
+    setPhotoPosition(photoPosition: RequestedPhotoPosition): void
 }
 
 interface State {
@@ -52,7 +52,7 @@ export default class ViewModeOverlay extends React.Component<Props, State> {
                     const nextPhotoPosition = limitPhotoPosition(cameraMetrics, { centerX, centerY, zoom }, true)
         
                     if (!isShallowEqual(nextPhotoPosition, cameraMetrics.photoPosition)) {
-                        this.props.onPhotoPositionChange(nextPhotoPosition)
+                        this.props.setPhotoPosition(nextPhotoPosition)
                     }
                 }
 
@@ -79,7 +79,7 @@ export default class ViewModeOverlay extends React.Component<Props, State> {
         if (zoom === photoPosition.zoom) {
             // Nothing to do
         } else if (zoom < cameraMetrics.minZoom) {
-            this.props.onPhotoPositionChange('contain')
+            this.props.setPhotoPosition('contain')
         } else {
             const mainElem = findDOMNode(this.refs.main) as HTMLDivElement
             const mainRect = mainElem.getBoundingClientRect()
@@ -96,7 +96,7 @@ export default class ViewModeOverlay extends React.Component<Props, State> {
             const centerX = mousePhotoX - mouseX / zoom
             const centerY = mousePhotoY - mouseY / zoom
 
-            this.props.onPhotoPositionChange({ centerX, centerY, zoom })
+            this.props.setPhotoPosition({ centerX, centerY, zoom })
         }
     }
 

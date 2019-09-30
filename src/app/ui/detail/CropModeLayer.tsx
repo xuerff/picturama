@@ -9,13 +9,16 @@ import { transformRect, transformPoint, getCornerPointOfRect, oppositeCorner, ge
 
 import CropOverlay from './CropOverlay'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
+import CropModeToolbar from './CropModeToolbar'
 
 
 export interface Props {
-    className?: any
+    topBarClassName: string
+    bodyClassName: string
     photoWork: PhotoWork
     cameraMetrics: CameraMetrics
-    onPhotoWorkChange(photoWork: PhotoWork): void
+    onPhotoWorkEdited(photoWork: PhotoWork): void
+    onDone(): void
 }
 
 export default class CropModeLayer extends React.Component<Props> {
@@ -23,7 +26,6 @@ export default class CropModeLayer extends React.Component<Props> {
     constructor(props: Props) {
         super(props)
         bindMany(this, 'onCornerDrag', 'onTiltChange')
-        this.state = {}
     }
 
     private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
@@ -42,7 +44,7 @@ export default class CropModeLayer extends React.Component<Props> {
         } else {
             photoWork.cropRect = cropRect
         }
-        props.onPhotoWorkChange(photoWork)
+        props.onPhotoWorkEdited(photoWork)
     }
 
     private onTiltChange(tilt: number) {
@@ -53,7 +55,7 @@ export default class CropModeLayer extends React.Component<Props> {
         } else {
             photoWork.tilt = tilt
         }
-        props.onPhotoWorkChange(photoWork)
+        props.onPhotoWorkEdited(photoWork)
     }
 
     render() {
@@ -66,15 +68,23 @@ export default class CropModeLayer extends React.Component<Props> {
         const cropRectInViewCoords = transformRect(cameraMetrics.cropRect, cameraMetrics.cameraMatrix)
 
         return (
-            <CropOverlay
-                className={classnames(props.className, 'CropModeLayer')}
-                width={cameraMetrics.canvasSize.width}
-                height={cameraMetrics.canvasSize.height}
-                rect={cropRectInViewCoords}
-                tilt={props.photoWork.tilt || 0}
-                onCornerDrag={this.onCornerDrag}
-                onTiltChange={this.onTiltChange}
-            />
+            <>
+                <CropModeToolbar
+                    className={classnames(props.topBarClassName, 'CropModeLayer-toolbar')}
+                    photoWork={props.photoWork}
+                    onPhotoWorkEdited={props.onPhotoWorkEdited}
+                    onDone={props.onDone}
+                />
+                <CropOverlay
+                    className={classnames(props.bodyClassName, 'CropModeLayer-body')}
+                    width={cameraMetrics.canvasSize.width}
+                    height={cameraMetrics.canvasSize.height}
+                    rect={cropRectInViewCoords}
+                    tilt={props.photoWork.tilt || 0}
+                    onCornerDrag={this.onCornerDrag}
+                    onTiltChange={this.onTiltChange}
+                />
+            </>
         )
     }
 
