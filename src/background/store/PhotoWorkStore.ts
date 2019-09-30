@@ -266,7 +266,7 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
     let match: RegExpMatchArray | null = null
     for (const rule of picasaRules) {
         if (match = rotateRuleRegExp.exec(rule)) {
-            rotate(photoWork, parseInt(match[1]))
+            rotate(photoWork, parseInt(match[1]), false)
         } else if (rule == 'star=yes') {
             photoWork.flagged = true
         } else if (! ignoredRulesRegExp.test(rule)) {

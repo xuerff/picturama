@@ -29,7 +29,7 @@ export default class CropModeToolbar extends React.Component<Props> {
         const prevPhotoWork = this.props.photoWork
         if (prevPhotoWork) {
             const photoWork = { ...prevPhotoWork }
-            rotate(photoWork, turns)
+            rotate(photoWork, turns, true)
             this.props.onPhotoWorkChange(photoWork)
         }
     }

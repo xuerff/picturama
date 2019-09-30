@@ -40,7 +40,7 @@ export default class PhotoActionButtons extends React.Component<Props> {
     private onRotate(turns: number) {
         const props = this.props
         for (const photo of props.selectedPhotos) {
-            props.updatePhotoWork(photo, photoWork => rotate(photoWork, turns))
+            props.updatePhotoWork(photo, photoWork => rotate(photoWork, turns, true))
         }
     }
 
