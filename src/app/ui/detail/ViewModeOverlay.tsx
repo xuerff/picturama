@@ -8,7 +8,7 @@ import { CameraMetrics, PhotoPosition, maxZoom, RequestedPhotoPosition, limitPho
 import DragDropController from 'app/util/DragDropController'
 import { Point } from 'app/util/GeometryTypes'
 
-import './ViewModeLayer.less'
+import './ViewModeOverlay.less'
 
 
 export interface Props {
@@ -21,7 +21,7 @@ interface State {
     dragStart: { x: number, y: number, photoPosition: PhotoPosition } | null
 }
 
-export default class ViewModeLayer extends React.Component<Props, State> {
+export default class ViewModeOverlay extends React.Component<Props, State> {
 
     private dragDropController: DragDropController
 
@@ -107,7 +107,7 @@ export default class ViewModeLayer extends React.Component<Props, State> {
         return (
             <div
                 ref='main'
-                className={classnames(props.className, 'ViewModeLayer', { isZoomed, isDragging: state.dragStart })}
+                className={classnames(props.className, 'ViewModeOverlay', { isZoomed, isDragging: state.dragStart })}
                 onMouseDown={this.dragDropController.onMouseDown}
                 onWheel={this.onWheel}
             />

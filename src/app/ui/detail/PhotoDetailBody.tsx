@@ -11,7 +11,7 @@ import { Size, zeroSize, Insets, zeroInsets } from 'app/util/GeometryTypes'
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
 import PhotoLayer from './PhotoLayer'
-import ViewModeLayer from './ViewModeLayer'
+import ViewModeOverlay from './ViewModeOverlay'
 
 import './PhotoDetailBody.less'
 
@@ -167,7 +167,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                         onTextureSizeChange={this.onTextureSizeChange}
                     />
                     {props.mode === 'view' &&
-                        <ViewModeLayer
+                        <ViewModeOverlay
                             className='PhotoDetailBody-layer'
                             cameraMetrics={state.cameraMetrics}
                             onPhotoPositionChange={this.onPhotoPositionChange}
