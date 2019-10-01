@@ -1,4 +1,4 @@
-import { intersectLinesPlain, cutLineWithPolygon, Vec2Like } from 'app/util/GeometryUtil'
+import { intersectLinesPlain, cutLineWithPolygon, Vec2Like, intersectLineWithPolygon } from 'app/util/GeometryUtil'
 import { vec2 } from 'gl-matrix'
 
 
@@ -44,4 +44,29 @@ test('test cutLineWithPolygon', () => {
 
     // Test line intersecting the polygon
     expect(cutLineWithPolygon([2,2], [-2,0], polygon)).toEqual(vec2.fromValues(1,2))
+})
+
+
+test('test intersectLineWithPolygon', () => {
+    const polygon: Vec2Like[] = [
+        [1, 1],
+        [1, 3],
+        [3, 5],
+        [5, 1],
+    ]
+
+    // Test line inside polygon
+    expect(intersectLineWithPolygon([3,2], [1,0], polygon)).toEqual([-2, 1.5])
+
+    // Test line outside polygon
+    expect(intersectLineWithPolygon([2,5], [0,2], polygon)).toEqual([-0.5, -2])
+
+    // Test line not cutting the polygon
+    expect(intersectLineWithPolygon([0,0], [3,0], polygon)).toEqual([])
+
+    // Test line intersecting the polygon (expect one factor to be in 0..1)
+    expect(intersectLineWithPolygon([2,2], [-2,0], polygon)).toEqual([-1.25, 0.5])
+
+    // Test line intersecting the polygon at a node (expect two times the same factor)
+    expect(intersectLineWithPolygon([5,3], [0,-1], polygon)).toEqual([2, 2])
 })

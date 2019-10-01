@@ -33,6 +33,7 @@ export interface CameraMetrics {
      * See: `doc/geometry-concept.md`
      */
     projectionMatrix: mat4
+    invertedProjectionMatrix?: mat4
     /**
      * The camera matrix translating projected coordinates to screen coordinates.
      * See: `doc/geometry-concept.md`
@@ -225,19 +226,6 @@ export class CameraMetricsBuilder {
         mat4.translate(cameraMatrix, cameraMatrix, [ -photoPosition.centerX, -photoPosition.centerY, 0 ])
         // We have projected coordinates here
 
-        const projectionMatrix = mat4.create()
-        // We have projected coordinates here
-        // Apply tilt
-        if (photoWork.tilt) {
-            mat4.rotateZ(projectionMatrix, projectionMatrix, photoWork.tilt * Math.PI / 180)
-        }
-        // Apply 90° rotation
-        mat4.rotateZ(projectionMatrix, projectionMatrix, rotationTurns * Math.PI / 2)
-        // Move texture to the center
-        // The center is rounded so projected pixels corresponded to whole texture pixels (even if width or height is odd)
-        mat4.translate(projectionMatrix, projectionMatrix, [ Math.round(-textureSize.width / 2), Math.round(-textureSize.height / 2), 0 ])
-        // We have texture coordinates here
-
         this.cameraMetrics = {
             canvasSize,
             textureSize,
@@ -248,7 +236,7 @@ export class CameraMetricsBuilder {
             maxZoom,
             cropRect,
             neutralCropRect,
-            projectionMatrix,
+            projectionMatrix: createProjectionMatrix(textureSize, exifOrientation, photoWork),
             cameraMatrix,
         }
         this.isDirty = false
@@ -277,6 +265,26 @@ function updateNeutralCropRect(rotationTurns: number, textureSize: Size, prevNeu
     }
 
     return neutralCropRect
+}
+
+
+export function createProjectionMatrix(textureSize: Size, exifOrientation: ExifOrientation, photoWork: PhotoWork): mat4 {
+    const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
+
+    const projectionMatrix = mat4.create()
+    // We have projected coordinates here
+    // Apply tilt
+    if (photoWork.tilt) {
+        mat4.rotateZ(projectionMatrix, projectionMatrix, photoWork.tilt * Math.PI / 180)
+    }
+    // Apply 90° rotation
+    mat4.rotateZ(projectionMatrix, projectionMatrix, rotationTurns * Math.PI / 2)
+    // Move texture to the center
+    // The center is rounded so projected pixels corresponded to whole texture pixels (even if width or height is odd)
+    mat4.translate(projectionMatrix, projectionMatrix, [ Math.round(-textureSize.width / 2), Math.round(-textureSize.height / 2), 0 ])
+    // We have texture coordinates here
+
+    return projectionMatrix
 }
 
 
@@ -319,12 +327,17 @@ export function limitPhotoPosition(cameraMetrics: CameraMetrics, photoPosition: 
 }
 
 
-export function getInvertedCameraMatrix(cameraMetrics: CameraMetrics): mat4 {
-    let { invertedCameraMatrix } = cameraMetrics
-    if (!invertedCameraMatrix) {
-        invertedCameraMatrix = mat4.create()
-        mat4.invert(invertedCameraMatrix, cameraMetrics.cameraMatrix)
-        cameraMetrics.invertedCameraMatrix = invertedCameraMatrix
+export function getInvertedProjectionMatrix(cameraMetrics: CameraMetrics): mat4 {
+    if (!cameraMetrics.invertedProjectionMatrix) {
+        cameraMetrics.invertedProjectionMatrix = mat4.invert(mat4.create(), cameraMetrics.projectionMatrix)!
     }
-    return invertedCameraMatrix
+    return cameraMetrics.invertedProjectionMatrix
+}
+
+
+export function getInvertedCameraMatrix(cameraMetrics: CameraMetrics): mat4 {
+    if (!cameraMetrics.invertedCameraMatrix) {
+        cameraMetrics.invertedCameraMatrix = mat4.invert(mat4.create(), cameraMetrics.cameraMatrix)!
+    }
+    return cameraMetrics.invertedCameraMatrix
 }

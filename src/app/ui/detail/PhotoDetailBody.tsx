@@ -234,6 +234,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     <CropModeLayer
                         topBarClassName={props.topBarClassName}
                         bodyClassName={props.bodyClassName}
+                        exifOrientation={props.photo.orientation}
                         photoWork={state.editedPhotoWork || props.photoWork}
                         cameraMetrics={state.cameraMetrics}
                         onPhotoWorkEdited={this.onPhotoWorkEdited}

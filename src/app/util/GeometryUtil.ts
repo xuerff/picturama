@@ -2,7 +2,7 @@ import { mat4, vec2 } from 'gl-matrix'
 
 import { round } from 'common/util/LangUtil'
 
-import { Point, Rect, Corner } from './GeometryTypes'
+import { Point, Rect, Corner, Size } from './GeometryTypes'
 
 
 export type Vec2Like = vec2 | [ number, number ]
@@ -74,10 +74,31 @@ export function rectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
     }
 }
 
+export function rectFromCenterAndSize(center: Vec2Like, size: Size): Rect {
+    return {
+        x: center[0] - size.width / 2,
+        y: center[1] - size.height / 2,
+        width: size.width,
+        height: size.height
+    }
+}
+
+export function centerOfRect(rect: Rect): vec2 {
+    return vec2.fromValues(rect.x + rect.width / 2, rect.y + rect.height / 2)
+}
+
 export function cornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     const x = (corner === 'nw' || corner === 'sw') ? rect.x : (rect.x + rect.width)
     const y = (corner === 'nw' || corner === 'ne') ? rect.y : (rect.y + rect.height)
     return vec2.fromValues(x, y)
+}
+
+export function scaleSize(size: Size, factor: number): Size {
+    if (factor === 1) {
+        return size
+    } else {
+        return { width: size.width * factor, height: size.height * factor }
+    }
 }
 
 export function directionOfPoints(start: Vec2Like, end: Vec2Like): vec2 {
@@ -162,4 +183,24 @@ export function cutLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec2Like,
             lineStart[1] + bestFactor * lineDirection[1]
         )
     }
+}
+
+export function intersectLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoints: Vec2Like[]): number[] {
+    const result: number[] = []
+
+    const intersectOutFactors: number[] = []
+    const polygonSize = polygonPoints.length
+    for (let i = 0, j = polygonSize - 1; i < polygonSize; j = i++) {
+        const segmentStart = polygonPoints[i]
+        const segmentEnd = polygonPoints[j]
+        const segmentDirection = directionOfPoints(segmentStart, segmentEnd)
+        intersectLines(segmentStart, segmentDirection, lineStart, lineDirection, intersectOutFactors)
+        if (intersectOutFactors[0] >= 0 && intersectOutFactors[0] <= 1) {
+            // The line cuts this segment
+            result.push(intersectOutFactors[1])
+        }
+    }
+
+    result.sort()
+    return result
 }
