@@ -80,24 +80,25 @@ export function getCornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     return vec2.fromValues(x, y)
 }
 
-export function intersectVectorLines(start1: Vec2Like, end1: Vec2Like, start2: Vec2Like, end2: Vec2Like, outFactors: number[]) {
-    intersectPlainLines(start1[0], start1[1], end1[0], end1[1], start2[0], start2[1], end2[0], end2[1], outFactors)
+export function directionOfPoints(start: Vec2Like, end: Vec2Like): vec2 {
+    return vec2.fromValues(end[0] - start[0], end[1] - start[1])
 }
 
-export function intersectPlainLines(startX1: number, startY1: number, endX1: number, endY1: number,
-    startX2: number, startY2: number, endX2: number, endY2: number,
-    outFactors: number[])
+export function intersectLines(start1: Vec2Like, direction1: Vec2Like, start2: Vec2Like, direction2: Vec2Like, outFactors: number[]) {
+    intersectLinesPlain(start1[0], start1[1], direction1[0], direction1[1], start2[0], start2[1], direction2[0], direction2[1], outFactors)
+}
+
+export function intersectLinesPlain(startX1: number, startY1: number, directionX1: number, directionY1: number,
+    startX2: number, startY2: number, directionX2: number, directionY2: number, outFactors: number[])
 {
-    const vX1 = endX1 - startX1, vY1 = endY1 - startY1
-    const vX2 = endX2 - startX2, vY2 = endY2 - startY2
-    const f = vX2*vY1 - vX1*vY2
+    const f = directionX2*directionY1 - directionX1*directionY2
     if (f == 0) {
         outFactors[0] = NaN
         outFactors[1] = NaN
     } else {
         const vX3 = startX2 - startX1, vY3 = startY2 - startY1
-        outFactors[0] = (vX2*vY3 - vX3*vY2)/f
-        outFactors[1] = (vX1*vY3 - vX3*vY1)/f
+        outFactors[0] = (directionX2*vY3 - vX3*directionY2)/f
+        outFactors[1] = (directionX1*vY3 - vX3*directionY1)/f
     }
 }
 
@@ -130,7 +131,7 @@ const epsilon = 0.0000001
  * If `lineStart` is outside the polygon, this is the first cut point before `lineStart`.
  * Returns `null` if the line doesn't hit the polygon at all.
  */
-export function cutLineWithPolygon(lineStart: Vec2Like, lineEnd: Vec2Like, polygonPoints: Vec2Like[],
+export function cutLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoints: Vec2Like[],
     outFactor?: number[]): vec2 | null
 {
     let bestFactor: number | null = null
@@ -139,7 +140,8 @@ export function cutLineWithPolygon(lineStart: Vec2Like, lineEnd: Vec2Like, polyg
     for (let i = 0, j = polygonSize - 1; i < polygonSize; j = i++) {
         const segmentStart = polygonPoints[i]
         const segmentEnd = polygonPoints[j]
-        intersectVectorLines(segmentStart, segmentEnd, lineStart, lineEnd, outFactors)
+        const segmentDirection = directionOfPoints(segmentStart, segmentEnd)
+        intersectLines(segmentStart, segmentDirection, lineStart, lineDirection, outFactors)
         if (outFactors[0] >= 0 && outFactors[0] <= 1) {
             // The line cuts this segment
             if (bestFactor === null || ((outFactors[1] >= epsilon && bestFactor >= epsilon) ? outFactors[1] < bestFactor : outFactors[1] > bestFactor)) {
@@ -156,8 +158,8 @@ export function cutLineWithPolygon(lineStart: Vec2Like, lineEnd: Vec2Like, polyg
         return null
     } else {
         return vec2.fromValues(
-            lineStart[0] + bestFactor * (lineEnd[0] - lineStart[0]),
-            lineStart[1] + bestFactor * (lineEnd[1] - lineStart[1])
+            lineStart[0] + bestFactor * lineDirection[0],
+            lineStart[1] + bestFactor * lineDirection[1]
         )
     }
 }

@@ -6,8 +6,8 @@ import { vec2 } from 'gl-matrix'
 
 import { CameraMetrics, getInvertedCameraMatrix } from 'app/renderer/CameraMetrics'
 import { Point, Corner } from 'app/util/GeometryTypes'
-import { transformRect, oppositeCorner, cutLineWithPolygon, getCornerPointOfRect, toVec2, getRectFromPoints,
-    roundVec2, horizontalAdjacentCorner, verticalAdjacentCorner, isVectorInPolygon, Vec2Like } from 'app/util/GeometryUtil'
+import { transformRect, oppositeCorner, cutLineWithPolygon, getCornerPointOfRect, toVec2,
+    roundVec2, horizontalAdjacentCorner, verticalAdjacentCorner, isVectorInPolygon, Vec2Like, directionOfPoints, getRectFromPoints } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
@@ -132,11 +132,11 @@ function createTexturePolygon(cameraMetrics: CameraMetrics): vec2[] {
 function limitPointToPolygon(point: vec2, referencePoint: Vec2Like, texturePolygon: Vec2Like[], goBeyoundPoint = false): vec2 {
     if (!isVectorInPolygon(referencePoint, texturePolygon)) {
         // Move referencePoint inside the polygon
-        referencePoint = cutLineWithPolygon(referencePoint, point, texturePolygon) || referencePoint
+        referencePoint = cutLineWithPolygon(referencePoint, directionOfPoints(referencePoint, point), texturePolygon) || referencePoint
     }
 
     const outFactor: number[] = []
-    const cutPoint = cutLineWithPolygon(referencePoint, point, texturePolygon, outFactor)
+    const cutPoint = cutLineWithPolygon(referencePoint, directionOfPoints(referencePoint, point), texturePolygon, outFactor)
 
     return ((goBeyoundPoint || outFactor[0] < 1) && cutPoint) ? cutPoint : point
 }
