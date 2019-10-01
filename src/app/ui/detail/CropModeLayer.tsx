@@ -9,12 +9,15 @@ import { Point, Corner, Size } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, toVec2, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
-    truncSize, roundRect
+    roundRect
 } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 import CropModeToolbar from './CropModeToolbar'
+
+
+const minCropRectSize = 32
 
 
 export interface Props {
@@ -54,7 +57,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const texturePolygon = createTexturePolygon(cameraMetrics)
         const wantedCornerPoint = isPointInPolygon(projectedPoint, texturePolygon) ? projectedPoint : nearestPointOnPolygon(projectedPoint, texturePolygon)
         const nextCropRectSize = {
-            width: wantedCornerPoint[0] - oppositePoint[0],
+            width:  wantedCornerPoint[0] - oppositePoint[0],
             height: wantedCornerPoint[1] - oppositePoint[1]
         }
         const xCutFactor = maxCutFactor(oppositePoint, [nextCropRectSize.width, 0], texturePolygon)
@@ -65,7 +68,13 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (yCutFactor && yCutFactor < 1) {
             nextCropRectSize.height *= yCutFactor
         }
-        const cropRect = rectFromCornerPointAndSize(oppositePoint, truncSize(nextCropRectSize))
+        const cornerDirection = [
+            corner === 'ne' || corner === 'se' ? 1 : -1,
+            corner === 'sw' || corner === 'se' ? 1 : -1
+        ]
+        nextCropRectSize.width  = cornerDirection[0] * Math.max(minCropRectSize, Math.floor(cornerDirection[0] * nextCropRectSize.width))
+        nextCropRectSize.height = cornerDirection[1] * Math.max(minCropRectSize, Math.floor(cornerDirection[1] * nextCropRectSize.height))
+        const cropRect = rectFromCornerPointAndSize(oppositePoint, nextCropRectSize)
 
         // Apply changes
         this.onPhotoWorkEdited({ ...props.photoWork, cropRect })

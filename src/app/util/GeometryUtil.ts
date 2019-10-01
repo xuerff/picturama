@@ -99,10 +99,6 @@ export function cornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     return vec2.fromValues(x, y)
 }
 
-export function truncSize(size: Size): Size {
-    return { width: Math.trunc(size.width), height: Math.trunc(size.height) }
-}
-
 export function scaleSize(size: Size, factor: number): Size {
     if (factor === 1) {
         return size
