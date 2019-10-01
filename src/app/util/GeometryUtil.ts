@@ -5,7 +5,7 @@ import { round } from 'common/util/LangUtil'
 import { Point, Rect, Corner } from './GeometryTypes'
 
 
-export type VectorLike = vec2 | [ number, number ]
+export type Vec2Like = vec2 | [ number, number ]
 
 export const oppositeCorner: { [K in Corner]: Corner } = {
     nw: 'se',
@@ -28,18 +28,29 @@ export const verticalAdjacentCorner: { [K in Corner]: Corner } = {
     se: 'ne'
 }
 
-export function vectorFromPoint(point: Point): vec2 {
-    return vec2.fromValues(point.x, point.y)
-}
-
-export function roundPoint(point: Point, fractionDigits: number = 0): Point {
-    return {
-        x: round(point.x, fractionDigits),
-        y: round(point.y, fractionDigits)
+export function toVec2(point: Vec2Like | Point): vec2 {
+    if (isVec2(point)) {
+        return point
+    } else if (isPoint(point)) {
+        return vec2.fromValues(point.x, point.y)
+    } else {
+        return vec2.fromValues(point[0], point[1])
     }
 }
 
-export function roundVector(vector: VectorLike, fractionDigits: number = 0): vec2 {
+export function isVec2(obj: Vec2Like | Point | null | undefined): obj is vec2 {
+    return obj instanceof Float32Array && obj.length === 2
+}
+
+export function isVec2Like(obj: Vec2Like | Point | null | undefined): obj is Vec2Like {
+    return !!obj && obj['length'] === 2 && typeof obj[0] === 'number' && typeof obj[1] === 'number'
+}
+
+export function isPoint(obj: Vec2Like | Point | null | undefined): obj is Point {
+    return !!obj && typeof obj['x'] === 'number' && typeof obj['y'] === 'number'
+}
+
+export function roundVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
     return vec2.fromValues(
         round(vector[0], fractionDigits),
         round(vector[1], fractionDigits)
@@ -47,50 +58,29 @@ export function roundVector(vector: VectorLike, fractionDigits: number = 0): vec
 }
 
 export function transformRect(rect: Rect, matrix: mat4): Rect {
-    const vector1 = getCornerVectorOfRect(rect, 'nw')
-    vec2.transformMat4(vector1, vector1, matrix)
-    const vector2 = getCornerVectorOfRect(rect, 'se')
-    vec2.transformMat4(vector2, vector2, matrix)
-    return getRectFromVectors(vector1, vector2)
+    const point1 = getCornerPointOfRect(rect, 'nw')
+    vec2.transformMat4(point1, point1, matrix)
+    const point2 = getCornerPointOfRect(rect, 'se')
+    vec2.transformMat4(point2, point2, matrix)
+    return getRectFromPoints(point1, point2)
 }
 
-export function transformPoint(point: Point, matrix: mat4): Point {
-    const vec = vec2.fromValues(point.x, point.y)
-    vec2.transformMat4(vec, vec, matrix)
-    return { x: vec[0], y: vec[1] }
-}
-
-export function getRectFromPoints(point1: Point, point2: Point): Rect {
+export function getRectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
     return {
-        x: Math.min(point1.x, point2.x),
-        y: Math.min(point1.y, point2.y),
-        width: Math.abs(point1.x - point2.x),
-        height: Math.abs(point1.y - point2.y)
+        x: Math.min(point1[0], point2[0]),
+        y: Math.min(point1[1], point2[1]),
+        width: Math.abs(point1[0] - point2[0]),
+        height: Math.abs(point1[1] - point2[1])
     }
 }
 
-export function getRectFromVectors(vector1: VectorLike, vector2: VectorLike): Rect {
-    return {
-        x: Math.min(vector1[0], vector2[0]),
-        y: Math.min(vector1[1], vector2[1]),
-        width: Math.abs(vector1[0] - vector2[0]),
-        height: Math.abs(vector1[1] - vector2[1])
-    }
-}
-
-export function getCornerPointOfRect(rect: Rect, corner: Corner): Point {
-    const x = (corner === 'nw' || corner === 'sw') ? rect.x : (rect.x + rect.width)
-    const y = (corner === 'nw' || corner === 'ne') ? rect.y : (rect.y + rect.height)
-    return { x, y }
-}
-
-export function getCornerVectorOfRect(rect: Rect, corner: Corner): vec2 {
+export function getCornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     const x = (corner === 'nw' || corner === 'sw') ? rect.x : (rect.x + rect.width)
     const y = (corner === 'nw' || corner === 'ne') ? rect.y : (rect.y + rect.height)
     return vec2.fromValues(x, y)
 }
 
-export function intersectVectorLines(start1: VectorLike, end1: VectorLike, start2: VectorLike, end2: VectorLike, outFactors: number[]) {
+export function intersectVectorLines(start1: Vec2Like, end1: Vec2Like, start2: Vec2Like, end2: Vec2Like, outFactors: number[]) {
     intersectPlainLines(start1[0], start1[1], end1[0], end1[1], start2[0], start2[1], end2[0], end2[1], outFactors)
 }
 
@@ -111,7 +101,7 @@ export function intersectPlainLines(startX1: number, startY1: number, endX1: num
     }
 }
 
-export function isVectorInPolygon(point: VectorLike, polygonPoints: VectorLike[]): boolean {
+export function isVectorInPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): boolean {
     // Original code from: https://github.com/substack/point-in-polygon/blob/master/index.js
     // ray-casting algorithm based on
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
@@ -140,7 +130,7 @@ const epsilon = 0.0000001
  * If `lineStart` is outside the polygon, this is the first cut point before `lineStart`.
  * Returns `null` if the line doesn't hit the polygon at all.
  */
-export function cutLineWithPolygon(lineStart: VectorLike, lineEnd: VectorLike, polygonPoints: VectorLike[],
+export function cutLineWithPolygon(lineStart: Vec2Like, lineEnd: Vec2Like, polygonPoints: Vec2Like[],
     outFactor?: number[]): vec2 | null
 {
     let bestFactor: number | null = null

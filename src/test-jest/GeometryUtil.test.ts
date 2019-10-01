@@ -1,4 +1,4 @@
-import { intersectPlainLines, cutLineWithPolygon, VectorLike } from 'app/util/GeometryUtil'
+import { intersectPlainLines, cutLineWithPolygon, Vec2Like } from 'app/util/GeometryUtil'
 import { vec2 } from 'gl-matrix'
 
 
@@ -26,7 +26,7 @@ test('test intersectLines', () => {
 
 
 test('test cutLineWithPolygon', () => {
-    const polygon: VectorLike[] = [
+    const polygon: Vec2Like[] = [
         [1, 1],
         [1, 3],
         [3, 5],

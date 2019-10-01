@@ -6,8 +6,8 @@ import { vec2 } from 'gl-matrix'
 
 import { CameraMetrics, getInvertedCameraMatrix } from 'app/renderer/CameraMetrics'
 import { Point, Corner } from 'app/util/GeometryTypes'
-import { transformRect, oppositeCorner, cutLineWithPolygon, getCornerVectorOfRect, vectorFromPoint, getRectFromVectors,
-    roundVector, horizontalAdjacentCorner, verticalAdjacentCorner, isVectorInPolygon, VectorLike } from 'app/util/GeometryUtil'
+import { transformRect, oppositeCorner, cutLineWithPolygon, getCornerPointOfRect, toVec2, getRectFromPoints,
+    roundVec2, horizontalAdjacentCorner, verticalAdjacentCorner, isVectorInPolygon, Vec2Like } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
@@ -36,22 +36,22 @@ export default class CropModeLayer extends React.Component<Props> {
         const prevCropRect = cameraMetrics.cropRect
 
         const invertedCameraMatrix = getInvertedCameraMatrix(cameraMetrics)
-        const projectedPoint = vec2.transformMat4(vec2.create(), vectorFromPoint(point), invertedCameraMatrix)
-        const oppositePoint = getCornerVectorOfRect(prevCropRect, oppositeCorner[corner])
+        const projectedPoint = vec2.transformMat4(vec2.create(), toVec2(point), invertedCameraMatrix)
+        const oppositePoint = getCornerPointOfRect(prevCropRect, oppositeCorner[corner])
 
         // Limit the rect to the texture
         const texturePolygon = createTexturePolygon(cameraMetrics)
         let nextCornerPoint = limitPointToPolygon(projectedPoint, oppositePoint, texturePolygon)
-        const xCutPoint = limitPointToPolygon(getCornerVectorOfRect(prevCropRect, verticalAdjacentCorner[corner]), oppositePoint, texturePolygon, true)
+        const xCutPoint = limitPointToPolygon(getCornerPointOfRect(prevCropRect, verticalAdjacentCorner[corner]), oppositePoint, texturePolygon, true)
         if (Math.abs(oppositePoint[0] - xCutPoint[0]) < Math.abs(oppositePoint[0] - nextCornerPoint[0])) {
             nextCornerPoint[0] = xCutPoint[0]
         }
-        const yCutPoint = limitPointToPolygon(getCornerVectorOfRect(prevCropRect, horizontalAdjacentCorner[corner]), oppositePoint, texturePolygon, true)
+        const yCutPoint = limitPointToPolygon(getCornerPointOfRect(prevCropRect, horizontalAdjacentCorner[corner]), oppositePoint, texturePolygon, true)
         if (Math.abs(oppositePoint[1] - yCutPoint[1]) < Math.abs(oppositePoint[1] - nextCornerPoint[1])) {
             nextCornerPoint[1] = yCutPoint[1]
         }
 
-        const cropRect = getRectFromVectors(roundVector(nextCornerPoint), oppositePoint)
+        const cropRect = getRectFromPoints(roundVec2(nextCornerPoint), oppositePoint)
 
         const photoWork = { ...props.photoWork }
         if (isShallowEqual(cropRect, cameraMetrics.neutralCropRect)) {
@@ -129,7 +129,7 @@ function createTexturePolygon(cameraMetrics: CameraMetrics): vec2[] {
 }
 
 
-function limitPointToPolygon(point: vec2, referencePoint: VectorLike, texturePolygon: VectorLike[], goBeyoundPoint = false): vec2 {
+function limitPointToPolygon(point: vec2, referencePoint: Vec2Like, texturePolygon: Vec2Like[], goBeyoundPoint = false): vec2 {
     if (!isVectorInPolygon(referencePoint, texturePolygon)) {
         // Move referencePoint inside the polygon
         referencePoint = cutLineWithPolygon(referencePoint, point, texturePolygon) || referencePoint
