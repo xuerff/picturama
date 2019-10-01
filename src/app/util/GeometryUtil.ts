@@ -43,6 +43,15 @@ export function roundVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
     )
 }
 
+export function roundRect(rect: Rect, fractionDigits: number = 0): Rect {
+    return {
+        x: round(rect.x, fractionDigits),
+        y: round(rect.y, fractionDigits),
+        width: round(rect.width, fractionDigits),
+        height: round(rect.height, fractionDigits)
+    }
+}
+
 export function transformRect(rect: Rect, matrix: mat4): Rect {
     const point1 = cornerPointOfRect(rect, 'nw')
     vec2.transformMat4(point1, point1, matrix)
@@ -88,6 +97,10 @@ export function cornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     const x = (corner === 'nw' || corner === 'sw') ? rect.x : (rect.x + rect.width)
     const y = (corner === 'nw' || corner === 'ne') ? rect.y : (rect.y + rect.height)
     return vec2.fromValues(x, y)
+}
+
+export function truncSize(size: Size): Size {
+    return { width: Math.trunc(size.width), height: Math.trunc(size.height) }
 }
 
 export function scaleSize(size: Size, factor: number): Size {

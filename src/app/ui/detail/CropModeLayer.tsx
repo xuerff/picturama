@@ -8,7 +8,8 @@ import { CameraMetrics, getInvertedCameraMatrix, getInvertedProjectionMatrix, cr
 import { Point, Corner, Size } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, toVec2, centerOfRect, intersectLineWithPolygon,
-    rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize
+    rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
+    truncSize, roundRect
 } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
@@ -64,7 +65,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (yCutFactor && yCutFactor < 1) {
             nextCropRectSize.height *= yCutFactor
         }
-        const cropRect = rectFromCornerPointAndSize(oppositePoint, nextCropRectSize)
+        const cropRect = rectFromCornerPointAndSize(oppositePoint, truncSize(nextCropRectSize))
 
         // Apply changes
         this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
@@ -106,7 +107,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
         outFactors = intersectLineWithPolygon(nextCropRectCenter, [tiltMaxCropRectSize.width / 2, -tiltMaxCropRectSize.height / 2], texturePolygon)
         minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
-        photoWork.cropRect = rectFromCenterAndSize(nextCropRectCenter, scaleSize(tiltMaxCropRectSize, minFactor))
+        photoWork.cropRect = roundRect(rectFromCenterAndSize(nextCropRectCenter, scaleSize(tiltMaxCropRectSize, minFactor)))
 
         // Apply changes
         this.onPhotoWorkEdited(photoWork)
