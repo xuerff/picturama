@@ -2,10 +2,18 @@
     fill: rgba(0, 0, 0, 0.75);
 }
 
-.CropOverlay-hint,
-.CropOverlay-border {
+.CropOverlay-hint {
     stroke: #a0a0a0;
     fill: none;
+}
+.CropOverlay-rect {
+    stroke: #a0a0a0;
+    fill: transparent;
+    cursor: grab;
+
+    .CropOverlay.isDraggingRect & {
+        cursor: grabbing;
+    }
 }
 
 .CropOverlay-cornerHandle {

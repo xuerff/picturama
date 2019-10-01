@@ -5,7 +5,7 @@ import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
 import { vec2 } from 'gl-matrix'
 
 import { CameraMetrics, getInvertedCameraMatrix, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
-import { Point, Corner, Size } from 'app/util/GeometryTypes'
+import { Point, Corner, Size, Rect } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, toVec2, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
@@ -15,6 +15,7 @@ import {
 import CropOverlay from './CropOverlay'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 import CropModeToolbar from './CropModeToolbar'
+import { createDragRectFencePolygon } from './CropModeUtil'
 
 
 const minCropRectSize = 32
@@ -31,16 +32,53 @@ export interface Props {
 }
 
 interface State {
-    tiltCenterInTextureCoords: vec2 | null
-    tiltMaxCropRectSize: Size | null
+    actionInfo:
+        { type: 'tilt', centerInTextureCoords: vec2, maxCropRectSize: Size } |
+        { type: 'drag-rect', startCropRect: Rect, fencePolygon: vec2[] } |
+        null
 }
 
 export default class CropModeLayer extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onCornerDrag', 'onTiltChange')
-        this.state = { tiltCenterInTextureCoords: null, tiltMaxCropRectSize: null }
+        bindMany(this, 'onRectDrag', 'onCornerDrag', 'onTiltChange')
+        this.state = { actionInfo: null }
+    }
+
+    private onRectDrag(deltaX: number, deltaY: number, isFinished: boolean) {
+        const { props } = this
+        const { cameraMetrics } = props
+        const { actionInfo } = this.state
+        let nextState: Partial<State> | null = null
+
+        let startCropRect: Rect
+        let fencePolygon: vec2[]
+        if (actionInfo && actionInfo.type === 'drag-rect') {
+            startCropRect = actionInfo.startCropRect
+            fencePolygon = actionInfo.fencePolygon
+        } else {
+            startCropRect = cameraMetrics.cropRect
+            fencePolygon = createDragRectFencePolygon(startCropRect, createTexturePolygon(cameraMetrics))
+            nextState = { actionInfo: { type: 'drag-rect', startCropRect, fencePolygon } }
+        }
+
+        // Limit the crop rect to the texture
+        const zoom = cameraMetrics.photoPosition.zoom
+        let nextRectLeftTop: Vec2Like = [startCropRect.x + deltaX / zoom, startCropRect.y + deltaY / zoom]
+        if (!isPointInPolygon(nextRectLeftTop, fencePolygon)) {
+            nextRectLeftTop = nearestPointOnPolygon(nextRectLeftTop, fencePolygon)
+        }
+        const cropRect = rectFromCornerPointAndSize(nextRectLeftTop, startCropRect)
+
+        // Apply changes
+        if (isFinished) {
+            nextState = { actionInfo: null }
+        }
+        if (nextState) {
+            this.setState(nextState as any)
+        }
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
     }
 
     private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
@@ -77,15 +115,16 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const cropRect = rectFromCornerPointAndSize(oppositePoint, nextCropRectSize)
 
         // Apply changes
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
-        if (this.state.tiltCenterInTextureCoords) {
-            this.setState({ tiltCenterInTextureCoords: null, tiltMaxCropRectSize: null })
+        if (this.state.actionInfo) {
+            this.setState({ actionInfo: null })
         }
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
     }
 
     private onTiltChange(tilt: number) {
         const { props } = this
         const { cameraMetrics } = props
+        const { actionInfo } = this.state
         let nextState: Partial<State> | null = null
         const prevCropRect = cameraMetrics.cropRect
 
@@ -98,31 +137,35 @@ export default class CropModeLayer extends React.Component<Props, State> {
         }
 
         // Get center and maximum size of crop rect
-        let { tiltCenterInTextureCoords, tiltMaxCropRectSize } = this.state
-        if (!tiltCenterInTextureCoords || !tiltMaxCropRectSize) {
+        let centerInTextureCoords: vec2
+        let maxCropRectSize: Size
+        if (actionInfo && actionInfo.type === 'tilt') {
+            centerInTextureCoords = actionInfo.centerInTextureCoords
+            maxCropRectSize = actionInfo.maxCropRectSize
+        } else {
             const center = centerOfRect(prevCropRect)
             vec2.transformMat4(center, center, getInvertedProjectionMatrix(cameraMetrics))
-            tiltCenterInTextureCoords = center
-            tiltMaxCropRectSize = { width: prevCropRect.width, height: prevCropRect.height }
-            nextState = { tiltCenterInTextureCoords, tiltMaxCropRectSize }
+            centerInTextureCoords = center
+            maxCropRectSize = { width: prevCropRect.width, height: prevCropRect.height }
+            nextState = { actionInfo: { type: 'tilt', centerInTextureCoords, maxCropRectSize } }
         }
 
         // Adjust crop rect
         const texturePolygon = createTexturePolygon(cameraMetrics)
         const nextProjectionMatrix = createProjectionMatrix(cameraMetrics.textureSize, props.exifOrientation, photoWork)
-        const nextCropRectCenter = vec2.transformMat4(vec2.create(), tiltCenterInTextureCoords, nextProjectionMatrix)
+        const nextCropRectCenter = vec2.transformMat4(vec2.create(), centerInTextureCoords, nextProjectionMatrix)
         let outFactors: number[]
-        outFactors = intersectLineWithPolygon(nextCropRectCenter, [tiltMaxCropRectSize.width / 2, tiltMaxCropRectSize.height / 2], texturePolygon)
+        outFactors = intersectLineWithPolygon(nextCropRectCenter, [maxCropRectSize.width / 2, maxCropRectSize.height / 2], texturePolygon)
         let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
-        outFactors = intersectLineWithPolygon(nextCropRectCenter, [tiltMaxCropRectSize.width / 2, -tiltMaxCropRectSize.height / 2], texturePolygon)
+        outFactors = intersectLineWithPolygon(nextCropRectCenter, [maxCropRectSize.width / 2, -maxCropRectSize.height / 2], texturePolygon)
         minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
-        photoWork.cropRect = roundRect(rectFromCenterAndSize(nextCropRectCenter, scaleSize(tiltMaxCropRectSize, minFactor)))
+        photoWork.cropRect = roundRect(rectFromCenterAndSize(nextCropRectCenter, scaleSize(maxCropRectSize, minFactor)))
 
         // Apply changes
-        this.onPhotoWorkEdited(photoWork)
         if (nextState) {
             this.setState(nextState as any)
         }
+        this.onPhotoWorkEdited(photoWork)
     }
 
     private onPhotoWorkEdited(photoWork: PhotoWork) {
@@ -161,6 +204,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
                     height={cameraMetrics.canvasSize.height}
                     rect={cropRectInViewCoords}
                     tilt={props.photoWork.tilt || 0}
+                    onRectDrag={this.onRectDrag}
                     onCornerDrag={this.onCornerDrag}
                     onTiltChange={this.onTiltChange}
                 />

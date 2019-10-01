@@ -45,6 +45,22 @@ function createDefaultProps(context: TestContext, width: number, height: number)
         height,
         rect,
         tilt: state.tilt || 0,
+        onRectDrag(deltaX: number, deltaY: number, isFinished: boolean) {
+            let dragStartRect: Rect = state.dragStartRect
+            if (!dragStartRect) {
+                dragStartRect = state.dragStartRect = state.rect
+            }
+
+            const nextRect: Rect = { ...dragStartRect }
+            nextRect.x += deltaX
+            nextRect.y += deltaY
+
+            state.rect = nextRect
+            if (isFinished) {
+                delete state.dragStartRect
+            }
+            context.forceUpdate()
+        },
         onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
             const prevRect: Rect = state.rect
             const nextRect: Rect = { ...prevRect }

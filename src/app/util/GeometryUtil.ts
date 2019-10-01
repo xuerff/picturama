@@ -43,6 +43,10 @@ export function roundVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
     )
 }
 
+export function movePoint(point: Vec2Like, direction: Vec2Like, factor = 1): vec2 {
+    return vec2.fromValues(point[0] + factor * direction[0], point[1] + factor * direction[1])
+}
+
 export function roundRect(rect: Rect, fractionDigits: number = 0): Rect {
     return {
         x: round(rect.x, fractionDigits),
@@ -149,8 +153,33 @@ export function isPointInPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): bo
     return inside
 }
 
+export function squareDistanceOfPoints(point1: Vec2Like, point2: Vec2Like): number {
+    const distX = point2[0] - point1[0]
+    const distY = point2[1] - point1[1]
+    return distX*distX + distY*distY
+}
+
 /**
- * Finds the nearest point on a polyline.
+ * Finds the nearest point on a line.
+ * Returns `null` if `lineDirection` is `[0, 0]`
+ */
+export function nearestPointOnLine(point: Vec2Like, lineStart: Vec2Like, lineDirection: Vec2Like): vec2 | null {
+    if (!lineDirection[0] && !lineDirection[1]) {
+        // This line is no real line -> Return `null` (and avoid division by 0)
+        return null
+    }
+    const [ bx, by ] = lineDirection
+    const vx = point[0] - lineStart[0]
+    const vy = point[1] - lineStart[1]
+    const t = (vx*bx + vy*by) / (bx*bx + by*by)
+    return vec2.fromValues(
+        lineStart[0] + t*bx,
+        lineStart[1] + t*by
+    )
+}
+
+/**
+ * Finds the nearest point on a polygon.
  */
 export function nearestPointOnPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): vec2 {
     let minSquareDistance: number | null = null
