@@ -14,20 +14,6 @@ export const oppositeCorner: { [K in Corner]: Corner } = {
     se: 'nw'
 }
 
-export const horizontalAdjacentCorner: { [K in Corner]: Corner } = {
-    nw: 'ne',
-    ne: 'nw',
-    sw: 'se',
-    se: 'sw'
-}
-
-export const verticalAdjacentCorner: { [K in Corner]: Corner } = {
-    nw: 'sw',
-    ne: 'se',
-    sw: 'nw',
-    se: 'ne'
-}
-
 export function toVec2(point: Vec2Like | Point): vec2 {
     if (isVec2(point)) {
         return point
@@ -75,11 +61,22 @@ export function rectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
 }
 
 export function rectFromCenterAndSize(center: Vec2Like, size: Size): Rect {
+    const width = Math.abs(size.width)
+    const height = Math.abs(size.height)
     return {
-        x: center[0] - size.width / 2,
-        y: center[1] - size.height / 2,
-        width: size.width,
-        height: size.height
+        x: center[0] - width / 2,
+        y: center[1] - height / 2,
+        width,
+        height
+    }
+}
+
+export function rectFromCornerPointAndSize(cornerPoint: Vec2Like, size: Size): Rect {
+    return {
+        x: size.width > 0 ? cornerPoint[0] : cornerPoint[0] + size.width,
+        y: size.height > 0 ? cornerPoint[1] : cornerPoint[1] + size.height,
+        width: Math.abs(size.width),
+        height: Math.abs(size.height)
     }
 }
 
@@ -123,7 +120,7 @@ export function intersectLinesPlain(startX1: number, startY1: number, directionX
     }
 }
 
-export function isVectorInPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): boolean {
+export function isPointInPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): boolean {
     // Original code from: https://github.com/substack/point-in-polygon/blob/master/index.js
     // ray-casting algorithm based on
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
@@ -143,46 +140,51 @@ export function isVectorInPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): b
     return inside
 }
 
-const epsilon = 0.0000001
-
 /**
- * Returns the first cut point of a line with a polygon.
- * If `lineStart` is in the polygon, this is the point where the line hits the polygon for the first time when going
- * from `lineStart` to `lineEnd` and beyond.
- * If `lineStart` is outside the polygon, this is the first cut point before `lineStart`.
- * Returns `null` if the line doesn't hit the polygon at all.
+ * Finds the nearest point on a polyline.
  */
-export function cutLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoints: Vec2Like[],
-    outFactor?: number[]): vec2 | null
-{
-    let bestFactor: number | null = null
-    const outFactors: number[] = []
+export function nearestPointOnPolygon(point: Vec2Like, polygonPoints: Vec2Like[]): vec2 {
+    let minSquareDistance: number | null = null
+    let bx: number, by: number, vx: number, vy: number, t: number, nx: number, ny: number, distX: number, distY: number,
+        squareDistance: number, nearestX = 0, nearestY = 0, nearestSegmentIndex = 0
+
     const polygonSize = polygonPoints.length
     for (let i = 0, j = polygonSize - 1; i < polygonSize; j = i++) {
         const segmentStart = polygonPoints[i]
         const segmentEnd = polygonPoints[j]
-        const segmentDirection = directionOfPoints(segmentStart, segmentEnd)
-        intersectLines(segmentStart, segmentDirection, lineStart, lineDirection, outFactors)
-        if (outFactors[0] >= 0 && outFactors[0] <= 1) {
-            // The line cuts this segment
-            if (bestFactor === null || ((outFactors[1] >= epsilon && bestFactor >= epsilon) ? outFactors[1] < bestFactor : outFactors[1] > bestFactor)) {
-                bestFactor = outFactors[1]
-            }
+
+        bx = segmentEnd[0] - segmentStart[0]
+        by = segmentEnd[1] - segmentStart[1]
+        if (bx == 0 && by == 0) {
+            // This segment has the same start and end point
+            // -> Ignore it (and avoid division by 0)
+            continue
+        }
+        vx = point[0] - segmentStart[0]
+        vy = point[1] - segmentStart[1]
+        t = (vx*bx + vy*by) / (bx*bx + by*by)
+        if (t <= 0) {
+            nx = segmentStart[0]
+            ny = segmentStart[1]
+        } else if (t >= 1) {
+            nx = segmentEnd[0]
+            ny = segmentEnd[1]
+        } else {
+            nx = segmentStart[0] + t*bx
+            ny = segmentStart[1] + t*by
+        }
+        distX = point[0] - nx
+        distY = point[1] - ny
+        squareDistance = distX*distX + distY*distY
+        if (minSquareDistance == null || squareDistance < minSquareDistance) {
+            minSquareDistance = squareDistance
+            nearestX = nx
+            nearestY = ny
+            nearestSegmentIndex = i
         }
     }
 
-    if (outFactor) {
-        outFactor[0] = (bestFactor === null) ? NaN : bestFactor
-    }
-
-    if (bestFactor === null) {
-        return null
-    } else {
-        return vec2.fromValues(
-            lineStart[0] + bestFactor * lineDirection[0],
-            lineStart[1] + bestFactor * lineDirection[1]
-        )
-    }
+    return vec2.fromValues(nearestX, nearestY)
 }
 
 export function intersectLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoints: Vec2Like[]): number[] {
@@ -201,6 +203,10 @@ export function intersectLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec
         }
     }
 
-    result.sort()
+    result.sort(compareNumbers)
     return result
+}
+
+function compareNumbers(a: number, b: number): number {
+    return a - b
 }
