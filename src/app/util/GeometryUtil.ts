@@ -58,14 +58,14 @@ export function roundVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
 }
 
 export function transformRect(rect: Rect, matrix: mat4): Rect {
-    const point1 = getCornerPointOfRect(rect, 'nw')
+    const point1 = cornerPointOfRect(rect, 'nw')
     vec2.transformMat4(point1, point1, matrix)
-    const point2 = getCornerPointOfRect(rect, 'se')
+    const point2 = cornerPointOfRect(rect, 'se')
     vec2.transformMat4(point2, point2, matrix)
-    return getRectFromPoints(point1, point2)
+    return rectFromPoints(point1, point2)
 }
 
-export function getRectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
+export function rectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
     return {
         x: Math.min(point1[0], point2[0]),
         y: Math.min(point1[1], point2[1]),
@@ -74,7 +74,7 @@ export function getRectFromPoints(point1: Vec2Like, point2: Vec2Like): Rect {
     }
 }
 
-export function getCornerPointOfRect(rect: Rect, corner: Corner): vec2 {
+export function cornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     const x = (corner === 'nw' || corner === 'sw') ? rect.x : (rect.x + rect.width)
     const y = (corner === 'nw' || corner === 'ne') ? rect.y : (rect.y + rect.height)
     return vec2.fromValues(x, y)
