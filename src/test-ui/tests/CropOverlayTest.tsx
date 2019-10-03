@@ -5,7 +5,8 @@ import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 import { bindMany } from 'common/util/LangUtil'
 
 import CropOverlay, { Props as CropOverlayProps } from 'app/ui/detail/CropOverlay'
-import { Point, Rect, Corner } from 'app/util/GeometryTypes'
+import { Point, Rect, Corner, Side } from 'app/util/GeometryTypes'
+import { cornerPointOfRect, rectFromPoints } from 'app/util/GeometryUtil'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
 import { cropModeInsets } from 'app/ui/detail/PhotoDetailBody'
@@ -59,6 +60,22 @@ function createDefaultProps(context: TestContext, width: number, height: number)
             if (isFinished) {
                 delete state.dragStartRect
             }
+            context.forceUpdate()
+        },
+        onSideDrag(side: Side, point: Point, isFinished: boolean) {
+            const prevRect: Rect = state.rect
+
+            const nwCorner = cornerPointOfRect(prevRect, 'nw')
+            const seCorner = cornerPointOfRect(prevRect, 'se')
+
+            switch (side) {
+                case 'w': nwCorner[0] = Math.min(seCorner[0] - minRectSize, point.x); break
+                case 'n': nwCorner[1] = Math.min(seCorner[1] - minRectSize, point.y); break
+                case 'e': seCorner[0] = Math.max(nwCorner[0] + minRectSize, point.x); break
+                case 's': seCorner[1] = Math.max(nwCorner[1] + minRectSize, point.y); break
+            }
+
+            state.rect = rectFromPoints(nwCorner, seCorner)
             context.forceUpdate()
         },
         onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {

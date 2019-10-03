@@ -5,11 +5,11 @@ import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
 import { vec2 } from 'gl-matrix'
 
 import { CameraMetrics, getInvertedCameraMatrix, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
-import { Point, Corner, Size, Rect } from 'app/util/GeometryTypes'
+import { Point, Size, Rect, Side, Corner, corners } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, toVec2, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
-    roundRect
+    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2
 } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
@@ -42,7 +42,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onRectDrag', 'onCornerDrag', 'onTiltChange')
+        bindMany(this, 'onRectDrag', 'onSideDrag', 'onCornerDrag', 'onTiltChange')
         this.state = { actionInfo: null }
     }
 
@@ -69,7 +69,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (!isPointInPolygon(nextRectLeftTop, fencePolygon)) {
             nextRectLeftTop = nearestPointOnPolygon(nextRectLeftTop, fencePolygon)
         }
-        const cropRect = rectFromCornerPointAndSize(nextRectLeftTop, startCropRect)
+        const cropRect = rectFromCornerPointAndSize(roundVec2(nextRectLeftTop), startCropRect)
 
         // Apply changes
         if (isFinished) {
@@ -77,6 +77,35 @@ export default class CropModeLayer extends React.Component<Props, State> {
         }
         if (nextState) {
             this.setState(nextState as any)
+        }
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
+    }
+
+    private onSideDrag(side: Side, point: Point, isFinished: boolean) {
+        const { props } = this
+        const { cameraMetrics } = props
+        const prevCropRect = cameraMetrics.cropRect
+
+        const invertedCameraMatrix = getInvertedCameraMatrix(cameraMetrics)
+        const projectedPoint = vec2.transformMat4(vec2.create(), toVec2(point), invertedCameraMatrix)
+
+        const nwCorner = cornerPointOfRect(prevCropRect, 'nw')
+        const seCorner = cornerPointOfRect(prevCropRect, 'se')
+
+        switch (side) {
+            case 'w': nwCorner[0] = Math.min(seCorner[0] - minCropRectSize, projectedPoint[0]); break
+            case 'n': nwCorner[1] = Math.min(seCorner[1] - minCropRectSize, projectedPoint[1]); break
+            case 'e': seCorner[0] = Math.max(nwCorner[0] + minCropRectSize, projectedPoint[0]); break
+            case 's': seCorner[1] = Math.max(nwCorner[1] + minCropRectSize, projectedPoint[1]); break
+        }
+
+        const wantedCropRect = rectFromPoints(nwCorner, seCorner)
+        const texturePolygon = createTexturePolygon(cameraMetrics)
+        const cropRect = limitRectResizeToTexture(prevCropRect, wantedCropRect, texturePolygon)
+
+        // Apply changes
+        if (this.state.actionInfo) {
+            this.setState({ actionInfo: null })
         }
         this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
     }
@@ -205,6 +234,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
                     rect={cropRectInViewCoords}
                     tilt={props.photoWork.tilt || 0}
                     onRectDrag={this.onRectDrag}
+                    onSideDrag={this.onSideDrag}
                     onCornerDrag={this.onCornerDrag}
                     onTiltChange={this.onTiltChange}
                 />
@@ -235,6 +265,51 @@ function createTexturePolygon(cameraMetrics: CameraMetrics): vec2[] {
     }
 
     return polygon
+}
+
+
+function limitRectResizeToTexture(prevRect: Rect, wantedRect: Rect, texturePolygon: Vec2Like[]): Rect {
+    let minFactor = 1
+
+    if (wantedRect.width < minCropRectSize) {
+        const minFactorX = (prevRect.width - minCropRectSize) / (wantedRect.width - minCropRectSize)
+        if (minFactorX < minFactor) {
+            minFactor = minFactorX
+        }
+    }
+    if (wantedRect.height < minCropRectSize) {
+        const minFactorY = (prevRect.height - minCropRectSize) / (wantedRect.height - minCropRectSize)
+        if (minFactorY < minFactor) {
+            minFactor = minFactorY
+        }
+    }
+
+    let nwStart: vec2 | null = null
+    let nwDirection: vec2 | null = null
+    let seStart: vec2 | null = null
+    let seDirection: vec2 | null = null
+    for (const corner of corners) {
+        const start = cornerPointOfRect(prevRect, corner)
+        const end = cornerPointOfRect(wantedRect, corner)
+        const direction = directionOfPoints(start, end)
+
+        const cutFactor = maxCutFactor(start, direction, texturePolygon)
+        if (cutFactor && cutFactor < minFactor) {
+            minFactor = cutFactor
+        }
+
+        if (corner === 'nw') {
+            nwStart = start
+            nwDirection = cutFactor ? direction : null
+        } else if (corner === 'se') {
+            seStart = start
+            seDirection = cutFactor ? direction : null
+        }
+    }
+
+    const nextNwPoint = ceilVec2(nwDirection ? movePoint(nwStart!, nwDirection, minFactor) : nwStart!)
+    const nextSePoint = floorVec2(seDirection ? movePoint(seStart!, seDirection, minFactor) : seStart!)
+    return rectFromPoints(nextNwPoint, nextSePoint)
 }
 
 

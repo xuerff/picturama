@@ -43,6 +43,14 @@ export function roundVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
     )
 }
 
+export function ceilVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
+    return vec2.fromValues(Math.ceil(vector[0]), Math.ceil(vector[1]))
+}
+
+export function floorVec2(vector: Vec2Like, fractionDigits: number = 0): vec2 {
+    return vec2.fromValues(Math.floor(vector[0]), Math.floor(vector[1]))
+}
+
 export function movePoint(point: Vec2Like, direction: Vec2Like, factor = 1): vec2 {
     return vec2.fromValues(point[0] + factor * direction[0], point[1] + factor * direction[1])
 }

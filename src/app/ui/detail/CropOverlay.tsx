@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import { bindMany } from 'common/util/LangUtil'
 
 import DragDropController from 'app/util/DragDropController'
-import { Rect, Point, Corner, corners } from 'app/util/GeometryTypes'
+import { Rect, Point, Corner, corners, Side, sides } from 'app/util/GeometryTypes'
 
 import TiltControl from './TiltControl'
 
@@ -19,12 +19,20 @@ const cornerSize = 20
 const tiltControlMargin = 20
 const minTiltHintGap = 50
 
+const halfHandleSize = 16
+
 const cornerPaths: { [K in Corner]: string } = {
     nw: `m${-cornerWidth/2},${cornerSize - cornerWidth/2} l0,${-cornerSize} l${cornerSize},0`,
     ne: `m${-cornerSize + cornerWidth/2},${-cornerWidth/2} l${cornerSize},0 l0,${cornerSize}`,
     sw: `m${-cornerWidth/2},${-cornerSize + cornerWidth/2} l0,${cornerSize} l${cornerSize},0`,
     se: `m${-cornerSize + cornerWidth/2},${cornerWidth/2} l${cornerSize},0 l0,${-cornerSize}`,
 }
+
+type DragInfo =
+    { type: 'rect', startPoint: Point } |
+    { type: 'side', side: Side, anchor: Point } |
+    { type: 'corner', corner: Corner, anchor: Point } |
+    null
 
 export interface Props {
     className?: any
@@ -33,26 +41,24 @@ export interface Props {
     rect: Rect
     tilt: number
     onRectDrag(deltaX: number, deltaY: number, isFinished: boolean): void
+    onSideDrag(side: Side, point: Point, isFinished: boolean): void
     onCornerDrag(corner: Corner, point: Point, isFinished: boolean): void
     onTiltChange(tilt: number): void
 }
 
 interface State {
-    dragInfo:
-        { type: 'rect', startPoint: Point } |
-        { type: 'corner', corner: Corner, anchor: Point } |
-        null
+    dragInfo: DragInfo
     isTilting: boolean
 }
 
 export default class CropOverlay extends React.Component<Props, State> {
 
     private rectDragDropController: DragDropController
-    private cornerDragDropController: DragDropController
+    private sideOrCornerDragDropController: DragDropController
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onTiltChange', 'renderCorner')
+        bindMany(this, 'onTiltChange', 'renderSide', 'renderCorner')
         this.state = { dragInfo: null, isTilting: false }
 
         this.rectDragDropController = new DragDropController({
@@ -71,25 +77,37 @@ export default class CropOverlay extends React.Component<Props, State> {
                 }
             }
         })
-        this.cornerDragDropController = new DragDropController({
+
+        this.sideOrCornerDragDropController = new DragDropController({
             onDragStart: (point: Point, event: React.MouseEvent) => {
                 const targetElem = event.target as SVGElement
                 const targetRect = targetElem.getBoundingClientRect()
-                const corner = targetElem.dataset.corner as Corner
                 const anchor: Point = {
-                    x: event.clientX - targetRect.left - cornerSize,
-                    y: event.clientY - targetRect.top - cornerSize,
+                    x: event.clientX - targetRect.left - halfHandleSize,
+                    y: event.clientY - targetRect.top - halfHandleSize,
                 }
-                this.setState({ dragInfo: { type: 'corner', corner, anchor } })
+                let dragInfo: DragInfo
+                const side = targetElem.dataset.side as Side | undefined
+                if (side) {
+                    dragInfo = { type: 'side', side, anchor }
+                } else {
+                    const corner = targetElem.dataset.corner as Corner
+                    dragInfo = { type: 'corner', corner, anchor }
+                }
+                this.setState({ dragInfo })
             },
             onDrag: (point: Point, isFinished: boolean, event: MouseEvent) => {
                 const { dragInfo } = this.state
-                if (dragInfo && dragInfo.type === 'corner') {
-                    const cornerPoint = {
+                if (dragInfo && (dragInfo.type === 'side' || dragInfo.type === 'corner')) {
+                    const targetPoint = {
                         x: point.x - dragInfo.anchor.x,
                         y: point.y - dragInfo.anchor.y,
                     }
-                    this.props.onCornerDrag(dragInfo.corner, cornerPoint, isFinished)
+                    if (dragInfo.type === 'side') {
+                        this.props.onSideDrag(dragInfo.side, targetPoint, isFinished)
+                    } else {
+                        this.props.onCornerDrag(dragInfo.corner, targetPoint, isFinished)
+                    }
                 }
                 if (isFinished) {
                     this.setState({ dragInfo: null })
@@ -101,7 +119,7 @@ export default class CropOverlay extends React.Component<Props, State> {
     componentDidMount() {
         const mainElem = findDOMNode(this.refs.main) as SVGElement
         this.rectDragDropController.setContainerElem(mainElem)
-        this.cornerDragDropController.setContainerElem(mainElem)
+        this.sideOrCornerDragDropController.setContainerElem(mainElem)
     }
 
     private onTiltChange(tilt: number, isFinished: boolean) {
@@ -135,6 +153,31 @@ export default class CropOverlay extends React.Component<Props, State> {
         )
     }
 
+    private renderSide(side: Side) {
+        const { rect } = this.props
+
+        const width = (side === 'n' || side === 's') ? rect.width - 2 * halfHandleSize : 2 * halfHandleSize
+        const height = (side === 'w' || side === 'e') ? rect.height - 2 * halfHandleSize : 2 * halfHandleSize
+
+        if (width <= 0 || height <= 0) {
+            return null
+        }
+
+        return (
+            <rect
+                key={side}
+                data-side={side}
+                className='CropOverlay-sideHandle'
+                style={{ cursor: (side === 'n' || side === 's') ? 'ns-resize' : 'ew-resize' }}
+                x={rect.x + (side === 'w' ? -halfHandleSize : side === 'e' ? rect.width - halfHandleSize : halfHandleSize)}
+                y={rect.y + (side === 'n' ? -halfHandleSize : side === 's' ? rect.height - halfHandleSize : halfHandleSize)}
+                width={width}
+                height={height}
+                onMouseDown={this.sideOrCornerDragDropController.onMouseDown}
+            />
+        )
+    }
+
     private renderCorner(corner: Corner) {
         const { rect } = this.props
 
@@ -155,11 +198,11 @@ export default class CropOverlay extends React.Component<Props, State> {
                     data-corner={corner}
                     className='CropOverlay-cornerHandle'
                     style={{ cursor }}
-                    x={-cornerSize}
-                    y={-cornerSize}
-                    width={2 * cornerSize}
-                    height={2 * cornerSize}
-                    onMouseDown={this.cornerDragDropController.onMouseDown}
+                    x={-halfHandleSize}
+                    y={-halfHandleSize}
+                    width={2 * halfHandleSize}
+                    height={2 * halfHandleSize}
+                    onMouseDown={this.sideOrCornerDragDropController.onMouseDown}
                 />
             </g>
         )
@@ -201,6 +244,7 @@ export default class CropOverlay extends React.Component<Props, State> {
                     strokeWidth={borderWidth}
                     onMouseDown={this.rectDragDropController.onMouseDown}
                 />
+                {sides.map(this.renderSide)}
                 {corners.map(this.renderCorner)}
                 {!state.dragInfo &&
                     <TiltControl
