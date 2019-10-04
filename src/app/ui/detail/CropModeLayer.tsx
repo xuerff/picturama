@@ -27,7 +27,7 @@ export interface Props {
     exifOrientation: ExifOrientation
     photoWork: PhotoWork
     cameraMetrics: CameraMetrics
-    onPhotoWorkEdited(photoWork: PhotoWork): void
+    onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean): void
     onDone(): void
 }
 
@@ -65,7 +65,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
 
         // Limit the crop rect to the texture
         const zoom = cameraMetrics.photoPosition.zoom
-        let nextRectLeftTop: Vec2Like = [startCropRect.x + deltaX / zoom, startCropRect.y + deltaY / zoom]
+        let nextRectLeftTop: Vec2Like = [startCropRect.x - deltaX / zoom, startCropRect.y - deltaY / zoom]
         if (!isPointInPolygon(nextRectLeftTop, fencePolygon)) {
             nextRectLeftTop = nearestPointOnPolygon(nextRectLeftTop, fencePolygon)
         }
@@ -107,7 +107,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (this.state.actionInfo) {
             this.setState({ actionInfo: null })
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, !isFinished)
     }
 
     private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
@@ -147,7 +147,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (this.state.actionInfo) {
             this.setState({ actionInfo: null })
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect })
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, !isFinished)
     }
 
     private onTiltChange(tilt: number) {
@@ -197,7 +197,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         this.onPhotoWorkEdited(photoWork)
     }
 
-    private onPhotoWorkEdited(photoWork: PhotoWork) {
+    private onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean) {
         const { cropRect } = photoWork
         if (cropRect) {
             if (isShallowEqual(cropRect, this.props.cameraMetrics.neutralCropRect)) {
@@ -207,7 +207,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
             }
         }
 
-        this.props.onPhotoWorkEdited(photoWork)
+        this.props.onPhotoWorkEdited(photoWork, keepCameraInPlace)
     }
 
     render() {

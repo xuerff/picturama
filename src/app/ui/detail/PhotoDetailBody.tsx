@@ -6,7 +6,7 @@ import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId } from 'comm
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
-import { Size, zeroSize, Insets, zeroInsets } from 'app/util/GeometryTypes'
+import { Size, zeroSize, Insets, zeroInsets, Rect } from 'app/util/GeometryTypes'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
@@ -56,6 +56,7 @@ interface State {
     loading: boolean
     canvasSize: Size
     textureSize: Size | null
+    boundsRect: Rect | null
     photoPosition: RequestedPhotoPosition
     /** The PhotoWork which is changed in crop mode but not yet saved */
     editedPhotoWork: PhotoWork | null
@@ -77,6 +78,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
             loading: true,
             canvasSize: zeroSize,
             textureSize: null,
+            boundsRect: null,
             photoPosition: 'contain',
             editedPhotoWork: null,
             cameraMetricsBuilder,
@@ -87,6 +89,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
     static getDerivedStateFromProps(nextProps: Props, prevState: State): Partial<State> | null {
         const { cameraMetricsBuilder } = prevState
         let nextState: Partial<State> | null = null
+        let nextBoundsRect = prevState.boundsRect
         let nextPhotoPosition = prevState.photoPosition
         let nextEditedPhotoWork = prevState.editedPhotoWork
 
@@ -98,10 +101,11 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
             const isCropMode = nextProps.mode === 'crop'
             cameraMetricsBuilder
                 .setInsets(isCropMode ? cropModeInsets : zeroInsets)
-            nextState = { ...nextState, prevMode: nextProps.mode }
+            nextBoundsRect = null
+            nextState = { ...nextState, prevMode: nextProps.mode, boundsRect: nextBoundsRect }
             if (isCropMode) {
                 nextPhotoPosition = 'contain'
-                nextState.photoPosition = 'contain'
+                nextState.photoPosition = nextPhotoPosition
             }
         }
 
@@ -117,11 +121,10 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         }
 
         if (prevState.textureSize && nextProps.photoWork) {
-            const prevCameraMetrics = prevState.cameraMetrics
             const cameraMetrics = cameraMetricsBuilder
                 .setCanvasSize(prevState.canvasSize)
                 .setTextureSize(prevState.textureSize)
-                .setBoundsRect(nextProps.mode === 'crop' && prevCameraMetrics ? prevCameraMetrics.neutralCropRect : null)
+                .setBoundsRect(nextBoundsRect)
                 .setExifOrientation(nextProps.orientation)
                 .setPhotoWork(nextEditedPhotoWork || nextProps.photoWork)
                 .setPhotoPosition(nextPhotoPosition)
@@ -164,8 +167,20 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         this.props.setMode('crop')
     }
 
-    private onPhotoWorkEdited(photoWork: PhotoWork) {
-        this.setState({ editedPhotoWork: photoWork })
+    private onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean) {
+        const prevState = this.state
+        const nextState: Partial<State> = { editedPhotoWork: photoWork }
+
+        if (keepCameraInPlace && !prevState.boundsRect) {
+            const photoWork = prevState.editedPhotoWork || this.props.photoWork
+            nextState.boundsRect = (photoWork && photoWork.cropRect) ||
+                (prevState.cameraMetrics && prevState.cameraMetrics.neutralCropRect) ||
+                null
+        } else if (!keepCameraInPlace && prevState.boundsRect) {
+            nextState.boundsRect = null
+        }
+
+        this.setState(nextState as any)
     }
 
     private onCropDone() {

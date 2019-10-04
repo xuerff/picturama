@@ -3,12 +3,12 @@ import classnames from 'classnames'
 import { Button, Classes } from '@blueprintjs/core'
 
 import { msg } from 'common/i18n/i18n'
+import { rotate } from 'common/util/EffectsUtil'
 import { bindMany } from 'common/util/LangUtil'
 import { PhotoWork } from 'common/CommonTypes'
 
 import RotateButtonGroup from 'app/ui/widget/RotateButtonGroup'
 import Toolbar from 'app/ui/widget/Toolbar'
-import { rotate } from 'common/util/EffectsUtil'
 
 
 export interface Props {
