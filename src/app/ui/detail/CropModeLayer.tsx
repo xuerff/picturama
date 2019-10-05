@@ -4,12 +4,12 @@ import classnames from 'classnames'
 import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
 import { vec2 } from 'gl-matrix'
 
-import { CameraMetrics, getInvertedCameraMatrix, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
-import { Point, Size, Rect, Side, Corner, corners } from 'app/util/GeometryTypes'
+import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
+import { Point, Size, Rect, Side, Corner, corners, Insets, zeroInsets } from 'app/util/GeometryTypes'
 import {
-    transformRect, oppositeCorner, cornerPointOfRect, toVec2, centerOfRect, intersectLineWithPolygon,
+    transformRect, oppositeCorner, cornerPointOfRect, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
-    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2
+    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2, boundsOfPoints
 } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
@@ -27,7 +27,7 @@ export interface Props {
     exifOrientation: ExifOrientation
     photoWork: PhotoWork
     cameraMetrics: CameraMetrics
-    onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean): void
+    onPhotoWorkEdited(photoWork: PhotoWork, boundsRect?: Rect | null): void
     onDone(): void
 }
 
@@ -35,6 +35,8 @@ interface State {
     actionInfo:
         { type: 'tilt', centerInTextureCoords: vec2, maxCropRectSize: Size } |
         { type: 'drag-rect', startCropRect: Rect, fencePolygon: vec2[] } |
+        { type: 'drag-side', dragStartMetrics: DragStartMetrics } |
+        { type: 'drag-corner', dragStartMetrics: DragStartMetrics } |
         null
 }
 
@@ -84,10 +86,20 @@ export default class CropModeLayer extends React.Component<Props, State> {
     private onSideDrag(side: Side, point: Point, isFinished: boolean) {
         const { props } = this
         const { cameraMetrics } = props
+        const { actionInfo } = this.state
         const prevCropRect = cameraMetrics.cropRect
+        let nextState: Partial<State> | null = null
 
-        const invertedCameraMatrix = getInvertedCameraMatrix(cameraMetrics)
-        const projectedPoint = vec2.transformMat4(vec2.create(), toVec2(point), invertedCameraMatrix)
+        let dragStartMetrics: DragStartMetrics
+        if (actionInfo && actionInfo.type === 'drag-side') {
+            dragStartMetrics = actionInfo.dragStartMetrics
+        } else {
+            dragStartMetrics = getDragStartMetrics(cameraMetrics)
+            nextState = { actionInfo: { type: 'drag-side', dragStartMetrics } }
+        }
+
+        const { projectedPoint, boundsRect } = getProjectedDragTarget(point, dragStartMetrics,
+            (side === 'e' || side === 'w') ? 'x-only' : 'y-only')
 
         const nwCorner = cornerPointOfRect(prevCropRect, 'nw')
         const seCorner = cornerPointOfRect(prevCropRect, 'se')
@@ -104,19 +116,31 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const cropRect = limitRectResizeToTexture(prevCropRect, wantedCropRect, texturePolygon)
 
         // Apply changes
-        if (this.state.actionInfo) {
-            this.setState({ actionInfo: null })
+        if (isFinished) {
+            nextState = { actionInfo: null }
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, !isFinished)
+        if (nextState) {
+            this.setState(nextState as any)
+        }
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsRect)
     }
 
     private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
         const { props } = this
         const { cameraMetrics } = props
+        const { actionInfo } = this.state
         const prevCropRect = cameraMetrics.cropRect
+        let nextState: Partial<State> | null = null
 
-        const invertedCameraMatrix = getInvertedCameraMatrix(cameraMetrics)
-        const projectedPoint = vec2.transformMat4(vec2.create(), toVec2(point), invertedCameraMatrix)
+        let dragStartMetrics: DragStartMetrics
+        if (actionInfo && actionInfo.type === 'drag-corner') {
+            dragStartMetrics = actionInfo.dragStartMetrics
+        } else {
+            dragStartMetrics = getDragStartMetrics(cameraMetrics)
+            nextState = { actionInfo: { type: 'drag-corner', dragStartMetrics } }
+        }
+
+        const { projectedPoint, boundsRect } = getProjectedDragTarget(point, dragStartMetrics, 'both')
         const oppositePoint = cornerPointOfRect(prevCropRect, oppositeCorner[corner])
 
         // Limit the crop rect to the texture
@@ -144,10 +168,13 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const cropRect = rectFromCornerPointAndSize(oppositePoint, nextCropRectSize)
 
         // Apply changes
-        if (this.state.actionInfo) {
-            this.setState({ actionInfo: null })
+        if (isFinished) {
+            nextState = { actionInfo: null }
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, !isFinished)
+        if (nextState) {
+            this.setState(nextState as any)
+        }
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsRect)
     }
 
     private onTiltChange(tilt: number) {
@@ -197,7 +224,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         this.onPhotoWorkEdited(photoWork)
     }
 
-    private onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean) {
+    private onPhotoWorkEdited(photoWork: PhotoWork, boundsRect?: Rect | null) {
         const { cropRect } = photoWork
         if (cropRect) {
             if (isShallowEqual(cropRect, this.props.cameraMetrics.neutralCropRect)) {
@@ -207,7 +234,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
             }
         }
 
-        this.props.onPhotoWorkEdited(photoWork, keepCameraInPlace)
+        this.props.onPhotoWorkEdited(photoWork, boundsRect)
     }
 
     render() {
@@ -320,4 +347,122 @@ function maxCutFactor(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoint
     } else {
         return null
     }
+}
+
+
+interface DragStartMetrics {
+    canvasSize: Size
+    insets: Insets
+    startZoom: number
+    startBoundsNwScreen: vec2
+    startBoundsSeScreen: vec2
+    startBoundsNwProjected: vec2
+    startBoundsSeProjected: vec2
+    textureBounds: Rect
+}
+
+function getDragStartMetrics(startCameraMetrics: CameraMetrics): DragStartMetrics {
+    const startBoundsNwProjected = cornerPointOfRect(startCameraMetrics.boundsRect, 'nw')
+    const startBoundsSeProjected = cornerPointOfRect(startCameraMetrics.boundsRect, 'se')
+    const startBoundsNwScreen = vec2.transformMat4(vec2.create(), startBoundsNwProjected, startCameraMetrics.cameraMatrix)
+    const startBoundsSeScreen = vec2.transformMat4(vec2.create(), startBoundsSeProjected, startCameraMetrics.cameraMatrix)
+
+    const texturePolygon = createTexturePolygon(startCameraMetrics)
+    const textureBounds = boundsOfPoints(texturePolygon)
+
+    return {
+        canvasSize: startCameraMetrics.canvasSize,
+        insets: startCameraMetrics.insets || zeroInsets,
+        startZoom: startCameraMetrics.photoPosition.zoom,
+        startBoundsNwScreen,
+        startBoundsSeScreen,
+        startBoundsNwProjected,
+        startBoundsSeProjected,
+        textureBounds,
+    }
+}
+
+
+function getProjectedDragTarget(screenPoint: Point, dragStartMetrics: DragStartMetrics, adjust: 'x-only' | 'y-only' | 'both'):
+    { projectedPoint: vec2, boundsRect: Rect }
+{
+    const {
+        canvasSize, insets, startZoom, startBoundsNwScreen, startBoundsSeScreen,
+        startBoundsNwProjected, startBoundsSeProjected, textureBounds
+    } = dragStartMetrics
+    const canvasPadding = 10
+
+    const startBoundsWidthScreen = startBoundsSeScreen[0] - startBoundsNwScreen[0]
+    const startBoundsHeightScreen = startBoundsSeScreen[1] - startBoundsNwScreen[1]
+
+    const insetsRightX = canvasSize.width - insets.right
+    const insetsBottomY = canvasSize.height - insets.bottom
+    const mainAreaWidth = insetsRightX - insets.left
+    const mainAreaHeight = insetsBottomY - insets.top
+
+    const boundsNwProjected = vec2.clone(startBoundsNwProjected)
+    const boundsSeProjected = vec2.clone(startBoundsSeProjected)
+
+    if (screenPoint.x < startBoundsNwScreen[0] && adjust !== 'y-only') {
+        if (screenPoint.x < insets.left) {
+            const borderX = insets.left - screenPoint.x
+            const borderWidth = insets.left - canvasPadding
+            const borderInsideProjected = boundsNwProjected[0] - (mainAreaWidth - startBoundsWidthScreen) / startZoom
+            const borderOutsideProjected = Math.min(borderInsideProjected - borderWidth / startZoom, textureBounds.x)
+            boundsNwProjected[0] = Math.max(textureBounds.x, borderInsideProjected - (borderX / borderWidth) * (borderInsideProjected - borderOutsideProjected))
+        } else {
+            boundsNwProjected[0] = Math.max(textureBounds.x, startBoundsNwProjected[0] - (startBoundsNwScreen[0] - screenPoint.x) * 2 / startZoom)
+        }
+    } else if (screenPoint.x > startBoundsSeScreen[0] && adjust !== 'y-only') {
+        const textureBoundsRight = textureBounds.x + textureBounds.width
+        if (screenPoint.x > insetsRightX) {
+            const borderX = insetsRightX - screenPoint.x
+            const borderWidth = insets.right - canvasPadding
+            const borderInsideProjected = boundsSeProjected[0] + (mainAreaWidth - startBoundsWidthScreen) / startZoom
+            const borderOutsideProjected = Math.max(borderInsideProjected + borderWidth / startZoom, textureBoundsRight)
+            boundsSeProjected[0] = Math.min(textureBoundsRight, borderInsideProjected + (borderX / borderWidth) * (borderInsideProjected - borderOutsideProjected))
+        } else {
+            boundsSeProjected[0] = Math.min(textureBoundsRight, startBoundsSeProjected[0] + (screenPoint.x - startBoundsSeScreen[0]) * 2 / startZoom)
+        }
+    }
+    if (screenPoint.y < startBoundsNwScreen[1] && adjust !== 'x-only') {
+        if (screenPoint.y < insets.top) {
+            const borderY = insets.top - screenPoint.y
+            const borderHeight = insets.top - canvasPadding
+            const borderInsideProjected = boundsNwProjected[1] - (mainAreaHeight - startBoundsHeightScreen) / startZoom
+            const borderOutsideProjected = Math.min(borderInsideProjected - borderHeight / startZoom, textureBounds.y)
+            boundsNwProjected[1] = Math.max(textureBounds.y, borderInsideProjected - (borderY / borderHeight) * (borderInsideProjected - borderOutsideProjected))
+        } else {
+            boundsNwProjected[1] = Math.max(textureBounds.y, startBoundsNwProjected[1] - (startBoundsNwScreen[1] - screenPoint.y) * 2 / startZoom)
+        }
+    } else if (screenPoint.y > startBoundsSeScreen[1] && adjust !== 'x-only') {
+        const textureBoundsRight = textureBounds.y + textureBounds.height
+        if (screenPoint.y > insetsBottomY) {
+            const borderY = insetsBottomY - screenPoint.y
+            const borderHeight = insets.bottom - canvasPadding
+            const borderInsideProjected = boundsSeProjected[1] + (mainAreaHeight - startBoundsHeightScreen) / startZoom
+            const borderOutsideProjected = Math.max(borderInsideProjected + borderHeight / startZoom, textureBoundsRight)
+            boundsSeProjected[1] = Math.min(textureBoundsRight, borderInsideProjected + (borderY / borderHeight) * (borderInsideProjected - borderOutsideProjected))
+        } else {
+            boundsSeProjected[1] = Math.min(textureBoundsRight, startBoundsSeProjected[1] + (screenPoint.y - startBoundsSeScreen[1]) * 2 / startZoom)
+        }
+    }
+
+    const zoom = Math.min(
+        startZoom,
+        mainAreaWidth / (boundsSeProjected[0] - boundsNwProjected[0]),
+        mainAreaHeight / (boundsSeProjected[1] - boundsNwProjected[1]))
+
+    const mainAreaCenterX = insets.left + mainAreaWidth / 2
+    const mainAreaCenterY = insets.top + mainAreaHeight / 2
+    const boundsCenterXProjected = (boundsNwProjected[0] + boundsSeProjected[0]) / 2
+    const boundsCenterYProjected = (boundsNwProjected[1] + boundsSeProjected[1]) / 2
+    const projectedX = boundsCenterXProjected + (Math.max(insets.left, Math.min(insetsRightX, screenPoint.x)) - mainAreaCenterX) / zoom
+    const projectedY = boundsCenterYProjected + (Math.max(insets.top, Math.min(insetsBottomY, screenPoint.y)) - mainAreaCenterY) / zoom
+
+    const result = {
+        projectedPoint: vec2.fromValues(projectedX, projectedY),
+        boundsRect: boundsOfPoints([boundsNwProjected, boundsSeProjected])
+    }
+    return result
 }

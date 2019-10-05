@@ -16,7 +16,7 @@ import ViewModeLayer from './ViewModeLayer'
 import './PhotoDetailBody.less'
 
 
-export const cropModeInsets: Insets = { left: 40, right: 80, top: 40, bottom: 40 }
+export const cropModeInsets: Insets = { left: 60, right: 80, top: 60, bottom: 60 }
 
 
 export interface Props {
@@ -167,20 +167,8 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         this.props.setMode('crop')
     }
 
-    private onPhotoWorkEdited(photoWork: PhotoWork, keepCameraInPlace?: boolean) {
-        const prevState = this.state
-        const nextState: Partial<State> = { editedPhotoWork: photoWork }
-
-        if (keepCameraInPlace && !prevState.boundsRect) {
-            const photoWork = prevState.editedPhotoWork || this.props.photoWork
-            nextState.boundsRect = (photoWork && photoWork.cropRect) ||
-                (prevState.cameraMetrics && prevState.cameraMetrics.neutralCropRect) ||
-                null
-        } else if (!keepCameraInPlace && prevState.boundsRect) {
-            nextState.boundsRect = null
-        }
-
-        this.setState(nextState as any)
+    private onPhotoWorkEdited(photoWork: PhotoWork, boundsRect?: Rect | null) {
+        this.setState({ editedPhotoWork: photoWork, boundsRect: boundsRect || null })
     }
 
     private onCropDone() {

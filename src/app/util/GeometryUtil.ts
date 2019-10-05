@@ -111,6 +111,46 @@ export function cornerPointOfRect(rect: Rect, corner: Corner): vec2 {
     return vec2.fromValues(x, y)
 }
 
+/**
+ * Returns a rect covering `rect1` and `rect2`.
+ */
+export function boundsOfRects(rect1: Rect, rect2: Rect): Rect {
+    const rect1Right = rect1.x + rect1.width
+    const rect1Bottom = rect1.y + rect1.height
+    const rect2Right = rect2.x + rect2.width
+    const rect2Bottom = rect2.y + rect2.height
+    if (rect1.x <= rect2.x && rect1.y <= rect2.y && rect1Right >= rect2Right && rect1Bottom >= rect2Bottom) {
+        // rect1 covers rect2
+        return rect1
+    } else if (rect2.x <= rect1.x && rect2.y <= rect1.y && rect2Right >= rect1Right && rect2Bottom >= rect1Bottom) {
+        // rect2 covers rect1
+        return rect2
+    } else {
+        const minX = Math.min(rect1.x, rect2.x)
+        const minY = Math.min(rect1.y, rect2.y)
+        return {
+            x: minX,
+            y: minY,
+            width: Math.max(rect1Right, rect2Right) - minX,
+            height: Math.max(rect1Bottom, rect2Bottom) - minY,
+        }
+    }
+}
+
+export function boundsOfPoints(points: Vec2Like[]): Rect {
+    let minX = Number.POSITIVE_INFINITY
+    let minY = Number.POSITIVE_INFINITY
+    let maxX = Number.NEGATIVE_INFINITY
+    let maxY = Number.NEGATIVE_INFINITY
+    for (const point of points) {
+        if (point[0] < minX) minX = point[0]
+        if (point[0] > maxX) maxX = point[0]
+        if (point[1] < minY) minY = point[1]
+        if (point[1] > maxY) maxY = point[1]
+    }
+    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
+}
+
 export function scaleSize(size: Size, factor: number): Size {
     if (factor === 1) {
         return size

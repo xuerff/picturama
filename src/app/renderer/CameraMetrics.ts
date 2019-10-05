@@ -13,6 +13,7 @@ export const maxZoom = 2
 export interface CameraMetrics {
     canvasSize: Size
     textureSize: Size
+    insets: Insets | null
     /**
      * The camera bounds. Pan and zoom actions are limited to this area.
      * In projected coordinates.
@@ -45,6 +46,7 @@ export interface CameraMetrics {
 export const zeroCameraMetrics: CameraMetrics = {
     canvasSize: zeroSize,
     textureSize: zeroSize,
+    insets: null,
     boundsRect: zeroRect,
     requestedPhotoPosition: 'contain',
     photoPosition: { centerX: 0, centerY: 0, zoom: 0 },
@@ -229,6 +231,7 @@ export class CameraMetricsBuilder {
         this.cameraMetrics = {
             canvasSize,
             textureSize,
+            insets,
             boundsRect,
             requestedPhotoPosition,
             photoPosition,
