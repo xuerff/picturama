@@ -16,6 +16,7 @@ Directory structure
         +-- common/           Shared code
         +-- package/          Resources needed for creating distributable packages (used by `electron-builder`)
         +-- static/           Static files to be copied directly to `dist`
+        +-- test-jest/        Unit tests
         +-- test-ui/          Code running in renderer electron process of UI Tester
         +-- typings/          TypeScript type definitions
     +-- submodules/           Third-party projects fetched as git submodules
@@ -185,6 +186,17 @@ The following files provide I18N:
   - `package.json` - Defines languagues available in mac package (see key `electronLanguages`)
   - `src/common/i18n/i18n.ts` - Defines available languages and provides the I18N logic
   - `src/common/i18n/text_*.ts` - Holds the I18N messages for each language
+
+
+
+Icons
+-----
+
+Used icon libs:
+
+  - [Blueprint icons](https://blueprintjs.com/docs/#icons) - using `@blueprintjs/icons`
+  - [Font Awesome](https://fontawesome.com/icons) - using `app/ui/widget/icon/FaIcon`
+  - [Material Design](https://material.io/tools/icons/) - using `react-icons/md`
 
 
 

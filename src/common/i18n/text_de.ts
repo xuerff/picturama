@@ -3,6 +3,11 @@ export default {
     common_cancel: 'Abbrechen',
     common_backToLibrary: 'Zurück zur Bibliothek',
 
+    CropModeToolbar_aspect_free: 'Frei',
+    CropModeToolbar_aspect_original: 'Original',
+    CropModeToolbar_aspect_square: 'Quadrat',
+    CropModeToolbar_changeToPortrait: 'Zu Hochformat wechseln',
+    CropModeToolbar_changeToLandscape: 'Zu Querformat wechseln',
     CropModeToolbar_reset: 'Zurücksetzen',
     CropModeToolbar_done: 'Fertig',
 

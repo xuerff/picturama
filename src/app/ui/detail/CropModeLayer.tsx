@@ -1,21 +1,23 @@
 import React from 'react'
 import classnames from 'classnames'
+import { vec2 } from 'gl-matrix'
 
 import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
-import { vec2 } from 'gl-matrix'
+import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
 import { Point, Size, Rect, Side, Corner, corners, Insets, zeroInsets } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
-    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2, boundsOfPoints
+    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2, boundsOfPoints, toVec2,
+    isPoint, boundsOfRects
 } from 'app/util/GeometryUtil'
 
 import CropOverlay from './CropOverlay'
-import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 import CropModeToolbar from './CropModeToolbar'
 import { createDragRectFencePolygon } from './CropModeUtil'
+import { AspectRatioType } from './DetailTypes'
 
 
 const minCropRectSize = 32
@@ -38,14 +40,55 @@ interface State {
         { type: 'drag-side', dragStartMetrics: DragStartMetrics } |
         { type: 'drag-corner', dragStartMetrics: DragStartMetrics } |
         null
+    aspectRatioType: AspectRatioType
+    isAspectRatioLandscape: boolean
 }
 
 export default class CropModeLayer extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onRectDrag', 'onSideDrag', 'onCornerDrag', 'onTiltChange')
-        this.state = { actionInfo: null }
+        bindMany(this, 'setAspectRatio', 'onRectDrag', 'onSideDrag', 'onCornerDrag', 'onTiltChange')
+        this.state = { actionInfo: null, aspectRatioType: 'free', isAspectRatioLandscape: true }
+    }
+
+    private setAspectRatio(aspectRatioType: AspectRatioType, isLandscape: boolean | null) {
+        const { props } = this
+        const { cameraMetrics } = props
+
+        if (isLandscape === null) {
+            // Detect landscape/portrait
+            const { width, height } = cameraMetrics.cropRect
+            isLandscape = (width === height) ? this.state.isAspectRatioLandscape : width > height
+        }
+
+        let nextCropRect: Rect | null = null
+        const aspectRatio = getAspectRatio(aspectRatioType, isLandscape, cameraMetrics.textureSize)
+        if (aspectRatio !== null) {
+            const { cropRect: prevCropRect, textureSize } = cameraMetrics
+            const texturePolygon = createTexturePolygon(cameraMetrics)
+
+            let wantedCropRectSize: Size
+            if (prevCropRect.width === textureSize.width || prevCropRect.height === textureSize.height) {
+                // The last crop rect was full size -> Make the next crop rect full size again
+                const maxSize = Math.max(textureSize.width, textureSize.height)
+                wantedCropRectSize = aspectRatio > 1 ?
+                    { width: maxSize, height: maxSize / aspectRatio } :
+                    { width: maxSize * aspectRatio, height: maxSize }
+            } else {
+                // The new crop rect's area should have the same size as the previous one
+                const width = Math.sqrt(prevCropRect.width * prevCropRect.height * aspectRatio)
+                wantedCropRectSize = { width, height: width / aspectRatio }
+            }
+
+            nextCropRect = scaleCropRectToTexture(centerOfRect(prevCropRect), wantedCropRectSize, texturePolygon)
+        }
+
+        // Apply changes
+        this.setState({ aspectRatioType, isAspectRatioLandscape: isLandscape })
+        if (nextCropRect) {
+            this.onPhotoWorkEdited({ ...props.photoWork, cropRect: nextCropRect })
+        }
     }
 
     private onRectDrag(deltaX: number, deltaY: number, isFinished: boolean) {
@@ -84,9 +127,9 @@ export default class CropModeLayer extends React.Component<Props, State> {
     }
 
     private onSideDrag(side: Side, point: Point, isFinished: boolean) {
-        const { props } = this
+        const { props, state } = this
         const { cameraMetrics } = props
-        const { actionInfo } = this.state
+        const { actionInfo } = state
         const prevCropRect = cameraMetrics.cropRect
         let nextState: Partial<State> | null = null
 
@@ -98,8 +141,9 @@ export default class CropModeLayer extends React.Component<Props, State> {
             nextState = { actionInfo: { type: 'drag-side', dragStartMetrics } }
         }
 
+        const isHorizontal = (side === 'e' || side === 'w')
         const { projectedPoint, boundsRect } = getProjectedDragTarget(point, dragStartMetrics,
-            (side === 'e' || side === 'w') ? 'x-only' : 'y-only')
+            isHorizontal ? 'x-only' : 'y-only')
 
         const nwCorner = cornerPointOfRect(prevCropRect, 'nw')
         const seCorner = cornerPointOfRect(prevCropRect, 'se')
@@ -111,7 +155,19 @@ export default class CropModeLayer extends React.Component<Props, State> {
             case 's': seCorner[1] = Math.max(nwCorner[1] + minCropRectSize, projectedPoint[1]); break
         }
 
-        const wantedCropRect = rectFromPoints(nwCorner, seCorner)
+        let wantedCropRect = rectFromPoints(nwCorner, seCorner)
+        const aspectRatio = getAspectRatio(state.aspectRatioType, state.isAspectRatioLandscape, cameraMetrics.textureSize)
+        if (aspectRatio) {
+            const wantedCropRectCenter = centerOfRect(wantedCropRect)
+            if (isHorizontal) {
+                wantedCropRect = rectFromCenterAndSize(wantedCropRectCenter,
+                    { width: wantedCropRect.width, height: wantedCropRect.width / aspectRatio })
+            } else {
+                wantedCropRect = rectFromCenterAndSize(wantedCropRectCenter,
+                    { width: wantedCropRect.height * aspectRatio, height: wantedCropRect.height })
+            }
+        }
+
         const texturePolygon = createTexturePolygon(cameraMetrics)
         const cropRect = limitRectResizeToTexture(prevCropRect, wantedCropRect, texturePolygon)
 
@@ -122,13 +178,13 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (nextState) {
             this.setState(nextState as any)
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsRect)
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsOfRects(boundsRect, cropRect))
     }
 
     private onCornerDrag(corner: Corner, point: Point, isFinished: boolean) {
-        const { props } = this
+        const { props, state } = this
         const { cameraMetrics } = props
-        const { actionInfo } = this.state
+        const { actionInfo } = state
         const prevCropRect = cameraMetrics.cropRect
         let nextState: Partial<State> | null = null
 
@@ -146,23 +202,45 @@ export default class CropModeLayer extends React.Component<Props, State> {
         // Limit the crop rect to the texture
         // The oppositePoint stays fixed, find width/height that fits into the texture
         const texturePolygon = createTexturePolygon(cameraMetrics)
-        const wantedCornerPoint = isPointInPolygon(projectedPoint, texturePolygon) ? projectedPoint : nearestPointOnPolygon(projectedPoint, texturePolygon)
-        const nextCropRectSize = {
-            width:  wantedCornerPoint[0] - oppositePoint[0],
-            height: wantedCornerPoint[1] - oppositePoint[1]
-        }
-        const xCutFactor = maxCutFactor(oppositePoint, [nextCropRectSize.width, 0], texturePolygon)
-        if (xCutFactor && xCutFactor < 1) {
-            nextCropRectSize.width *= xCutFactor
-        }
-        const yCutFactor = maxCutFactor(oppositePoint, [0, nextCropRectSize.height], texturePolygon)
-        if (yCutFactor && yCutFactor < 1) {
-            nextCropRectSize.height *= yCutFactor
-        }
         const cornerDirection = [
             corner === 'ne' || corner === 'se' ? 1 : -1,
             corner === 'sw' || corner === 'se' ? 1 : -1
         ]
+
+        let wantedCornerPoint: Vec2Like
+        const aspectRatio = getAspectRatio(state.aspectRatioType, state.isAspectRatioLandscape, cameraMetrics.textureSize)
+        if (aspectRatio) {
+            let rawWidth  = Math.abs(projectedPoint[0] - oppositePoint[0])
+            let rawHeight = Math.abs(projectedPoint[1] - oppositePoint[1])
+            if (rawWidth / rawHeight < aspectRatio) {
+                rawWidth = rawHeight * aspectRatio
+            } else {
+                rawHeight = rawWidth / aspectRatio
+            }
+            wantedCornerPoint = [
+                oppositePoint[0] + cornerDirection[0] * rawWidth,
+                oppositePoint[1] + cornerDirection[1] * rawHeight
+            ]
+        } else {
+            wantedCornerPoint = isPointInPolygon(projectedPoint, texturePolygon) ? projectedPoint : nearestPointOnPolygon(projectedPoint, texturePolygon)
+        }
+
+        const nextCropRectSize = {
+            width:  wantedCornerPoint[0] - oppositePoint[0],
+            height: wantedCornerPoint[1] - oppositePoint[1]
+        }
+        let xCutFactor = maxCutFactor(oppositePoint, [nextCropRectSize.width, 0], texturePolygon) || 1
+        let yCutFactor = maxCutFactor(oppositePoint, [0, nextCropRectSize.height], texturePolygon) || 1
+        if (aspectRatio) {
+            xCutFactor = yCutFactor = Math.min(xCutFactor, yCutFactor)
+        }
+        if (xCutFactor < 1) {
+            nextCropRectSize.width *= xCutFactor
+        }
+        if (yCutFactor < 1) {
+            nextCropRectSize.height *= yCutFactor
+        }
+
         nextCropRectSize.width  = cornerDirection[0] * Math.max(minCropRectSize, Math.floor(cornerDirection[0] * nextCropRectSize.width))
         nextCropRectSize.height = cornerDirection[1] * Math.max(minCropRectSize, Math.floor(cornerDirection[1] * nextCropRectSize.height))
         const cropRect = rectFromCornerPointAndSize(oppositePoint, nextCropRectSize)
@@ -174,7 +252,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         if (nextState) {
             this.setState(nextState as any)
         }
-        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsRect)
+        this.onPhotoWorkEdited({ ...props.photoWork, cropRect }, isFinished ? null : boundsOfRects(boundsRect, cropRect))
     }
 
     private onTiltChange(tilt: number) {
@@ -210,12 +288,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const texturePolygon = createTexturePolygon(cameraMetrics)
         const nextProjectionMatrix = createProjectionMatrix(cameraMetrics.textureSize, props.exifOrientation, photoWork)
         const nextCropRectCenter = vec2.transformMat4(vec2.create(), centerInTextureCoords, nextProjectionMatrix)
-        let outFactors: number[]
-        outFactors = intersectLineWithPolygon(nextCropRectCenter, [maxCropRectSize.width / 2, maxCropRectSize.height / 2], texturePolygon)
-        let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
-        outFactors = intersectLineWithPolygon(nextCropRectCenter, [maxCropRectSize.width / 2, -maxCropRectSize.height / 2], texturePolygon)
-        minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
-        photoWork.cropRect = roundRect(rectFromCenterAndSize(nextCropRectCenter, scaleSize(maxCropRectSize, minFactor)))
+        photoWork.cropRect = scaleCropRectToTexture(nextCropRectCenter, maxCropRectSize, texturePolygon)
 
         // Apply changes
         if (nextState) {
@@ -238,7 +311,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
     }
 
     render() {
-        const { props } = this
+        const { props, state } = this
         const { cameraMetrics } = props
         if (!cameraMetrics) {
             return null
@@ -250,7 +323,10 @@ export default class CropModeLayer extends React.Component<Props, State> {
             <>
                 <CropModeToolbar
                     className={classnames(props.topBarClassName, 'CropModeLayer-toolbar')}
+                    aspectRatioType={state.aspectRatioType}
+                    isAspectRatioLandscape={state.isAspectRatioLandscape}
                     photoWork={props.photoWork}
+                    setAspectRatio={this.setAspectRatio}
                     onPhotoWorkEdited={props.onPhotoWorkEdited}
                     onDone={props.onDone}
                 />
@@ -269,6 +345,22 @@ export default class CropModeLayer extends React.Component<Props, State> {
         )
     }
 
+}
+
+
+function getAspectRatio(aspectRatioType: AspectRatioType, isLandscape: boolean, textureSize: Size): number | null {
+    let value: number
+    switch (aspectRatioType) {
+        case 'free':     return null
+        case 'original': value = Math.max(1, textureSize.width, textureSize.height) / Math.max(1, Math.min(textureSize.width, textureSize.height)); break
+        case '1:1':      value = 1; break
+        case '16:9':     value = 16 / 9; break
+        case '4:3':      value = 4 / 3; break
+        case '3:2':      value = 3 / 2; break
+        default: throw new Error('Unsupported aspectRatioType: ' + aspectRatioType)
+    }
+
+    return isLandscape ? value : 1 / value
 }
 
 
@@ -292,6 +384,20 @@ function createTexturePolygon(cameraMetrics: CameraMetrics): vec2[] {
     }
 
     return polygon
+}
+
+
+function scaleCropRectToTexture(cropRectCenter: Vec2Like | Point, maxCropRectSize: Size, texturePolygon: Vec2Like[]): Rect {
+    if (isPoint(cropRectCenter)) {
+        cropRectCenter = toVec2(cropRectCenter)
+    }
+
+    let outFactors: number[]
+    outFactors = intersectLineWithPolygon(cropRectCenter, [maxCropRectSize.width / 2, maxCropRectSize.height / 2], texturePolygon)
+    let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
+    outFactors = intersectLineWithPolygon(cropRectCenter, [maxCropRectSize.width / 2, -maxCropRectSize.height / 2], texturePolygon)
+    minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
+    return roundRect(rectFromCenterAndSize(cropRectCenter, scaleSize(maxCropRectSize, minFactor)))
 }
 
 

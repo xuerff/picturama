@@ -3,6 +3,11 @@ export default {
     common_cancel: 'Cancel',
     common_backToLibrary: 'Back to library',
 
+    CropModeToolbar_aspect_free: 'Free',
+    CropModeToolbar_aspect_original: 'Original',
+    CropModeToolbar_aspect_square: 'Square',
+    CropModeToolbar_changeToPortrait: 'Change to portrait',
+    CropModeToolbar_changeToLandscape: 'Change to landscape',
     CropModeToolbar_reset: 'Reset',
     CropModeToolbar_done: 'Done',
 
