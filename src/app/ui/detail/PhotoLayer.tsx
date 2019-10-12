@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 
-import { ExifOrientation } from 'common/CommonTypes'
+import { ExifOrientation, Size, zeroSize } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -10,7 +10,6 @@ import { showError } from 'app/ErrorPresenter'
 import { CameraMetrics } from 'app/renderer/CameraMetrics'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
-import { Size, zeroSize } from 'app/util/GeometryTypes'
 
 import { DetailMode } from './DetailTypes'
 import TextureCache from './TextureCache'

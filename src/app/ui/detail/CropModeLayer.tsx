@@ -2,11 +2,11 @@ import React from 'react'
 import classnames from 'classnames'
 import { vec2 } from 'gl-matrix'
 
-import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
+import { PhotoWork, ExifOrientation, Size } from 'common/CommonTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
-import { Point, Size, Rect, Side, Corner, corners, Insets, zeroInsets } from 'app/util/GeometryTypes'
+import { Point, Rect, Side, Corner, corners, Insets, zeroInsets } from 'app/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, centerOfRect, intersectLineWithPolygon,
     rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,

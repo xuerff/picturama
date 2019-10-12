@@ -1,8 +1,9 @@
 import { mat4, vec2 } from 'gl-matrix'
 
+import { Size } from 'common/CommonTypes'
 import { round } from 'common/util/LangUtil'
 
-import { Point, Rect, Corner, Size } from './GeometryTypes'
+import { Point, Rect, Corner } from './GeometryTypes'
 
 
 export type Vec2Like = vec2 | [ number, number ]

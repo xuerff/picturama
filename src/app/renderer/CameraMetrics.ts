@@ -1,10 +1,10 @@
 import { mat4 } from 'gl-matrix'
 
-import { ExifOrientation, PhotoWork } from 'common/CommonTypes'
+import { ExifOrientation, PhotoWork, Size, zeroSize } from 'common/CommonTypes'
 import { isShallowEqual } from 'common/util/LangUtil'
 import { getTotalRotationTurns } from 'common/util/DataUtil'
 
-import { Size, zeroSize, Rect, zeroRect, Insets, zeroInsets } from 'app/util/GeometryTypes'
+import { Rect, zeroRect, Insets, zeroInsets } from 'app/util/GeometryTypes'
 
 
 const globalMinZoom = 0.0000001

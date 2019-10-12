@@ -75,6 +75,7 @@ export interface Size {
     width: number
     height: number
 }
+export const zeroSize: Size = { width: 0, height: 0 }
 
 
 /** An EXIF orientation. See: https://www.impulseadventure.com/photo/exif-orientation.html */

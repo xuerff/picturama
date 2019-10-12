@@ -1,4 +1,4 @@
-export type Size = { width: number, height: number }
+import { Size } from 'common/CommonTypes'
 
 
 let scrollbarSize: Size | null = null
