@@ -13,17 +13,17 @@ let errorToastKey: string | undefined = undefined
 let errorReport = ''
 
 
-export function showError(msg: string, error?: Error) {
+export function showError(msg: string, error?: unknown) {
     console.error(msg, error)
     if (!errorReport) {
         errorReport = createBasicErrorReport(msg, 'app')
         new Promise(
             resolve => {
-                if (!error) {
-                    resolve(null)
-                } else {
+                if (error instanceof Error) {
                     errorReport += '\n\n' + error.name + ': ' + error.message
                     mapStackTrace(error.stack, resolve)
+                } else {
+                    resolve(null)
                 }
             })
             .then((mappedStack: string[] | null) => {
