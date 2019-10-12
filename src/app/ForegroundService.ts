@@ -51,7 +51,7 @@ async function executeForegroundAction(action: string, params: any): Promise<any
             setTags(params.updatedTags)
         }
     } else if (action === 'renderPhoto') {
-        return renderPhoto(params.photo, params.photoWork, params.maxSize)
+        return renderPhoto(params.photo, params.photoWork, params.maxSize, params.options)
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }

@@ -1,15 +1,20 @@
-import { PhotoId, Size, Photo } from 'common/CommonTypes'
+import config from 'common/config'
+import { PhotoId, Size, Photo, PhotoRenderOptions } from 'common/CommonTypes'
 import { getThumbnailPath } from 'common/util/DataUtil'
-
-import { fsExists, fsUnlink, fsWriteFile } from 'background/util/FileUtil'
-import { fetchPhotoWork } from './PhotoWorkStore'
-import ForegroundClient from 'background/ForegroundClient'
 import SerialJobQueue from 'common/util/SerialJobQueue'
+
+import ForegroundClient from 'background/ForegroundClient'
+import { fsExists, fsUnlink, fsWriteFile } from 'background/util/FileUtil'
+import { parseImageDataUrl } from 'background/util/NodeUtil'
+
+import { fetchPhotoWork } from './PhotoWorkStore'
 
 
 // Default row height of 'justified-layout' is 320px.
 // Max width is relatively high in order to get most panorama images with full row height.
 const maxThumbnailSize: Size = { width: 1024, height: 320 }
+
+const thumbnailRenderOptions: PhotoRenderOptions = { format: config.workExt }
 
 
 const createThumbnailQueue = new SerialJobQueue(
@@ -31,13 +36,9 @@ async function processNextCreateThumbnail(job: { photo: Photo }): Promise<void> 
 
     const photoWork = await fetchPhotoWork(photo.master_dir, photo.master_filename)
 
-    const thumbnailData = await ForegroundClient.renderPhoto(photo, photoWork, maxThumbnailSize)
+    const thumbnailDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, maxThumbnailSize, thumbnailRenderOptions)
 
-    // thumbnailData is a data URL. Example: 'data:image/webp;base64,UklG...'
-    const dataPrefix = 'base64,'
-    const base64Data = thumbnailData.substr(thumbnailData.indexOf(dataPrefix) + dataPrefix.length)
-    const dataBuffer = new Buffer(base64Data, 'base64')
-    await fsWriteFile(thumbnailPath, dataBuffer)
+    await fsWriteFile(thumbnailPath, parseImageDataUrl(thumbnailDataUrl))
     console.log('Stored ' + thumbnailPath)
 }
 

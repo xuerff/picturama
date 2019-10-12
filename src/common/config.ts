@@ -3,6 +3,8 @@ import os from 'os'
 
 import npmPackage from '../../package.json'
 
+import { PhotoRenderFormat } from 'common/CommonTypes'
+
 
 let dotAnsel = `${os.homedir()}/.ansel`
 let dbMigrationsFolder = `${process.resourcesPath}/app/migrations`
@@ -35,8 +37,7 @@ export default {
     acceptedRawExtensions: [ 'raf', 'cr2', 'arw', 'dng' ],
     acceptedNonRawExtensions: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
     watchedFormats: /([$#\w\d]+)-([$#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
-    exportFormats: [ 'jpg', 'png', 'webp' ],
-    workExt: 'webp',
+    workExt: 'webp' as  PhotoRenderFormat,
     dotAnsel,
     menusFolder,
     keymapsFolder: `${anselFolder}/keymaps`,

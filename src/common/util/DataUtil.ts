@@ -21,6 +21,15 @@ export function getRenderedRawPath(photoId: PhotoId): string {
 }
 
 export function getNonRawPath(photo: Photo): string {
+    // TODO: Revive Legacy code of 'version' feature
+    /*
+    const photoDetail = await fetchPhotoDetail(photo.id)
+    if (photoDetail.versions.length > 0) {
+        const last = photoDetail.versions[photoDetail.versions.length - 1]
+        return last.output
+    }
+    */
+
     return photo.master_is_raw ? getRenderedRawPath(photo.id) : getMasterPath(photo)
 }
 

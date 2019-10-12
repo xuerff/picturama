@@ -165,3 +165,16 @@ export type PhotoFilter =
     { readonly type: 'tag', readonly tagId: TagId }
     // TODO: Revive Legacy code of 'version' feature
     // -> Add 'processed'
+
+
+export interface PhotoRenderOptions {
+    format: PhotoRenderFormat
+    /** Quality between `0` and `1`. Will be ignored if `format` is `png` */
+    quality?: number
+}
+export type PhotoRenderFormat = 'jpg' | 'webp' | 'png'
+export const photoRenderFormats: PhotoRenderFormat[] = [ 'jpg', 'webp', 'png' ]
+
+
+export interface PhotoExportOptions extends PhotoRenderOptions {
+}

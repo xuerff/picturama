@@ -4,6 +4,7 @@ import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
 import AppWindowController from 'background/AppWindowController'
+import { exportPhoto } from 'background/ExportController'
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport, toggleImportPaused, cancelImport } from 'background/ImportController'
 import { fetchPhotoWork, storePhotoWork } from 'background/store/PhotoWorkStore'
@@ -97,6 +98,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'storePhotoTags') {
         const shouldFetchTags = await storePhotoTags(params.photoId, params.photoTags)
         return shouldFetchTags ? (await fetchTags()) : null
+    } else if (action === 'exportPhoto') {
+        return exportPhoto(params.photo, params.folderPath, params.options)
     } else {
         throw new Error('Unknown background action: ' + action)
     }

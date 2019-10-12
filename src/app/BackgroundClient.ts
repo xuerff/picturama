@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig, Settings, PhotoSet } from 'common/CommonTypes'
+import { UiConfig, Settings, PhotoSet, PhotoExportOptions } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
@@ -127,6 +127,9 @@ export default {
         return callOnBackground('storePhotoTags', { photoId, photoTags })
     },
 
+    exportPhoto(photo: Photo, folderPath: string, options: PhotoExportOptions): Promise<void> {
+        return callOnBackground('exportPhoto', { photo, folderPath, options })
+    },
 }
 
 async function callOnBackground(action: string, params: any = null): Promise<any> {

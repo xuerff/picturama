@@ -74,7 +74,7 @@ export type RequestedPhotoPosition = 'contain' | PhotoPosition
 
 export class CameraMetricsBuilder {
 
-    private canvasSize: Size = zeroSize
+    private canvasSize: Size | null = null
     private textureSize: Size = zeroSize
     private insets: Insets = zeroInsets
     private boundsRect: Rect | null = null
@@ -91,7 +91,11 @@ export class CameraMetricsBuilder {
         this.photoWork = {}
     }
 
-    setCanvasSize(canvasSize: Size): this {
+    /**
+     * Sets the canvas size.
+     * If set to `null` the canvas size will be set to the size of the bounds rect (which falls back to the crop rect).
+     */
+    setCanvasSize(canvasSize: Size | null): this {
         if (!isShallowEqual(this.canvasSize, canvasSize)) {
             this.canvasSize = canvasSize
             this.isDirty = true
@@ -180,7 +184,6 @@ export class CameraMetricsBuilder {
         }
 
         const { textureSize, photoWork, exifOrientation, insets, requestedPhotoPosition } = this
-        let { canvasSize } = this
 
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
         const insetsWidth = insets.left + insets.right
@@ -188,6 +191,7 @@ export class CameraMetricsBuilder {
         const neutralCropRect = updateNeutralCropRect(rotationTurns, textureSize, this.cameraMetrics && this.cameraMetrics.neutralCropRect)
         const cropRect = photoWork.cropRect || neutralCropRect
         const boundsRect = this.boundsRect || cropRect
+        let canvasSize: Size = this.canvasSize || { width: boundsRect.width, height: boundsRect.height }
 
         let photoPosition: PhotoPosition
         const minZoom = (boundsRect.width === 0 || boundsRect.height === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?

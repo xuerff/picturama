@@ -1,4 +1,4 @@
-import { Photo, PhotoWork, Size } from 'common/CommonTypes'
+import { Photo, PhotoWork, Size, PhotoRenderOptions, PhotoRenderFormat } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
@@ -13,7 +13,14 @@ import PhotoCanvas from './PhotoCanvas'
 assertRendererProcess()
 
 
-type RenderJob = { nonRawUrl: string, photo: Photo, photoWork: PhotoWork, maxSize: Size, profiler: Profiler | null }
+interface RenderJob {
+    nonRawUrl: string
+    photo: Photo
+    photoWork: PhotoWork
+    maxSize: Size | null
+    options: PhotoRenderOptions
+    profiler: Profiler | null
+}
 
 const queue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.nonRawUrl === existingJob.nonRawUrl) ? newJob : null,
@@ -23,15 +30,23 @@ const queue = new SerialJobQueue(
 let cameraMetricsBuilder = new CameraMetricsBuilder()
 let canvas: PhotoCanvas | null = null
 
+const mimeTypeByFormat: { [K in PhotoRenderFormat]: string } = {
+    jpg:  'image/jpeg',
+    webp: 'image/webp',
+    png:  'image/png',
+}
 
-export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size, profiler: Profiler | null = null): Promise<string> {
+
+export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions,
+    profiler: Profiler | null = null): Promise<string>
+{
     const nonRawUrl = getNonRawUrl(photo)
-    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, maxSize, profiler })
+    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, maxSize, options, profiler })
 }
 
 
 async function renderNext(job: RenderJob): Promise<string> {
-    const { nonRawUrl, photo, photoWork, profiler } = job
+    const { nonRawUrl, photo, photoWork, options, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
     if (canvas === null) {
@@ -44,7 +59,7 @@ async function renderNext(job: RenderJob): Promise<string> {
     // Get camera metrics
     const cameraMetrics = cameraMetricsBuilder
         .setCanvasSize(job.maxSize)
-        .setAdjustCanvasSize(true)
+        .setAdjustCanvasSize(job.maxSize !== null)
         .setTextureSize({ width: texture.width, height: texture.height })
         .setExifOrientation(photo.orientation)
         .setPhotoWork(photoWork)
@@ -70,7 +85,7 @@ async function renderNext(job: RenderJob): Promise<string> {
         throw new Error('Photo rendering canvas not valid')
     }
 
-    const dataUrl = canvas.getElement().toDataURL('image/webp')
+    const dataUrl = canvas.getElement().toDataURL(mimeTypeByFormat[options.format], options.quality)
     if (profiler) profiler.addPoint('Encoded thumbnail to data URL')
     return dataUrl
 }

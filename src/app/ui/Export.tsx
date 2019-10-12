@@ -1,29 +1,20 @@
 import { remote } from 'electron'
-import fs from 'fs'
 import BluebirdPromise from 'bluebird'
 import notifier from 'node-notifier'
-import sharp from 'sharp'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 
-import { PhotoId, PhotoById, LoadedPhotoSection, Photo } from 'common/CommonTypes'
-import config from 'common/config'
-import { getNonRawPath, getMasterPath } from 'common/util/DataUtil'
+import { PhotoId, PhotoById, LoadedPhotoSection, PhotoRenderFormat, photoRenderFormats } from 'common/CommonTypes'
 import { bindMany } from 'common/util/LangUtil'
-import { parsePath } from 'common/util/TextUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
 import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'app/controller/HotkeyController'
 import { closeExportAction } from 'app/state/actions'
 import { AppState } from 'app/state/StateTypes'
+import { showError } from 'app/ErrorPresenter'
 
 import Progress from './Progress'
-
-
-const fsReadFile = BluebirdPromise.promisify(fs.readFile)
-
-let libraw: any | false | null = null
 
 
 interface OwnProps {
@@ -45,7 +36,7 @@ export interface Props extends OwnProps, StateProps, DispatchProps {
 interface State {
     folder: string | null
     quality: number
-    format: string
+    format: PhotoRenderFormat
     progress: { processed: number, total: number, photosDir: string } | null
 }
 
@@ -55,18 +46,13 @@ export class Export extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-
-        bindMany(this, 'onEachPhoto', 'processImg')
-
+        bindMany(this, 'onEachPhoto')
         this.state = {
             folder: null,
             quality: 90,
-            format: config.exportFormats[0],
+            format: photoRenderFormats[0],
             progress: null
         }
-
-        this.onEachPhoto = this.onEachPhoto.bind(this)
-        this.processImg = this.processImg.bind(this)
     }
 
     componentDidMount() {
@@ -92,21 +78,6 @@ export class Export extends React.Component<Props, State> {
         )
     }
 
-    processImg(photo: Photo, source) {
-        const sharpObject = sharp(source)
-            .rotate()
-            .withMetadata()
-
-        switch(this.state.format) {
-            case 'png': sharpObject.png({ quality: this.state.quality }); break
-            case 'webp': sharpObject.webp({ quality: this.state.quality }); break
-            default: sharpObject.jpeg({ quality: this.state.quality }); break
-        }
-
-        const filenameParts = parsePath(photo.master_filename)
-        sharpObject.toFile(`${this.state.folder}/${filenameParts.name}.${this.state.format}`)
-    }
-
     afterExport() {
         notifier.notify({
             title: 'Ansel',
@@ -117,47 +88,21 @@ export class Export extends React.Component<Props, State> {
     }
 
     async onEachPhoto(photoId: PhotoId, i: number) {
-        const photo = this.props.photoData[photoId]
+        const { props, state } = this
+        const photo = props.photoData[photoId]
 
-        const pathParts = parsePath(photo.master_filename)
-        const extension = pathParts.ext.toLowerCase()
-
-        if (!this.state.folder)
+        if (!state.folder)
             return false
 
         this.setState({
             progress: {
                 processed: i + 1,
-                total: this.props.photoIds.length,
-                photosDir: this.state.folder
+                total: props.photoIds.length,
+                photosDir: state.folder
             }
         })
 
-        const photoDetail = await BackgroundClient.fetchPhotoDetail(photoId)
-        if (photoDetail.versions.length > 0) {
-            const last = photoDetail.versions[photoDetail.versions.length - 1]
-            return this.processImg(photo, last.output)
-        }
-
-        if (config.acceptedRawExtensions.indexOf(extension) !== -1) {
-            if (libraw !== false) {
-                if (!libraw) {
-                    try {
-                        libraw = require('libraw')
-                    } catch (error) {
-                        libraw = false
-                        console.log('libraw is not supported', error)
-                    }
-                }
-                if (libraw) {
-                    return libraw.extract(getMasterPath(photo), `${config.tmp}/ansel-export-temp-${photo.id}`)
-                        .then(imgPath => fsReadFile(imgPath))
-                        .then(img => this.processImg(photo, img))
-                }
-            }
-        }
-
-        return this.processImg(photo, getNonRawPath(photo))
+        return BackgroundClient.exportPhoto(photo, state.folder, { format: state.format, quality: state.quality })
     }
 
     handleSubmit(e) {
@@ -165,6 +110,7 @@ export class Export extends React.Component<Props, State> {
 
         BluebirdPromise.each(this.props.photoIds, this.onEachPhoto)
             .then(this.afterExport.bind(this))
+            .catch(error => showError('Export failed', error))
     }
 
     updateQuality() {
@@ -174,11 +120,11 @@ export class Export extends React.Component<Props, State> {
 
     updateFormat() {
         const formatElem = findDOMNode(this.refs.format) as HTMLSelectElement
-        this.setState({ format: formatElem.value })
+        this.setState({ format: formatElem.value as PhotoRenderFormat })
     }
 
     render() {
-        let formats = config.exportFormats
+        let formats = photoRenderFormats
             .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>)
 
         return (

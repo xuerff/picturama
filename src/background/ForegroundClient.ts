@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, Size } from 'common/CommonTypes'
+import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, Size, PhotoRenderOptions } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 
 
@@ -68,8 +68,8 @@ export default {
         return callOnForeground('onPhotoTrashed', { photoIds, updatedTags })
     },
 
-    async renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size): Promise<string> {
-        return callOnForeground('renderPhoto', { photo, photoWork, maxSize })
+    async renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions): Promise<string> {
+        return callOnForeground('renderPhoto', { photo, photoWork, maxSize, options })
     },
 }
 
