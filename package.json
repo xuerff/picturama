@@ -95,6 +95,7 @@
     "node-notifier": "5.4.0",
     "node-pre-gyp": "^0.13.0",
     "normalize.css": "^8.0.1",
+    "piexifjs": "1.0.5",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-icons": "^3.7.0",

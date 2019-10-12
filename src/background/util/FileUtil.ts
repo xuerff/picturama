@@ -9,6 +9,7 @@ export const fsRename = promisify(fs.rename)
 export const fsRmDir = promisify(fs.rmdir)
 export const fsStat = promisify(fs.stat)
 export const fsUnlink = promisify(fs.unlink)
+export const fsUtimes = promisify(fs.utimes)
 export const fsWriteFile = promisify(fs.writeFile)
 
 

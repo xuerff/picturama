@@ -102,7 +102,7 @@ export class Export extends React.Component<Props, State> {
             }
         })
 
-        return BackgroundClient.exportPhoto(photo, state.folder, { format: state.format, quality: state.quality })
+        return BackgroundClient.exportPhoto(photo, state.folder, { format: state.format, quality: state.quality, withMetadata: true })
     }
 
     handleSubmit(e) {

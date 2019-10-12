@@ -6413,6 +6413,11 @@ picomatch@^2.0.4:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.0.7.tgz#514169d8c7cd0bdbeecc8a2609e34a7163de69f6"
   integrity sha512-oLHIdio3tZ0qH76NybpeneBhYVj0QFTfXEFTc/B3zKQspYfYYkWYgFsmzo+4kvId/bQRcNkVeguI3y+CD22BtA==
 
+piexifjs@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/piexifjs/-/piexifjs-1.0.5.tgz#74a92f509f99fd6cc658b2a1aec3c36ebb877e5c"
+  integrity sha512-WzkgGzqJ6+lgHyBIpsbnqNEo3ANBCp/CoOzekxptC6wAS+9Ku+G9IT8Fp3GvLeiuoA9RklYvGbtotUArIByypQ==
+
 pify@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"

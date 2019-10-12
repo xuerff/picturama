@@ -177,4 +177,5 @@ export const photoRenderFormats: PhotoRenderFormat[] = [ 'jpg', 'webp', 'png' 
 
 
 export interface PhotoExportOptions extends PhotoRenderOptions {
+    withMetadata: boolean
 }
