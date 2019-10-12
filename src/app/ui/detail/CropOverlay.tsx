@@ -219,7 +219,10 @@ export default class CropOverlay extends React.Component<Props, State> {
         return (
             <svg
                 ref='main'
-                className={classnames(props.className, 'CropOverlay', { isDraggingRect: dragInfo && dragInfo.type === 'rect' })}
+                className={classnames(props.className, 'CropOverlay', {
+                    isChanging: state.isTilting || state.dragInfo,
+                    isDraggingRect: dragInfo && dragInfo.type === 'rect'
+                })}
                 width={width}
                 height={height}
                 viewBox={`0 0 ${width} ${height}`}
