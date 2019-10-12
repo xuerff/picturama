@@ -1,5 +1,5 @@
-import { Photo, PhotoWork } from 'common/CommonTypes'
-import { getTotalRotationTurns, getNonRawUrl } from 'common/util/DataUtil'
+import { Photo, PhotoWork, Size } from 'common/CommonTypes'
+import { getNonRawUrl } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
@@ -13,31 +13,24 @@ import PhotoCanvas from './PhotoCanvas'
 assertRendererProcess()
 
 
-type RenderJob = { nonRawUrl: string, photo: Photo, photoWork: PhotoWork, profiler: Profiler | null }
+type RenderJob = { nonRawUrl: string, photo: Photo, photoWork: PhotoWork, maxSize: Size, profiler: Profiler | null }
 
 const queue = new SerialJobQueue(
     (newJob, existingJob) => (newJob.nonRawUrl === existingJob.nonRawUrl) ? newJob : null,
-    renderNextThumbnail)
+    renderNext)
 
-
-// Default row height of 'justified-layout' is 320px.
-// Max width is relatively high in order to get most panorama images with full row height.
-const maxThumbnailWidth = 1024
-const maxThumbnailHeight = 320
 
 let cameraMetricsBuilder = new CameraMetricsBuilder()
-    .setCanvasSize({ width: maxThumbnailWidth, height: maxThumbnailHeight })
-    .setAdjustCanvasSize(true)
 let canvas: PhotoCanvas | null = null
 
 
-export async function renderThumbnailForPhoto(photo: Photo, photoWork: PhotoWork, profiler: Profiler | null = null): Promise<string> {
+export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size, profiler: Profiler | null = null): Promise<string> {
     const nonRawUrl = getNonRawUrl(photo)
-    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, profiler })
+    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, maxSize, profiler })
 }
 
 
-async function renderNextThumbnail(job: RenderJob): Promise<string> {
+async function renderNext(job: RenderJob): Promise<string> {
     const { nonRawUrl, photo, photoWork, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
@@ -50,6 +43,8 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
 
     // Get camera metrics
     const cameraMetrics = cameraMetricsBuilder
+        .setCanvasSize(job.maxSize)
+        .setAdjustCanvasSize(true)
         .setTextureSize({ width: texture.width, height: texture.height })
         .setExifOrientation(photo.orientation)
         .setPhotoWork(photoWork)
@@ -72,7 +67,7 @@ async function renderNextThumbnail(job: RenderJob): Promise<string> {
     if (profiler) profiler.addPoint('Rendered canvas')
 
     if (!canvas.isValid()) {
-        throw new Error('Thumbnail canvas not valid')
+        throw new Error('Photo rendering canvas not valid')
     }
 
     const dataUrl = canvas.getElement().toDataURL('image/webp')

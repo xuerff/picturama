@@ -6,10 +6,11 @@ import { assertMainProcess } from 'common/util/ElectronUtil'
 import AppWindowController from 'background/AppWindowController'
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport, toggleImportPaused, cancelImport } from 'background/ImportController'
-import { fetchPhotoWork, storePhotoWork, storeThumbnail } from 'background/store/PhotoWorkStore'
+import { fetchPhotoWork, storePhotoWork } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
 import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
+import { createThumbnail, deleteThumbnail } from 'background/store/ThumbnailStore'
 import { fsStat } from 'background/util/FileUtil'
 
 
@@ -87,8 +88,10 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return fetchPhotoWork(params.photoDir, params.photoFileName)
     } else if (action === 'storePhotoWork') {
         return storePhotoWork(params.photoDir, params.photoFileName, params.photoWork)
-    } else if (action === 'storeThumbnail') {
-        return storeThumbnail(params.thumbnailPath, params.thumbnailData)
+    } else if (action === 'createThumbnail') {
+        return createThumbnail(params.photo)
+    } else if (action === 'deleteThumbnail') {
+        return deleteThumbnail(params.photoId)
     } else if (action === 'fetchTags') {
         return fetchTags()
     } else if (action === 'storePhotoTags') {

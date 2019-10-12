@@ -6,6 +6,7 @@ import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { showExternalError } from 'app/ErrorPresenter'
 import ImportProgressController from 'app/controller/ImportProgressController'
 import { setTags } from 'app/controller/PhotoTagController'
+import { renderPhoto } from 'app/renderer/PhotoRenderer'
 import { setFullScreenAction, initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, openSettingsAction } from 'app/state/actions'
 import store from 'app/state/store'
 
@@ -49,6 +50,8 @@ async function executeForegroundAction(action: string, params: any): Promise<any
         if (params.updatedTags) {
             setTags(params.updatedTags)
         }
+    } else if (action === 'renderPhoto') {
+        return renderPhoto(params.photo, params.photoWork, params.maxSize)
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }

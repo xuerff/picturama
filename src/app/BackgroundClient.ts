@@ -111,8 +111,12 @@ export default {
         return callOnBackground('storePhotoWork', { photoDir, photoFileName, photoWork })
     },
 
-    storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
-        return callOnBackground('storeThumbnail', { thumbnailPath, thumbnailData })
+    createThumbnail(photo: Photo): Promise<void> {
+        return callOnBackground('createThumbnail', { photo })
+    },
+
+    deleteThumbnail(photoId: PhotoId): Promise<void> {
+        return callOnBackground('deleteThumbnail', { photoId })
     },
 
     fetchTags(): Promise<Tag[]> {

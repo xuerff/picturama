@@ -1,7 +1,5 @@
-import Promise from 'bluebird'
-
-import { PhotoWork, PhotoSectionId, Photo, PhotoFilter } from 'common/CommonTypes'
-import { getMasterPath } from 'common/util/DataUtil'
+import { PhotoWork, PhotoSectionId, Photo, PhotoFilter, PhotoId } from 'common/CommonTypes'
+import { getMasterPath, getThumbnailUrl } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
@@ -9,10 +7,12 @@ import { showError } from 'app/ErrorPresenter'
 import store from 'app/state/store'
 import { fetchTotalPhotoCountAction, fetchSectionsAction, changePhotoWorkAction, changePhotosAction } from 'app/state/actions'
 
-import { onThumbnailChange } from './ImageProvider'
-
 
 assertRendererProcess()
+
+
+let thumbnailVersion = Date.now()
+
 
 export function fetchTotalPhotoCount() {
     BackgroundClient.fetchTotalPhotoCount()
@@ -39,6 +39,12 @@ function internalFetchSections(newFilter: PhotoFilter | null, sectionIdsToKeepLo
             console.error('Fetching sections failed', error)
             store.dispatch(fetchSectionsAction.failure(error))
         })
+}
+
+
+export function getThumbnailSrc(photo: Photo): string {
+    const thumbnailUrl = getThumbnailUrl(photo.id)
+    return `${thumbnailUrl}?v=${thumbnailVersion}`
 }
 
 
@@ -88,6 +94,13 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
                 showError('Updating photo work failed: ' + photoPath, error)
             })
     }
+}
+
+async function onThumbnailChange(photoId: PhotoId): Promise<void> {
+    await BackgroundClient.deleteThumbnail(photoId)
+
+    thumbnailVersion = Date.now()
+    window.dispatchEvent(new CustomEvent('edit:thumnailChange', { detail: { photoId } }))
 }
 
 // TODO: Revive Legacy code of 'version' feature

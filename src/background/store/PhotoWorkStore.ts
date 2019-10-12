@@ -340,23 +340,3 @@ export async function storePhotoWork(photoDir: string, photoFileName: string, ph
 export async function removePhotoWork(photoDir: string, photoFileName: string): Promise<void> {
     await storePhotoWork(photoDir, photoFileName, {})
 }
-
-
-const storeThumbnailQueue = new SerialJobQueue(
-    (newJob, existingJob) => (newJob.thumbnailPath === existingJob.thumbnailPath) ? newJob : null,
-    processNextStoreThumbnail)
-
-
-export async function storeThumbnail(thumbnailPath: string, thumbnailData: string): Promise<void> {
-    return storeThumbnailQueue.addJob({ thumbnailPath, thumbnailData })
-}
-
-
-async function processNextStoreThumbnail(job: {thumbnailPath: string, thumbnailData: string}): Promise<void> {
-    // thumbnailData is a data URL. Example: 'data:image/webp;base64,UklG...'
-    const dataPrefix = 'base64,'
-    const base64Data = job.thumbnailData.substr(job.thumbnailData.indexOf(dataPrefix) + dataPrefix.length)
-    const dataBuffer = new Buffer(base64Data, 'base64')
-    await fsWriteFile(job.thumbnailPath, dataBuffer)
-    console.log('Stored ' + job.thumbnailPath)
-}

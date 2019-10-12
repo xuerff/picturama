@@ -14,7 +14,7 @@ import { sectionHeadHeight } from 'app/ui/library/GridSection'
 import { forgetSectionPhotosAction, fetchSectionPhotosAction, setLibraryInfoPhotoAction } from 'app/state/actions'
 import store from 'app/state/store'
 
-import { getThumbnailSrc, createThumbnail as createThumbnailOnDisk } from './ImageProvider'
+import { getThumbnailSrc } from './PhotoController'
 
 
 /**
@@ -458,7 +458,10 @@ async function createNextThumbnail(job: CreateThumbnailJob): Promise<void> {
         return
     }
 
-    await createThumbnailOnDisk(job.photo, job.profiler)
+    await BackgroundClient.createThumbnail(job.photo)
+    if (job.profiler) {
+        job.profiler.addPoint('Create thumbnail on disk')
+    }
 }
 
 function getThumbnailPriority(job: CreateThumbnailJob): number {
