@@ -3,10 +3,10 @@ import classnames from 'classnames'
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core'
 
 import { bindMany } from 'common/util/LangUtil'
+import { Point, Rect, Corner, Side } from 'common/util/GeometryTypes'
+import { cornerPointOfRect, rectFromPoints } from 'common/util/GeometryUtil'
 
 import CropOverlay, { Props as CropOverlayProps } from 'app/ui/detail/CropOverlay'
-import { Point, Rect, Corner, Side } from 'app/util/GeometryTypes'
-import { cornerPointOfRect, rectFromPoints } from 'app/util/GeometryUtil'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
 import { cropModeInsets } from 'app/ui/detail/PhotoDetailBody'

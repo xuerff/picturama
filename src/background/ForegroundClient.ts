@@ -1,15 +1,16 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, Size, PhotoRenderOptions } from 'common/CommonTypes'
+import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, PhotoRenderOptions } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
+import { Size } from 'common/util/GeometryTypes'
 
 
 assertMainProcess()
 
 
 interface CallInfo {
-    resolve(result: any)
-    reject(error: any)
+    resolve(result: any): void
+    reject(error: any): void
 }
 
 

@@ -1,6 +1,7 @@
-import { Photo, PhotoWork, Size, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation } from 'common/CommonTypes'
+import { Photo, PhotoWork, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation } from 'common/CommonTypes'
 import { getNonRawUrl, getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
+import { Size } from 'common/util/GeometryTypes'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
 

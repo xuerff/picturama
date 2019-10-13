@@ -6,7 +6,7 @@ import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, PhotoPosition, maxZoom, RequestedPhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
 import DragDropController from 'app/util/DragDropController'
-import { Point } from 'app/util/GeometryTypes'
+import { Point } from 'common/util/GeometryTypes'
 
 import './ViewModeOverlay.less'
 

@@ -2,9 +2,10 @@ import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 
-import { ExifOrientation, Size, zeroSize } from 'common/CommonTypes'
-import { profileDetailView } from 'common/LogConstants'
+import { Size, zeroSize } from 'common/util/GeometryTypes'
 import { bindMany } from 'common/util/LangUtil'
+import { ExifOrientation } from 'common/CommonTypes'
+import { profileDetailView } from 'common/LogConstants'
 
 import { showError } from 'app/ErrorPresenter'
 import { CameraMetrics } from 'app/renderer/CameraMetrics'

@@ -1,4 +1,4 @@
-import { Rect } from 'app/util/GeometryTypes'
+import { Rect } from 'common/util/GeometryTypes'
 
 
 // ----- Database types -----
@@ -73,13 +73,6 @@ export interface Version {
 
 
 // ----- Other types (not database) -----
-
-
-export interface Size {
-    width: number
-    height: number
-}
-export const zeroSize: Size = { width: 0, height: 0 }
 
 
 /** An EXIF orientation. See: https://www.impulseadventure.com/photo/exif-orientation.html */

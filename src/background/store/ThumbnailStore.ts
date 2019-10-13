@@ -1,6 +1,7 @@
 import config from 'common/config'
-import { PhotoId, Size, Photo, PhotoRenderOptions } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoRenderOptions } from 'common/CommonTypes'
 import { getThumbnailPath } from 'common/util/DataUtil'
+import { Size } from 'common/util/GeometryTypes'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 
 import ForegroundClient from 'background/ForegroundClient'

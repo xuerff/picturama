@@ -1,6 +1,6 @@
 import { bindMany } from 'common/util/LangUtil'
 
-import { Point } from 'app/util/GeometryTypes'
+import { Point } from 'common/util/GeometryTypes'
 
 
 export interface DragDropControllerOptions {

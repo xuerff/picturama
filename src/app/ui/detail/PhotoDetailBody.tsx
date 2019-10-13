@@ -2,11 +2,11 @@ import React from 'react'
 import classnames from 'classnames'
 import { ResizeSensor, IResizeEntry, Spinner } from '@blueprintjs/core'
 
-import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId, Size, zeroSize } from 'common/CommonTypes'
+import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId } from 'common/CommonTypes'
+import { Size, zeroSize, Insets, zeroInsets, Rect } from 'common/util/GeometryTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
-import { Insets, zeroInsets, Rect } from 'app/util/GeometryTypes'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
