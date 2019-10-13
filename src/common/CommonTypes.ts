@@ -11,12 +11,16 @@ export interface Photo {
     master_dir: string,
     /** The filename (without directory) of the original image. Example: 'IMG_9700.JPG' */
     master_filename: string,
-    /** The width of the original image (in px). */
+    /** The width of the original image - only with EXIF rotation applied (in px). */
     master_width: number | null
-    /** The height of the original image (in px). */
+    /** The height of the original image - only with EXIF rotation applied (in px). */
     master_height: number | null
     /** Whether the master image has a raw format */
     master_is_raw: 0 | 1,
+    /** The width of the original image - after EXIF rotation and all PhotoWork have been applied (in px). */
+    edited_width: number | null
+    /** The height of the original image - after EXIF rotation and all PhotoWork have been applied (in px). */
+    edited_height: number | null
     /** Example: '2016-09-18' */
     date_section: string,
     /** The timestamp when the photo was created */

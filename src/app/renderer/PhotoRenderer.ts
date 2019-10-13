@@ -1,5 +1,5 @@
-import { Photo, PhotoWork, Size, PhotoRenderOptions, PhotoRenderFormat } from 'common/CommonTypes'
-import { getNonRawUrl } from 'common/util/DataUtil'
+import { Photo, PhotoWork, Size, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation } from 'common/CommonTypes'
+import { getNonRawUrl, getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
@@ -67,8 +67,15 @@ async function renderNext(job: RenderJob): Promise<string> {
 
     // Update photo size in DB (asynchronously)
     const { cropRect } = cameraMetrics
-    if (photo.master_width !== cropRect.width || photo.master_height !== cropRect.height) {
-        updatePhoto(photo, { master_width: cropRect.width, master_height: cropRect.height })
+    const switchMasterSides = (photo.orientation == ExifOrientation.Left) || (photo.orientation == ExifOrientation.Right)
+    const master_width = switchMasterSides ? texture.height : texture.width
+    const master_height = switchMasterSides ? texture.width : texture.height
+    const masterSizeIsWrong = photo.master_width !== master_width || photo.master_height !== master_height
+    if (masterSizeIsWrong || photo.edited_width !== cropRect.width || photo.edited_height !== cropRect.height) {
+        if (masterSizeIsWrong) {
+            console.info(`Correcting master size of #${photo.id} (${getMasterPath(photo)}) from ${photo.master_width}x${photo.master_height} to ${master_width}x${master_height}`)
+        }
+        updatePhoto(photo, { master_width, master_height, edited_width: cropRect.width, edited_height: cropRect.height })
     }
     if (profiler) profiler.addPoint('Checked photo size in DB')
 

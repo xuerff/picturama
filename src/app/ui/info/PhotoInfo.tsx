@@ -138,6 +138,11 @@ export default class PhotoInfo extends React.Component<Props, State> {
                                 <div>{`${photo.master_width} \u00d7 ${photo.master_height}`}</div>
                                 <div>{formatFileSize(state.masterFileSize)}</div>
                             </div>
+                            {(photo.edited_width !== photo.master_width || photo.edited_height !== photo.master_height) &&
+                                <div className='PhotoInfo-minorInfo isCentered'>
+                                    {`(${photo.edited_width} \u00d7 ${photo.edited_height})`}
+                                </div>
+                            }
                         </div>
                     </div>
                     {(photo.camera || photo.aperture || photo.exposure_time || photo.focal_length || photo.iso) &&

@@ -247,13 +247,13 @@ export function createLayoutForLoadedSection(section: LoadedPhotoSection, sectio
 
     const aspects = section.photoIds.map(photoId => {
         const photo = photoData[photoId]
-        const { master_width, master_height } = photo
-        // If we have no master size yet (which happens when loading an old DB were it was missing), the following will happen:
+        const { edited_width, edited_height } = photo
+        // If we have no edited size yet (which happens when loading an old DB were it was missing), the following will happen:
         //   - We calculate a layout using the average aspect (which is how the loading rect of the photo is shown)
-        //   - `ThumbnailRenderer.renderThumbnailForPhoto` will detect that the master size is missing and will update the DB
+        //   - `PhotoRenderer.renderPhoto` will detect that the edited size is missing and will update the DB
         //   - The Grid will trigger a layout, because the photo has changed in the app state
-        //   - `getLayoutForSections` will detect that the section changed and so it will get a ney layout using the correct master size
-        return (master_width && master_height) ? (master_width / master_height) : averageAspect
+        //   - `getLayoutForSections` will detect that the section changed and so it will get a ney layout using the correct edited size
+        return (edited_width && edited_height) ? (edited_width / edited_height) : averageAspect
     })
     const layout = createLayout(aspects, { containerWidth, targetRowHeight })
     layout.sectionTop = sectionTop

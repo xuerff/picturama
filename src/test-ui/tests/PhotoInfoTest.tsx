@@ -48,6 +48,13 @@ addSection('PhotoInfo')
             {...createGridRowHeightProps(context)}
         />
     ))
+    .add('with edited size', context => (
+        <PhotoInfo
+            {...defaultProps}
+            {...createGridRowHeightProps(context)}
+            photo={{ ...testBigPhoto, edited_width: 800, edited_height: 600 }}
+        />
+    ))
     .add('filename overflow', context => (
         <PhotoInfo
             {...defaultProps}

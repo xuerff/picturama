@@ -21,6 +21,8 @@ export function createRandomDummyPhoto(): Photo {
         master_width,
         master_height,
         master_is_raw: 0,
+        edited_width: master_width,
+        edited_height: master_height,
     }
 }
 
