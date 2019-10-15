@@ -262,7 +262,7 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
 const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
 const filtersRuleRegExp = /^filters=(.*)$/
 const cropRuleRegExp = /^crop=rect64\(([0-9a-f]+)\)$/
-const ignoredRulesRegExp = /^([ \t]*$|backuphash=|width=|height=|moddate=|textactive=0)/
+const ignoredRulesRegExp = /^([ \t]*$|backuphash=|width=|height=|moddate=|textactive=0|redo=)/
 
 const tiltFilterRegExp = /^tilt=1,([-0-9.]+),0.0*$/
 const cropFilterRegExp = /^crop64=1,([0-9a-f]+)$/
