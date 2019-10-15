@@ -16,10 +16,11 @@ export async function exportPhoto(photo: Photo, folderPath: string, options: Pho
     let imageDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, null, options)
 
     let exportFilePath: string
-    let counter = 1
+    let counter = 0
     const filenameParts = parsePath(photo.master_filename)
     do {
-        exportFilePath = `${folderPath}/${filenameParts.name}${counter === 1 ? '' : '_' + counter}.${options.format}`
+        const suffix = counter === 0 ? '' : ('_' + (counter < 10 ? '00' : counter < 100 ? '0' : '') + counter)
+        exportFilePath = `${folderPath}/${filenameParts.name}${suffix}.${options.format}`
         counter++
     } while (await fsExists(exportFilePath))
 
