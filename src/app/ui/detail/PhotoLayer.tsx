@@ -2,13 +2,13 @@ import classNames from 'classnames'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 
+import { CameraMetrics } from 'common/util/CameraMetrics'
 import { Size, zeroSize } from 'common/util/GeometryTypes'
 import { bindMany } from 'common/util/LangUtil'
 import { ExifOrientation } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
 
 import { showError } from 'app/ErrorPresenter'
-import { CameraMetrics } from 'app/renderer/CameraMetrics'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 

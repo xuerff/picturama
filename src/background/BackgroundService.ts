@@ -7,7 +7,7 @@ import AppWindowController from 'background/AppWindowController'
 import { exportPhoto } from 'background/ExportController'
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport, toggleImportPaused, cancelImport } from 'background/ImportController'
-import { fetchPhotoWork, storePhotoWork } from 'background/store/PhotoWorkStore'
+import { fetchPhotoWorkOfPhoto, storePhotoWork } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
 import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
@@ -85,8 +85,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return updatePhotos(params.photoIds, params.update)
     } else if (action === 'fetchPhotoDetail') {
         return fetchPhotoDetail(params.photoId)
-    } else if (action === 'fetchPhotoWork') {
-        return fetchPhotoWork(params.photoDir, params.photoFileName)
+    } else if (action === 'fetchPhotoWorkOfPhoto') {
+        return fetchPhotoWorkOfPhoto(params.photo)
     } else if (action === 'storePhotoWork') {
         return storePhotoWork(params.photoDir, params.photoFileName, params.photoWork)
     } else if (action === 'createThumbnail') {

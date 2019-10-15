@@ -12,9 +12,9 @@ export interface Photo {
     /** The filename (without directory) of the original image. Example: 'IMG_9700.JPG' */
     master_filename: string,
     /** The width of the original image - only with EXIF rotation applied (in px). */
-    master_width: number | null
+    master_width: number
     /** The height of the original image - only with EXIF rotation applied (in px). */
-    master_height: number | null
+    master_height: number
     /** Whether the master image has a raw format */
     master_is_raw: 0 | 1,
     /** The width of the original image - after EXIF rotation and all PhotoWork have been applied (in px). */

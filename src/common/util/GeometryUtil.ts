@@ -295,3 +295,19 @@ export function intersectLineWithPolygon(lineStart: Vec2Like, lineDirection: Vec
 function compareNumbers(a: number, b: number): number {
     return a - b
 }
+
+/**
+ * Scales a rect to fit into a rotated version of itself (same center and same size).
+ */
+export function scaleRectToFitBorders(rectCenter: Vec2Like | Point, maxRectSize: Size, rotatedRectPolygon: Vec2Like[]): Rect {
+    if (isPoint(rectCenter)) {
+        rectCenter = toVec2(rectCenter)
+    }
+
+    let outFactors: number[]
+    outFactors = intersectLineWithPolygon(rectCenter, [maxRectSize.width / 2, maxRectSize.height / 2], rotatedRectPolygon)
+    let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
+    outFactors = intersectLineWithPolygon(rectCenter, [maxRectSize.width / 2, -maxRectSize.height / 2], rotatedRectPolygon)
+    minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
+    return roundRect(rectFromCenterAndSize(rectCenter, scaleSize(maxRectSize, minFactor)))
+}

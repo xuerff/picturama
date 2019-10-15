@@ -1,14 +1,17 @@
-import { dirname, basename } from 'path'
 import fs from 'fs'
 import readline from 'readline'
 import stringify from 'json-stringify-pretty-compact'
+import { mat4, vec2 } from 'gl-matrix'
 
-import { PhotoWork } from 'common/CommonTypes'
+import { Photo, PhotoWork, ExifOrientation } from 'common/CommonTypes'
+import { createProjectionMatrix } from 'common/util/CameraMetrics'
 import { rotate } from 'common/util/EffectsUtil'
 import { assertMainProcess } from 'common/util/ElectronUtil'
-import { fsExists, fsUnlink, fsWriteFile, fsReadFile } from 'background/util/FileUtil'
-import SerialJobQueue from 'common/util/SerialJobQueue'
+import { Rect } from 'common/util/GeometryTypes'
+import { scaleRectToFitBorders, centerOfRect, Vec2Like, cornerPointOfRect, rectFromPoints } from 'common/util/GeometryUtil'
 import { parsePath } from 'common/util/TextUtil'
+
+import { fsExists, fsUnlink, fsWriteFile, fsReadFile } from 'background/util/FileUtil'
 
 
 declare global {
@@ -93,7 +96,7 @@ class DirectoryWork {
         }
     }
 
-    public async fetchPhotoWork(photoBasename: string): Promise<PhotoWork> {
+    public async fetchPhotoWork(photoBasename: string, masterWidth: number, masterHeight: number): Promise<PhotoWork> {
         const data = await this.fetchData()
 
         let photoWork = data.anselData.photos[photoBasename]
@@ -101,7 +104,7 @@ class DirectoryWork {
         if (!photoWork && data.picasaData) {
             const picasaRules = data.picasaData.photos[photoBasename]
             if (picasaRules) {
-                photoWork = createPhotoWorkFromPicasaRules(picasaRules, this.directoryPath, photoBasename)
+                photoWork = createPhotoWorkFromPicasaRules(picasaRules, this.directoryPath, photoBasename, masterWidth, masterHeight)
             }
         }
 
@@ -257,28 +260,108 @@ async function fetchPicasaIni(directoryPath: string): Promise<PicasaData | null>
 
 
 const rotateRuleRegExp = /^rotate=rotate\((\d+)\)$/
+const filtersRuleRegExp = /^filters=(.*)$/
+const cropRuleRegExp = /^crop=rect64\(([0-9a-f]+)\)$/
 const ignoredRulesRegExp = /^([ \t]*$|backuphash=|width=|height=|moddate=|textactive=0)/
 
-function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string): PhotoWork {
+const tiltFilterRegExp = /^tilt=1,([-0-9.]+),0.0*$/
+const cropFilterRegExp = /^crop64=1,([0-9a-f]+)$/
+
+function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath: string, photoBasename: string,
+    masterWidth: number, masterHeight: number): PhotoWork
+{
+    // For information about picasa.ini see:
+    //   - https://gist.github.com/fbuchinger/1073823
+
     const photoWork: PhotoWork = {}
 
-    let importProblems: string[] | null = null
+    let importProblems: string[] = []
+
     let match: RegExpMatchArray | null = null
+    let picasaCropRect: string | null = null
     for (const rule of picasaRules) {
         if (match = rotateRuleRegExp.exec(rule)) {
             rotate(photoWork, parseInt(match[1]), false)
         } else if (rule == 'star=yes') {
             photoWork.flagged = true
+        } else if (match = filtersRuleRegExp.exec(rule)) {
+            const filterSplits = match[1].split(';')
+            for (const filter of filterSplits) {
+                if (match = tiltFilterRegExp.exec(filter)) {
+                    const picasaTilt = parseFloat(match[1])
+                    photoWork.tilt = (photoWork.tilt || 0) + picasaTilt * -11.3848
+                        // For formula see: doc/picasa-ini-format.md
+                } else if (match = cropFilterRegExp.exec(filter)) {
+                    if (!picasaCropRect) {
+                        picasaCropRect = match[1]
+                    } else if (picasaCropRect !== match[1]) {
+                        importProblems.push(`Duplicate crop rects: ${picasaCropRect} and ${match[1]}`)
+                    }
+                } else if (filter.length) {
+                    importProblems.push('Unknown filter: ' + filter)
+                }
+            }
+        } else if (match = cropRuleRegExp.exec(rule)) {
+            if (!picasaCropRect) {
+                picasaCropRect = match[1]
+            } else if (picasaCropRect !== match[1]) {
+                importProblems.push(`Duplicate crop rects: ${picasaCropRect} and ${match[1]}`)
+            }
         } else if (! ignoredRulesRegExp.test(rule)) {
             // Unknown rule
-            if (!importProblems) {
-                importProblems = []
-            }
             importProblems.push('Unknown rule: ' + rule)
         }
     }
 
-    if (importProblems) {
+    if (picasaCropRect || photoWork.tilt) {
+        // Picasa works in the opposite order like we do: Picasa first crops the original image, then in tilts it and
+        // shrinks it to fit into the borders of the cropped image while keeping the aspect ratio.
+        // For details see: doc/picasa-ini-format.md
+
+        let picasaCanvasRect: Rect | null = null
+        if (picasaCropRect) {
+            if (picasaCropRect.length > 16) {
+                importProblems.push('Invalid crop rect (length > 16): ' + picasaCropRect)
+            } else {
+                while (picasaCropRect.length < 16) {
+                    picasaCropRect = '0' + picasaCropRect
+                }
+                picasaCanvasRect = rectFromPoints(
+                    [
+                        parseInt(picasaCropRect.substring(0, 4), 16) / 0xffff * masterWidth,
+                        parseInt(picasaCropRect.substring(4, 8), 16) / 0xffff * masterHeight
+                    ], [
+                        parseInt(picasaCropRect.substring(8, 12), 16) / 0xffff * masterWidth,
+                        parseInt(picasaCropRect.substring(12, 16), 16) / 0xffff * masterHeight
+                    ])
+            }
+        }
+        if (!picasaCanvasRect) {
+            picasaCanvasRect = {
+                x:      0,
+                y:      0,
+                width:  masterWidth,
+                height: masterHeight
+            }
+        }
+
+        const exifOrientation = ExifOrientation.Up
+            // masterWidth and masterHeight have already EXIF orientation applied, so we use "Up" here
+        const projectionMatrix = createProjectionMatrix({ width: masterWidth, height: masterHeight }, exifOrientation, photoWork)
+        const borderPolygon: Vec2Like[] = [
+            vec2.transformMat4(vec2.create(), cornerPointOfRect(picasaCanvasRect, 'nw'), projectionMatrix),
+            vec2.transformMat4(vec2.create(), cornerPointOfRect(picasaCanvasRect, 'ne'), projectionMatrix),
+            vec2.transformMat4(vec2.create(), cornerPointOfRect(picasaCanvasRect, 'se'), projectionMatrix),
+            vec2.transformMat4(vec2.create(), cornerPointOfRect(picasaCanvasRect, 'sw'), projectionMatrix)
+        ]
+        const projectedCropRectCenter = vec2.transformMat4(vec2.create(), centerOfRect(picasaCanvasRect), projectionMatrix)
+        const projectedCropRectSize = (photoWork.rotationTurns === 1 || photoWork.rotationTurns === 3) ?
+            { width: picasaCanvasRect.height, height: picasaCanvasRect.width } :
+            picasaCanvasRect
+        photoWork.cropRect = scaleRectToFitBorders(projectedCropRectCenter, projectedCropRectSize, borderPolygon)
+    }
+
+    if (importProblems.length) {
         let msg = `Picasa import is incomplete for ${directoryPath}/${photoBasename}:`
         for (const problem of importProblems) {
             msg += '\n  - ' + problem
@@ -325,9 +408,15 @@ function getDirectoryWork(directoryPath: string): DirectoryWork {
 }
 
 
-export async function fetchPhotoWork(photoDir: string, photoFileName: string): Promise<PhotoWork> {
+export async function fetchPhotoWorkOfPhoto(photo: Photo): Promise<PhotoWork> {
+    return fetchPhotoWork(photo.master_dir, photo.master_filename, photo.master_width, photo.master_height)
+}
+
+export async function fetchPhotoWork(photoDir: string, photoFileName: string, masterWidth: number, masterHeight: number):
+    Promise<PhotoWork>
+{
     return getDirectoryWork(photoDir)
-        .fetchPhotoWork(photoFileName)
+        .fetchPhotoWork(photoFileName, masterWidth, masterHeight)
 }
 
 

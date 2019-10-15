@@ -3,10 +3,9 @@ import classnames from 'classnames'
 import { ResizeSensor, IResizeEntry, Spinner } from '@blueprintjs/core'
 
 import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId } from 'common/CommonTypes'
+import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'common/util/CameraMetrics'
 import { Size, zeroSize, Insets, zeroInsets, Rect } from 'common/util/GeometryTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
-
-import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'app/renderer/CameraMetrics'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'

@@ -54,7 +54,7 @@ new SerialUpdater({
             return new CancelablePromise(Promise.all(
                 [
                     BackgroundClient.fetchPhotoDetail(photo.id),
-                    BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
+                    BackgroundClient.fetchPhotoWorkOfPhoto(photo)
                 ]))
                 .then(results => {
                     const [ photoDetail, photoWork ] = results

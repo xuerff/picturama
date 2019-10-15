@@ -96,6 +96,43 @@ testImportScanner('import png',
     })
 
 
+testImportScanner('import Picasa crop and tilt',
+    async testDir => {
+        await Promise.all([
+            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            writeFile(`${testDir}/.picasa.ini`,
+                '[ice-cubes.jpg]\n' +
+                'rotate=rotate(1)\n' +
+                'backuphash=3812\n' +
+                'filters=tilt=1,0.367535,0.000000;crop64=1,fde5dcc44cdb5cc;\n' +
+                'crop=rect64(fde5dcc44cdb5cc)\n'),
+        ])
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: testDir,
+                master_filename: 'ice-cubes.jpg',
+                master_width: 800,
+                master_height: 533,
+                master_is_raw: 0,
+                edited_width: 170,
+                edited_height: 153,
+                date_section: '2018-06-28',
+                created_at: 1530214626000,
+                orientation: 1,
+                camera: 'FUJIFILM X-T2',
+                exposure_time: 0.05,
+                iso: 200,
+                focal_length: 80,
+                aperture: 11,
+                flag: 0,
+                trashed: 0
+            }
+        ])
+    })
+
+
 testImportScanner('import Picasa originals #1',
     async testDir => {
         // This is what happens if you select "Save" on an image in Picasa:
@@ -129,8 +166,8 @@ testImportScanner('import Picasa originals #1',
                 master_width: 800,
                 master_height: 533,
                 master_is_raw: 0,
-                edited_width: 800,
-                edited_height: 533,
+                edited_width: 166,
+                edited_height: 186,
                 date_section: '2018-06-28',
                 created_at: 1530214626000,
                 orientation: 1,
@@ -185,8 +222,8 @@ testImportScanner('import Picasa originals #2',
                 master_width: 800,
                 master_height: 533,
                 master_is_raw: 0,
-                edited_width: 800,
-                edited_height: 533,
+                edited_width: 251,
+                edited_height: 219,
                 date_section: '2018-06-28',
                 created_at: 1530214626000,
                 orientation: 1,

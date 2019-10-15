@@ -103,8 +103,8 @@ export default {
         return callOnBackground('fetchPhotoDetail', { photoId })
     },
 
-    fetchPhotoWork(photoDir: string, photoFileName: string): Promise<PhotoWork> {
-        return callOnBackground('fetchPhotoWork', { photoDir, photoFileName })
+    fetchPhotoWorkOfPhoto(photo: Photo): Promise<PhotoWork> {
+        return callOnBackground('fetchPhotoWorkOfPhoto', { photo })
     },
 
     storePhotoWork(photoDir: string, photoFileName: string, photoWork: PhotoWork): Promise<void> {

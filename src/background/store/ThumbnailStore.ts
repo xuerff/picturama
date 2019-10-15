@@ -8,7 +8,7 @@ import ForegroundClient from 'background/ForegroundClient'
 import { fsExists, fsUnlink, fsWriteFile } from 'background/util/FileUtil'
 import { parseImageDataUrl } from 'background/util/NodeUtil'
 
-import { fetchPhotoWork } from './PhotoWorkStore'
+import { fetchPhotoWorkOfPhoto } from './PhotoWorkStore'
 
 
 // Default row height of 'justified-layout' is 320px.
@@ -35,7 +35,7 @@ async function processNextCreateThumbnail(job: { photo: Photo }): Promise<void> 
         return
     }
 
-    const photoWork = await fetchPhotoWork(photo.master_dir, photo.master_filename)
+    const photoWork = await fetchPhotoWorkOfPhoto(photo)
 
     const thumbnailDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, maxThumbnailSize, thumbnailRenderOptions)
 

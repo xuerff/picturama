@@ -4,13 +4,13 @@ import { Button, ButtonGroup, Slider } from '@blueprintjs/core'
 
 import { PhotoId, Photo as Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
+import { CameraMetrics, RequestedPhotoPosition, limitPhotoPosition } from 'common/util/CameraMetrics'
 import { bindMany } from 'common/util/LangUtil'
 
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 import PhotoActionButtons from 'app/ui/widget/PhotoActionButtons'
 import Toolbar from 'app/ui/widget/Toolbar'
 import { Command, getCommandButtonProps, CommandGroupId, addCommandGroup, setCommandGroupEnabled, removeCommandGroup } from 'app/controller/HotkeyController'
-import { CameraMetrics, RequestedPhotoPosition, limitPhotoPosition } from 'app/renderer/CameraMetrics'
 
 import ViewModeOverlay from './ViewModeOverlay'
 

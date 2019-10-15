@@ -1,4 +1,5 @@
 import { Photo, PhotoWork, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation } from 'common/CommonTypes'
+import { CameraMetricsBuilder } from 'common/util/CameraMetrics'
 import { getNonRawUrl, getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { Size } from 'common/util/GeometryTypes'
@@ -7,7 +8,6 @@ import Profiler from 'common/util/Profiler'
 
 import { updatePhoto } from 'app/controller/PhotoController'
 
-import { CameraMetricsBuilder } from './CameraMetrics'
 import PhotoCanvas from './PhotoCanvas'
 
 

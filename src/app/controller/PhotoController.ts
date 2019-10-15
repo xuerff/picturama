@@ -63,7 +63,7 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
         }
         pendingUpdates[photoPath] = pendingUpdate
 
-        BackgroundClient.fetchPhotoWork(photo.master_dir, photo.master_filename)
+        BackgroundClient.fetchPhotoWorkOfPhoto(photo)
             .then(photoWork => {
                 const photoWorkBefore = { ...photoWork }
                 for (const up of pendingUpdate.updates) {

@@ -4,7 +4,7 @@ import { getMasterPath } from 'common/util/DataUtil'
 import { parsePath } from 'common/util/TextUtil'
 import { Photo, PhotoExportOptions } from 'common/CommonTypes'
 
-import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
+import { fetchPhotoWorkOfPhoto } from 'background/store/PhotoWorkStore'
 import { fsExists, fsWriteFile, fsReadFile, fsStat, fsUtimes } from 'background/util/FileUtil'
 import { parseImageDataUrl } from 'background/util/NodeUtil'
 import ForegroundClient from 'background/ForegroundClient'
@@ -12,7 +12,7 @@ import ForegroundClient from 'background/ForegroundClient'
 
 export async function exportPhoto(photo: Photo, folderPath: string, options: PhotoExportOptions): Promise<void> {
     const masterPath = getMasterPath(photo)
-    const photoWork = await fetchPhotoWork(photo.master_dir, photo.master_filename)
+    const photoWork = await fetchPhotoWorkOfPhoto(photo)
     let imageDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, null, options)
 
     let exportFilePath: string

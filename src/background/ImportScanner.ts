@@ -361,10 +361,9 @@ export default class ImportScanner {
 
             // Fetch meta data and PhotoWork
 
-            const [ fileStats, metaData, photoWork ] = await Promise.all([
+            const [ fileStats, metaData ] = await Promise.all([
                 fsStat(masterFullPath),
                 readMetadataOfImage(masterFullPath),
-                fetchPhotoWork(masterDir, masterFileName),
             ])
             if (profiler) profiler.addPoint('Fetched meta data and PhotoWork')
 
@@ -420,6 +419,8 @@ export default class ImportScanner {
             }
 
             // Get edited size
+
+            const photoWork = await fetchPhotoWork(masterDir, masterFileName, master_width, master_height)
 
             let edited_width: number
             let edited_height: number

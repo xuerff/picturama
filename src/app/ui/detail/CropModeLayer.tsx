@@ -3,16 +3,15 @@ import classnames from 'classnames'
 import { vec2 } from 'gl-matrix'
 
 import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
+import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'common/util/CameraMetrics'
 import { Point, Size, Rect, Side, Corner, corners, Insets, zeroInsets } from 'common/util/GeometryTypes'
 import {
     transformRect, oppositeCorner, cornerPointOfRect, centerOfRect, intersectLineWithPolygon,
-    rectFromCenterAndSize, scaleSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
-    roundRect, rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2, boundsOfPoints, toVec2,
-    isPoint, boundsOfRects
+    rectFromCenterAndSize, isPointInPolygon, nearestPointOnPolygon, Vec2Like, rectFromCornerPointAndSize,
+    rectFromPoints, directionOfPoints, movePoint, ceilVec2, floorVec2, roundVec2, boundsOfPoints,
+    boundsOfRects, scaleRectToFitBorders
 } from 'common/util/GeometryUtil'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
-
-import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'app/renderer/CameraMetrics'
 
 import CropOverlay from './CropOverlay'
 import CropModeToolbar from './CropModeToolbar'
@@ -81,7 +80,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
                 wantedCropRectSize = { width, height: width / aspectRatio }
             }
 
-            nextCropRect = scaleCropRectToTexture(centerOfRect(prevCropRect), wantedCropRectSize, texturePolygon)
+            nextCropRect = scaleRectToFitBorders(centerOfRect(prevCropRect), wantedCropRectSize, texturePolygon)
         }
 
         // Apply changes
@@ -288,7 +287,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
         const texturePolygon = createTexturePolygon(cameraMetrics)
         const nextProjectionMatrix = createProjectionMatrix(cameraMetrics.textureSize, props.exifOrientation, photoWork)
         const nextCropRectCenter = vec2.transformMat4(vec2.create(), centerInTextureCoords, nextProjectionMatrix)
-        photoWork.cropRect = scaleCropRectToTexture(nextCropRectCenter, maxCropRectSize, texturePolygon)
+        photoWork.cropRect = scaleRectToFitBorders(nextCropRectCenter, maxCropRectSize, texturePolygon)
 
         // Apply changes
         if (nextState) {
@@ -384,20 +383,6 @@ function createTexturePolygon(cameraMetrics: CameraMetrics): vec2[] {
     }
 
     return polygon
-}
-
-
-function scaleCropRectToTexture(cropRectCenter: Vec2Like | Point, maxCropRectSize: Size, texturePolygon: Vec2Like[]): Rect {
-    if (isPoint(cropRectCenter)) {
-        cropRectCenter = toVec2(cropRectCenter)
-    }
-
-    let outFactors: number[]
-    outFactors = intersectLineWithPolygon(cropRectCenter, [maxCropRectSize.width / 2, maxCropRectSize.height / 2], texturePolygon)
-    let minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), 1)
-    outFactors = intersectLineWithPolygon(cropRectCenter, [maxCropRectSize.width / 2, -maxCropRectSize.height / 2], texturePolygon)
-    minFactor = outFactors.reduce((minFactor, factor) => Math.min(minFactor, Math.abs(factor)), minFactor)
-    return roundRect(rectFromCenterAndSize(cropRectCenter, scaleSize(maxCropRectSize, minFactor)))
 }
 
 
