@@ -1,7 +1,7 @@
 
 // TODO: Revive Legacy code of 'version' feature
 /*
-import anselBookshelf from './ansel-bookshelf'
+import myBookshelf from './my-bookshelf'
 import { copy as fsCopy } from 'fs.extra'
 import Promise from 'bluebird'
 import sharp from 'sharp'
@@ -15,7 +15,7 @@ import { BookshelfClass } from '../DataTypes'
 
 const copy = Promise.promisify(fsCopy) as ((fromPath: string, toPath: string) => Promise<void>)
 
-const Version = anselBookshelf.Model.extend({
+const Version = myBookshelf.Model.extend({
     tableName: 'versions',
 
     photo: function() {

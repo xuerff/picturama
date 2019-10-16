@@ -34,7 +34,7 @@ app.on('ready', () => {
     let cursorPos = screen.getCursorScreenPoint()
     let workAreaSize = screen.getDisplayNearestPoint(cursorPos).workAreaSize
 
-    app.setName('Ansel')
+    app.setName('Picturama')
 
     const platform = os.platform()
     let icon: string | undefined = undefined
@@ -50,7 +50,7 @@ app.on('ready', () => {
         width: 1356,
         height: 768,
         icon,
-        title: 'Ansel',
+        title: 'Picturama',
         titleBarStyle: 'hiddenInset',
         backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
@@ -63,7 +63,7 @@ app.on('ready', () => {
     }
 
     mainWindow.loadURL('file://' + __dirname + '/app.html')
-    mainWindow.setTitle('Ansel')
+    mainWindow.setTitle('Picturama')
     AppWindowController.init(mainWindow)
     initBackgroundService(mainWindow, { version: config.version, platform, locale })
     ForegroundClient.init(mainWindow)
@@ -103,7 +103,7 @@ function initDb(): Promise<any> {
         const dbOptions: DBOptions = { path: config.dbFile, migrate: false }
         initDbPromise =
             (async() => {
-                await fsMkDirIfNotExists(config.dotAnsel)
+                await fsMkDirIfNotExists(config.picturamaHomeDir)
                 await Promise.all([
                     fsMkDirIfNotExists(config.tmp),
                     fsMkDirIfNotExists(config.nonRawPath),
@@ -117,14 +117,14 @@ function initDb(): Promise<any> {
                 if (isLegacyDb) {
                     // This is a DB created with bookshelf.js and knex.js (before 2019-08-11)
                     // -> Delete the DB and create a new one
-                    console.warn('Ansel database is a legacy database - creating a new one')
+                    console.warn('Picturama database is a legacy database - creating a new one')
                     await Promise.all([
                         DB().close()
                             .then(() => fsUnlink(config.dbFile)),
-                        fsUnlinkDeep(`${config.dotAnsel}/non-raw`),
-                        fsUnlinkDeep(`${config.dotAnsel}/thumbs`),
-                        fsUnlinkDeep(`${config.dotAnsel}/thumbs-250`),
-                        fsUnlinkDeep(`${config.dotAnsel}/thumbnails`),
+                        fsUnlinkDeep(`${config.picturamaHomeDir}/non-raw`),
+                        fsUnlinkDeep(`${config.picturamaHomeDir}/thumbs`),
+                        fsUnlinkDeep(`${config.picturamaHomeDir}/thumbs-250`),
+                        fsUnlinkDeep(`${config.picturamaHomeDir}/thumbnails`),
                     ])
                     DB(dbOptions)
                 }

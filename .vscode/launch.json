@@ -12,7 +12,7 @@
             },
             "args" : ["."],
             "env": {
-                "ANSEL_DEV_MODE": "true"
+                "PICTURAMA_DEV_MODE": "true"
             }
         }
     ]

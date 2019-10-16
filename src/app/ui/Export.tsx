@@ -80,7 +80,7 @@ export class Export extends React.Component<Props, State> {
 
     afterExport() {
         notifier.notify({
-            title: 'Ansel',
+            title: 'Picturama',
             message: `Finish exporting ${this.props.photoIds.length} photo(s)`
         })
 
@@ -128,8 +128,8 @@ export class Export extends React.Component<Props, State> {
             .map((exportFormat, i) => <option key={i} value={exportFormat}>{exportFormat}</option>)
 
         return (
-            <div className="ansel-outer-modal" style={this.props.style}>
-                <div className="ansel-modal shadow--2dp">
+            <div className="picturama-outer-modal" style={this.props.style}>
+                <div className="picturama-modal shadow--2dp">
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <div>
                             <label htmlFor="format">Format:</label>

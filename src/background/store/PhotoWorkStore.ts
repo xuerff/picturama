@@ -39,7 +39,7 @@ interface PicasaData {
 
 /** All work data we have about one directory */
 interface DirectoryData {
-    anselData: DirectoryWorkData,
+    picturamaData: DirectoryWorkData,
     picasaData?: PicasaData
 }
 
@@ -78,8 +78,8 @@ class DirectoryWork {
                     fetchPicasaIni(this.directoryPath)
                 ])
                 .then(results => {
-                    const [ anselData, picasaData ] = results
-                    return { anselData, picasaData: picasaData || undefined }
+                    const [ picturamaData, picasaData ] = results
+                    return { picturamaData, picasaData: picasaData || undefined }
                 })
 
             this.runningFetch.then(
@@ -99,7 +99,7 @@ class DirectoryWork {
     public async fetchPhotoWork(photoBasename: string, masterWidth: number, masterHeight: number): Promise<PhotoWork> {
         const data = await this.fetchData()
 
-        let photoWork = data.anselData.photos[photoBasename]
+        let photoWork = data.picturamaData.photos[photoBasename]
 
         if (!photoWork && data.picasaData) {
             const picasaRules = data.picasaData.photos[photoBasename]
@@ -116,20 +116,20 @@ class DirectoryWork {
         // We store the photos in canonical order (with sorted keys) so a `ansel.json` file produces less conflicts when version controlled.
 
         const data = await this.fetchData()
-        const anselData = data.anselData
+        const picturamaData = data.picturamaData
 
         const isEmpty = Object.keys(photoWork).length === 0
         if (isEmpty) {
-            delete anselData.photos[photoBasename]
+            delete picturamaData.photos[photoBasename]
         } else {
             photoWork = toCanonical(photoWork)
-            anselData.photos[photoBasename] = photoWork
+            picturamaData.photos[photoBasename] = photoWork
 
-            const isNew = !anselData.photos[photoBasename]
+            const isNew = !picturamaData.photos[photoBasename]
             if (isNew) {
                 // This is a new photo
                 // -> We have to sort the keys
-                anselData.photos = toCanonical(anselData.photos)
+                picturamaData.photos = toCanonical(picturamaData.photos)
             }
         }
 
@@ -148,15 +148,15 @@ class DirectoryWork {
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
                 this.needsStoreFollowup = false
-                const anselData = this.data && this.data.anselData
-                const isEmpty = !anselData || Object.keys(anselData.photos).length === 0
+                const picturamaData = this.data && this.data.picturamaData
+                const isEmpty = !picturamaData || Object.keys(picturamaData.photos).length === 0
                 if (isEmpty) {
                     if (await fsExists(directoryWorkFile)) {
                         await fsUnlink(directoryWorkFile)
                         console.log('Removed empty ' + directoryWorkFile)
                     }
                 } else {
-                    const json = stringify(anselData)
+                    const json = stringify(picturamaData)
                     await fsWriteFile(directoryWorkFile, json)
                     console.log('Stored ' + directoryWorkFile)
                 }
@@ -182,9 +182,9 @@ async function fetchAnselJson(directoryPath: string): Promise<DirectoryWorkData>
         return { photos: {} }
     } else {
         const buffer = await fsReadFile(directoryWorkFile)
-        const anselData = JSON.parse(buffer) as DirectoryWorkData
+        const picturamaData = JSON.parse(buffer) as DirectoryWorkData
         console.log('Fetched ' + directoryWorkFile)
-        return anselData
+        return picturamaData
     }
 }
 

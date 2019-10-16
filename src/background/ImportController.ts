@@ -33,7 +33,7 @@ export function startImport(): void {
             if (finalProgress) {
                 const duration = Date.now() - startTime
                 notifier.notify({
-                    title: 'Ansel',
+                    title: 'Picturama',
                     message: msg('ImportController_importFinished', formatNumber(finalProgress.total), moment.duration(duration).humanize())
                 })
             }

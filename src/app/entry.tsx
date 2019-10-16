@@ -16,10 +16,10 @@ import pkgs from '../../package.json'
 import { showError } from 'app/ErrorPresenter'
 
 
-if (process.env.ANSEL_DEV_MODE) {
-    document.title = 'Ansel - DEV MODE'
+if (process.env.PICTURAMA_DEV_MODE) {
+    document.title = 'Picturama - DEV MODE'
 } else {
-    document.title = `Ansel - ${pkgs.version}`
+    document.title = `Picturama - ${pkgs.version}`
 }
 
 BackgroundClient.init()

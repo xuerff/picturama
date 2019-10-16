@@ -257,13 +257,6 @@ testImportScanner('broken image',
     })
 
 
-//test('scan test-data', async () => {
-//    const testImportScannerDelegate = new TestImportScannerDelegate()
-//    const importScanner = new ImportScanner(testImportScannerDelegate)
-//    await importScanner.scanPhotos([ '/Users/til/Temp/Ansel_Bilder' ])
-//})
-
-
 function testImportScanner(testName: string, prepareTestDir: (testDir: string) => Promise<void>,
     checkResult: (result: { testDir: string, storedPhotos: Photo[], finalProgress: ImportProgress }) => Promise<void>)
 {

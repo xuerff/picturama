@@ -1,5 +1,5 @@
-How to develop Ansel
-====================
+How to develop Picturama
+========================
 
 
 
@@ -38,7 +38,7 @@ Fetch git submodules:
 
     git submodule update --init --recursive
 
-Fetch dependnencies and build and start Ansel:
+Fetch dependnencies and build and start Picturama:
 
 ```bash
 yarn
@@ -57,7 +57,7 @@ yarn
 Developing main process code
 ----------------------------
 
-If you change code that runs in the main process, you have to restart Ansel each time in order to see your changes.
+If you change code that runs in the main process, you have to restart Picturama each time in order to see your changes.
 Here's how you can use a watch build in order to reduce turnaround time:
 
 1. Run watch build (in extra console):
@@ -67,7 +67,7 @@ Here's how you can use a watch build in order to reduce turnaround time:
 
 2. Change your code.
 
-3. Restart Ansel without building (since building is done by the watch):
+3. Restart Picturama without building (since building is done by the watch):
     ```bash
     yarn run start-no-build
     ```
@@ -112,7 +112,7 @@ UI Tester
     yarn run watch
     ```
 
-2. Run Ansel (in extra console):
+2. Run Picturama (in extra console):
     ```bash
     yarn run start-no-build
     ```
@@ -143,7 +143,7 @@ Only generate the package directory without really packaging it (This is useful 
     yarn run package-dir
 
 **Hint:** In order check what is packed, add a `"asar": false` to the `build`-Object of `package.json`, then run
-`yarn run package-dir` and check the folder `dist-package/mac/Ansel.app/Contents/Resources/app`
+`yarn run package-dir` and check the folder `dist-package/mac/Picturama.app/Contents/Resources/app`
 
 Cross-build linux package on Mac OS or Windows:
 
@@ -159,14 +159,14 @@ Cross-build linux package on Mac OS or Windows:
           -v ~/.cache/electron-builder:/root/.cache/electron-builder \
           electronuserland/builder
 
-  2.  Build `dist-package/Ansel-xyz.deb` for Linux (in docker container):
+  2.  Build `dist-package/Picturama-xyz.deb` for Linux (in docker container):
 
           yarn && yarn run package
 
 Cross-build windows package on Mac OS or Linux:
 
   - Log in to [AppYeyor](https://www.appveyor.com/)
-  - Create a project for Ansel:
+  - Create a project for Picturama:
     - Type: "Git"
     - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/ansel-app/ansel/master/appveyor.yml`
   - Click "New build" on the project details screen.

@@ -1,4 +1,4 @@
-# Ansel
+# Picturama
 
 Digital image organizer powered by the web
 
@@ -27,4 +27,4 @@ Digital image organizer powered by the web
 
 ## Develop
 
-See [DEVELOP.md](DEVELOP.md) for details about how to build Ansel.
+See [DEVELOP.md](DEVELOP.md) for details about how to build Picturama.

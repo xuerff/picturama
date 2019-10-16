@@ -1,6 +1,6 @@
 {
-  "name": "ansel",
-  "productName": "Ansel",
+  "name": "picturama",
+  "productName": "Picturama",
   "version": "1.1.0-dev",
   "description": "Digital image organizer powered by the web",
   "author": "Loïc Nogues <nogues.loic@gmail.com>, Til Schneider <github@murfman.de>",
@@ -12,7 +12,7 @@
     "npm": ">=6.0.0"
   },
   "build": {
-    "appId": "github.ansel",
+    "appId": "github.picturama",
     "mac": {
       "category": "public.app-category.photography",
       "electronLanguages": [
@@ -53,7 +53,7 @@
     "watch": "NODE_ENV=development webpack -w",
     "build": "NODE_ENV=development webpack",
     "build-production": "NODE_ENV=production webpack",
-    "start-no-build": "ANSEL_DEV_MODE=true electron .",
+    "start-no-build": "PICTURAMA_DEV_MODE=true electron .",
     "package-dir": "electron-builder --dir",
     "package": "electron-builder",
     "release": "yarn run clean && yarn run build-production && yarn run package",

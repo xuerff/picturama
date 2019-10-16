@@ -10,7 +10,7 @@ import { TransformationShader } from './Shaders'
 
 
 /**
- * Renders a photo using a WebGL canvas. Provides a high-level API suited for Ansel's photo rendering.
+ * Renders a photo using a WebGL canvas. Provides a high-level API suited for Picturama's photo rendering.
  */
 export default class PhotoCanvas {
 

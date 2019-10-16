@@ -20,4 +20,4 @@ test: off
 
 artifacts:
   - path: 'dist-package\*.exe'
-    name: 'Ansel package'
+    name: 'Picturama package'
