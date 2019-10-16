@@ -22,10 +22,6 @@ if (process.env.ANSEL_DEV_MODE) {
     document.title = `Ansel - ${pkgs.version}`
 }
 
-if (process.env.ANSEL_TEST_MODE) {
-    document.title = 'Ansel - TEST MODE'
-}
-
 BackgroundClient.init()
 
 Promise

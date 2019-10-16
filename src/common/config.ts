@@ -17,17 +17,6 @@ if (process.env.ANSEL_DEV_MODE) {
     anselFolder = `${cwd}`
 }
 
-if (process.env.ANSEL_TEST_MODE) {
-    const testsPath = `${os.tmpdir()}/ansel-tests`
-
-    if (!fs.existsSync(testsPath)) {
-        fs.mkdirSync(testsPath)
-    }
-
-    dotAnsel = `${testsPath}/dot-ansel`
-    dbMigrationsFolder = `${cwd}/migrations`
-}
-
 const menusFolder = `${anselFolder}/menus`
 const platform = os.platform()
 
