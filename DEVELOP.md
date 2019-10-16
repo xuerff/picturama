@@ -168,7 +168,7 @@ Cross-build windows package on Mac OS or Linux:
   - Log in to [AppYeyor](https://www.appveyor.com/)
   - Create a project for Picturama:
     - Type: "Git"
-    - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/ansel-app/ansel/master/appveyor.yml`
+    - In Settings -> General set "Custom configuration .yml file name" to `https://raw.githubusercontent.com/picturama/picturama/master/appveyor.yml`
   - Click "New build" on the project details screen.
 
 For more details see:

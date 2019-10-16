@@ -148,5 +148,5 @@
     "webpack-fix-default-import-plugin": "^1.0.3",
     "webpack-node-externals": "^1.7.2"
   },
-  "repository": "https://github.com/ansel-app/ansel.git"
+  "repository": "https://github.com/picturama/picturama.git"
 }

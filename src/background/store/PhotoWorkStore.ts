@@ -50,7 +50,7 @@ const storeDelay = 2000
 
 const picturamaYmlHeader =
     '# This file contains the changes applied to photos in this directory using Picturama.\n' +
-    '# See: https://github.com/ansel-app/ansel\n\n'
+    '# See: https://picturama.github.io/\n\n'
 
 
 class DirectoryWork {
