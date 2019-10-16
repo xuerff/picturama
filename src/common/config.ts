@@ -6,14 +6,17 @@ import { PhotoRenderFormat } from 'common/CommonTypes'
 
 
 let picturamaAppDir: string
+let anselHomeDir: string
 let picturamaHomeDir: string
 if (process.env.PICTURAMA_DEV_MODE) {
     const cwd = process.cwd()
     picturamaAppDir = `${cwd}`
-    picturamaHomeDir = `${cwd}/dot-ansel`
+    anselHomeDir = `${cwd}/dot-ansel`
+    picturamaHomeDir = `${cwd}/dot-picturama`
 } else {
     picturamaAppDir = `${process.resourcesPath}/app`
-    picturamaHomeDir = `${os.homedir()}/.ansel`
+    anselHomeDir = `${os.homedir()}/.ansel`
+    picturamaHomeDir = `${os.homedir()}/.picturama`
 }
 
 const menusFolder = `${picturamaAppDir}/menus`
@@ -26,6 +29,8 @@ export default {
     acceptedNonRawExtensions: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
     watchedFormats: /([$#\w\d]+)-([$#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
     workExt: 'webp' as  PhotoRenderFormat,
+    /** The home directory of version 1.0.0 and before (where Picturama's name was Ansel) */
+    anselHomeDir,
     picturamaHomeDir,
     menusFolder,
     keymapsFolder: `${picturamaAppDir}/keymaps`,

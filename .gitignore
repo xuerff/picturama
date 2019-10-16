@@ -1,7 +1,7 @@
 /dist/
 /dist-package/
 /dist-test/
-/dot-ansel*/
+/dot-picturama*/
 /node_modules/
 /*.patch
 ansel.json

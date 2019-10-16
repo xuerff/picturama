@@ -13,7 +13,7 @@ import MainMenu from 'background/MainMenu'
 //import Watch from 'background/watch'
 import { init as initBackgroundService, onBackgroundReady } from 'background/BackgroundService'
 import ForegroundClient from 'background/ForegroundClient'
-import { fsUnlink, fsUnlinkDeep, fsMkDirIfNotExists } from 'background/util/FileUtil'
+import { fsUnlink, fsUnlinkDeep, fsMkDirIfNotExists, fsExists, fsRename } from 'background/util/FileUtil'
 
 
 initSourceMapSupport()
@@ -103,6 +103,9 @@ function initDb(): Promise<any> {
         const dbOptions: DBOptions = { path: config.dbFile, migrate: false }
         initDbPromise =
             (async() => {
+                if (await fsExists(config.anselHomeDir)) {
+                    await fsRename(config.anselHomeDir, config.picturamaHomeDir)
+                }
                 await fsMkDirIfNotExists(config.picturamaHomeDir)
                 await Promise.all([
                     fsMkDirIfNotExists(config.tmp),
