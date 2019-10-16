@@ -1,16 +1,25 @@
-import fs, { PathLike, Dirent } from 'fs'
+import fs, { PathLike, Dirent, WriteFileOptions } from 'fs'
 import BluebirdPromise, { promisify } from 'bluebird'
 
 
 export const fsMkDir = promisify(fs.mkdir)
 export const fsReadDir: (path: PathLike, options?: { encoding?: string, withFileTypes?: false }) => BluebirdPromise<string[]> = promisify(fs.readdir)
-export const fsReadFile = promisify(fs.readFile)
+export const fsReadFile = promisify(fs.readFile) as
+    {
+        (path: PathLike | number): BluebirdPromise<Buffer>
+        (path: PathLike | number, options: { encoding?: null; flag?: string; } | undefined | null): BluebirdPromise<Buffer>
+        (path: PathLike | number, options: { encoding: string; flag?: string; } | string): BluebirdPromise<string>
+    }
 export const fsRename = promisify(fs.rename)
 export const fsRmDir = promisify(fs.rmdir)
 export const fsStat = promisify(fs.stat)
 export const fsUnlink = promisify(fs.unlink)
 export const fsUtimes = promisify(fs.utimes)
-export const fsWriteFile = promisify(fs.writeFile)
+export const fsWriteFile = promisify(fs.writeFile) as
+    {
+        (path: PathLike | number, data: any, options: WriteFileOptions): BluebirdPromise<void>
+        (path: PathLike | number, data: any): BluebirdPromise<void>
+    }
 
 
 export function fsReadDirWithFileTypes(path: PathLike, options?: { encoding?: string }): BluebirdPromise<Dirent[]> {

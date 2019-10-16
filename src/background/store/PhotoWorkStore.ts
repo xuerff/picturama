@@ -1,7 +1,7 @@
 import fs from 'fs'
 import readline from 'readline'
-import stringify from 'json-stringify-pretty-compact'
-import { mat4, vec2 } from 'gl-matrix'
+import { vec2 } from 'gl-matrix'
+import yaml from 'js-yaml'
 
 import { Photo, PhotoWork, ExifOrientation } from 'common/CommonTypes'
 import { createProjectionMatrix } from 'common/util/CameraMetrics'
@@ -9,9 +9,10 @@ import { rotate } from 'common/util/EffectsUtil'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 import { Rect } from 'common/util/GeometryTypes'
 import { scaleRectToFitBorders, centerOfRect, Vec2Like, cornerPointOfRect, rectFromPoints } from 'common/util/GeometryUtil'
+import { round } from 'common/util/LangUtil'
 import { parsePath } from 'common/util/TextUtil'
 
-import { fsExists, fsUnlink, fsWriteFile, fsReadFile } from 'background/util/FileUtil'
+import { fsExists, fsUnlink, fsWriteFile, fsReadFile, fsUnlinkIfExists } from 'background/util/FileUtil'
 
 
 declare global {
@@ -24,7 +25,7 @@ declare global {
 assertMainProcess()
 
 
-/** The data as it is stored in ansel.json */
+/** The data as it is stored in picturama.yml */
 interface DirectoryWorkData {
     photos: { [key:string]: PhotoWork }
 }
@@ -46,6 +47,10 @@ interface DirectoryData {
 
 const refetchInterval = 30000
 const storeDelay = 2000
+
+const picturamaYmlHeader =
+    '# This file contains the changes applied to photos in this directory using Picturama.\n' +
+    '# See: https://github.com/ansel-app/ansel\n\n'
 
 
 class DirectoryWork {
@@ -74,7 +79,7 @@ class DirectoryWork {
         } else {
             this.runningFetch = Promise.all(
                 [
-                    fetchAnselJson(this.directoryPath),
+                    fetchPicturamaYml(this.directoryPath),
                     fetchPicasaIni(this.directoryPath)
                 ])
                 .then(results => {
@@ -112,9 +117,6 @@ class DirectoryWork {
     }
 
     public async storePhotoWork(photoBasename: string, photoWork: PhotoWork) {
-        // Why `toCanonical`?
-        // We store the photos in canonical order (with sorted keys) so a `ansel.json` file produces less conflicts when version controlled.
-
         const data = await this.fetchData()
         const picturamaData = data.picturamaData
 
@@ -122,15 +124,7 @@ class DirectoryWork {
         if (isEmpty) {
             delete picturamaData.photos[photoBasename]
         } else {
-            photoWork = toCanonical(photoWork)
             picturamaData.photos[photoBasename] = photoWork
-
-            const isNew = !picturamaData.photos[photoBasename]
-            if (isNew) {
-                // This is a new photo
-                // -> We have to sort the keys
-                picturamaData.photos = toCanonical(picturamaData.photos)
-            }
         }
 
         this.onDataChanged()
@@ -143,23 +137,28 @@ class DirectoryWork {
         }
 
         this.isStoreRunning = true
-        const directoryWorkFile = this.directoryPath + '/ansel.json'
         const storePromise =
             (async () => {
                 await new Promise(resolve => setTimeout(resolve, storeDelay))
                 this.needsStoreFollowup = false
                 const picturamaData = this.data && this.data.picturamaData
+
+                const picturamaYmlFile = this.directoryPath + '/picturama.yml'
                 const isEmpty = !picturamaData || Object.keys(picturamaData.photos).length === 0
                 if (isEmpty) {
-                    if (await fsExists(directoryWorkFile)) {
-                        await fsUnlink(directoryWorkFile)
-                        console.log('Removed empty ' + directoryWorkFile)
+                    if (await fsExists(picturamaYmlFile)) {
+                        await fsUnlink(picturamaYmlFile)
+                        console.log('Removed empty ' + picturamaYmlFile)
                     }
                 } else {
-                    const json = stringify(picturamaData)
-                    await fsWriteFile(directoryWorkFile, json)
-                    console.log('Stored ' + directoryWorkFile)
+                    // Why `sortKeys: true`?
+                    // We store the photos in canonical order (with sorted keys) so a `picturama.yml` file produces less conflicts when version controlled.
+                    const ymlString = picturamaYmlHeader + yaml.safeDump(picturamaData, { sortKeys: true, flowLevel: 3 })
+                    await fsWriteFile(picturamaYmlFile, ymlString, 'utf8')
+                    console.log('Stored ' + picturamaYmlFile)
                 }
+
+                await fsUnlinkIfExists(this.directoryPath + '/ansel.json')
             })()
             .then(() => {
                 this.isStoreRunning = false
@@ -176,16 +175,23 @@ class DirectoryWork {
 }
 
 
-async function fetchAnselJson(directoryPath: string): Promise<DirectoryWorkData> {
-    const directoryWorkFile = directoryPath + '/ansel.json'
-    if (! await fsExists(directoryWorkFile)) {
-        return { photos: {} }
+async function fetchPicturamaYml(directoryPath: string): Promise<DirectoryWorkData> {
+    const picturamaYmlFile = directoryPath + '/picturama.yml'
+    const anselJsonFile = directoryPath + '/ansel.json'
+    let result: DirectoryWorkData
+    if (await fsExists(picturamaYmlFile)) {
+        const ymlString = await fsReadFile(picturamaYmlFile, 'utf8')
+        result = yaml.safeLoad(ymlString)
+        console.log('Fetched ' + picturamaYmlFile)
+    } else if (await fsExists(anselJsonFile)) {
+        // Legacy support: `ansel.json` was used by version 1.0.0 and before (where Picturama's name was Ansel)
+        const buffer = await fsReadFile(anselJsonFile)
+        result = JSON.parse(buffer)
+        console.log('Fetched ' + anselJsonFile)
     } else {
-        const buffer = await fsReadFile(directoryWorkFile)
-        const picturamaData = JSON.parse(buffer) as DirectoryWorkData
-        console.log('Fetched ' + directoryWorkFile)
-        return picturamaData
+        result = { photos: {} }
     }
+    return result
 }
 
 
@@ -318,6 +324,10 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
         // shrinks it to fit into the borders of the cropped image while keeping the aspect ratio.
         // For details see: doc/picasa-ini-format.md
 
+        if (photoWork.tilt) {
+            photoWork.tilt = round(photoWork.tilt, 1)
+        }
+
         let picasaCanvasRect: Rect | null = null
         if (picasaCropRect) {
             if (picasaCropRect.length > 16) {
@@ -370,16 +380,6 @@ function createPhotoWorkFromPicasaRules(picasaRules: PicasaRules, directoryPath:
     }
 
     return photoWork
-}
-
-
-function toCanonical<T extends { [key:string]: any }>(obj: T): T {
-    const sortedKeys = Object.keys(obj).sort()
-    const sortedObj = {}
-    for (const key of sortedKeys) {
-        sortedObj[key] = obj[key]
-    }
-    return sortedObj as T
 }
 
 

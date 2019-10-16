@@ -4,7 +4,7 @@
 /dot-picturama*/
 /node_modules/
 /*.patch
-ansel.json
+picturama.yml
 
 npm-debug.log
 .DS_Store

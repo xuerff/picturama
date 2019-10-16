@@ -79,7 +79,7 @@ export function updatePhotoWork(photo: Photo, update: (photoWork: PhotoWork) => 
 
                 // We do all in parallel:
                 //   - Show the new effects in UI
-                //   - Store PhotoWork to ansel.json
+                //   - Store PhotoWork to picturama.yml
                 //   - Update Thumbnail
 
                 store.dispatch(changePhotoWorkAction(photo.id, photoWork))

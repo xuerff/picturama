@@ -1,5 +1,3 @@
-import stringify from 'json-stringify-pretty-compact'
-
 import { Settings } from 'common/CommonTypes'
 import config from 'common/config'
 import { isArray, isObject } from 'common/util/LangUtil'
@@ -44,5 +42,5 @@ export function fetchSettings(): Promise<Settings> {
 
 export async function storeSettings(settings: Settings): Promise<void> {
     fetchSettingsPromise = Promise.resolve(settings)
-    await fsWriteFile(config.settings, stringify(settings))
+    await fsWriteFile(config.settings, JSON.stringify(settings))
 }
