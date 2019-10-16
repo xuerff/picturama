@@ -1,0 +1,3 @@
+[submodule "submodules/node-libraw"]
+	path = submodules/node-libraw
+	url = https://github.com/picturama/node-libraw.git
