@@ -429,7 +429,7 @@ function getScrollTopForNailedGridPosition(nailedGridPosition: NailedGridPositio
     }
 
     const avgCenterY = totalCenterY / centerYCount
-    return Math.round(avgCenterY - viewportHeight / 2)
+    return Math.max(0, Math.round(avgCenterY - viewportHeight / 2))
 }
 
 
