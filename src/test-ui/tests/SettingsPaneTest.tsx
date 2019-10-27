@@ -10,6 +10,7 @@ const defaultProps: Props = {
     settings: {
         photoDirs: [ '/Users/me/Documents/Photos', '/Users/me/ownCloud/Photos' ],
     },
+    toggleMaximized: action('toggleMaximized'),
     selectDirectories: () => Promise.resolve([ '/Users/me/Dropbox/Photos' ]),
     onSettingsChange: action('onSettingsChange'),
     onClose: action('onClose'),

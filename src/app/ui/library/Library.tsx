@@ -70,6 +70,7 @@ interface DispatchProps {
     setSelectedPhotos: (sectionId: PhotoSectionId | null, photoIds: PhotoId[]) => void
     setDetailPhotoById: (sectionId: PhotoSectionId, photoId: PhotoId) => void
     setInfoPhoto: (sectionId: PhotoSectionId | null, photoId: PhotoId | null) => void
+    toggleMaximized(): void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
     setPhotoTags: (photo: Photo, tags: string[]) => void
@@ -222,6 +223,7 @@ export class Library extends React.Component<Props, State> {
                     isShowingTrash={props.libraryFilterType === 'trash'}
                     isShowingInfo={state.isShowingInfo}
                     photosCount={props.photoCount}
+                    toggleMaximized={props.toggleMaximized}
                     openExport={props.openExport}
                     updatePhotoWork={props.updatePhotoWork}
                     setPhotosFlagged={props.setPhotosFlagged}
@@ -320,6 +322,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         createThumbnail,
         setDetailPhotoById,
         setInfoPhoto,
+        toggleMaximized: BackgroundClient.toggleMaximized,
         setPhotosFlagged,
         setPhotoTags,
         updatePhotoWork,

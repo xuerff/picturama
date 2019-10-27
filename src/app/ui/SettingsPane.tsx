@@ -29,6 +29,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
+    toggleMaximized(): void
     selectDirectories(): Promise<string[] | undefined>
     onSettingsChange(settings: Settings): void
     onClose(settings: Settings, startImport: boolean): void
@@ -80,7 +81,11 @@ export class SettingsPane extends React.Component<Props> {
         return (
             <div className={classnames(props.className, 'SettingsPane')} style={props.style}>
                 <LogoDecoration getDecorationWidth={this.getDecorationWidth}/>
-                <Toolbar className="SettingsPane-topBar" isLeft={true}>
+                <Toolbar
+                    className="SettingsPane-topBar"
+                    isLeft={true}
+                    onBackgroundDoubleClick={props.toggleMaximized}
+                >
                     <Button onClick={this.onClose}>
                         <FaIcon name="chevron-left"/>
                         <span>{msg('common_backToLibrary')}</span>
@@ -137,6 +142,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         }
     },
     dispatch => ({
+        toggleMaximized: BackgroundClient.toggleMaximized,
         selectDirectories: BackgroundClient.selectDirectories,
         onSettingsChange(settings: Settings) {
             dispatch(setSettingsAction(settings))

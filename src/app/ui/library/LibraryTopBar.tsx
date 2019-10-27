@@ -12,8 +12,6 @@ import Toolbar from 'app/ui/widget/Toolbar'
 
 import './LibraryTopBar.less'
 
-const dialog = remote.dialog;
-
 
 interface Props {
     className?: any
@@ -23,6 +21,7 @@ interface Props {
     isShowingTrash: boolean
     isShowingInfo: boolean
     photosCount: number
+    toggleMaximized(): void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
@@ -38,22 +37,26 @@ export default class LibraryTopBar extends React.Component<Props> {
         bindMany(this, 'emptyTrashModal')
     }
 
-    emptyTrashModal() {
-        dialog.showMessageBox({
-            type: 'question',
-            message: msg('LibraryTopBar_emptyTrashQuestion'),
-            buttons: [ msg('LibraryTopBar_moveToTrash'), msg('common_cancel') ]
-        }, index => {
-            if (index === 0) {
-                ipcRenderer.send('empty-trash', true)
-            }
-        })
+    private emptyTrashModal() {
+        remote.dialog.showMessageBox(
+            {
+                type: 'question',
+                message: msg('LibraryTopBar_emptyTrashQuestion'),
+                buttons: [ msg('LibraryTopBar_moveToTrash'), msg('common_cancel') ]
+            }, index => {
+                if (index === 0) {
+                    ipcRenderer.send('empty-trash', true)
+                }
+            })
     }
 
     render() {
         const props = this.props
         return (
-            <Toolbar className={classNames(props.className, 'LibraryTopBar')}>
+            <Toolbar
+                className={classNames(props.className, 'LibraryTopBar')}
+                onBackgroundDoubleClick={props.toggleMaximized}
+            >
                 {props.leftItem}
 
                 <div className="pull-right">

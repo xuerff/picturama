@@ -35,6 +35,7 @@ export interface Props {
     srcNext: string | null
     orientation: ExifOrientation
     photoWork: PhotoWork | null
+    toggleMaximized(): void
     setMode(mode: DetailMode): void
     setPreviousDetailPhoto(): void
     setNextDetailPhoto(): void
@@ -218,6 +219,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                         isLast={props.isLast}
                         cameraMetrics={state.cameraMetrics}
                         isShowingInfo={props.isShowingInfo}
+                        toggleMaximized={props.toggleMaximized}
                         setPreviousDetailPhoto={props.setPreviousDetailPhoto}
                         setNextDetailPhoto={props.setNextDetailPhoto}
                         setPhotoPosition={this.setPhotoPosition}
@@ -239,6 +241,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                         exifOrientation={props.photo.orientation}
                         photoWork={state.editedPhotoWork || props.photoWork}
                         cameraMetrics={state.cameraMetrics}
+                        toggleMaximized={props.toggleMaximized}
                         onPhotoWorkEdited={this.onPhotoWorkEdited}
                         onDone={this.onCropDone}
                     />

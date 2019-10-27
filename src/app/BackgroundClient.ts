@@ -51,6 +51,10 @@ export default {
         return callOnBackground('toggleFullScreen')
     },
 
+    toggleMaximized(): Promise<void> {
+        return callOnBackground('toggleMaximized')
+    },
+
     fetchUiConfig(): Promise<UiConfig> {
         return callOnBackground('fetchUiConfig')
     },

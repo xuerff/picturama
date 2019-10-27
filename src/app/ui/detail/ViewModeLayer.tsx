@@ -25,6 +25,7 @@ export interface Props {
     isLast: boolean
     cameraMetrics: CameraMetrics | null
     isShowingInfo: boolean
+    toggleMaximized(): void
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
     setPhotoPosition(photoPosition: RequestedPhotoPosition): void
@@ -104,7 +105,11 @@ export default class ViewModeLayer extends React.Component<Props> {
 
         return (
             <>
-                <Toolbar className={classnames(props.topBarClassName, 'ViewModeLayer-toolbar')} isLeft={true}>
+                <Toolbar
+                    className={classnames(props.topBarClassName, 'ViewModeLayer-toolbar')}
+                    isLeft={true}
+                    onBackgroundDoubleClick={props.toggleMaximized}
+                >
                     <Button onClick={commands.close.onAction}>
                         <FaIcon name="chevron-left"/>
                         <span>{commands.close.label}</span>

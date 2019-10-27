@@ -56,6 +56,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return waitForBackgroundReadyPromise
     } else if (action === 'toggleFullScreen') {
         AppWindowController.toggleFullScreen()
+    } else if (action === 'toggleMaximized') {
+        AppWindowController.toggleMaximized()
     } else if (action === 'fetchUiConfig') {
         return Promise.resolve(uiConfig)
     } else if (action === 'fetchSettings') {
