@@ -15,10 +15,11 @@ export type I18nKey = keyof typeof text_en
 const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
     de: text_de,
     en: text_en,
-    es: text_es,
+    es: text_es as any,
 }
 
 const msgFormatRe = /\{(\d+)\}/g
+const msgSplitRe = /(\{\d+\})/g
 
 
 let locale: Locale
@@ -40,15 +41,26 @@ export function getLocale(): string {
 }
 
 export function msg(key: I18nKey, ...args: any[]): string {
+    if (!locale) {
+        throw new Error('msg was called before locale was set')
+    }
+
     let text: string | undefined = textsByLang[locale][key]
     if (!text) {
         console.error(`Missing I18N key for ${locale}: ${key}`)
-        return textsByLang[fallbackLocale][key] || `[${key}]`
-    } else {
-        if (args && args.length > 0) {
-            return text.replace(msgFormatRe, (match, group1) => args[parseInt(group1)])
-        } else {
-            return text
+        text = textsByLang[fallbackLocale][key]
+        if (!text) {
+            return `[${key}]`
         }
     }
+
+    if (args && args.length > 0) {
+        return text.replace(msgFormatRe, (match, group1) => args[parseInt(group1)])
+    } else {
+        return text
+    }
+}
+
+export function splitMsg(key: I18nKey): string[] {
+    return msg(key).split(msgSplitRe)
 }

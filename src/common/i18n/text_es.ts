@@ -2,6 +2,7 @@ export default {
 
     common_cancel: 'Cancelar',
     common_backToLibrary: 'Volver a la biblioteca',
+    common_ratio: '{0} de {1}',
 
     CropModeToolbar_aspect_free: 'Libre',
     CropModeToolbar_aspect_original: 'Original',
@@ -22,7 +23,6 @@ export default {
     ImportProgressButton_phase_cleanup: 'Limpiando',
     ImportProgressButton_phase_import_photos: 'Importando',
     ImportProgressButton_phase_error: 'Escaneo fallido',
-    ImportProgressButton_ratio: '{0} of {1}',
     ImportProgressButton_resume: 'Reanudar',
     ImportProgressButton_pause: 'Pausa',
 

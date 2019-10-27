@@ -7,13 +7,13 @@ import classNames from 'classnames'
 import { ImportProgress } from 'common/CommonTypes'
 
 import BackgroundClient from 'app/BackgroundClient'
-import Export from 'app/ui/Export'
-import PhotoDetailPane from 'app/ui//detail/PhotoDetailPane'
-import PictureDiff from 'app/ui/PictureDiff'
-import SettingsPane from 'app/ui/SettingsPane'
+import PhotoDetailPane from 'app/ui/detail/PhotoDetailPane'
+import ExportDialog from 'app/ui/export/ExportDialog'
 import Library from 'app/ui/library/Library'
 import LibraryFilterButton from 'app/ui/library/LibraryFilterButton'
 import ImportProgressButton from 'app/ui/ImportProgressButton'
+import PictureDiff from 'app/ui/PictureDiff'
+import SettingsPane from 'app/ui/SettingsPane'
 import { openSettingsAction } from 'app/state/actions'
 import { AppState, MainViewState } from 'app/state/StateTypes'
 
@@ -55,7 +55,7 @@ class App extends React.Component<Props> {
 
         let modalView: ReactNode | null = null
         if (props.showExport) {
-            modalView = <Export />
+            modalView = <ExportDialog />
         }
 
         let mainView: ReactNode | null = null

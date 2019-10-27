@@ -70,7 +70,7 @@ export default class ImportProgressButton extends React.Component<Props, State> 
                         {progress.phase !== 'cleanup' &&
                             <div className='ImportProgressButton-ratio'>
                                 {spinnerProgress ?
-                                    msg('ImportProgressButton_ratio', formatNumber(progress.processed), formatNumber(progress.total)) :
+                                    msg('common_ratio', formatNumber(progress.processed), formatNumber(progress.total)) :
                                     formatNumber(progress.total)
                                 }
                             </div>

@@ -1,6 +1,6 @@
 import { action, createAsyncAction } from 'typesafe-actions'
 
-import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoSet, PhotoFilter, Settings, UiConfig } from 'common/CommonTypes'
+import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, PhotoSectionId, PhotoSet, PhotoFilter, Settings, UiConfig, PhotoExportOptions, PhotoExportProgress } from 'common/CommonTypes'
 import { ImportProgress } from 'common/CommonTypes'
 
 import {
@@ -9,7 +9,8 @@ import {
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_LIBRARY_INFO_PHOTO_FAILURE,FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
     CHANGE_PHOTOWORK, CHANGE_PHOTOS, EMPTY_TRASH, SET_IMPORT_PROGRESS, FETCH_TAGS, SET_PHOTO_TAGS,
-    INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT
+    INIT_DEVICES, ADD_DEVICE, REMOVE_DEVICE, OPEN_DIFF, CLOSE_DIFF, OPEN_EXPORT, CLOSE_EXPORT, SET_EXPORT_OPTIONS,
+    TOGGLE_SHOW_EXPORT_REMOVE_INFO_DESC, SET_EXPORT_PROGRESS
 } from './actionTypes'
 
 
@@ -50,3 +51,6 @@ export const closeDiffAction = () => action(CLOSE_DIFF)
 
 export const openExportAction = (sectionId: PhotoSectionId, photoIds: PhotoId[]) => action(OPEN_EXPORT, { sectionId, photoIds })
 export const closeExportAction = () => action(CLOSE_EXPORT)
+export const setExportOptionsAction = (options: PhotoExportOptions) => action(SET_EXPORT_OPTIONS, options)
+export const toggleShowExportRemoveInfoDescAction = () => action(TOGGLE_SHOW_EXPORT_REMOVE_INFO_DESC)
+export const setExportProgressAction = (progress: PhotoExportProgress) => action(SET_EXPORT_PROGRESS, progress)

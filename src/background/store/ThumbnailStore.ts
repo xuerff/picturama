@@ -15,7 +15,10 @@ import { fetchPhotoWorkOfPhoto } from './PhotoWorkStore'
 // Max width is relatively high in order to get most panorama images with full row height.
 const maxThumbnailSize: Size = { width: 1024, height: 320 }
 
-const thumbnailRenderOptions: PhotoRenderOptions = { format: config.workExt }
+const thumbnailRenderOptions: PhotoRenderOptions = {
+    format: config.workExt,
+    quality: 0.92  // 0.92 is the official default. See: https://developer.mozilla.org/de/docs/Web/API/HTMLCanvasElement/toDataURL
+}
 
 
 const createThumbnailQueue = new SerialJobQueue(

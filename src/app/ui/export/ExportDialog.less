@@ -1,0 +1,106 @@
+@import "../../style/variables.less";
+
+.ExportDialog-form {
+    display: grid;
+    padding: 20px;
+    grid-template-columns: auto minmax(auto, 1fr);
+    grid-gap: 0 20px;
+
+    > .bp3-label {
+        padding: 4px 0;
+    }
+    > * {
+        justify-self: start;
+    }
+}
+
+.ExportDialog-customSize {
+    grid-column: 2;
+    width: 100%;
+
+    .bp3-collapse-body {
+        padding-bottom: 10px;
+    }
+}
+
+.ExportDialog-customSizeBody {
+    display: grid;
+    grid-gap: 0 10px;
+    text-align: center;
+    padding: 10px 0 !important;
+}
+
+.ExportDialog-customSizeSide,
+.ExportDialog-customSizePixels {
+    margin: 0 5px;
+    vertical-align: baseline !important;
+}
+
+.ExportDialog-customSizePixels {
+    width: 80px;
+}
+
+.ExportDialog-customSizeSideIcon {
+    margin: 16px auto 5px auto;
+}
+
+.ExportDialog-removeInfo {
+    margin-top: 4px;
+    margin-right: 8px !important;
+}
+
+.ExportDialog-removeInfoToggleDesc {
+    margin-top: -2px;
+}
+
+.ExportDialog-removeInfoDesc {
+    margin-bottom: 12px;
+    padding-left: 26px;
+}
+
+.ExportDialog-fileName {
+    width: 100%;
+}
+
+.ExportDialog-fileNameStyle {
+    margin-bottom: 10px;
+}
+
+.ExportDialog-fileNamePrefixLabel {
+    font-size: 14px;
+}
+
+.ExportDialog-sequenceExample {
+    margin-top: 4px;
+}
+
+.ExportDialog-progressBody {
+    text-align: center;
+
+    .bp3-spinner-head {
+        // Disable transition, because it won't be renderered while exported image is rendered
+        transition: none !important;
+    }
+}
+
+.ExportDialog-progressFolder {
+    color: @blue-grey-400;
+    margin: 20px 0;
+}
+
+.ExportDialog-progressPercent {
+    margin-top: -79px;
+    margin-bottom: 60px;
+    font-size: 30px;
+}
+
+.ExportDialog-progressRatio {
+    color: @blue-grey-400;
+    margin-bottom: 20px;
+}
+
+.ExportDialog-progressActions {
+    button {
+        margin: 0 auto !important;
+    }
+}

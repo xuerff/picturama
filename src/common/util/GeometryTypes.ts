@@ -10,6 +10,9 @@ export interface Size {
     height: number
 }
 export const zeroSize: Size = { width: 0, height: 0 }
+export function isSize(obj: any): obj is Size {
+    return obj && typeof obj.width === 'number' && typeof obj.height === 'number'
+}
 
 export type Rect = Point & Size
 export const zeroRect: Rect = { x: 0, y: 0, width: 0, height: 0 }

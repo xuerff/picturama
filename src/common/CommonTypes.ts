@@ -167,12 +167,26 @@ export type PhotoFilter =
 export interface PhotoRenderOptions {
     format: PhotoRenderFormat
     /** Quality between `0` and `1`. Will be ignored if `format` is `png` */
-    quality?: number
+    quality: number
 }
 export type PhotoRenderFormat = 'jpg' | 'webp' | 'png'
 export const photoRenderFormats: PhotoRenderFormat[] = [ 'jpg', 'webp', 'png' ]
 
 
 export interface PhotoExportOptions extends PhotoRenderOptions {
+    size: PhotoExportSizeType
+    customSizeSide: PhotoExportCustomSizeSide
+    customSizePixels: number
     withMetadata: boolean
+    fileNameStyle: PhotoExportFileNameStyle
+    fileNamePrefix: string
+    folderPath: string
+}
+export type PhotoExportSizeType = 'S' | 'M' | 'L' | 'original' | 'custom'
+export type PhotoExportCustomSizeSide = 'width' | 'height' | 'size'
+export type PhotoExportFileNameStyle = 'like-original' | 'sequence'
+
+export interface PhotoExportProgress {
+    processed: number
+    total: number
 }
