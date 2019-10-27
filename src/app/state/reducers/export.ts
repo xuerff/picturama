@@ -1,17 +1,17 @@
 import { Action } from 'app/state/ActionType'
 import { OPEN_EXPORT, CLOSE_EXPORT, SET_EXPORT_OPTIONS, TOGGLE_SHOW_EXPORT_REMOVE_INFO_DESC, SET_EXPORT_PROGRESS } from 'app/state/actionTypes'
-import { ExportState } from 'app/state/StateTypes'
+import { ExportState, DataState } from 'app/state/StateTypes'
 import { PhotoExportOptions } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 
 
-export const exportReducer = (state: ExportState = null, action: Action): ExportState => {
+export const exportReducer = (state: ExportState = null, dataState: DataState, action: Action): ExportState => {
     switch (action.type) {
         case OPEN_EXPORT:
             return {
                 sectionId: action.payload.sectionId, 
                 photoIds: action.payload.photoIds,
-                exportOptions: createDefaultExportOptions(),
+                exportOptions: dataState.settings.exportOptions || createDefaultExportOptions(),
                 showRemoveInfoDesc: false,
                 progress: null,
             }

@@ -42,5 +42,5 @@ export function fetchSettings(): Promise<Settings> {
 
 export async function storeSettings(settings: Settings): Promise<void> {
     fetchSettingsPromise = Promise.resolve(settings)
-    await fsWriteFile(config.settings, JSON.stringify(settings))
+    await fsWriteFile(config.settings, JSON.stringify(settings, null, 4))
 }

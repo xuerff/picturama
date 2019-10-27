@@ -19,6 +19,6 @@ export default (state: AppState = {} as AppState, action: Action) => {
         library: library(state.library, action),
         detail: detailState,
         import: importReducer(state.import, action),
-        export: exportReducer(state.export, action),
+        export: exportReducer(state.export, dataState, action),
     }
 }

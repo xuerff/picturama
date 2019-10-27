@@ -5,7 +5,7 @@ import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { PhotoExportOptions, Photo, LoadedPhotoSection } from 'common/CommonTypes'
 
-import { closeExportAction, setExportProgressAction } from 'app/state/actions'
+import { closeExportAction, setExportProgressAction, setSettingsAction } from 'app/state/actions'
 import store from 'app/state/store'
 import BackgroundClient from 'app/BackgroundClient'
 import { showError } from 'app/ErrorPresenter'
@@ -65,6 +65,8 @@ async function runExport(exportInfo: ExportInfo): Promise<void> {
     const { exportOptions } = exportInfo
     const photoCount = exportInfo.photos.length
 
+    // Select target folder
+
     const filePaths: string[] | undefined = await new Promise(resolve => {
         remote.dialog.showOpenDialog(
             { properties: [ 'openDirectory', 'createDirectory' ] },
@@ -81,6 +83,18 @@ async function runExport(exportInfo: ExportInfo): Promise<void> {
     }
     exportOptions.folderPath = filePaths[0]
 
+    // Store settings
+
+    const settings = store.getState().data.settings
+    settings.exportOptions = exportOptions
+    store.dispatch(setSettingsAction(settings))
+    await BackgroundClient.storeSettings(settings)
+    if (exportInfo.isCancelled) {
+        return
+    }
+
+    // Export photos
+
     for (let photoIndex = 0; photoIndex < photoCount; photoIndex++) {
         store.dispatch(setExportProgressAction({
             processed: photoIndex,
@@ -93,6 +107,8 @@ async function runExport(exportInfo: ExportInfo): Promise<void> {
             return
         }
     }
+
+    // Show done notification
 
     notifier.notify({
         title: 'Picturama',

@@ -81,6 +81,7 @@ export enum ExifOrientation { Up = 1, Bottom = 3, Right = 6, Left = 8 }
 
 export interface Settings {
     photoDirs: string[]
+    exportOptions?: PhotoExportOptions
     legacy?: {
         versionsDir?: string
     }
