@@ -88,7 +88,7 @@ async function runExport(exportInfo: ExportInfo): Promise<void> {
         }))
 
         const photo = exportInfo.photos[photoIndex]
-        await BackgroundClient.exportPhoto(photo, exportOptions.folderPath, exportOptions)
+        await BackgroundClient.exportPhoto(photo, photoIndex, exportOptions)
         if (exportInfo.isCancelled) {
             return
         }

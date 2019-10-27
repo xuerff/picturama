@@ -99,7 +99,7 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         const shouldFetchTags = await storePhotoTags(params.photoId, params.photoTags)
         return shouldFetchTags ? (await fetchTags()) : null
     } else if (action === 'exportPhoto') {
-        return exportPhoto(params.photo, params.folderPath, params.options)
+        return exportPhoto(params.photo, params.photoIndex, params.options)
     } else {
         throw new Error('Unknown background action: ' + action)
     }

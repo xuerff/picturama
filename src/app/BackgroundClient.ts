@@ -127,8 +127,8 @@ export default {
         return callOnBackground('storePhotoTags', { photoId, photoTags })
     },
 
-    exportPhoto(photo: Photo, folderPath: string, options: PhotoExportOptions): Promise<void> {
-        return callOnBackground('exportPhoto', { photo, folderPath, options })
+    exportPhoto(photo: Photo, photoIndex: number, options: PhotoExportOptions): Promise<void> {
+        return callOnBackground('exportPhoto', { photo, photoIndex, options })
     },
 }
 
