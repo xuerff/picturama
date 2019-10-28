@@ -145,7 +145,7 @@ Only generate the package directory without really packaging it (This is useful 
 **Hint:** In order check what is packed, add a `"asar": false` to the `build`-Object of `package.json`, then run
 `yarn run package-dir` and check the folder `dist-package/mac/Picturama.app/Contents/Resources/app`
 
-Cross-build linux package on Mac OS or Windows:
+Cross-build linux package on macOS or Windows:
 
   1.  Run docker container:
 
@@ -159,11 +159,11 @@ Cross-build linux package on Mac OS or Windows:
           -v ~/.cache/electron-builder:/root/.cache/electron-builder \
           electronuserland/builder
 
-  2.  Build `dist-package/Picturama-xyz.deb` for Linux (in docker container):
+  2.  Build `dist-package/Picturama-xyz.AppImage` for Linux (in docker container):
 
           yarn && yarn run package
 
-Cross-build windows package on Mac OS or Linux:
+Cross-build windows package on macOS or Linux:
 
   - Log in to [AppYeyor](https://www.appveyor.com/)
   - Create a project for Picturama:

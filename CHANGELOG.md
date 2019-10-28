@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+v1.1.0 - 2019-10-28
+-------------------
+
+  - Ansel is now called Picturama
+  - Spanish translation (thanks to @ChesuCR)
+  - Cropping and tilting of photos
+  - Improved export
+  - Improved import of Picasa's `Originals` folders
+  - Other bugfixes and improvements
+
+
 v1.0.0 - 2019-08-29
 -------------------
 
