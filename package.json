@@ -13,8 +13,11 @@
   },
   "build": {
     "appId": "github.picturama",
+    "afterSign": "src/package/afterSignHook.js",
     "mac": {
       "category": "public.app-category.photography",
+      "hardenedRuntime": true,
+      "entitlements": "src/package/entitlements.mac.plist",
       "electronLanguages": [
         "de",
         "en",
@@ -27,7 +30,6 @@
     },
     "publish": null,
     "directories": {
-      "app": ".",
       "output": "dist-package",
       "buildResources": "src/package"
     },
@@ -132,6 +134,7 @@
     "css-loader": "^3.1.0",
     "electron": "5.0.8",
     "electron-builder": "^21.2.0",
+    "electron-notarize": "^0.1.1",
     "file-loader": "^4.1.0",
     "jest": "^24.9.0",
     "less": "^3.9.0",
