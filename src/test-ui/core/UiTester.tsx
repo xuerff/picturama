@@ -165,9 +165,9 @@ export default class UiTester extends React.Component<Props, State> {
         }
 
         return (
-            <div className={classnames(props.className, 'UITester')}>
-                <div className="UITester-sidebar">
-                    <ButtonGroup className='UITester-localeSwitch'>
+            <div className={classnames(props.className, 'UiTester')}>
+                <div className="UiTester-sidebar">
+                    <ButtonGroup className='UiTester-localeSwitch'>
                         {props.locales.map(loc =>
                             <Button
                                 key={loc}
@@ -185,11 +185,11 @@ export default class UiTester extends React.Component<Props, State> {
                     </ButtonGroup>
                     {sections.map((section, sectionIndex) =>
                         <div key={sectionIndex}>
-                            <div className='UITester-sectionTitle'>
+                            <div className='UiTester-sectionTitle'>
                                 {section.title}
                             </div>
                             <ButtonGroup
-                                className='UITester-sectionButtons'
+                                className='UiTester-sectionButtons'
                                 vertical={true}
                             >
                                 {section.tests.map((test, testIndex) =>
@@ -204,7 +204,7 @@ export default class UiTester extends React.Component<Props, State> {
                         </div>
                     )}
                 </div>
-                <div className="UITester-arena" style={arenaStyle}>
+                <div className="UiTester-arena" style={arenaStyle}>
                     {testView}
                 </div>
             </div>
