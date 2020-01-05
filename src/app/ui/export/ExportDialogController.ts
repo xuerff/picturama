@@ -1,4 +1,3 @@
-import { remote } from 'electron'
 import notifier from 'node-notifier'
 
 import { msg } from 'common/i18n/i18n'
@@ -67,21 +66,16 @@ async function runExport(exportInfo: ExportInfo): Promise<void> {
 
     // Select target folder
 
-    const filePaths: string[] | undefined = await new Promise(resolve => {
-        remote.dialog.showOpenDialog(
-            { properties: [ 'openDirectory', 'createDirectory' ] },
-            resolve
-        )
-    })
+    const filePath: string | undefined = await BackgroundClient.selectExportDirectory()
     if (exportInfo.isCancelled) {
         return
     }
-    if (!filePaths) {
+    if (!filePath) {
         // User cancelled
         store.dispatch(closeExportAction())
         return
     }
-    exportOptions.folderPath = filePaths[0]
+    exportOptions.folderPath = filePath
 
     // Store settings
 

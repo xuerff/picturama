@@ -82,7 +82,7 @@ class DirectoryWork {
                     fetchPicturamaYml(this.directoryPath),
                     fetchPicasaIni(this.directoryPath)
                 ])
-                .then(results => {
+                .then((results: [ DirectoryWorkData, PicasaData | null ]) => {
                     const [ picturamaData, picasaData ] = results
                     return { picturamaData, picasaData: picasaData || undefined }
                 })

@@ -71,8 +71,12 @@ export default {
         return callOnBackground('getFileSize', { path })
     },
 
-    selectDirectories(): Promise<string[] | undefined> {
-        return callOnBackground('selectDirectories')
+    selectScanDirectories(): Promise<string[] | undefined> {
+        return callOnBackground('selectScanDirectories')
+    },
+
+    selectExportDirectory(): Promise<string | undefined> {
+        return callOnBackground('selectExportDirectory')
     },
 
     startImport(): Promise<void> {

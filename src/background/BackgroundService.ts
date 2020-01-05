@@ -67,10 +67,12 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'getFileSize') {
         const stat = await fsStat(params.path)
         return stat.size
-    } else if (action === 'selectDirectories') {
-        return new Promise(resolve =>
-            dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory', 'multiSelections' ] }, resolve)
-        )
+    } else if (action === 'selectScanDirectories') {
+        const result = await dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory', 'multiSelections' ] })
+        return result.canceled ? undefined : result.filePaths
+    } else if (action === 'selectExportDirectory') {
+        const result = await dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory', 'createDirectory' ] })
+        return result.canceled ? undefined : result.filePaths[0]
     } else if (action === 'startImport') {
         startImport()
     } else if (action === 'toggleImportPaused') {

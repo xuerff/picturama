@@ -143,7 +143,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     },
     dispatch => ({
         toggleMaximized: BackgroundClient.toggleMaximized,
-        selectDirectories: BackgroundClient.selectDirectories,
+        selectDirectories: BackgroundClient.selectScanDirectories,
         onSettingsChange(settings: Settings) {
             dispatch(setSettingsAction(settings))
         },

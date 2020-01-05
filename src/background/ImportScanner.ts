@@ -2,7 +2,7 @@ import { promisify } from 'util'
 import sharp from 'sharp'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
-import getImageSizeWithCallback from 'image-size'
+import { imageSize as getImageSizeWithCallback } from 'image-size'
 
 import { Photo, ExifOrientation, ImportProgress, PhotoId } from 'common/CommonTypes'
 import { profileScanner } from 'common/LogConstants'
@@ -403,6 +403,10 @@ export default class ImportScanner {
             if (!master_width || !master_height) {
                 try {
                     const imageInfo = await getImageSize(masterFullPath)
+                    if (!imageInfo || typeof imageInfo.width !== 'number' || typeof imageInfo.height !== 'number') {
+                        console.error(`Received invalid photo size for ${masterFullPath}:`, imageInfo)
+                        throw new Error('Received invalid photo size')
+                    }
                     master_width = imageInfo.width
                     master_height = imageInfo.height
                     if (imageInfo.orientation) {

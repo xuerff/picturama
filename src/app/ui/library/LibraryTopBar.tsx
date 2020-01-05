@@ -1,7 +1,7 @@
-import { remote, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
-import { Button, MaybeElement } from '@blueprintjs/core'
+import { Button, MaybeElement, Alert } from '@blueprintjs/core'
 
 import { PhotoId, Photo, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
@@ -30,28 +30,33 @@ interface Props {
     toggleShowInfo: () => void
 }
 
-export default class LibraryTopBar extends React.Component<Props> {
+interface State {
+    showEmptyTrashAlert: boolean
+}
+
+export default class LibraryTopBar extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'emptyTrashModal')
+        bindMany(this, 'onShowEmptyTrashAlert', 'onEmptyTrashCancelled', 'onEmptyTrashConfirmed')
+        this.state = { showEmptyTrashAlert: false }
     }
 
-    private emptyTrashModal() {
-        remote.dialog.showMessageBox(
-            {
-                type: 'question',
-                message: msg('LibraryTopBar_emptyTrashQuestion'),
-                buttons: [ msg('LibraryTopBar_moveToTrash'), msg('common_cancel') ]
-            }, index => {
-                if (index === 0) {
-                    ipcRenderer.send('empty-trash', true)
-                }
-            })
+    private onShowEmptyTrashAlert() {
+        this.setState({ showEmptyTrashAlert: true })
+    }
+
+    private onEmptyTrashCancelled() {
+        this.setState({ showEmptyTrashAlert: false })
+    }
+
+    private onEmptyTrashConfirmed() {
+        this.setState({ showEmptyTrashAlert: false })
+        ipcRenderer.send('empty-trash', true)
     }
 
     render() {
-        const props = this.props
+        const { props, state } = this
         return (
             <Toolbar
                 className={classNames(props.className, 'LibraryTopBar')}
@@ -67,7 +72,7 @@ export default class LibraryTopBar extends React.Component<Props> {
                             text={msg('LibraryTopBar_emptyTrash')}
                             intent={props.photosCount === 0 ? undefined : 'warning'}
                             disabled={props.photosCount === 0}
-                            onClick={this.emptyTrashModal}
+                            onClick={this.onShowEmptyTrashAlert}
                         />
                     }
                     <PhotoActionButtons
@@ -83,6 +88,19 @@ export default class LibraryTopBar extends React.Component<Props> {
                         toggleShowInfo={props.toggleShowInfo}
                     />
                 </div>
+
+                <Alert
+                    className='LibraryTopBar-emptyTrashAlert'
+                    isOpen={state.showEmptyTrashAlert}
+                    icon='trash'
+                    intent='danger'
+                    cancelButtonText={msg('common_cancel')}
+                    confirmButtonText={msg('LibraryTopBar_moveToTrash')}
+                    onCancel={this.onEmptyTrashCancelled}
+                    onConfirm={this.onEmptyTrashConfirmed}
+                >
+                    {msg('LibraryTopBar_emptyTrashQuestion')}
+                </Alert>
             </Toolbar>
         )
     }

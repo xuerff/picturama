@@ -154,7 +154,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
                     this.deferredHideCanvasTimeout = null
                 }
                 canvas.update()
-                canvas.getElement().style.display = null
+                canvas.getElement().style.display = 'block'
                 this.setLoading(false)
             } else if (!this.deferredHideCanvasTimeout) {
                 // We hide the old image of an invalid canvas with a little delay,
