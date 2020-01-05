@@ -48,6 +48,7 @@ function readExifOfImage(imagePath) {
 
 
 const simplifiedBrandNames: { [K in string]: string } = {
+    'CASIO COMPUTER CO.,LTD.': 'CASIO',
     'NIKON CORPORATION': 'Nikon',
     'OLYMPUS IMAGING CORP.': 'Olympus'
 }
@@ -61,17 +62,22 @@ function extractMetaDataFromExif(exifData): MetaData {
     //   - Make = 'SONY', Model = 'DSC-N2'  ->  'SONY DSC-N2'
     //   - Make = 'NIKON CORPORATION', Model = 'NIKON D7200'  ->  'Nikon D7200'
     //   - Make = 'OLYMPUS IMAGING CORP.', Model = 'E-M10'  ->  'Olympus E-M10'
+    //   - Make = 'CASIO COMPUTER CO.,LTD.', Model = 'EX-Z5      '  ->  'CASIO EX-Z5'
     let cameraBrand: string | null = exifTags.Make
     let cameraModel: string | null = exifTags.Model
     let camera = cameraModel
     if (cameraBrand && cameraModel) {
+        cameraBrand = cameraBrand.trim()
         cameraBrand = simplifiedBrandNames[cameraBrand] || cameraBrand
+
         if (cameraModel.toLowerCase().indexOf(cameraBrand.toLowerCase()) === 0) {
-            cameraModel = cameraModel.substring(cameraBrand.length).trimLeft()
+            cameraModel = cameraModel.substring(cameraBrand.length)
         }
+        cameraModel = cameraModel.trim()
 
         camera = `${cameraBrand} ${cameraModel}`
     }
+    //console.log(`## Make = '${exifTags.Make}', Model = '${exifTags.Model}'  ->  '${camera}'`)
 
     let iso: number | undefined = undefined
     if (typeof exifTags.ISO === 'number') {
