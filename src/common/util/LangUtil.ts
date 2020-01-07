@@ -136,3 +136,16 @@ export function slug(text: string): string {
         .replace(/[^\w ]+/g, '')
         .replace(/ +/g, '-')
 }
+
+
+export function getErrorCode(error: any): string | undefined {
+    if (error && typeof error['errorCode'] === 'string') {
+        return error['errorCode']
+    }
+}
+
+
+export function addErrorCode(error: Error, errorCode: string): Error {
+    error['errorCode'] = errorCode
+    return error
+}

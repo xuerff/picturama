@@ -2,6 +2,7 @@ import { BrowserWindow, ipcMain, dialog } from 'electron'
 
 import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
+import { encodeIpcError } from 'common/util/IpcUtil'
 
 import AppWindowController from 'background/AppWindowController'
 import { exportPhoto } from 'background/ExportController'
@@ -35,14 +36,13 @@ export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {
             })
     })
 
-    ipcMain.on('executeBackgroundAction', (event, callId, action, params) => {
+    ipcMain.on('executeBackgroundAction', (event, callId: number, action: string, params: any) => {
         executeBackgroundAction(action, params)
             .then(result => {
                 mainWin.webContents.send('onBackgroundActionDone', callId, null, result)
             },
             error => {
-                const msg = (error instanceof Error) ? error.message : error
-                mainWin.webContents.send('onBackgroundActionDone', callId, msg, null)
+                mainWin.webContents.send('onBackgroundActionDone', callId, encodeIpcError(error), null)
             })
     })
 }

@@ -86,7 +86,8 @@ export default {
     LibraryTopBar_moveToTrash: 'In Betriebsystem-Papierkorb verschieben',
     LibraryTopBar_emptyTrash: 'Papierkorb leeren',
 
-    Picture_error_createThumbnail: 'Konnte Vorschaubild nicht erstellen.',
+    Picture_error_createThumbnail: 'Konnte Vorschaubild nicht erstellen',
+    Picture_error_photoNotExisting: 'Foto ist nicht mehr da',
 
     PhotoActionButtons_movedToTrash_one: 'Foto wurde in den Papierkorb gelegt',
     PhotoActionButtons_movedToTrash_more: '{0} Fotos wurden in den Papierkorb gelegt',

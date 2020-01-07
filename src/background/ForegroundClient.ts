@@ -1,8 +1,9 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, PhotoRenderOptions } from 'common/CommonTypes'
+import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, PhotoRenderOptions, IpcErrorInfo } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 import { Size } from 'common/util/GeometryTypes'
+import { decodeIpcError } from 'common/util/IpcUtil'
 
 
 assertMainProcess()
@@ -31,12 +32,12 @@ export default {
 
         mainWindow = mainWin
 
-        ipcMain.on('onForegroundActionDone', (event, callId, error, result) => {
+        ipcMain.on('onForegroundActionDone', (event, callId: number, error: IpcErrorInfo | null, result: any | null) => {
             const callInfo = pendingCalls[callId]
             delete pendingCalls[callId]
             if (callInfo) {
                 if (error) {
-                    callInfo.reject(error)
+                    callInfo.reject(decodeIpcError(error))
                 } else {
                     callInfo.resolve(result)
                 }

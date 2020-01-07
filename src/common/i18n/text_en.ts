@@ -86,7 +86,8 @@ export default {
     LibraryTopBar_moveToTrash: 'Move to trash of operating system',
     LibraryTopBar_emptyTrash: 'Empty trash',
 
-    Picture_error_createThumbnail: 'Creating thumbnail failed.',
+    Picture_error_createThumbnail: 'Creating thumbnail failed',
+    Picture_error_photoNotExisting: 'Photo is no longer there',
 
     PhotoActionButtons_movedToTrash_one: 'Moved photo to trash',
     PhotoActionButtons_movedToTrash_more: 'Moved {0} photos to trash',

@@ -1,7 +1,8 @@
 import config from 'common/config'
 import { PhotoId, Photo, PhotoRenderOptions } from 'common/CommonTypes'
-import { getThumbnailPath } from 'common/util/DataUtil'
+import { getMasterPath, getThumbnailPath } from 'common/util/DataUtil'
 import { Size } from 'common/util/GeometryTypes'
+import { addErrorCode } from 'common/util/LangUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 
 import ForegroundClient from 'background/ForegroundClient'
@@ -36,6 +37,12 @@ async function processNextCreateThumbnail(job: { photo: Photo }): Promise<void> 
     const thumbnailExists = await fsExists(thumbnailPath)
     if (thumbnailExists) {
         return
+    }
+
+    const masterPath = getMasterPath(photo)
+    const masterExists = await fsExists(masterPath)
+    if (!masterExists) {
+        throw addErrorCode(new Error(`Photo does not exist: ${masterPath}`), 'master-missing')
     }
 
     const photoWork = await fetchPhotoWorkOfPhoto(photo)

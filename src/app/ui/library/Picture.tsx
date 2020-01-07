@@ -5,7 +5,7 @@ import { Icon } from '@blueprintjs/core'
 
 import { msg } from 'common/i18n/i18n'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
-import { bindMany } from 'common/util/LangUtil'
+import { bindMany, getErrorCode } from 'common/util/LangUtil'
 import { PhotoId, Photo, PhotoSectionId } from 'common/CommonTypes'
 
 import { JustifiedLayoutBox } from 'app/UITypes'
@@ -29,7 +29,7 @@ interface Props {
 interface State {
     thumbnailSrc: string | null
     isThumbnailLoaded: boolean
-    hasThumbnailError: boolean
+    thumbnailError: 'master-missing' | 'create-failed' | 'load-failed' | null
 }
 
 export default class Picture extends React.Component<Props, State> {
@@ -43,7 +43,7 @@ export default class Picture extends React.Component<Props, State> {
         this.state = {
             thumbnailSrc: this.props.getThumbnailSrc(props.photo),
             isThumbnailLoaded: false,
-            hasThumbnailError: false
+            thumbnailError: null,
         }
 
         bindMany(this, 'onClick', 'onDoubleClick', 'onThumnailChange', 'onThumbnailLoad', 'onThumbnailLoadError')
@@ -64,7 +64,11 @@ export default class Picture extends React.Component<Props, State> {
                 this.createThumbnailPromise.cancel()
                 this.createThumbnailPromise = null
             }
-            this.setState({ thumbnailSrc: this.props.getThumbnailSrc(this.props.photo), isThumbnailLoaded: false, hasThumbnailError: false })
+            this.setState({
+                thumbnailSrc: this.props.getThumbnailSrc(this.props.photo),
+                isThumbnailLoaded: false,
+                thumbnailError: null,
+            })
         }
 
         if (props.isHighlighted && props.isHighlighted !== prevProps.isHighlighted) {
@@ -113,7 +117,7 @@ export default class Picture extends React.Component<Props, State> {
         if (!this.createThumbnailPromise) {
             this.createThumbnail(false)
         } else {
-            this.setState({ hasThumbnailError: true })
+            this.setState({ thumbnailError: 'load-failed' })
         }
     }
 
@@ -152,18 +156,27 @@ export default class Picture extends React.Component<Props, State> {
             })
             .catch(error => {
                 if (!isCancelError(error)) {
-                    console.error('Getting thumbnail failed', error)
-                    this.setState({ hasThumbnailError: true })
+                    const errorCode = getErrorCode(error)
+                    const isMasterMissing = errorCode === 'master-missing'
+                    if (!isMasterMissing) {
+                        console.error('Getting thumbnail failed', error)
+                    }
+                    this.setState({ thumbnailError: isMasterMissing ? 'master-missing' : 'create-failed' })
                 }
             })
     }
 
     renderThumbnailError() {
         const isSmall = this.props.layoutBox.height < 150
+        const { thumbnailError } = this.state
+        const isMasterMissing = thumbnailError === 'master-missing'
         return (
             <div className={classNames('Picture-error', { isSmall })}>
-                <Icon icon="disable" iconSize={isSmall ? 20 : 40}/>
-                <div>{msg('Picture_error_createThumbnail')}</div>
+                <Icon
+                    icon={isMasterMissing ? 'delete' : 'disable'}
+                    iconSize={isSmall ? 20 : 40}
+                />
+                <div>{msg(isMasterMissing ? 'Picture_error_photoNotExisting' : 'Picture_error_createThumbnail')}</div>
             </div>
         )
     }
@@ -207,7 +220,7 @@ export default class Picture extends React.Component<Props, State> {
                 {showFlag &&
                     <FaIcon ref="flag" className="Picture-flag" name="flag"/>
                 }
-                {state.hasThumbnailError &&
+                {state.thumbnailError &&
                     this.renderThumbnailError()
                 }
             </div>

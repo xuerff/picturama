@@ -191,3 +191,9 @@ export interface PhotoExportProgress {
     processed: number
     total: number
 }
+
+
+export interface IpcErrorInfo {
+    message: string
+    errorCode?: string
+}

@@ -4,6 +4,7 @@ import { Button } from '@blueprintjs/core'
 import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
+import { addErrorCode } from 'common/util/LangUtil'
 
 import { defaultGridRowHeight } from 'app/UiConstants'
 import { GridLayout } from 'app/UITypes'
@@ -56,6 +57,8 @@ function createDefaultProps(context: TestContext): Props {
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             if (photo.master_filename === 'dummy') {
                 return new CancelablePromise<string>(() => {})
+            } else if (photo.master_filename === 'error_master-missing') {
+                return new CancelablePromise<string>(Promise.reject(addErrorCode(new Error('test error'), 'master-missing')))
             } else {
                 return new CancelablePromise<string>(Promise.resolve(getNonRawUrl(photo)))
             }
@@ -245,9 +248,11 @@ addSection('Library')
     })
     .add('thumbnail error', context => {
         let photos = [ ...defaultPhotos ]
-        const errorPhoto = createRandomDummyPhoto()
-        errorPhoto.master_filename = 'error'
-        photos.splice(1, 0, errorPhoto)
+        const errorPhoto1 = createRandomDummyPhoto()
+        errorPhoto1.master_filename = 'error_load-failed'
+        const errorPhoto2 = createRandomDummyPhoto()
+        errorPhoto2.master_filename = 'error_master-missing'
+        photos.splice(1, 0, errorPhoto1, errorPhoto2)
         const section = createSection(defaultSectionId, photos)
 
         return (

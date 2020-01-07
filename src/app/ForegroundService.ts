@@ -2,6 +2,7 @@ import { ipcRenderer } from 'electron'
 
 import { Device } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
+import { encodeIpcError } from 'common/util/IpcUtil'
 
 import { showExternalError } from 'app/ErrorPresenter'
 import ImportProgressController from 'app/controller/ImportProgressController'
@@ -15,14 +16,13 @@ assertRendererProcess()
 
 
 export function init() {
-    ipcRenderer.on('executeForegroundAction', (event, callId, action, params) => {
+    ipcRenderer.on('executeForegroundAction', (event, callId: number, action: string, params: any) => {
         executeForegroundAction(action, params)
             .then(result => {
                 ipcRenderer.send('onForegroundActionDone', callId, null, result)
             },
             error => {
-                const msg = (error instanceof Error) ? error.message : error
-                ipcRenderer.send('onForegroundActionDone', callId, msg, null)
+                ipcRenderer.send('onForegroundActionDone', callId, encodeIpcError(error), null)
             })
     })
 

@@ -1,8 +1,9 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig, Settings, PhotoSet, PhotoExportOptions } from 'common/CommonTypes'
+import { UiConfig, Settings, PhotoSet, PhotoExportOptions, IpcErrorInfo } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
+import { decodeIpcError } from 'common/util/IpcUtil'
 
 
 assertRendererProcess()
@@ -30,12 +31,12 @@ export default {
             throw new Error('BackgroundClient is already initialized')
         }
         isInitialized = true
-        ipcRenderer.on('onBackgroundActionDone', (event, callId, error, result) => {
+        ipcRenderer.on('onBackgroundActionDone', (event, callId: number, error: IpcErrorInfo | null, result: any | null) => {
             const callInfo = pendingCalls[callId]
             delete pendingCalls[callId]
             if (callInfo) {
                 if (error) {
-                    callInfo.reject(error)
+                    callInfo.reject(decodeIpcError(error))
                 } else {
                     callInfo.resolve(result)
                 }
