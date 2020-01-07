@@ -3,9 +3,10 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { Icon } from '@blueprintjs/core'
 
-import { PhotoId, Photo, PhotoSectionId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import CancelablePromise, { isCancelError } from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
+import { PhotoId, Photo, PhotoSectionId } from 'common/CommonTypes'
 
 import { JustifiedLayoutBox } from 'app/UITypes'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
@@ -162,7 +163,7 @@ export default class Picture extends React.Component<Props, State> {
         return (
             <div className={classNames('Picture-error', { isSmall })}>
                 <Icon icon="disable" iconSize={isSmall ? 20 : 40}/>
-                <div>Creating thumbnail failed.</div>
+                <div>{msg('Picture_error_createThumbnail')}</div>
             </div>
         )
     }
