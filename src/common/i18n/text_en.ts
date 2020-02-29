@@ -107,6 +107,7 @@ export default {
     PhotoInfo_copyPath: 'Copy path',
     PhotoInfo_noSelection_title: 'No photo selected',
     PhotoInfo_noSelection_message: 'Please select a photo on the left.',
+    PhotoInfo_error_fetchPhotoSize: 'Getting photo size failed',
 
     PhotoDetailPane_prevPhoto: 'Previous photo',
     PhotoDetailPane_nextPhoto: 'Next photo',

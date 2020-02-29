@@ -34,7 +34,7 @@ interface Props {
 }
 
 interface State {
-    masterFileSize: number | null
+    masterFileSize: number | 'pending' | 'error'
 }
 
 export default class PhotoInfo extends React.Component<Props, State> {
@@ -44,7 +44,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         bindMany(this, 'showPhotoInFolder', 'copyPhotoPath')
-        this.state = { masterFileSize: null }
+        this.state = { masterFileSize: 'pending' }
     }
 
     componentDidMount() {
@@ -54,11 +54,11 @@ export default class PhotoInfo extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         const { props, state } = this
         if (props.photo !== prevProps.photo) {
-            this.setState({ masterFileSize: null })
+            this.setState({ masterFileSize: 'pending' })
             if (props.isActive) {
                 this.updateMasterFileSize()
             }
-        } else if (props.photo && props.isActive && state.masterFileSize === null) {
+        } else if (props.photo && props.isActive && state.masterFileSize === 'pending') {
             this.updateMasterFileSize()
         }
     }
@@ -79,7 +79,8 @@ export default class PhotoInfo extends React.Component<Props, State> {
                 })
                 .catch(error => {
                     this.isFetchingMasterFileSize = false
-                    showError('Fetching master file size failed', error)
+                    this.setState({ masterFileSize: 'error' })
+                    console.warn('Fetching master file size failed', error)
                 })
         }
     }
@@ -136,7 +137,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
                             <div className="PhotoInfo-minorInfo hasColumns">
                                 <div>{formatImageMegaPixel(photo.master_width, photo.master_height)}</div>
                                 <div>{`${photo.master_width} \u00d7 ${photo.master_height}`}</div>
-                                <div>{formatFileSize(state.masterFileSize)}</div>
+                                <div>{renderPhotoSize(state.masterFileSize)}</div>
                             </div>
                             {(photo.edited_width !== photo.master_width || photo.edited_height !== photo.master_height) &&
                                 <div className='PhotoInfo-minorInfo isCentered'>
@@ -213,9 +214,13 @@ function formatImageMegaPixel(width, height): string {
     return `${formatNumber(sizeMp, 1)} MP`
 }
 
-function formatFileSize(bytes: number | null): string {
-    if (bytes === null) {
+function renderPhotoSize(bytes: number | 'pending' | 'error'): string | JSX.Element {
+    if (bytes === 'pending') {
         return '...'
+    } else if (bytes === 'error') {
+        return (
+            <Icon icon='warning-sign' htmlTitle={msg('PhotoInfo_error_fetchPhotoSize')}/>
+        )
     } else if (bytes < 1000) {
         return `${bytes} byte`
     } else if (bytes < 1000000) {
