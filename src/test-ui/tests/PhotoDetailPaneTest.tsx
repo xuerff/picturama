@@ -34,6 +34,11 @@ const defaultProps: Props = {
 
 
 addSection('PhotoDetailPane')
+    .add('normal', context => (
+        <PhotoDetailPane
+            {...defaultProps}
+        />
+    ))
     .add('loading', context => (
         <PhotoDetailPane
             {...defaultProps}
@@ -41,8 +46,9 @@ addSection('PhotoDetailPane')
             photoDetail={null}
         />
     ))
-    .add('done', context => (
+    .add('error', context => (
         <PhotoDetailPane
             {...defaultProps}
+            photo={{ ...testBigPhoto, master_filename: 'missing-master' }}
         />
     ))

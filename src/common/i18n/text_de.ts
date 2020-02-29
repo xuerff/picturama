@@ -3,6 +3,8 @@ export default {
     common_cancel: 'Abbrechen',
     common_backToLibrary: 'Zurück zur Bibliothek',
     common_ratio: '{0} von {1}',
+    common_error_photoNotExisting: 'Foto ist nicht mehr da',
+    common_error_photoNotExisting_desc: 'Dieses Foto nicht mehr da wo es beim letzten Scan war. Evtl. wurde es verschoben, gelöscht oder es befindet sich auf einem Datenträger, der nun nicht mehr angeschlossen ist.',
 
     CropModeToolbar_aspect_free: 'Frei',
     CropModeToolbar_aspect_original: 'Original',
@@ -87,7 +89,6 @@ export default {
     LibraryTopBar_emptyTrash: 'Papierkorb leeren',
 
     Picture_error_createThumbnail: 'Konnte Vorschaubild nicht erstellen',
-    Picture_error_photoNotExisting: 'Foto ist nicht mehr da',
 
     PhotoActionButtons_movedToTrash_one: 'Foto wurde in den Papierkorb gelegt',
     PhotoActionButtons_movedToTrash_more: '{0} Fotos wurden in den Papierkorb gelegt',

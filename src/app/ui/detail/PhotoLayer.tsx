@@ -8,7 +8,6 @@ import { bindMany } from 'common/util/LangUtil'
 import { ExifOrientation } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
 
-import { showError } from 'app/ErrorPresenter'
 import PhotoCanvas from 'app/renderer/PhotoCanvas'
 import { Texture } from 'app/renderer/WebGLCanvas'
 
@@ -16,6 +15,9 @@ import { DetailMode } from './DetailTypes'
 import TextureCache from './TextureCache'
 
 import './PhotoLayer.less'
+
+
+export type PhotoLayerLoadingState = 'loading' | 'error' | 'done'
 
 
 export interface Props {
@@ -28,7 +30,7 @@ export interface Props {
     srcNext: string | null
     orientation: ExifOrientation
     cameraMetrics: CameraMetrics | null
-    onLoadingChange(loading: boolean): void
+    onLoadingStateChange(loadingState: PhotoLayerLoadingState): void
     onTextureSizeChange(textureSize: Size): void
 }
 
@@ -45,7 +47,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
     private canvasSrc: string | null = null
     private deferredHideCanvasTimeout: NodeJS.Timer | null
 
-    private prevLoading: boolean | null = null
+    private prevLoadingState: PhotoLayerLoadingState | null = null
 
 
     constructor(props: Props) {
@@ -87,10 +89,10 @@ export default class PhotoLayer extends React.Component<Props, State> {
         this.updateCanvas(prevProps, prevState)
     }
 
-    private setLoading(loading: boolean) {
-        if (loading !== this.prevLoading) {
-            this.prevLoading = loading
-            this.props.onLoadingChange(loading)
+    private setLoadingState(loadingState: PhotoLayerLoadingState) {
+        if (loadingState !== this.prevLoadingState) {
+            this.prevLoadingState = loadingState
+            this.props.onLoadingStateChange(loadingState)
         }
     }
 
@@ -110,9 +112,8 @@ export default class PhotoLayer extends React.Component<Props, State> {
         textureCache.setSourcesToFetch([ props.src, props.srcNext, props.srcPrev ])
 
         if (textureCache.hasTextureError(props.src)) {
-            showError('Showing photo failed: ' + props.src)
             canvas.getElement().style.display = 'none'
-            this.setLoading(false)
+            this.setLoadingState('error')
             return
         }
 
@@ -155,14 +156,14 @@ export default class PhotoLayer extends React.Component<Props, State> {
                 }
                 canvas.update()
                 canvas.getElement().style.display = 'block'
-                this.setLoading(false)
+                this.setLoadingState('done')
             } else if (!this.deferredHideCanvasTimeout) {
                 // We hide the old image of an invalid canvas with a little delay,
                 // in order to avoid blinking if loading the next texture and photo work is fast
                 this.deferredHideCanvasTimeout = setTimeout(() => {
                     this.deferredHideCanvasTimeout = null
                     canvas.getElement().style.display = 'none'
-                    this.setLoading(true)
+                    this.setLoadingState('loading')
                 }, 100)
             }
         }

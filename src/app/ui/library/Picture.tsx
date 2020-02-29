@@ -176,7 +176,7 @@ export default class Picture extends React.Component<Props, State> {
                     icon={isMasterMissing ? 'delete' : 'disable'}
                     iconSize={isSmall ? 20 : 40}
                 />
-                <div>{msg(isMasterMissing ? 'Picture_error_photoNotExisting' : 'Picture_error_createThumbnail')}</div>
+                <div>{msg(isMasterMissing ? 'common_error_photoNotExisting' : 'Picture_error_createThumbnail')}</div>
             </div>
         )
     }

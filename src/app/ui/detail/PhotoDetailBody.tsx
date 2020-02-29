@@ -1,15 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
-import { ResizeSensor, IResizeEntry, Spinner } from '@blueprintjs/core'
+import { ResizeSensor, IResizeEntry, Spinner, NonIdealState, Classes } from '@blueprintjs/core'
 
 import { ExifOrientation, PhotoWork, PhotoSectionId, Photo, PhotoId } from 'common/CommonTypes'
+import { msg } from 'common/i18n/i18n'
 import { CameraMetrics, CameraMetricsBuilder, RequestedPhotoPosition, PhotoPosition } from 'common/util/CameraMetrics'
 import { Size, zeroSize, Insets, zeroInsets, Rect } from 'common/util/GeometryTypes'
 import { bindMany, isShallowEqual } from 'common/util/LangUtil'
 
 import CropModeLayer from './CropModeLayer'
 import { DetailMode } from './DetailTypes'
-import PhotoLayer from './PhotoLayer'
+import PhotoLayer, { PhotoLayerLoadingState } from './PhotoLayer'
 import ViewModeLayer from './ViewModeLayer'
 
 import './PhotoDetailBody.less'
@@ -53,7 +54,7 @@ interface State {
     prevMode: DetailMode | null
     prevSrc: string | null
     prevPhotoWork: PhotoWork | null
-    loading: boolean
+    loadingState: PhotoLayerLoadingState | null
     canvasSize: Size
     textureSize: Size | null
     boundsRect: Rect | null
@@ -68,14 +69,14 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onLoadingChange', 'onResize', 'onTextureSizeChange', 'setPhotoPosition', 'enterCropMode',
+        bindMany(this, 'onLoadingStateChange', 'onResize', 'onTextureSizeChange', 'setPhotoPosition', 'enterCropMode',
             'onPhotoWorkEdited', 'onCropDone')
         const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
             prevMode: null,
             prevSrc: null,
             prevPhotoWork: null,
-            loading: true,
+            loadingState: null,
             canvasSize: zeroSize,
             textureSize: null,
             boundsRect: null,
@@ -139,8 +140,8 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         return nextState
     }
 
-    private onLoadingChange(loading: boolean) {
-        this.setState({ loading })
+    private onLoadingStateChange(loadingState: PhotoLayerLoadingState) {
+        this.setState({ loadingState })
     }
 
     private onResize(entries: IResizeEntry[]) {
@@ -205,7 +206,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     srcNext={props.srcNext}
                     orientation={props.orientation}
                     cameraMetrics={state.cameraMetrics}
-                    onLoadingChange={this.onLoadingChange}
+                    onLoadingStateChange={this.onLoadingStateChange}
                     onTextureSizeChange={this.onTextureSizeChange}
                 />
                 {props.mode === 'view' &&
@@ -246,8 +247,16 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                         onDone={this.onCropDone}
                     />
                 }
-                {state.loading &&
+                {state.loadingState === 'loading' &&
                     <Spinner className='PhotoDetailBody-spinner' size={Spinner.SIZE_LARGE} />
+                }
+                {state.loadingState === 'error' &&
+                    <NonIdealState
+                        className={classnames('PhotoDetailBody-error', Classes.DARK)}
+                        icon='delete'
+                        title={msg('common_error_photoNotExisting')}
+                        description={msg('common_error_photoNotExisting_desc')}
+                    />
                 }
             </div>
         )
