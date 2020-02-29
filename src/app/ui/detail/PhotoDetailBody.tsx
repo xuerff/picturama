@@ -24,6 +24,7 @@ export interface Props {
     style?: any
     topBarClassName: string
     bodyClassName: string
+    devicePixelRatio: number
     isActive: boolean
     mode: DetailMode
     isShowingInfo: boolean
@@ -55,7 +56,8 @@ interface State {
     prevSrc: string | null
     prevPhotoWork: PhotoWork | null
     loadingState: PhotoLayerLoadingState | null
-    canvasSize: Size
+    /** The size of the detail body (in px) */
+    bodySize: Size
     textureSize: Size | null
     boundsRect: Rect | null
     photoPosition: RequestedPhotoPosition
@@ -77,7 +79,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
             prevSrc: null,
             prevPhotoWork: null,
             loadingState: null,
-            canvasSize: zeroSize,
+            bodySize: zeroSize,
             textureSize: null,
             boundsRect: null,
             photoPosition: 'contain',
@@ -123,8 +125,8 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
 
         if (prevState.textureSize && nextProps.photoWork) {
             const cameraMetrics = cameraMetricsBuilder
-                .setCanvasSize(prevState.canvasSize)
                 .setTextureSize(prevState.textureSize)
+                .setDisplaySize(prevState.bodySize, 1 / nextProps.devicePixelRatio)
                 .setBoundsRect(nextBoundsRect)
                 .setExifOrientation(nextProps.orientation)
                 .setPhotoWork(nextEditedPhotoWork || nextProps.photoWork)
@@ -147,9 +149,9 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
     private onResize(entries: IResizeEntry[]) {
         const { state } = this
         const contentRect = entries[0].contentRect
-        if (state.canvasSize.width !== contentRect.width || state.canvasSize.height !== contentRect.height) {
-            const canvasSize: Size = { width: contentRect.width, height: contentRect.height }
-            this.setState({ canvasSize })
+        if (state.bodySize.width !== contentRect.width || state.bodySize.height !== contentRect.height) {
+            const bodySize: Size = { width: contentRect.width, height: contentRect.height }
+            this.setState({ bodySize })
         }
     }
 
@@ -200,7 +202,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                 <PhotoLayer
                     className={props.bodyClassName}
                     mode={props.mode}
-                    canvasSize={state.canvasSize}
+                    bodySize={state.bodySize}
                     src={props.src}
                     srcPrev={props.srcPrev}
                     srcNext={props.srcNext}

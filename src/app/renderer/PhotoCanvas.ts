@@ -77,7 +77,7 @@ export default class PhotoCanvas {
     }
 
     /**
-     * Sets the camera matrix translating projected coordinates to screen coordinates.
+     * Sets the camera matrix translating projected coordinates to canvas coordinates.
      * See: `doc/geometry-concept.md`
      */
     setCameraMatrix(cameraMatrix: mat4): this {

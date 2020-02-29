@@ -1,16 +1,22 @@
 import { Action } from 'app/state/ActionType'
-import { SET_FULL_SCREEN, OPEN_SETTINGS, CLOSE_SETTINGS, OPEN_DIFF, CLOSE_DIFF } from 'app/state/actionTypes'
+import { SET_DEVICE_PIXEL_RATIO, SET_FULL_SCREEN, OPEN_SETTINGS, CLOSE_SETTINGS, OPEN_DIFF, CLOSE_DIFF } from 'app/state/actionTypes'
 
 import { NavigationState, DetailState } from 'app/state/StateTypes'
 
 
 const initialNavigationState: NavigationState = {
+    devicePixelRatio: window.devicePixelRatio,
     isFullScreen: false,
     mainView: null
 }
 
 export const navigation = (state: NavigationState = initialNavigationState, detailState: DetailState | null, action: Action): NavigationState => {
     switch (action.type) {
+        case SET_DEVICE_PIXEL_RATIO:
+            return {
+                ...state,
+                devicePixelRatio: action.payload
+            }
         case SET_FULL_SCREEN:
             return {
                 ...state,

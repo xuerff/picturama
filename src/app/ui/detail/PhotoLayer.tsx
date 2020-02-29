@@ -24,7 +24,8 @@ export interface Props {
     className?: any
     style?: any
     mode: DetailMode
-    canvasSize: Size
+    /** The size of the detail body (in px) */
+    bodySize: Size
     src: string
     srcPrev: string | null
     srcNext: string | null
@@ -129,9 +130,10 @@ export default class PhotoLayer extends React.Component<Props, State> {
             canvasChanged = true
         }
 
-        if (props.canvasSize !== prevProps.canvasSize) {
-            canvas.setSize(props.canvasSize)
-            canvasChanged = true
+        if (props.bodySize !== prevProps.bodySize) {
+            const canvasElem = canvas.getElement()
+            canvasElem.style.width  = `${props.bodySize.width}px`
+            canvasElem.style.height = `${props.bodySize.height}px`
         }
 
         if (props.mode !== prevProps.mode || props.cameraMetrics !== prevProps.cameraMetrics) {
@@ -142,6 +144,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
         if (props.cameraMetrics !== prevProps.cameraMetrics) {
             if (props.cameraMetrics) {
                 canvas
+                    .setSize(props.cameraMetrics.canvasSize)
                     .setProjectionMatrix(props.cameraMetrics.projectionMatrix)
                     .setCameraMatrix(props.cameraMetrics.cameraMatrix)
             }
@@ -175,7 +178,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
             <div
                 ref="main"
                 className={classNames(props.className, 'PhotoLayer')}
-                style={{ ...props.style, width: props.canvasSize.width, height: props.canvasSize.height }}
+                style={{ ...props.style, width: props.bodySize.width, height: props.bodySize.height }}
             />
         )
     }

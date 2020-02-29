@@ -10,8 +10,11 @@ const globalMinZoom = 0.0000001
 export const maxZoom = 2
 
 export interface CameraMetrics {
-    canvasSize: Size
     textureSize: Size
+    canvasSize: Size
+    displaySize: Size
+    /** The scaling from canvas coordinates to display coordinates */
+    displayScaling: number
     insets: Insets | null
     /**
      * The camera bounds. Pan and zoom actions are limited to this area.
@@ -35,16 +38,24 @@ export interface CameraMetrics {
     projectionMatrix: mat4
     invertedProjectionMatrix?: mat4
     /**
-     * The camera matrix translating projected coordinates to screen coordinates.
+     * The camera matrix translating projected coordinates to canvas coordinates.
      * See: `doc/geometry-concept.md`
      */
     cameraMatrix: mat4
     invertedCameraMatrix?: mat4
+    /**
+     * The display matrix translating projected coordinates to display coordinates.
+     * See: `doc/geometry-concept.md`
+     */
+    displayMatrix: mat4
+    invertedDisplayMatrix?: mat4
 }
 
 export const zeroCameraMetrics: CameraMetrics = {
-    canvasSize: zeroSize,
     textureSize: zeroSize,
+    canvasSize: zeroSize,
+    displaySize: zeroSize,
+    displayScaling: 1,
     insets: null,
     boundsRect: zeroRect,
     requestedPhotoPosition: 'contain',
@@ -55,6 +66,7 @@ export const zeroCameraMetrics: CameraMetrics = {
     maxZoom,
     projectionMatrix: mat4.create(),
     cameraMatrix: mat4.create(),
+    displayMatrix: mat4.create(),
 }
 
 export interface PhotoPosition {
@@ -73,8 +85,9 @@ export type RequestedPhotoPosition = 'contain' | PhotoPosition
 
 export class CameraMetricsBuilder {
 
-    private canvasSize: Size | null = null
     private textureSize: Size = zeroSize
+    private canvasSize: Size | null = null
+    private displayScaling = 1
     private insets: Insets = zeroInsets
     private boundsRect: Rect | null = null
     private adjustCanvasSize = false
@@ -90,18 +103,6 @@ export class CameraMetricsBuilder {
         this.photoWork = {}
     }
 
-    /**
-     * Sets the canvas size.
-     * If set to `null` the canvas size will be set to the size of the bounds rect (which falls back to the crop rect).
-     */
-    setCanvasSize(canvasSize: Size | null): this {
-        if (!isShallowEqual(this.canvasSize, canvasSize)) {
-            this.canvasSize = canvasSize
-            this.isDirty = true
-        }
-        return this
-    }
-
     setTextureSize(textureSize: Size): this {
         if (!isShallowEqual(this.textureSize, textureSize)) {
             this.textureSize = textureSize
@@ -111,7 +112,31 @@ export class CameraMetricsBuilder {
     }
 
     /**
-     * Sets insets to apply when requestedPhotoPosition is `contain`.
+     * Sets the canvas size.
+     * If set to `null` the canvas size will be set to the size of the bounds rect (which falls back to the crop rect).
+     */
+    setCanvasSize(canvasSize: Size | null): this {
+        const displayScaling = 1
+        if (!isShallowEqual(this.canvasSize, canvasSize) || this.displayScaling !== displayScaling) {
+            this.canvasSize = canvasSize
+            this.displayScaling = displayScaling
+            this.isDirty = true
+        }
+        return this
+    }
+
+    setDisplaySize(displaySize: Size, displayScaling: number): this {
+        const canvasSize: Size = { width: displaySize.width / displayScaling, height: displaySize.height / displayScaling }
+        if (!isShallowEqual(this.canvasSize, canvasSize) || this.displayScaling !== displayScaling) {
+            this.canvasSize = canvasSize
+            this.displayScaling = displayScaling
+            this.isDirty = true
+        }
+        return this
+    }
+
+    /**
+     * Sets insets to apply when requestedPhotoPosition is `contain` (in display coordinates).
      */
     setInsets(insets: Insets): this {
         if (!isShallowEqual(this.insets, insets)) {
@@ -182,7 +207,7 @@ export class CameraMetricsBuilder {
             return this.cameraMetrics
         }
 
-        const { textureSize, photoWork, exifOrientation, insets, requestedPhotoPosition } = this
+        const { textureSize, displayScaling, photoWork, exifOrientation, insets, requestedPhotoPosition } = this
 
         const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
         const insetsWidth = insets.left + insets.right
@@ -195,14 +220,16 @@ export class CameraMetricsBuilder {
         let photoPosition: PhotoPosition
         const minZoom = (boundsRect.width === 0 || boundsRect.height === 0 || insetsWidth >= canvasSize.width || insetsHeight >= canvasSize.height) ?
             globalMinZoom :
-            Math.min(maxZoom, (canvasSize.width - insetsWidth) / boundsRect.width, (canvasSize.height - insetsHeight) / boundsRect.height)
+            Math.min(maxZoom,
+                (canvasSize.width - insetsWidth / displayScaling) / boundsRect.width,
+                (canvasSize.height - insetsHeight / displayScaling) / boundsRect.height)
         if (requestedPhotoPosition === 'contain') {
             const zoom = minZoom
             const insetsOffsetX = (insets.right - insets.left) / 2
             const insetsOffsetY = (insets.bottom - insets.top) / 2
             photoPosition = {
-                centerX: boundsRect.x + boundsRect.width / 2 + insetsOffsetX / zoom,
-                centerY: boundsRect.y + boundsRect.height / 2 + insetsOffsetY / zoom,
+                centerX: boundsRect.x + boundsRect.width / 2 + insetsOffsetX / displayScaling / zoom,
+                centerY: boundsRect.y + boundsRect.height / 2 + insetsOffsetY / displayScaling /zoom,
                 zoom
             }
             if (this.adjustCanvasSize) {
@@ -231,9 +258,28 @@ export class CameraMetricsBuilder {
         mat4.translate(cameraMatrix, cameraMatrix, [ -photoPosition.centerX, -photoPosition.centerY, 0 ])
         // We have projected coordinates here
 
+        let displaySize: Size
+        let displayMatrix: mat4
+        if (displayScaling === 1) {
+            displaySize = canvasSize
+            displayMatrix = cameraMatrix
+        } else {
+            displaySize = { width: canvasSize.width * displayScaling, height: canvasSize.height * displayScaling }
+
+            displayMatrix = mat4.create()
+            // We have display coordinates here
+            // Scale from canvas coordinates to display coordinates
+            mat4.scale(displayMatrix, displayMatrix, [ displayScaling, displayScaling, 0 ])
+            // We have canvas coordinates here
+            mat4.multiply(displayMatrix, displayMatrix, cameraMatrix)
+            // We have projected coordinates here
+        }
+
         this.cameraMetrics = {
-            canvasSize,
             textureSize,
+            canvasSize,
+            displaySize,
+            displayScaling,
             insets,
             boundsRect,
             requestedPhotoPosition,
@@ -244,6 +290,7 @@ export class CameraMetricsBuilder {
             neutralCropRect,
             projectionMatrix: createProjectionMatrix(textureSize, exifOrientation, photoWork),
             cameraMatrix,
+            displayMatrix,
         }
         this.isDirty = false
         return this.cameraMetrics

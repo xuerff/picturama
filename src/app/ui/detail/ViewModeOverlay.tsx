@@ -47,8 +47,8 @@ export default class ViewModeOverlay extends React.Component<Props, State> {
                     const startPhotoPosition = dragStart.photoPosition
                     const zoom = startPhotoPosition.zoom
         
-                    let centerX = startPhotoPosition.centerX - (point.x - dragStart.x) / zoom
-                    let centerY = startPhotoPosition.centerY - (point.y - dragStart.y) / zoom
+                    let centerX = startPhotoPosition.centerX - (point.x - dragStart.x) / cameraMetrics.displayScaling / zoom
+                    let centerY = startPhotoPosition.centerY - (point.y - dragStart.y) / cameraMetrics.displayScaling / zoom
                     const nextPhotoPosition = limitPhotoPosition(cameraMetrics, { centerX, centerY, zoom }, true)
         
                     if (!isShallowEqual(nextPhotoPosition, cameraMetrics.photoPosition)) {

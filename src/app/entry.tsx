@@ -7,7 +7,7 @@ import { setLocale } from 'common/i18n/i18n'
 import BackgroundClient from 'app/BackgroundClient'
 import { init as initForegroundService } from 'app/ForegroundService'
 import App from 'app/ui/main/App'
-import { initAction } from 'app/state/actions'
+import { initAction, setDevicePixelRatioAction } from 'app/state/actions'
 import store from 'app/state/store'
 
 import './entry.less'
@@ -35,6 +35,8 @@ Promise
         initForegroundService()
         store.dispatch(initAction(uiConfig, settings))
 
+        detectDevicePixelRatioChanges()
+
         render(
             <Provider store={store}>
                 <App/>
@@ -44,3 +46,17 @@ Promise
     .catch(error => {
         showError('Initializing UI failed', error)
     })
+
+
+function detectDevicePixelRatioChanges() {
+    window.addEventListener('resize', updateDevicePixelRatio)
+    window.matchMedia('screen and (min-resolution: 2dppx)').addListener(updateDevicePixelRatio)
+}
+
+
+function updateDevicePixelRatio() {
+    const { devicePixelRatio } = window
+    if (devicePixelRatio !== store.getState().navigation.devicePixelRatio) {
+        store.dispatch(setDevicePixelRatioAction(devicePixelRatio))
+    }
+}

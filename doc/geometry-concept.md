@@ -31,11 +31,17 @@ Projected coordinates:
     - The center is rounded, so projected coordinates correspond to whole texture pixels even if width or height is odd.
   - Unit: texture pixels
 
-Screen coordinates:
+Canvas coordinates:
 
-  - The pixels as they are shown on the screen
+  - The pixels as they are shown on the canvas
   - Origin: The left-top corner of the canvas
-  - Unit: screen pixels (CSS would say: px)
+  - Unit: canvas pixels
+
+Display coordinates:
+
+  - The pixels as they are used to display the canvas
+  - Origin: The left-top corner of the canvas
+  - Unit: display pixels (depends on what "display" means, the detail view uses CSS px)
 
 
 Matrices
@@ -47,4 +53,8 @@ Projection matrix:
 
 Camera matrix:
 
-  - Translates from projected coordinates to screen coordinates
+  - Translates from projected coordinates to canvas coordinates
+
+Display matrix:
+
+  - Translates from projected coordinates to display coordinates

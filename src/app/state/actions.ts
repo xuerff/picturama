@@ -4,7 +4,7 @@ import { PhotoId, Photo, Tag, Device, PhotoDetail, PhotoWork, PhotoSection, Phot
 import { ImportProgress } from 'common/CommonTypes'
 
 import {
-    INIT, SET_FULL_SCREEN, OPEN_SETTINGS, SET_SETTINGS, CLOSE_SETTINGS, SET_GRID_ROW_HEIGHT,
+    INIT, SET_DEVICE_PIXEL_RATIO, SET_FULL_SCREEN, OPEN_SETTINGS, SET_SETTINGS, CLOSE_SETTINGS, SET_GRID_ROW_HEIGHT,
     SET_DETAIL_PHOTO, FETCH_DETAIL_PHOTO_DATA_REQUEST, FETCH_DETAIL_PHOTO_DATA_SUCCESS, FETCH_DETAIL_PHOTO_DATA_FAILURE,
     CLOSE_DETAIL, SET_SELECTED_PHOTOS, SET_LIBRARY_INFO_PHOTO_REQUEST, SET_LIBRARY_INFO_PHOTO_SUCCESS, SET_LIBRARY_INFO_PHOTO_FAILURE,FETCH_TOTAL_PHOTO_COUNT, FETCH_SECTIONS_REQUEST, FETCH_SECTIONS_SUCCESS, FETCH_SECTIONS_FAILURE,
     FETCH_SECTION_PHOTOS, FORGET_SECTION_PHOTOS,
@@ -15,6 +15,7 @@ import {
 
 
 export const initAction = (uiConfig: UiConfig, settings: Settings) => action(INIT, { uiConfig, settings })
+export const setDevicePixelRatioAction = (devicePixelRatio: number) => action(SET_DEVICE_PIXEL_RATIO, devicePixelRatio)
 export const setFullScreenAction = (isFullScreen: boolean) => action(SET_FULL_SCREEN, isFullScreen)
 export const openSettingsAction = () => action(OPEN_SETTINGS)
 export const setSettingsAction = (settings: Settings) => action(SET_SETTINGS, settings)

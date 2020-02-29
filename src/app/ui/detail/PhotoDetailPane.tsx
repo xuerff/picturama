@@ -29,6 +29,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+    devicePixelRatio: number
     sectionId: PhotoSectionId
     photo: Photo
     photoPrev: Photo | null
@@ -111,6 +112,7 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                 <PhotoDetailBody
                     topBarClassName='PhotoDetailPane-topBar'
                     bodyClassName='PhotoDetailPane-body'
+                    devicePixelRatio={props.devicePixelRatio}
                     isActive={props.isActive}
                     mode={state.mode}
                     isShowingInfo={state.isShowingInfo}
@@ -161,6 +163,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         const section = getLoadedSectionById(state, sectionId)
         return {
             ...props,
+            devicePixelRatio: state.navigation.devicePixelRatio,
             sectionId: currentPhoto.sectionId,
             photo: getPhotoById(state, sectionId, currentPhoto.photoId)!,
             photoPrev: getPhotoByIndex(state, sectionId, currentPhoto.photoIndex - 1),

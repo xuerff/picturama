@@ -110,7 +110,10 @@ export default class CropModeLayer extends React.Component<Props, State> {
 
         // Limit the crop rect to the texture
         const zoom = cameraMetrics.photoPosition.zoom
-        let nextRectLeftTop: Vec2Like = [startCropRect.x - deltaX / zoom, startCropRect.y - deltaY / zoom]
+        let nextRectLeftTop: Vec2Like = [
+            startCropRect.x - deltaX / cameraMetrics.displayScaling / zoom,
+            startCropRect.y - deltaY / cameraMetrics.displayScaling / zoom
+        ]
         if (!isPointInPolygon(nextRectLeftTop, fencePolygon)) {
             nextRectLeftTop = nearestPointOnPolygon(nextRectLeftTop, fencePolygon)
         }
@@ -317,7 +320,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
             return null
         }
 
-        const cropRectInViewCoords = transformRect(cameraMetrics.cropRect, cameraMetrics.cameraMatrix)
+        const cropRectInDisplayCoords = transformRect(cameraMetrics.cropRect, cameraMetrics.displayMatrix)
 
         return (
             <>
@@ -333,9 +336,9 @@ export default class CropModeLayer extends React.Component<Props, State> {
                 />
                 <CropOverlay
                     className={classnames(props.bodyClassName, 'CropModeLayer-body')}
-                    width={cameraMetrics.canvasSize.width}
-                    height={cameraMetrics.canvasSize.height}
-                    rect={cropRectInViewCoords}
+                    width={cameraMetrics.displaySize.width}
+                    height={cameraMetrics.displaySize.height}
+                    rect={cropRectInDisplayCoords}
                     tilt={props.photoWork.tilt || 0}
                     onRectDrag={this.onRectDrag}
                     onSideDrag={this.onSideDrag}
@@ -444,7 +447,8 @@ function maxCutFactor(lineStart: Vec2Like, lineDirection: Vec2Like, polygonPoint
 
 
 interface DragStartMetrics {
-    canvasSize: Size
+    displaySize: Size
+    displayScaling: number
     insets: Insets
     startZoom: number
     startBoundsNwScreen: vec2
@@ -457,14 +461,15 @@ interface DragStartMetrics {
 function getDragStartMetrics(startCameraMetrics: CameraMetrics): DragStartMetrics {
     const startBoundsNwProjected = cornerPointOfRect(startCameraMetrics.boundsRect, 'nw')
     const startBoundsSeProjected = cornerPointOfRect(startCameraMetrics.boundsRect, 'se')
-    const startBoundsNwScreen = vec2.transformMat4(vec2.create(), startBoundsNwProjected, startCameraMetrics.cameraMatrix)
-    const startBoundsSeScreen = vec2.transformMat4(vec2.create(), startBoundsSeProjected, startCameraMetrics.cameraMatrix)
+    const startBoundsNwScreen = vec2.transformMat4(vec2.create(), startBoundsNwProjected, startCameraMetrics.displayMatrix)
+    const startBoundsSeScreen = vec2.transformMat4(vec2.create(), startBoundsSeProjected, startCameraMetrics.displayMatrix)
 
     const texturePolygon = createTexturePolygon(startCameraMetrics)
     const textureBounds = boundsOfPoints(texturePolygon)
 
     return {
-        canvasSize: startCameraMetrics.canvasSize,
+        displaySize: startCameraMetrics.displaySize,
+        displayScaling: startCameraMetrics.displayScaling,
         insets: startCameraMetrics.insets || zeroInsets,
         startZoom: startCameraMetrics.photoPosition.zoom,
         startBoundsNwScreen,
@@ -476,20 +481,29 @@ function getDragStartMetrics(startCameraMetrics: CameraMetrics): DragStartMetric
 }
 
 
+/**
+ * Translates a screen point (in display coordinates) into a projected point (in projected coordinates).
+ * See: doc/geometry-concept.md
+ *
+ * While the user drags a point/line within the original bounds, zoom and center stays the same. Once he draggs
+ * outside the original bounds, the bounds will be adjusted (which will change center and zoom) so the user can drag to
+ * the full borders of the image without having to drop in between.
+ */
 function getProjectedDragTarget(screenPoint: Point, dragStartMetrics: DragStartMetrics, adjust: 'x-only' | 'y-only' | 'both'):
     { projectedPoint: vec2, boundsRect: Rect }
 {
     const {
-        canvasSize, insets, startZoom, startBoundsNwScreen, startBoundsSeScreen,
+        displaySize, displayScaling, insets, startZoom, startBoundsNwScreen, startBoundsSeScreen,
         startBoundsNwProjected, startBoundsSeProjected, textureBounds
     } = dragStartMetrics
     const canvasPadding = 10
 
+    const startProjectedPixPerDevicePix = 1 / displayScaling / startZoom
     const startBoundsWidthScreen = startBoundsSeScreen[0] - startBoundsNwScreen[0]
     const startBoundsHeightScreen = startBoundsSeScreen[1] - startBoundsNwScreen[1]
 
-    const insetsRightX = canvasSize.width - insets.right
-    const insetsBottomY = canvasSize.height - insets.bottom
+    const insetsRightX = displaySize.width - insets.right
+    const insetsBottomY = displaySize.height - insets.bottom
     const mainAreaWidth = insetsRightX - insets.left
     const mainAreaHeight = insetsBottomY - insets.top
 
@@ -500,58 +514,58 @@ function getProjectedDragTarget(screenPoint: Point, dragStartMetrics: DragStartM
         if (screenPoint.x < insets.left) {
             const borderX = insets.left - screenPoint.x
             const borderWidth = insets.left - canvasPadding
-            const borderInsideProjected = boundsNwProjected[0] - (mainAreaWidth - startBoundsWidthScreen) / startZoom
-            const borderOutsideProjected = Math.min(borderInsideProjected - borderWidth / startZoom, textureBounds.x)
+            const borderInsideProjected = boundsNwProjected[0] - (mainAreaWidth - startBoundsWidthScreen) * startProjectedPixPerDevicePix
+            const borderOutsideProjected = Math.min(borderInsideProjected - borderWidth * startProjectedPixPerDevicePix, textureBounds.x)
             boundsNwProjected[0] = Math.max(textureBounds.x, borderInsideProjected - (borderX / borderWidth) * (borderInsideProjected - borderOutsideProjected))
         } else {
-            boundsNwProjected[0] = Math.max(textureBounds.x, startBoundsNwProjected[0] - (startBoundsNwScreen[0] - screenPoint.x) * 2 / startZoom)
+            boundsNwProjected[0] = Math.max(textureBounds.x, startBoundsNwProjected[0] - (startBoundsNwScreen[0] - screenPoint.x) * 2 * startProjectedPixPerDevicePix)
         }
     } else if (screenPoint.x > startBoundsSeScreen[0] && adjust !== 'y-only') {
         const textureBoundsRight = textureBounds.x + textureBounds.width
         if (screenPoint.x > insetsRightX) {
             const borderX = insetsRightX - screenPoint.x
             const borderWidth = insets.right - canvasPadding
-            const borderInsideProjected = boundsSeProjected[0] + (mainAreaWidth - startBoundsWidthScreen) / startZoom
-            const borderOutsideProjected = Math.max(borderInsideProjected + borderWidth / startZoom, textureBoundsRight)
+            const borderInsideProjected = boundsSeProjected[0] + (mainAreaWidth - startBoundsWidthScreen) * startProjectedPixPerDevicePix
+            const borderOutsideProjected = Math.max(borderInsideProjected + borderWidth * startProjectedPixPerDevicePix, textureBoundsRight)
             boundsSeProjected[0] = Math.min(textureBoundsRight, borderInsideProjected + (borderX / borderWidth) * (borderInsideProjected - borderOutsideProjected))
         } else {
-            boundsSeProjected[0] = Math.min(textureBoundsRight, startBoundsSeProjected[0] + (screenPoint.x - startBoundsSeScreen[0]) * 2 / startZoom)
+            boundsSeProjected[0] = Math.min(textureBoundsRight, startBoundsSeProjected[0] + (screenPoint.x - startBoundsSeScreen[0]) * 2 * startProjectedPixPerDevicePix)
         }
     }
     if (screenPoint.y < startBoundsNwScreen[1] && adjust !== 'x-only') {
         if (screenPoint.y < insets.top) {
             const borderY = insets.top - screenPoint.y
             const borderHeight = insets.top - canvasPadding
-            const borderInsideProjected = boundsNwProjected[1] - (mainAreaHeight - startBoundsHeightScreen) / startZoom
-            const borderOutsideProjected = Math.min(borderInsideProjected - borderHeight / startZoom, textureBounds.y)
+            const borderInsideProjected = boundsNwProjected[1] - (mainAreaHeight - startBoundsHeightScreen) * startProjectedPixPerDevicePix
+            const borderOutsideProjected = Math.min(borderInsideProjected - borderHeight * startProjectedPixPerDevicePix, textureBounds.y)
             boundsNwProjected[1] = Math.max(textureBounds.y, borderInsideProjected - (borderY / borderHeight) * (borderInsideProjected - borderOutsideProjected))
         } else {
-            boundsNwProjected[1] = Math.max(textureBounds.y, startBoundsNwProjected[1] - (startBoundsNwScreen[1] - screenPoint.y) * 2 / startZoom)
+            boundsNwProjected[1] = Math.max(textureBounds.y, startBoundsNwProjected[1] - (startBoundsNwScreen[1] - screenPoint.y) * 2 * startProjectedPixPerDevicePix)
         }
     } else if (screenPoint.y > startBoundsSeScreen[1] && adjust !== 'x-only') {
         const textureBoundsRight = textureBounds.y + textureBounds.height
         if (screenPoint.y > insetsBottomY) {
             const borderY = insetsBottomY - screenPoint.y
             const borderHeight = insets.bottom - canvasPadding
-            const borderInsideProjected = boundsSeProjected[1] + (mainAreaHeight - startBoundsHeightScreen) / startZoom
-            const borderOutsideProjected = Math.max(borderInsideProjected + borderHeight / startZoom, textureBoundsRight)
+            const borderInsideProjected = boundsSeProjected[1] + (mainAreaHeight - startBoundsHeightScreen) * startProjectedPixPerDevicePix
+            const borderOutsideProjected = Math.max(borderInsideProjected + borderHeight * startProjectedPixPerDevicePix, textureBoundsRight)
             boundsSeProjected[1] = Math.min(textureBoundsRight, borderInsideProjected + (borderY / borderHeight) * (borderInsideProjected - borderOutsideProjected))
         } else {
-            boundsSeProjected[1] = Math.min(textureBoundsRight, startBoundsSeProjected[1] + (screenPoint.y - startBoundsSeScreen[1]) * 2 / startZoom)
+            boundsSeProjected[1] = Math.min(textureBoundsRight, startBoundsSeProjected[1] + (screenPoint.y - startBoundsSeScreen[1]) * 2 * startProjectedPixPerDevicePix)
         }
     }
 
     const zoom = Math.min(
         startZoom,
-        mainAreaWidth / (boundsSeProjected[0] - boundsNwProjected[0]),
-        mainAreaHeight / (boundsSeProjected[1] - boundsNwProjected[1]))
+        (mainAreaWidth  / displayScaling) / (boundsSeProjected[0] - boundsNwProjected[0]),
+        (mainAreaHeight / displayScaling) / (boundsSeProjected[1] - boundsNwProjected[1]))
 
     const mainAreaCenterX = insets.left + mainAreaWidth / 2
     const mainAreaCenterY = insets.top + mainAreaHeight / 2
     const boundsCenterXProjected = (boundsNwProjected[0] + boundsSeProjected[0]) / 2
     const boundsCenterYProjected = (boundsNwProjected[1] + boundsSeProjected[1]) / 2
-    const projectedX = boundsCenterXProjected + (Math.max(insets.left, Math.min(insetsRightX, screenPoint.x)) - mainAreaCenterX) / zoom
-    const projectedY = boundsCenterYProjected + (Math.max(insets.top, Math.min(insetsBottomY, screenPoint.y)) - mainAreaCenterY) / zoom
+    const projectedX = boundsCenterXProjected + (Math.max(insets.left, Math.min(insetsRightX, screenPoint.x)) - mainAreaCenterX) / displayScaling / zoom
+    const projectedY = boundsCenterYProjected + (Math.max(insets.top, Math.min(insetsBottomY, screenPoint.y)) - mainAreaCenterY) / displayScaling / zoom
 
     const result = {
         projectedPoint: vec2.fromValues(projectedX, projectedY),
