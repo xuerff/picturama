@@ -38,7 +38,7 @@ Fetch git submodules:
 
     git submodule update --init --recursive
 
-Fetch dependnencies and build and start Picturama:
+Fetch dependencies and build and start Picturama:
 
 ```bash
 yarn
