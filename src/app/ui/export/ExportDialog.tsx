@@ -95,10 +95,6 @@ export class ExportDialog extends React.Component<Props, State> {
         this.setState({ isOpen: false })
     }
 
-    private onClosed() {
-
-    }
-
     private onFormatChange(event: React.ChangeEvent<HTMLSelectElement>) {
         this.props.onExportOptionsChange({ ...this.props.exportOptions, format: event.currentTarget.value as any })
     }
@@ -152,7 +148,7 @@ export class ExportDialog extends React.Component<Props, State> {
                 canEscapeKeyClose={!props.progress}
                 isCloseButtonShown={!props.progress}
                 onClose={this.onClose}
-                onClosed={this.onClosed}
+                onClosed={props.onClosed}
             >
                 {content}
             </Dialog>
