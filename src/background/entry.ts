@@ -22,6 +22,10 @@ let initDbPromise: Promise<any> | null = null
 let mainWindow: BrowserWindow | null = null
 
 
+process.on('SIGINT', () => {
+    app.quit()
+})
+
 app.on('window-all-closed', () => {
     // if (process.platform !== 'darwin')
     app.quit()
