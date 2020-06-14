@@ -1,9 +1,9 @@
-import ExifParser from 'exif-parser'
+import exifr from 'exifr'
 
 import { ExifOrientation } from 'common/CommonTypes'
 import { isArray } from 'common/util/LangUtil'
 
-import { fsStat, fsReadFile } from 'background/util/FileUtil'
+import { fsStat } from 'background/util/FileUtil'
 
 
 export interface MetaData {
@@ -21,29 +21,32 @@ export interface MetaData {
 }
 
 
-export function readMetadataOfImage(imagePath: string): Promise<MetaData> {
-    return readExifOfImage(imagePath)
-        .then(extractMetaDataFromExif)
-        .catch(error => {
-            if (error.message !== 'Invalid JPEG section offset') {
-                console.log(`Reading EXIF data from ${imagePath} failed - continuing without. Error: ${error.message}`)
-            }
-            return fsStat(imagePath)
-                .then(stat => ({
-                    createdAt: stat.birthtime,
-                    orientation: 1,
-                    tags: []
-                }))
-        })
+// exifr can improve performance, if options object is cached
+// See: https://github.com/MikeKovarik/exifr#tips-for-better-performance
+const exifrOptions = {
+    translateValues: false,
+    pick: [
+        'CreateDate', 'DateTime', 'DateTimeOriginal', 'ExifImageHeight', 'ExifImageWidth', 'ExposureTime', 'FNumber',
+        'FocalLength', 'ImageHeight', 'ImageWidth', 'ISO', 'Make', 'Model', 'ModifyDate', 'Orientation',
+    ]
 }
 
 
-function readExifOfImage(imagePath) {
-    return fsReadFile(imagePath)
-        .then(buffer => {
-            const parser = ExifParser.create(buffer) as any
-            return parser.parse()
-        })
+export async function readMetadataOfImage(imagePath: string): Promise<MetaData> {
+    try {
+        const exifTags = await exifr.parse(imagePath, exifrOptions)
+            // We need `translateValues: false`, because we want a numeric `Orientation`, not something like `'Horizontal (normal)'`
+        return extractMetaDataFromExif(exifTags)
+    } catch (error) {
+        console.log(`Reading EXIF data from ${imagePath} failed - continuing without. Error: ${error.message}`)
+
+        const stat = await fsStat(imagePath)
+        return {
+            createdAt: stat.birthtime,
+            orientation: 1,
+            tags: []
+        }
+    }
 }
 
 
@@ -53,10 +56,7 @@ const simplifiedBrandNames: { [K in string]: string } = {
     'OLYMPUS IMAGING CORP.': 'Olympus'
 }
 
-function extractMetaDataFromExif(exifData): MetaData {
-    const exifTags = exifData.tags
-    const rawDate = exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate
-
+function extractMetaDataFromExif(exifTags: { [K: string]: any }): MetaData {
     // Examples:
     //   - Make = 'Canon', Model = 'Canon EOS 30D'  ->  'Canon EOS 30D'
     //   - Make = 'SONY', Model = 'DSC-N2'  ->  'SONY DSC-N2'
@@ -88,22 +88,18 @@ function extractMetaDataFromExif(exifData): MetaData {
     }
 
     const metaData: MetaData = {
-        imgWidth:     (exifData.imageSize && exifData.imageSize.width)  || exifTags.ExifImageWidth,
-        imgHeight:    (exifData.imageSize && exifData.imageSize.height) || exifTags.ExifImageHeight,
+        imgWidth:     exifTags.ImageWidth || exifTags.ExifImageWidth,
+        imgHeight:    exifTags.ImageHeight || exifTags.ExifImageHeight,
         camera:       camera || undefined,
         exposureTime: exifTags.ExposureTime,
         iso,
         aperture:     exifTags.FNumber,
         focalLength:  exifTags.FocalLength,
-        createdAt:    rawDate ? new Date(rawDate * 1000) : undefined,
+        createdAt:    exifTags.DateTimeOriginal || exifTags.DateTime || exifTags.CreateDate || exifTags.ModifyDate,
         orientation:  exifTags.Orientation || 1,
             // Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html
         tags:         []
     }
-
-    // TODO: Translate from `exiv2` result into `exif-parser` result
-    //if (exData.hasOwnProperty('Xmp.dc.subject'))
-    //  metaData.tags = exData['Xmp.dc.subject'].split(', ');
 
     return metaData
 }
