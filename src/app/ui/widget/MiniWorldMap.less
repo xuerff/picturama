@@ -1,0 +1,22 @@
+@import "../../style/variables.less";
+
+@pinSize: 6px;
+
+.MiniWorldMap {
+    position: relative;
+}
+
+.MiniWorldMap-clipper {
+    overflow: hidden;
+}
+
+.MiniWorldMap-pin {
+    position: absolute;
+    width: @pinSize;
+    height: @pinSize;
+    margin: (-@pinSize / 2) 0 0 (-@pinSize / 2);
+    background-color: @deep-orange-500;
+    border-radius: 50%;
+    font-size: 1px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .8);
+}

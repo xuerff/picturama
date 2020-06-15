@@ -13,6 +13,7 @@ import 'test-ui/tests/ExportDialogTest'
 import 'test-ui/tests/ErrorToastTest'
 import 'test-ui/tests/GridSectionTest'
 import 'test-ui/tests/CropOverlayTest'
+import 'test-ui/tests/MiniWorldMapTest'
 import 'test-ui/tests/IconTest'
 
 import 'app/entry.less'

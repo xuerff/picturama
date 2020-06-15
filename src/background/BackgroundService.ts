@@ -8,6 +8,7 @@ import AppWindowController from 'background/AppWindowController'
 import { exportPhoto } from 'background/ExportController'
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport, toggleImportPaused, cancelImport } from 'background/ImportController'
+import { getExifData } from 'background/MetaData'
 import { fetchPhotoWorkOfPhoto, storePhotoWork } from 'background/store/PhotoWorkStore'
 import { fetchTotalPhotoCount, fetchSections, updatePhotos, fetchPhotoDetail, fetchSectionPhotos, emptyTrash } from 'background/store/PhotoStore'
 import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
@@ -67,6 +68,8 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'getFileSize') {
         const stat = await fsStat(params.path)
         return stat.size
+    } else if (action === 'getExifData') {
+        return getExifData(params.path)
     } else if (action === 'selectScanDirectories') {
         const result = await dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory', 'multiSelections' ] })
         return result.canceled ? undefined : result.filePaths

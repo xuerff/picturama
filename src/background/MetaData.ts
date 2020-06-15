@@ -1,6 +1,6 @@
 import exifr from 'exifr'
 
-import { ExifOrientation } from 'common/CommonTypes'
+import { ExifOrientation, ExifData } from 'common/CommonTypes'
 import { isArray } from 'common/util/LangUtil'
 
 import { fsStat } from 'background/util/FileUtil'
@@ -23,18 +23,34 @@ export interface MetaData {
 
 // exifr can improve performance, if options object is cached
 // See: https://github.com/MikeKovarik/exifr#tips-for-better-performance
-const exifrOptions = {
+const metadataExifrOptions = {
     translateValues: false,
     pick: [
         'CreateDate', 'DateTime', 'DateTimeOriginal', 'ExifImageHeight', 'ExifImageWidth', 'ExposureTime', 'FNumber',
         'FocalLength', 'ImageHeight', 'ImageWidth', 'ISO', 'Make', 'Model', 'ModifyDate', 'Orientation',
     ]
 }
+const fullExifrOptions = {
+    mergeOutput: false,
+
+    // Segments
+    tiff: true,
+    ifd1: true,
+    exfif: true,
+    gps: true,
+    interop: true,
+    jfif: true,
+    iptc: true,
+    xmp: true,
+    icc: true,
+    makerNote: true,
+    userComment: true,
+}
 
 
 export async function readMetadataOfImage(imagePath: string): Promise<MetaData> {
     try {
-        const exifTags = await exifr.parse(imagePath, exifrOptions)
+        const exifTags = await exifr.parse(imagePath, metadataExifrOptions)
             // We need `translateValues: false`, because we want a numeric `Orientation`, not something like `'Horizontal (normal)'`
         return extractMetaDataFromExif(exifTags)
     } catch (error) {
@@ -47,6 +63,11 @@ export async function readMetadataOfImage(imagePath: string): Promise<MetaData> 
             tags: []
         }
     }
+}
+
+
+export function getExifData(imagePath: string): Promise<ExifData | null> {
+    return exifr.parse(imagePath, fullExifrOptions)
 }
 
 

@@ -197,3 +197,6 @@ export interface IpcErrorInfo {
     message: string
     errorCode?: string
 }
+
+
+export type ExifData = { [K: string]: { [K: string]: any } }

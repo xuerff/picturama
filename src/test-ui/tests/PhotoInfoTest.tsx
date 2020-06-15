@@ -1,12 +1,11 @@
 import React from 'react'
 
-import { Photo, PhotoDetail } from 'common/CommonTypes'
-import { getMasterPath } from 'common/util/DataUtil'
+import { Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
 
 import PhotoInfo from 'app/ui/info/PhotoInfo'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
-import { testBigPhoto } from 'test-ui/util/MockData'
+import { testBigPhoto, testExifData } from 'test-ui/util/MockData'
 
 
 const baseUrl = 'dist'
@@ -16,10 +15,11 @@ const defaultProps = {
     style: { width: '300px', height: '100%' },
 
     isActive: true,
-    photo: { ...testBigPhoto, master: `${baseUrl}/${getMasterPath(testBigPhoto)}` },
+    photo: { ...testBigPhoto, master_dir: `${baseUrl}/${testBigPhoto.master_dir}` } as Photo,
     tags: defaultTags,
     closeInfo: action('closeInfo'),
     getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
+    getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(testExifData) },
 }
 
 let sharedPhotoDetail: PhotoDetail = {

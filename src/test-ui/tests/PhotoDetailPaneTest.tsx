@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { ExifData } from 'common/CommonTypes'
+
 import { PhotoDetailPane, Props } from 'app/ui/detail/PhotoDetailPane'
 
 import {addSection, action} from 'test-ui/core/UiTester'
@@ -23,6 +25,7 @@ const defaultProps: Props = {
     setPreviousDetailPhoto: action('setPreviousDetailPhoto'),
     setNextDetailPhoto: action('setNextDetailPhoto'),
     getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
+    getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(null) },
     updatePhotoWork: action('updatePhotoWork'),
     setPhotosFlagged: action('setPhotosFlagged'),
     setPhotoTags: action('setPhotoTags'),

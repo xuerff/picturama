@@ -105,6 +105,7 @@ export default {
     PhotoInfo_title: 'Info',
     PhotoInfo_showInFolder: 'Foto in Ordner anzeigen',
     PhotoInfo_copyPath: 'Pfad kopieren',
+    PhotoInfo_copyCoordinates: 'GPS-Koordinaten kopieren',
     PhotoInfo_noSelection_title: 'Kein Foto ausgewählt',
     PhotoInfo_noSelection_message: 'Bitte wähle links ein Foto aus.',
     PhotoInfo_error_fetchPhotoSize: 'Fotogröße konnte nicht ermittelt werden',

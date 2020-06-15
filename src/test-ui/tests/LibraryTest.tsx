@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@blueprintjs/core'
 
-import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter } from 'common/CommonTypes'
+import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter, ExifData } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { addErrorCode } from 'common/util/LangUtil'
@@ -54,6 +54,7 @@ function createDefaultProps(context: TestContext): Props {
         getGridLayout,
         getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
         getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
+        getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(null) },
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             if (photo.master_filename === 'dummy') {
                 return new CancelablePromise<string>(() => {})

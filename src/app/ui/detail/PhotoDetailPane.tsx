@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId } from 'common/CommonTypes'
+import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId, ExifData } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -46,6 +46,7 @@ interface DispatchProps {
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
     getFileSize(path: string): Promise<number>
+    getExifData(path: string): Promise<ExifData | null>
     updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
     setPhotoTags: (photo: Photo, tags: string[]) => void
@@ -147,6 +148,7 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
                     getFileSize={props.getFileSize}
+                    getExifData={props.getExifData}
                     setPhotoTags={props.setPhotoTags}
                 />
             </div>
@@ -180,6 +182,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setPreviousDetailPhoto,
         setNextDetailPhoto,
         getFileSize: BackgroundClient.getFileSize,
+        getExifData: BackgroundClient.getExifData,
         updatePhotoWork,
         setPhotosFlagged,
         setPhotoTags,

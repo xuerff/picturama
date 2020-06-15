@@ -4,13 +4,13 @@ import React from 'react'
 import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
 import moment from 'moment'
 
-import { Photo, PhotoDetail } from 'common/CommonTypes'
+import { Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 import { formatNumber } from 'common/util/TextUtil'
 
-import { showError } from 'app/ErrorPresenter'
+import MiniWorldMap from 'app/ui/widget/MiniWorldMap'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
 
@@ -21,7 +21,17 @@ import './PhotoInfo.less'
 
 const infoIconSize = 24
 
-interface Props {
+type FileInfo =
+    {
+        state: 'pending'
+    } |
+    {
+        state: 'done'
+        masterFileSize: number | null
+        exifData: ExifData | null
+    }
+
+export interface Props {
     style?: any
     className?: any
     isActive: boolean
@@ -30,77 +40,107 @@ interface Props {
     tags: string[]
     closeInfo: () => void
     getFileSize(path: string): Promise<number>
-    setPhotoTags: (photo: Photo, tags: string[]) => void
+    getExifData(path: string): Promise<ExifData | null>
+    setPhotoTags(photo: Photo, tags: string[]): void
 }
 
 interface State {
-    masterFileSize: number | 'pending' | 'error'
+    fileInfo: FileInfo
 }
 
 export default class PhotoInfo extends React.Component<Props, State> {
 
-    private isFetchingMasterFileSize = false
+    private isFetchingFileInfo = false
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'showPhotoInFolder', 'copyPhotoPath')
-        this.state = { masterFileSize: 'pending' }
+        bindMany(this, 'showPhotoInFolder', 'copyPhotoPath', 'copyCoordinates')
+        this.state = { fileInfo: { state: 'pending' } }
     }
 
     componentDidMount() {
-        this.updateMasterFileSize()
+        this.updateFileInfo()
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
         const { props, state } = this
         if (props.photo !== prevProps.photo) {
-            this.setState({ masterFileSize: 'pending' })
+            this.setState({ fileInfo: { state: 'pending' } })
             if (props.isActive) {
-                this.updateMasterFileSize()
+                this.updateFileInfo()
             }
-        } else if (props.photo && props.isActive && state.masterFileSize === 'pending') {
-            this.updateMasterFileSize()
+        } else if (props.photo && props.isActive && state.fileInfo.state === 'pending') {
+            this.updateFileInfo()
         }
     }
 
-    updateMasterFileSize() {
+    private updateFileInfo() {
         const photo = this.props.photo
-        if (photo && !this.isFetchingMasterFileSize) {
-            this.isFetchingMasterFileSize = true
-            this.props.getFileSize(getMasterPath(photo))
-                .then(masterFileSize => {
-                    this.isFetchingMasterFileSize = false
+        if (photo && !this.isFetchingFileInfo) {
+            this.isFetchingFileInfo = true
+            const masterPath = getMasterPath(photo)
+            Promise.all(
+                [
+                    this.props.getFileSize(masterPath)
+                        .catch(error => {
+                            console.warn('Fetching master file size failed', error)
+                            return null
+                        }),
+                    this.props.getExifData(masterPath)
+                        .catch(error => {
+                            console.warn('Fetching EXIF data failed', error)
+                            return null
+                        }),
+                ])
+                .then(([ masterFileSize, exifData ]) => {
+                    this.isFetchingFileInfo = false
                     if (photo === this.props.photo) {
-                        this.setState({ masterFileSize })
+                        this.setState({ fileInfo: { state: 'done', masterFileSize, exifData } })
                     } else {
                         // The photo has changed in the mean time -> Fetch again
-                        this.updateMasterFileSize()
+                        this.updateFileInfo()
                     }
                 })
                 .catch(error => {
-                    this.isFetchingMasterFileSize = false
-                    this.setState({ masterFileSize: 'error' })
-                    console.warn('Fetching master file size failed', error)
+                    console.warn('Updating file info failed', error)
                 })
         }
     }
 
-    showPhotoInFolder() {
+    private showPhotoInFolder() {
         if (this.props.photo) {
             shell.showItemInFolder(getMasterPath(this.props.photo))
         }
     }
 
-    copyPhotoPath() {
+    private copyPhotoPath() {
         if (this.props.photo) {
             clipboard.writeText(getMasterPath(this.props.photo))
         }
     }
 
+    private copyCoordinates() {
+        const coordinates = this.getCoordinates()
+        if (coordinates) {
+            clipboard.writeText(formatLatLon(coordinates))
+        }
+    }
+
+    private getCoordinates(): { lat: number, lon: number } | null {
+        const { fileInfo } = this.state
+        const exifData = fileInfo.state === 'done' ? fileInfo.exifData : null
+        if (exifData && exifData.gps && typeof exifData.gps.latitude === 'number' && typeof exifData.gps.longitude === 'number') {
+            return { lat: exifData.gps.latitude, lon: exifData.gps.longitude }
+        } else {
+            return null
+        }
+    }
+
     render() {
-        const props = this.props
-        const state = this.state
-        const photo = props.photo
+        const { props, state } = this
+        const { photo } = props
+        const { fileInfo } = state
+        const coordinates = this.getCoordinates()
 
         let body
         if (!props.isActive) {
@@ -137,7 +177,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
                             <div className="PhotoInfo-minorInfo hasColumns">
                                 <div>{formatImageMegaPixel(photo.master_width, photo.master_height)}</div>
                                 <div>{`${photo.master_width} \u00d7 ${photo.master_height}`}</div>
-                                <div>{renderPhotoSize(state.masterFileSize)}</div>
+                                <div>{renderPhotoSize(fileInfo.state === 'done' ? fileInfo.masterFileSize : fileInfo.state)}</div>
                             </div>
                             {(photo.edited_width !== photo.master_width || photo.edited_height !== photo.master_height) &&
                                 <div className='PhotoInfo-minorInfo isCentered'>
@@ -180,6 +220,26 @@ export default class PhotoInfo extends React.Component<Props, State> {
                             setPhotoTags={props.setPhotoTags}
                         />
                     </div>
+                    {coordinates &&
+                        <div className='PhotoInfo-infoRow'>
+                            <Icon className='PhotoInfo-infoIcon' icon='map-marker' iconSize={infoIconSize} />
+                            <div className='PhotoInfo-infoBody'>
+                                <h1 className="PhotoInfo-infoTitle hasColumns">
+                                    <div>{formatLatLon(coordinates)}</div>
+                                    <Popover position={Position.BOTTOM_RIGHT}>
+                                    <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />
+                                    <Menu>
+                                        <MenuItem text={msg('PhotoInfo_copyCoordinates')} onClick={this.copyCoordinates} />
+                                    </Menu>
+                                </Popover>
+                                </h1>
+                                <MiniWorldMap
+                                    width={215}
+                                    pins={[ coordinates ]}
+                                />
+                            </div>
+                        </div>
+                    }
                 </>
             )
         } else {
@@ -214,10 +274,10 @@ function formatImageMegaPixel(width, height): string {
     return `${formatNumber(sizeMp, 1)} MP`
 }
 
-function renderPhotoSize(bytes: number | 'pending' | 'error'): string | JSX.Element {
+function renderPhotoSize(bytes: number | 'pending' | null): string | JSX.Element {
     if (bytes === 'pending') {
         return '...'
-    } else if (bytes === 'error') {
+    } else if (bytes === null) {
         return (
             <Icon icon='warning-sign' htmlTitle={msg('PhotoInfo_error_fetchPhotoSize')}/>
         )
@@ -232,4 +292,9 @@ function renderPhotoSize(bytes: number | 'pending' | 'error'): string | JSX.Ele
 
 function formatShutterSpeed(exposureTime: number): string {
     return '1/' + Math.round(1 / exposureTime)
+}
+
+function formatLatLon(latLon: { lat: number, lon: number }): string {
+    const options: Intl.NumberFormatOptions = { minimumFractionDigits: 6, maximumFractionDigits: 6 }
+    return `${latLon.lat.toLocaleString('en', options)}, ${latLon.lon.toLocaleString('en', options)}`
 }
