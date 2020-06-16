@@ -261,7 +261,9 @@ export default class PhotoInfo extends React.Component<Props, State> {
                         <Button icon="cross" minimal={true} onClick={props.closeInfo} />
                     </div>
                 </Toolbar>
-                {body}
+                <div className='PhotoInfo-body'>
+                    {body}
+                </div>
             </div>
         )
     }
