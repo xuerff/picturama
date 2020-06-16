@@ -103,8 +103,8 @@ function extractMetaDataFromExif(exifTags: { [K: string]: any }): MetaData {
     let iso: number | undefined = undefined
     if (typeof exifTags.ISO === 'number') {
         iso = exifTags.ISO
-    } else if (isArray(exifTags.ISO) && typeof exifTags.ISO[0] === 'number') {
-        // Sometimes `exifTags.ISO` is something like `[ 200, 0 ]`
+    } else if (exifTags.ISO instanceof Uint16Array && exifTags.ISO.length > 0) {
+        // Sometimes `exifTags.ISO` is something like `new Uint16Array([ 200, 0 ])`
         iso = exifTags.ISO[0]
     }
 
