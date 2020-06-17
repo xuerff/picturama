@@ -1,7 +1,6 @@
 import os from 'os'
 import { app, screen, BrowserWindow } from 'electron'
-import DB from 'sqlite3-helper/no-generators'
-import { DBOptions } from 'sqlite3-helper'
+import DB, { DBOptions } from 'sqlite3-helper/no-generators'
 import { install as initSourceMapSupport } from 'source-map-support'
 
 import config from 'common/config'

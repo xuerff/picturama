@@ -1,5 +1,7 @@
-import CancelablePromise from '../../common/util/CancelablePromise'
-import Profiler from '../../common/util/Profiler'
+import { mat4 } from 'gl-matrix'
+
+import CancelablePromise from 'common/util/CancelablePromise'
+import Profiler from 'common/util/Profiler'
 
 
 /**
@@ -178,8 +180,8 @@ export class Texture {
 }
 
 
-export type ShaderParameter = Texture | Float32Array | number
-export type ShaderParameterMap = { [key:string]:ShaderParameter }
+export type ShaderParameter = Texture | Float32Array | mat4 | number
+export type ShaderParameterMap = { [key: string]: ShaderParameter }
 
 export class ShaderProgram<Uniforms extends ShaderParameterMap> {
 
@@ -327,7 +329,7 @@ export class StandardShaderProgram<Uniforms extends ShaderParameterMap> extends 
             } else if (typeof value === 'number') {
                 gl.uniform1f(location, value)
             } else {
-                throw new Error('Attempted to set uniform "' + name + '" to invalid value ' + (value || 'undefined').toString())
+                throw new Error('Attempted to set uniform "' + name + '" to invalid value ' + ((value as any) || 'undefined').toString())
             }
         }
         return this

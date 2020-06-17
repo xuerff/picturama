@@ -95,9 +95,9 @@ module.exports = [
         plugins: [
             ...commonPlugins,
 
-            new CopyPlugin(
-                [ { from: 'src/static' } ]
-            ),
+            new CopyPlugin({
+                patterns: [ { from: 'src/static' } ]
+            }),
 
             // Extract CSS into separate file
             new MiniCssExtractPlugin({
