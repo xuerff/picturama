@@ -24,6 +24,7 @@ export interface MetaData {
 // See: https://github.com/MikeKovarik/exifr#tips-for-better-performance
 const metadataExifrOptions = {
     translateValues: false,
+        // We need `translateValues: false`, because we want a numeric `Orientation`, not something like `'Horizontal (normal)'`
     pick: [
         'CreateDate', 'DateTime', 'DateTimeOriginal', 'ExifImageHeight', 'ExifImageWidth', 'ExposureTime', 'FNumber',
         'FocalLength', 'ImageHeight', 'ImageWidth', 'ISO', 'Make', 'Model', 'ModifyDate', 'Orientation',
@@ -39,20 +40,26 @@ for (const segment of allExifSegments) {
 
 
 export async function readMetadataOfImage(imagePath: string): Promise<MetaData> {
+    let metaData: MetaData | null = null
     try {
         const exifTags = await exifr.parse(imagePath, metadataExifrOptions)
-            // We need `translateValues: false`, because we want a numeric `Orientation`, not something like `'Horizontal (normal)'`
-        return extractMetaDataFromExif(exifTags)
+        if (exifTags) {
+            metaData = extractMetaDataFromExif(exifTags)
+        }
     } catch (error) {
         console.log(`Reading EXIF data from ${imagePath} failed - continuing without. Error: ${error.message}`)
+    }
 
+    if (!metaData) {
         const stat = await fsStat(imagePath)
-        return {
+        metaData = {
             createdAt: stat.birthtime,
             orientation: 1,
             tags: []
         }
     }
+
+    return metaData
 }
 
 
