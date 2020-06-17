@@ -73,6 +73,10 @@ export default {
     async renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions): Promise<string> {
         return callOnForeground('renderPhoto', { photo, photoWork, maxSize, options })
     },
+
+    async renderImage(imageDataUrl: string, maxSize: Size | null, options: PhotoRenderOptions): Promise<string> {
+        return callOnForeground('renderImage', { imageDataUrl, maxSize, options })
+    },
 }
 
 

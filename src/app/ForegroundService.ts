@@ -7,7 +7,7 @@ import { encodeIpcError } from 'common/util/IpcUtil'
 import { showExternalError } from 'app/ErrorPresenter'
 import ImportProgressController from 'app/controller/ImportProgressController'
 import { setTags } from 'app/controller/PhotoTagController'
-import { renderPhoto } from 'app/renderer/PhotoRenderer'
+import { renderPhoto, renderImage } from 'app/renderer/PhotoRenderer'
 import { setFullScreenAction, initDevicesAction, addDeviceAction, removeDeviceAction, emptyTrashAction, openSettingsAction } from 'app/state/actions'
 import store from 'app/state/store'
 
@@ -52,6 +52,8 @@ async function executeForegroundAction(action: string, params: any): Promise<any
         }
     } else if (action === 'renderPhoto') {
         return renderPhoto(params.photo, params.photoWork, params.maxSize, params.options)
+    } else if (action === 'renderImage') {
+        return renderImage(params.imageDataUrl, params.maxSize, params.options)
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }

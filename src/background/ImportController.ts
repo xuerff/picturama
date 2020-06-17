@@ -88,8 +88,8 @@ class ImportScannerDelegateImpl implements ImportScannerDelegate {
     nextTempRawConversionPaths(): { tempExtractThumbPath: string, tempNonRawImgPath: string } {
         const tempRawConversionId = this.nextTempRawConversionId++
         return {
-            tempExtractThumbPath: `${config.tmp}/non-raw-${tempRawConversionId}.jpg`,
-            tempNonRawImgPath: `${config.nonRawPath}/temp-${tempRawConversionId}.${config.workExt}`
+            tempExtractThumbPath: `${config.tmp}/temp-thumb-${tempRawConversionId}.jpg`,
+            tempNonRawImgPath: `${config.nonRawPath}/temp-non-raw-${tempRawConversionId}.${config.workExt}`
         }
     }
 

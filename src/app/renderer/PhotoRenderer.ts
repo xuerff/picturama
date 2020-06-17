@@ -14,17 +14,27 @@ import PhotoCanvas from './PhotoCanvas'
 assertRendererProcess()
 
 
+type RenderJobSource =
+    {
+        type: 'photo'
+        nonRawUrl: string
+        photo: Photo
+        photoWork: PhotoWork
+    } |
+    {
+        type: 'image'
+        imageDataUrl: string
+    }
+
 interface RenderJob {
-    nonRawUrl: string
-    photo: Photo
-    photoWork: PhotoWork
+    source: RenderJobSource
     maxSize: Size | null
     options: PhotoRenderOptions
     profiler: Profiler | null
 }
 
 const queue = new SerialJobQueue(
-    (newJob, existingJob) => (newJob.nonRawUrl === existingJob.nonRawUrl) ? newJob : null,
+    (newJob, existingJob) => (newJob.source.type === 'photo' && existingJob.source.type === 'photo' && newJob.source.nonRawUrl === existingJob.source.nonRawUrl) ? newJob : null,
     renderNext)
 
 
@@ -42,12 +52,19 @@ export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: S
     profiler: Profiler | null = null): Promise<string>
 {
     const nonRawUrl = getNonRawUrl(photo)
-    return queue.addJob({ nonRawUrl: nonRawUrl, photo, photoWork, maxSize, options, profiler })
+    return queue.addJob({ source: { type: 'photo', nonRawUrl, photo, photoWork }, maxSize, options, profiler })
+}
+
+
+export async function renderImage(imageDataUrl: string, maxSize: Size | null, options: PhotoRenderOptions,
+    profiler: Profiler | null = null): Promise<string>
+{
+    return queue.addJob({ source: { type: 'image', imageDataUrl }, maxSize, options, profiler })
 }
 
 
 async function renderNext(job: RenderJob): Promise<string> {
-    const { nonRawUrl, photo, photoWork, options, profiler } = job
+    const { source, options, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
     if (canvas === null) {
@@ -55,6 +72,14 @@ async function renderNext(job: RenderJob): Promise<string> {
         if (profiler) profiler.addPoint('Created canvas')
     }
 
+    let nonRawUrl: string
+    if (source.type === 'photo') {
+        nonRawUrl = source.nonRawUrl
+    } else if (source.type === 'image') {
+        nonRawUrl = source.imageDataUrl
+    } else {
+        throw new Error(`Unsupported source type: ${source['type']}`)
+    }
     const texture = await canvas.createTextureFromSrc(nonRawUrl, profiler)
 
     // Get camera metrics
@@ -62,23 +87,26 @@ async function renderNext(job: RenderJob): Promise<string> {
         .setCanvasSize(job.maxSize)
         .setAdjustCanvasSize(job.maxSize !== null)
         .setTextureSize({ width: texture.width, height: texture.height })
-        .setExifOrientation(photo.orientation)
-        .setPhotoWork(photoWork)
+        .setExifOrientation(source.type === 'photo' ? source.photo.orientation : ExifOrientation.Up)
+        .setPhotoWork(source.type === 'photo' ? source.photoWork : {})
         .getCameraMetrics()
 
     // Update photo size in DB (asynchronously)
-    const { cropRect } = cameraMetrics
-    const switchMasterSides = (photo.orientation == ExifOrientation.Left) || (photo.orientation == ExifOrientation.Right)
-    const master_width = switchMasterSides ? texture.height : texture.width
-    const master_height = switchMasterSides ? texture.width : texture.height
-    const masterSizeIsWrong = photo.master_width !== master_width || photo.master_height !== master_height
-    if (masterSizeIsWrong || photo.edited_width !== cropRect.width || photo.edited_height !== cropRect.height) {
-        if (masterSizeIsWrong) {
-            console.info(`Correcting master size of #${photo.id} (${getMasterPath(photo)}) from ${photo.master_width}x${photo.master_height} to ${master_width}x${master_height}`)
+    if (source.type === 'photo') {
+        const { photo } = source
+        const { cropRect } = cameraMetrics
+        const switchMasterSides = (photo.orientation == ExifOrientation.Left) || (photo.orientation == ExifOrientation.Right)
+        const master_width = switchMasterSides ? texture.height : texture.width
+        const master_height = switchMasterSides ? texture.width : texture.height
+        const masterSizeIsWrong = photo.master_width !== master_width || photo.master_height !== master_height
+        if (masterSizeIsWrong || photo.edited_width !== cropRect.width || photo.edited_height !== cropRect.height) {
+            if (masterSizeIsWrong) {
+                console.info(`Correcting master size of #${photo.id} (${getMasterPath(photo)}) from ${photo.master_width}x${photo.master_height} to ${master_width}x${master_height}`)
+            }
+            updatePhoto(photo, { master_width, master_height, edited_width: cropRect.width, edited_height: cropRect.height })
         }
-        updatePhoto(photo, { master_width, master_height, edited_width: cropRect.width, edited_height: cropRect.height })
+        if (profiler) profiler.addPoint('Checked photo size in DB')
     }
-    if (profiler) profiler.addPoint('Checked photo size in DB')
 
     // Render thumbnail
     canvas

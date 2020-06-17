@@ -1,5 +1,4 @@
 import { promisify } from 'util'
-import sharp from 'sharp'
 import moment from 'moment'
 import BluebirdPromise from 'bluebird'
 import { imageSize as getImageSizeWithCallback } from 'image-size'
@@ -10,9 +9,11 @@ import config from 'common/config'
 import { bindMany } from 'common/util/LangUtil'
 import Profiler from 'common/util/Profiler'
 
+import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
-import { fsReadDirWithFileTypes, fsReadFile, fsStat, fsUnlink, fsExists } from 'background/util/FileUtil'
+import { fsReadDirWithFileTypes, fsReadFile, fsStat, fsUnlink, fsExists, fsWriteFile } from 'background/util/FileUtil'
+import { parseImageDataUrl } from 'background/util/NodeUtil'
 
 const getImageSize = promisify(getImageSizeWithCallback)
 
@@ -381,21 +382,27 @@ export default class ImportScanner {
                 const tempRawConversionPaths = this.delegate.nextTempRawConversionPaths()
                 tempNonRawImgPath = tempRawConversionPaths.tempNonRawImgPath
 
-                const tempExtractedThumbPath = await libraw.extractThumb(masterFullPath, tempRawConversionPaths.tempExtractThumbPath)
+                const tempJpgPath = await libraw.extractThumb(masterFullPath, tempRawConversionPaths.tempExtractThumbPath)
                 if (profiler) profiler.addPoint('Extracted non-raw image')
 
-                const imgBuffer = await fsReadFile(tempExtractedThumbPath)
-                await fsUnlink(tempExtractedThumbPath)
+                const jpgBuffer = await fsReadFile(tempJpgPath)
+                const jpgDataUrl = 'data:image/jpg;base64,' + jpgBuffer.toString('base64')
+                await fsUnlink(tempJpgPath)
                 if (profiler) profiler.addPoint('Loaded extracted image')
 
-                const outputInfo = await sharp(imgBuffer)
-                    .rotate()
-                    .withMetadata()
-                    .toFile(tempNonRawImgPath)
-                master_width = outputInfo.width
-                master_height = outputInfo.height
-                orientation = ExifOrientation.Up
-                if (profiler) profiler.addPoint('Rotated and transcoded extracted image')
+                const webpDataUrl = await ForegroundClient.renderImage(jpgDataUrl, null, { format: config.workExt, quality: 0.9 })
+                const webpBuffer = parseImageDataUrl(webpDataUrl)
+                await fsWriteFile(tempNonRawImgPath, webpBuffer)
+
+                const imageInfo = await getImageSize(tempNonRawImgPath)
+                if (!imageInfo) {
+                    console.error(`Received invalid non-raw size for ${masterFullPath} using non-raw ${tempNonRawImgPath}`, imageInfo)
+                    throw new Error('Received invalid non-raw size')
+                }
+
+                master_width  = imageInfo.width
+                master_height = imageInfo.height
+                if (profiler) profiler.addPoint('Transcoded extracted image')
             }
 
             // Get photo size (if not available from EXIF data)
