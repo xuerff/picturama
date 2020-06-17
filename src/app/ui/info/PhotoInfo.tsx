@@ -431,6 +431,8 @@ function renderExifEntry(entry: [string, any], showAll: boolean): JSX.Element | 
         }
     } else if (value instanceof Uint8Array) {
         formattedValue = formatByteArray(value, showAll)
+    } else if (value instanceof Uint16Array || value instanceof Uint32Array) {
+        formattedValue = value.join(', ')
     } else {
         formattedValue = JSON.stringify(value)
     }
