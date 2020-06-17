@@ -98,6 +98,7 @@ class MainMenu {
                     nodeIntegration: true,
                 }
             })
+            this.uiTesterWindow.on('closed', () => { this.uiTesterWindow = null })
             this.uiTesterWindow.maximize()
             this.uiTesterWindow.loadURL('file://' + __dirname + '/test-ui.html')
             this.uiTesterWindow.webContents.toggleDevTools()
