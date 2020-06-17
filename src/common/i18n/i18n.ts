@@ -61,6 +61,13 @@ export function msg(key: I18nKey, ...args: any[]): string {
     }
 }
 
+export function hasMsg(key: string): key is I18nKey {
+    if (!locale) {
+        throw new Error('msg was called before locale was set')
+    }
+    return !!textsByLang[locale][key]
+}
+
 export function splitMsg(key: I18nKey): string[] {
     return msg(key).split(msgSplitRe)
 }

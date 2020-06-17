@@ -1,7 +1,6 @@
 import exifr from 'exifr'
 
-import { ExifOrientation, ExifData } from 'common/CommonTypes'
-import { isArray } from 'common/util/LangUtil'
+import { ExifOrientation, ExifData, allExifSegments } from 'common/CommonTypes'
 
 import { fsStat } from 'background/util/FileUtil'
 
@@ -32,19 +31,10 @@ const metadataExifrOptions = {
 }
 const fullExifrOptions = {
     mergeOutput: false,
-
-    // Segments
     tiff: true,
-    ifd1: true,
-    exfif: true,
-    gps: true,
-    interop: true,
-    jfif: true,
-    iptc: true,
-    xmp: true,
-    icc: true,
-    makerNote: true,
-    userComment: true,
+}
+for (const segment of allExifSegments) {
+    fullExifrOptions[segment] = true
 }
 
 

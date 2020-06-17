@@ -199,4 +199,19 @@ export interface IpcErrorInfo {
 }
 
 
-export type ExifData = { [K: string]: { [K: string]: any } }
+export type ExifData = {
+    exif?:        { [K: string]: any }
+    ifd0?:        { [K: string]: any }
+    ifd1?:        { [K: string]: any }
+    gps?:         { [K: string]: any }
+    interop?:     { [K: string]: any }
+    jfif?:        { [K: string]: any }
+    iptc?:        { [K: string]: any }
+    xmp?:         { [K: string]: any }
+    icc?:         { [K: string]: any }
+    makerNote?:   Uint8Array
+    userComment?: Uint8Array
+}
+
+export type ExifSegment = 'exif' | 'ifd0' | 'ifd1' | 'gps' | 'interop' | 'jfif' | 'iptc' | 'xmp' | 'icc' | 'makerNote' | 'userComment'
+export const allExifSegments: ExifSegment[] = [ 'exif', 'ifd0', 'ifd1', 'gps', 'interop', 'jfif', 'iptc', 'xmp', 'icc', 'makerNote', 'userComment' ]

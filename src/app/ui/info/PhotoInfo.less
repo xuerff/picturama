@@ -1,6 +1,6 @@
 @import "../../style/variables.less";
 
-@paddingX: 20px;
+@paddingX: 18px;
 
 .PhotoInfo {
     display: flex;
@@ -52,6 +52,12 @@
     opacity: 0.8;
 }
 
+.PhotoInfo-infoTitle {
+    .bp3-popover-wrapper {
+        font-size: 16px;
+        line-height: 1;
+    }
+}
 .PhotoInfo-infoTitle,
 .PhotoInfo-minorInfo {
     &.hasColumns {
@@ -85,4 +91,32 @@
     .bp3-tag-input {
         box-shadow: none !important;
     }
+}
+
+.PhotoInfo-exifData {
+    padding: 0 @paddingX 20px;
+    font-size: 12px;
+
+    h1 {
+        font-size: 14px;
+
+        .bp3-button {
+            font-size: 12px;
+            padding: 0 5px;
+            min-height: 20px;
+            float: right;
+        }
+    }
+}
+.PhotoInfo-clear {
+    clear: both;
+}
+.PhotoInfo-noValueMessage,
+.PhotoInfo-exifKey {
+    opacity: 0.5;
+    white-space: nowrap;
+}
+.PhotoInfo-exifValue {
+    font-family: monospace;
+    float: right;
 }

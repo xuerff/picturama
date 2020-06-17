@@ -4,8 +4,8 @@ import React from 'react'
 import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
 import moment from 'moment'
 
-import { Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
-import { msg } from 'common/i18n/i18n'
+import { Photo, PhotoDetail, ExifData, ExifSegment, allExifSegments } from 'common/CommonTypes'
+import { msg, hasMsg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 import { formatNumber } from 'common/util/TextUtil'
@@ -21,15 +21,22 @@ import './PhotoInfo.less'
 
 const infoIconSize = 24
 
-type FileInfo =
-    {
-        state: 'pending'
-    } |
-    {
-        state: 'done'
-        masterFileSize: number | null
-        exifData: ExifData | null
-    }
+const exifFilters: { [K in ExifSegment]?: string[] } = {
+    // Original from: https://github.com/MikeKovarik/exifr/blob/master/homepage/components.js
+    ifd0:      ['ImageWidth', 'ImageHeight', 'Make', 'Model', 'Software'],
+	exif:      ['ExposureTime', 'ShutterSpeedValue', 'FNumber', 'ApertureValue', 'ISO', 'LensModel'],
+	gps:       ['latitude', 'longitude'],
+	interop:   ['InteropIndex', 'InteropVersion'],
+	ifd1:      ['ImageWidth', 'ImageHeight', 'ThumbnailLength'],
+	iptc:      ['Headline', 'Byline', 'Credit', 'Caption', 'Source', 'Country'],
+	icc:       ['ProfileVersion', 'ProfileClass', 'ColorSpaceData', 'ProfileConnectionSpace', 'ProfileFileSignature', 'DeviceManufacturer', 'RenderingIntent', 'ProfileCreator', 'ProfileDescription'],
+}
+
+interface FileInfo {
+    state: 'pending' | 'done'
+    masterFileSize: number | null
+    exifData: ExifData | null
+}
 
 export interface Props {
     style?: any
@@ -46,6 +53,8 @@ export interface Props {
 
 interface State {
     fileInfo: FileInfo
+    showExif: boolean
+    showAllOfExifSegment: { [K in ExifSegment]?: true }
 }
 
 export default class PhotoInfo extends React.Component<Props, State> {
@@ -54,8 +63,12 @@ export default class PhotoInfo extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'showPhotoInFolder', 'copyPhotoPath', 'copyCoordinates')
-        this.state = { fileInfo: { state: 'pending' } }
+        bindMany(this, 'showPhotoInFolder', 'copyPhotoPath', 'copyCoordinates', 'toggleExif')
+        this.state = {
+            fileInfo: { state: 'pending', masterFileSize: null, exifData: null },
+            showExif: false,
+            showAllOfExifSegment: {},
+        }
     }
 
     componentDidMount() {
@@ -65,7 +78,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         const { props, state } = this
         if (props.photo !== prevProps.photo) {
-            this.setState({ fileInfo: { state: 'pending' } })
+            this.setState({ fileInfo: { state: 'pending', masterFileSize: null, exifData: null } })
             if (props.isActive) {
                 this.updateFileInfo()
             }
@@ -127,13 +140,26 @@ export default class PhotoInfo extends React.Component<Props, State> {
     }
 
     private getCoordinates(): { lat: number, lon: number } | null {
-        const { fileInfo } = this.state
-        const exifData = fileInfo.state === 'done' ? fileInfo.exifData : null
+        const { exifData } = this.state.fileInfo
         if (exifData && exifData.gps && typeof exifData.gps.latitude === 'number' && typeof exifData.gps.longitude === 'number') {
             return { lat: exifData.gps.latitude, lon: exifData.gps.longitude }
         } else {
             return null
         }
+    }
+
+    private toggleExif() {
+        this.setState({ showExif: !this.state.showExif })
+    }
+
+    private toggleShowAllOfExifSegment(segment: ExifSegment) {
+        const { showAllOfExifSegment } = this.state
+        this.setState({
+            showAllOfExifSegment: {
+                ...showAllOfExifSegment,
+                [segment]: !showAllOfExifSegment[segment]
+            }
+        })
     }
 
     render() {
@@ -227,11 +253,11 @@ export default class PhotoInfo extends React.Component<Props, State> {
                                 <h1 className="PhotoInfo-infoTitle hasColumns">
                                     <div>{formatLatLon(coordinates)}</div>
                                     <Popover position={Position.BOTTOM_RIGHT}>
-                                    <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />
-                                    <Menu>
-                                        <MenuItem text={msg('PhotoInfo_copyCoordinates')} onClick={this.copyCoordinates} />
-                                    </Menu>
-                                </Popover>
+                                        <span className={classNames('PhotoInfo-breadcrumbs',  Classes.BREADCRUMBS_COLLAPSED)} />
+                                        <Menu>
+                                            <MenuItem text={msg('PhotoInfo_copyCoordinates')} onClick={this.copyCoordinates} />
+                                        </Menu>
+                                    </Popover>
                                 </h1>
                                 <MiniWorldMap
                                     width={215}
@@ -239,6 +265,23 @@ export default class PhotoInfo extends React.Component<Props, State> {
                                 />
                             </div>
                         </div>
+                    }
+                    {fileInfo.exifData &&
+                        <div className='PhotoInfo-infoRow'>
+                            <Icon className='PhotoInfo-infoIcon' icon='th' iconSize={infoIconSize} />
+                            <div className='PhotoInfo-infoBody'>
+                                <h1 className="PhotoInfo-infoTitle hasColumns">
+                                    <div>{msg('PhotoInfo_exifData')}</div>
+                                    <Button
+                                        text={msg(state.showExif ? 'PhotoInfo_hide' : 'PhotoInfo_show')}
+                                        onClick={this.toggleExif}
+                                    />
+                                </h1>
+                            </div>
+                        </div>
+                    }
+                    {fileInfo.exifData && state.showExif &&
+                        this.renderExifData(fileInfo.exifData)
                     }
                 </>
             )
@@ -268,6 +311,60 @@ export default class PhotoInfo extends React.Component<Props, State> {
         )
     }
 
+    private renderExifData(exifData: ExifData): JSX.Element {
+        return (
+            <div className='PhotoInfo-exifData'>
+                {allExifSegments.map(exifSegment => {
+                    const titleKey = `PhotoInfo_exifTitle_${exifSegment}`
+                    const title = hasMsg(titleKey) ? msg(titleKey) : capitalize(exifSegment)
+                    const segmentData = exifData[exifSegment]
+                    const showAll = !!this.state.showAllOfExifSegment[exifSegment]
+
+                    let body: any
+                    if (!segmentData) {
+                        body = (
+                            <div className='PhotoInfo-noValueMessage'>
+                                {msg('PhotoInfo_noValue', title)}
+                            </div>
+                        )
+                    } else if (segmentData instanceof Uint8Array) {
+                        body = (
+                            <div className='PhotoInfo-exifValue'>
+                                {formatByteArray(segmentData, showAll)}
+                            </div>
+                        )
+                    } else {
+                        let entries: [string, any][]
+                        if (showAll) {
+                            entries = Object.entries(segmentData)
+                        } else {
+                            let filteredKeys = exifFilters[exifSegment] || Object.keys(segmentData).slice(0, 10)
+                            entries = filteredKeys.map(key => [ key, segmentData[key] ])
+                        }
+
+                        body = entries.map(entry => renderExifEntry(entry, showAll))
+                    }
+
+                    return (
+                        <div key={exifSegment}>
+                            <h1>
+                                {title}
+                                {segmentData &&
+                                    <Button
+                                        text={msg(showAll ? 'PhotoInfo_showLess' : 'PhotoInfo_showAll')}
+                                        onClick={() => this.toggleShowAllOfExifSegment(exifSegment)}
+                                    />
+                                }
+                            </h1>
+                            {body}
+                            <div className='PhotoInfo-clear'/>
+                        </div>
+                    )
+                })}
+            </div>
+        )
+    }
+    
 }
 
 
@@ -299,4 +396,63 @@ function formatShutterSpeed(exposureTime: number): string {
 function formatLatLon(latLon: { lat: number, lon: number }): string {
     const options: Intl.NumberFormatOptions = { minimumFractionDigits: 6, maximumFractionDigits: 6 }
     return `${latLon.lat.toLocaleString('en', options)}, ${latLon.lon.toLocaleString('en', options)}`
+}
+
+// Original from: https://github.com/MikeKovarik/exifr/blob/master/homepage/util.js
+// ISO => ISO
+// XMPToolkit => XMP Toolkit
+// FNumber => F Number
+// AbsoluteAltitude => Absolute Altitude
+// FlightRollDegree => Flight Roll Degree
+// imageWidth => Image Width
+// latitude => Latitude
+const matchRegex = /([A-Z]+(?=[A-Z][a-z]))|([A-Z][a-z]+)|([0-9]+)|([a-z]+)|([A-Z]+)/g
+function prettyCase(string: string): string {
+	return string.match(matchRegex)!.map(capitalize).join(' ')
+}
+
+function capitalize(string: string): string {
+	return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+function renderExifEntry(entry: [string, any], showAll: boolean): JSX.Element | null {
+    const [ key, value ] = entry
+    if (value == null) {
+        return null
+    }
+
+    let formattedValue: string
+    if (typeof value === 'string') {
+        const stringLimit = 300
+        if (showAll || value.length <= stringLimit) {
+            formattedValue = value
+        } else {
+            formattedValue = value.substr(0, stringLimit) + ' ... ' + msg('PhotoInfo_andMore', value.length - stringLimit)
+        }
+    } else if (value instanceof Uint8Array) {
+        formattedValue = formatByteArray(value, showAll)
+    } else {
+        formattedValue = JSON.stringify(value)
+    }
+
+    return (
+        <div key={key}>
+            <span className='PhotoInfo-exifKey'>{prettyCase(key)}</span>
+            {' '}
+            <span className='PhotoInfo-exifValue'>{formattedValue}</span>
+        </div>
+    )
+}
+
+function formatByteArray(value: Uint8Array, showAll: boolean): string {
+    const byteLimit = 60
+    let bytes: string[] = []
+    for (let i = 0, il = showAll ? value.length : Math.min(byteLimit, value.length); i < il; i++) {
+        bytes.push(value[i].toString(16).padStart(2, '0'))
+    }
+    let formattedValue = bytes.join(' ')
+    if (bytes.length < value.length) {
+        formattedValue += ' ... ' + msg('PhotoInfo_andMore', value.length - bytes.length)
+    }
+    return formattedValue
 }
