@@ -1,7 +1,14 @@
 import { mat4 } from 'gl-matrix'
+import exifr from 'exifr'
 
-import CancelablePromise from 'common/util/CancelablePromise'
 import Profiler from 'common/util/Profiler'
+import { ExifOrientation } from 'common/CommonTypes'
+
+
+const exifrOrientationOptions = {
+    translateValues: false,
+    pick: [ 'Orientation' ],
+}
 
 
 /**
@@ -59,37 +66,45 @@ export default class WebGLCanvas {
         return new GraphicBuffer(gl, bufferId, gl.FLOAT, componentSize, data.length / componentSize)
     }
 
-    createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler | null = null): CancelablePromise<Texture> {
+    async createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler | null = null): Promise<Texture> {
         // For details see: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 
         const gl = this.gl
-        return new CancelablePromise<Texture>((resolve, reject) => {
-            let image: HTMLImageElement | HTMLCanvasElement = new Image()
-            image.onload = () => {
-                if (profiler) profiler.addPoint('Loaded image')
-                const textureId = this.gl.createTexture()
-                if (!textureId) {
-                    throw new Error('Creating WebGL texture failed')
-                }
-                gl.bindTexture(gl.TEXTURE_2D, textureId)
 
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-                gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, srcFormat, srcType, image)
-                gl.generateMipmap(gl.TEXTURE_2D);
-                gl.bindTexture(gl.TEXTURE_2D, null);
-
-                if (profiler) profiler.addPoint('Created texture')
-                resolve(new Texture(gl, textureId, image.width, image.height))
-            }
+        const image = new Image()
+        await new Promise((resolve, reject) => {
+            image.onload = resolve
             image.onerror = errorEvt => {
                 reject(new Error(`Loading image failed: ${src}`))
             }
             image.src = src
         })
+        if (profiler) profiler.addPoint('Loaded image')
+
+        const textureId = this.gl.createTexture()
+        if (!textureId) {
+            throw new Error('Creating WebGL texture failed')
+        }
+        gl.bindTexture(gl.TEXTURE_2D, textureId)
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+        gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, srcFormat, srcType, image)
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        if (profiler) profiler.addPoint('Created texture')
+
+        const exifData = await exifr.parse(image, exifrOrientationOptions)
+        const orientation = exifData && exifData.Orientation || ExifOrientation.Up
+        const switchSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)
+        const width = switchSides ? image.height : image.width
+        const height = switchSides ? image.width : image.height
+        if (profiler) profiler.addPoint('Loaded Exif orientation')
+
+        return new Texture(gl, textureId, width, height)
     }
 
 }

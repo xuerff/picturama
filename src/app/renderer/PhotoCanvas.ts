@@ -103,7 +103,7 @@ export default class PhotoCanvas {
     }
 
     createTextureFromSrc(src: string, profiler: Profiler | null = null): CancelablePromise<Texture> {
-        return this.webGlCanvas.createTextureFromSrc(src, undefined, undefined, profiler)
+        return new CancelablePromise<Texture>(this.webGlCanvas.createTextureFromSrc(src, undefined, undefined, profiler))
     }
 
     setBaseTexture(texture: Texture | null, destroyLast = true): this {

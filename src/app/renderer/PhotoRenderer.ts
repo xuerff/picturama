@@ -99,9 +99,13 @@ async function renderNext(job: RenderJob): Promise<string> {
         const master_width = switchMasterSides ? texture.height : texture.width
         const master_height = switchMasterSides ? texture.width : texture.height
         const masterSizeIsWrong = photo.master_width !== master_width || photo.master_height !== master_height
+        const editedSizeIsWrong = photo.edited_width !== cropRect.width || photo.edited_height !== cropRect.height
         if (masterSizeIsWrong || photo.edited_width !== cropRect.width || photo.edited_height !== cropRect.height) {
             if (masterSizeIsWrong) {
                 console.info(`Correcting master size of #${photo.id} (${getMasterPath(photo)}) from ${photo.master_width}x${photo.master_height} to ${master_width}x${master_height}`)
+            }
+            if (editedSizeIsWrong) {
+                console.info(`Correcting edited size of #${photo.id} (${getMasterPath(photo)}) from ${photo.edited_width}x${photo.edited_height} to ${cropRect.width}x${cropRect.height}`)
             }
             updatePhoto(photo, { master_width, master_height, edited_width: cropRect.width, edited_height: cropRect.height })
         }
