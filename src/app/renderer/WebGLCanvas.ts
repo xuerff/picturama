@@ -97,7 +97,12 @@ export default class WebGLCanvas {
         gl.bindTexture(gl.TEXTURE_2D, null);
         if (profiler) profiler.addPoint('Created texture')
 
-        const exifData = await exifr.parse(image, exifrOrientationOptions)
+        let exifData: any = null
+        try {
+            exifData = await exifr.parse(image, exifrOrientationOptions)
+        } catch (error) {
+            console.warn(`Getting EXIF data failed - continuing without: ${src}: ${error.message}`)
+        }
         const orientation = exifData && exifData.Orientation || ExifOrientation.Up
         const switchSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)
         const width = switchSides ? image.height : image.width
