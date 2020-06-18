@@ -438,7 +438,7 @@ function renderExifEntry(entry: [string, any], showAll: boolean): JSX.Element | 
     }
 
     return (
-        <div key={key}>
+        <div key={key} className='PhotoInfo-clear'>
             <span className='PhotoInfo-exifKey'>{prettyCase(key)}</span>
             {' '}
             <span className='PhotoInfo-exifValue'>{formattedValue}</span>
