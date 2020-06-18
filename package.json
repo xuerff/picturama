@@ -60,6 +60,7 @@
     "release": "yarn run clean && yarn run build-production && yarn run package",
     "release:windows": "yarn run clean && set \"NODE_ENV=production\" && webpack && yarn run package",
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:clean": "rm -rf dist-test"
   },
   "jest": {

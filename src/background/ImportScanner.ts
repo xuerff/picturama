@@ -414,11 +414,10 @@ export default class ImportScanner {
                         console.error(`Received invalid photo size for ${masterFullPath}:`, imageInfo)
                         throw new Error('Received invalid photo size')
                     }
-                    master_width = imageInfo.width
-                    master_height = imageInfo.height
-                    if (imageInfo.orientation) {
-                        orientation = imageInfo.orientation
-                    }
+                    orientation = imageInfo.orientation || ExifOrientation.Up
+                    const switchMasterSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)
+                    master_width  = switchMasterSides ? imageInfo.height : imageInfo.width
+                    master_height = switchMasterSides ? imageInfo.width : imageInfo.height
                 } catch (error) {
                     console.error('Detecting photo size failed', masterFullPath, error)
                     if (profiler) {

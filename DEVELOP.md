@@ -40,17 +40,13 @@ Fetch git submodules:
 
 Fetch dependencies and build and start Picturama:
 
-```bash
-yarn
-yarn start
-```
+    yarn
+    yarn start
 
 If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try again:
 
-```bash
-rm -rf ~/.node-gyp
-yarn
-```
+    rm -rf ~/.node-gyp
+    yarn
 
 
 
@@ -61,16 +57,14 @@ If you change code that runs in the main process, you have to restart Picturama 
 Here's how you can use a watch build in order to reduce turnaround time:
 
 1. Run watch build (in extra console):
-    ```bash
-    yarn run watch
-    ```
+
+        yarn run watch
 
 2. Change your code.
 
 3. Restart Picturama without building (since building is done by the watch):
-    ```bash
-    yarn run start-no-build
-    ```
+
+        yarn run start-no-build
 
 
 
@@ -94,6 +88,10 @@ Run unit tests:
 
     yarn run test
 
+Run unit tests in watch mode:
+
+    npm run test:watch
+
 Run a single test in watch mode (example runs test `simple import`):
 
     npx jest -t 'simple import' --watch
@@ -108,14 +106,12 @@ UI Tester
 ---------
 
 1. Run watch build:
-    ```bash
-    yarn run watch
-    ```
+
+        yarn run watch
 
 2. Run Picturama (in extra console):
-    ```bash
-    yarn run start-no-build
-    ```
+
+        yarn run start-no-build
 
 3. Open the UI Tester: `Shift`+`Ctrl`+`T` (On Mac: `Alt`+`Cmd`+`T`)
 

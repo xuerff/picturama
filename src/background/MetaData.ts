@@ -25,10 +25,8 @@ export interface MetaData {
 const metadataExifrOptions = {
     translateValues: false,
         // We need `translateValues: false`, because we want a numeric `Orientation`, not something like `'Horizontal (normal)'`
-    pick: [
-        'CreateDate', 'DateTime', 'DateTimeOriginal', 'ExifImageHeight', 'ExifImageWidth', 'ExposureTime', 'FNumber',
-        'FocalLength', 'ImageHeight', 'ImageWidth', 'ISO', 'Make', 'Model', 'ModifyDate', 'Orientation',
-    ]
+    exif: true,
+    xmp: true,
 }
 const fullExifrOptions = {
     mergeOutput: false,

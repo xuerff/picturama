@@ -96,6 +96,57 @@ testImportScanner('import png',
     })
 
 
+testImportScanner('import jpg',
+    async testDir => {
+        await copyFile('test-data/photos/jpg/Apple_iPhone_XR_landscape.jpg', `${testDir}/Apple_iPhone_XR_landscape.jpg`)
+        await copyFile('test-data/photos/jpg/Apple_iPhone_XR_portrait.jpg',  `${testDir}/Apple_iPhone_XR_portrait.jpg`)
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: 'dist-test/import_jpg',
+                master_filename: 'Apple_iPhone_XR_landscape.jpg',
+                master_width: 3824,
+                master_height: 2866,
+                master_is_raw: 0,
+                edited_width: 3824,
+                edited_height: 2866,
+                date_section: '2019-09-12',
+                created_at: 1568305337000,
+                updated_at: 1592454077260,
+                orientation: 1,
+                camera: 'Apple iPhone XR',
+                exposure_time: 0.0007407407407407407,
+                iso: 25,
+                focal_length: 4.25,
+                aperture: 1.8,
+                flag: 0,
+                trashed: 0
+            },
+            {
+                master_dir: 'dist-test/import_jpg',
+                master_filename: 'Apple_iPhone_XR_portrait.jpg',
+                master_width: 480,
+                master_height: 640,
+                master_is_raw: 0,
+                edited_width: 480,
+                edited_height: 640,
+                date_section: '2019-07-29',
+                created_at: 1564394038000,
+                updated_at: 1592454077262,
+                orientation: 6,
+                camera: 'Apple iPhone XR',
+                exposure_time: 0.008264462809917356,
+                iso: 64,
+                focal_length: 4.25,
+                aperture: 1.8,
+                flag: 0,
+                trashed: 0
+            }
+        ])
+    })
+
+
 testImportScanner('import Picasa crop and tilt',
     async testDir => {
         await Promise.all([
