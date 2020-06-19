@@ -3,6 +3,7 @@ import { CameraMetricsBuilder } from 'common/util/CameraMetrics'
 import { getNonRawUrl, getMasterPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { Size } from 'common/util/GeometryTypes'
+import { isShallowEqual } from 'common/util/LangUtil'
 import SerialJobQueue from 'common/util/SerialJobQueue'
 import Profiler from 'common/util/Profiler'
 
@@ -17,7 +18,6 @@ assertRendererProcess()
 type RenderJobSource =
     {
         type: 'photo'
-        nonRawUrl: string
         photo: Photo
         photoWork: PhotoWork
     } |
@@ -34,7 +34,13 @@ interface RenderJob {
 }
 
 const queue = new SerialJobQueue(
-    (newJob, existingJob) => (newJob.source.type === 'photo' && existingJob.source.type === 'photo' && newJob.source.nonRawUrl === existingJob.source.nonRawUrl) ? newJob : null,
+    (newJob, existingJob) =>
+        (
+            newJob.source.type === 'photo' && existingJob.source.type === 'photo' &&
+            newJob.source.photo.id === existingJob.source.photo.id &&
+            isShallowEqual(newJob.maxSize, existingJob.maxSize) &&
+            isShallowEqual(newJob.options, existingJob.options)
+        ) ? newJob : null,
     renderNext)
 
 
@@ -51,8 +57,7 @@ const mimeTypeByFormat: { [K in PhotoRenderFormat]: string } = {
 export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions,
     profiler: Profiler | null = null): Promise<string>
 {
-    const nonRawUrl = getNonRawUrl(photo)
-    return queue.addJob({ source: { type: 'photo', nonRawUrl, photo, photoWork }, maxSize, options, profiler })
+    return queue.addJob({ source: { type: 'photo', photo, photoWork }, maxSize, options, profiler })
 }
 
 
@@ -74,7 +79,7 @@ async function renderNext(job: RenderJob): Promise<string> {
 
     let nonRawUrl: string
     if (source.type === 'photo') {
-        nonRawUrl = source.nonRawUrl
+        nonRawUrl = getNonRawUrl(source.photo)
     } else if (source.type === 'image') {
         nonRawUrl = source.imageDataUrl
     } else {
