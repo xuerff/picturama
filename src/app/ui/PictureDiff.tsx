@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Spinner } from '@blueprintjs/core'
 
-import { Photo, PhotoDetail, Version } from 'common/CommonTypes'
+import { Photo, PhotoDetail, Version, ExifOrientation } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 
 import { CommandGroupId, addCommandGroup, removeCommandGroup } from 'app/controller/HotkeyController'
@@ -80,9 +80,10 @@ export class PictureDiff extends React.Component<Props, State> {
     render() {
         const props = this.props
 
+        const orientation = ExifOrientation.Up  // TODO
         let className = [
             'shadow--2dp',
-            rotation[props.photo.orientation]
+            rotation[orientation]
         ].join(' ')
 
         const photoDetail = props.photoDetail

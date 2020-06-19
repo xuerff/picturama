@@ -29,10 +29,9 @@ export interface Props {
     src: string
     srcPrev: string | null
     srcNext: string | null
-    orientation: ExifOrientation
     cameraMetrics: CameraMetrics | null
     onLoadingStateChange(loadingState: PhotoLayerLoadingState): void
-    onTextureSizeChange(textureSize: Size): void
+    onTextureChange(textureSize: Size, orientation: ExifOrientation): void
 }
 
 interface State {
@@ -99,7 +98,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
 
     private onTextureFetched(src: string, texture: Texture | null) {
         if (src === this.props.src && texture) {
-            this.props.onTextureSizeChange({ width: texture.width, height: texture.height })
+            this.props.onTextureChange({ width: texture.width, height: texture.height }, texture.orientation)
         }
         this.updateCanvas(this.props, this.state)
     }
@@ -125,7 +124,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
             canvas.setBaseTexture(texture, false)
             this.canvasSrc = texture ? props.src : null
             if (texture) {
-                this.props.onTextureSizeChange({ width: texture.width, height: texture.height })
+                this.props.onTextureChange({ width: texture.width, height: texture.height }, texture.orientation)
             }
             canvasChanged = true
         }

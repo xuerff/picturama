@@ -109,7 +109,7 @@ export default class WebGLCanvas {
         const height = switchSides ? image.width : image.height
         if (profiler) profiler.addPoint('Loaded Exif orientation')
 
-        return new Texture(gl, textureId, width, height)
+        return new Texture(gl, textureId, width, height, orientation)
     }
 
 }
@@ -175,7 +175,9 @@ export class GraphicBuffer {
 
 export class Texture {
 
-    constructor(private gl: WebGLRenderingContext, public textureId: WebGLTexture, readonly width: number, readonly height: number) {
+    constructor(private gl: WebGLRenderingContext, public textureId: WebGLTexture,
+        readonly width: number, readonly height: number, readonly orientation: ExifOrientation = ExifOrientation.Up)
+    {
     }
 
     destroy() {

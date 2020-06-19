@@ -29,8 +29,6 @@ export interface Photo {
     updated_at: number,
     /** The timestamp when the photo was imported */
     imported_at: number,
-    /** Example: 1 (= ExifOrientation.Up) */
-    orientation: ExifOrientation,
     /** Example: 'SONY DSC-N2' */
     camera?: string,
     /** Example: 0.0166 */

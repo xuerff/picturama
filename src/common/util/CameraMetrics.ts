@@ -11,6 +11,7 @@ export const maxZoom = 2
 
 export interface CameraMetrics {
     textureSize: Size
+    textureOrientation: ExifOrientation
     canvasSize: Size
     displaySize: Size
     /** The scaling from canvas coordinates to display coordinates */
@@ -53,6 +54,7 @@ export interface CameraMetrics {
 
 export const zeroCameraMetrics: CameraMetrics = {
     textureSize: zeroSize,
+    textureOrientation: ExifOrientation.Up,
     canvasSize: zeroSize,
     displaySize: zeroSize,
     displayScaling: 1,
@@ -86,13 +88,13 @@ export type RequestedPhotoPosition = 'contain' | PhotoPosition
 export class CameraMetricsBuilder {
 
     private textureSize: Size = zeroSize
+    private textureOrientation: ExifOrientation
     private canvasSize: Size | null = null
     private displayScaling = 1
     private insets: Insets = zeroInsets
     private boundsRect: Rect | null = null
     private adjustCanvasSize = false
     private requestedPhotoPosition: RequestedPhotoPosition = 'contain'
-    private exifOrientation: ExifOrientation
     private photoWork: PhotoWork
 
     private isDirty = true
@@ -106,6 +108,14 @@ export class CameraMetricsBuilder {
     setTextureSize(textureSize: Size): this {
         if (!isShallowEqual(this.textureSize, textureSize)) {
             this.textureSize = textureSize
+            this.isDirty = true
+        }
+        return this
+    }
+
+    setTextureOrientation(textureOrientation: ExifOrientation): this {
+        if (this.textureOrientation !== textureOrientation) {
+            this.textureOrientation = textureOrientation
             this.isDirty = true
         }
         return this
@@ -186,14 +196,6 @@ export class CameraMetricsBuilder {
         return this.requestedPhotoPosition
     }
 
-    setExifOrientation(exifOrientation: ExifOrientation): this {
-        if (this.exifOrientation !== exifOrientation) {
-            this.exifOrientation = exifOrientation
-            this.isDirty = true
-        }
-        return this
-    }
-
     setPhotoWork(photoWork: PhotoWork): this {
         if (this.photoWork !== photoWork) {
             this.photoWork = photoWork
@@ -207,9 +209,9 @@ export class CameraMetricsBuilder {
             return this.cameraMetrics
         }
 
-        const { textureSize, displayScaling, photoWork, exifOrientation, insets, requestedPhotoPosition } = this
+        const { textureSize, textureOrientation, displayScaling, photoWork, insets, requestedPhotoPosition } = this
 
-        const rotationTurns = getTotalRotationTurns(exifOrientation, photoWork)
+        const rotationTurns = getTotalRotationTurns(textureOrientation, photoWork)
         const insetsWidth = insets.left + insets.right
         const insetsHeight = insets.top + insets.bottom
         const neutralCropRect = updateNeutralCropRect(rotationTurns, textureSize, this.cameraMetrics && this.cameraMetrics.neutralCropRect)
@@ -277,6 +279,7 @@ export class CameraMetricsBuilder {
 
         this.cameraMetrics = {
             textureSize,
+            textureOrientation,
             canvasSize,
             displaySize,
             displayScaling,
@@ -288,7 +291,7 @@ export class CameraMetricsBuilder {
             maxZoom,
             cropRect,
             neutralCropRect,
-            projectionMatrix: createProjectionMatrix(textureSize, exifOrientation, photoWork),
+            projectionMatrix: createProjectionMatrix(textureSize, textureOrientation, photoWork),
             cameraMatrix,
             displayMatrix,
         }

@@ -124,7 +124,6 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     src={getNonRawUrl(props.photo)}
                     srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
                     srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
-                    orientation={props.photo.orientation}
                     photoWork={props.photoWork}
                     toggleMaximized={props.toggleMaximized}
                     setMode={this.setMode}

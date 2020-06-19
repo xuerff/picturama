@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { vec2 } from 'gl-matrix'
 
-import { PhotoWork, ExifOrientation } from 'common/CommonTypes'
+import { PhotoWork } from 'common/CommonTypes'
 import { CameraMetrics, getInvertedProjectionMatrix, createProjectionMatrix } from 'common/util/CameraMetrics'
 import { Point, Size, Rect, Side, Corner, corners, Insets, zeroInsets } from 'common/util/GeometryTypes'
 import {
@@ -25,7 +25,6 @@ const minCropRectSize = 32
 export interface Props {
     topBarClassName: string
     bodyClassName: string
-    exifOrientation: ExifOrientation
     photoWork: PhotoWork
     cameraMetrics: CameraMetrics
     toggleMaximized(): void
@@ -289,7 +288,7 @@ export default class CropModeLayer extends React.Component<Props, State> {
 
         // Adjust crop rect
         const texturePolygon = createTexturePolygon(cameraMetrics)
-        const nextProjectionMatrix = createProjectionMatrix(cameraMetrics.textureSize, props.exifOrientation, photoWork)
+        const nextProjectionMatrix = createProjectionMatrix(cameraMetrics.textureSize, cameraMetrics.textureOrientation, photoWork)
         const nextCropRectCenter = vec2.transformMat4(vec2.create(), centerInTextureCoords, nextProjectionMatrix)
         photoWork.cropRect = scaleRectToFitBorders(nextCropRectCenter, maxCropRectSize, texturePolygon)
 

@@ -20,7 +20,6 @@ export const testBigPhoto: Photo = {
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
-    orientation: 1,
     camera: 'Canon EOS 30D',
     exposure_time: 0.016666666666666666,
     iso: 1600,
@@ -43,7 +42,6 @@ export const testLandscapePhoto: Photo = {
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
-    orientation: 1,
     flag: 0,
     trashed: 0
 }
@@ -61,7 +59,6 @@ export const testPortraitPhoto: Photo = {
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
-    orientation: 1,
     flag: 1,
     trashed: 0
 }
@@ -79,7 +76,6 @@ export const testPanoramaPhoto: Photo = {
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
-    orientation: 1,
     flag: 0,
     trashed: 0
 }

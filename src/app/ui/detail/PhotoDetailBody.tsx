@@ -35,7 +35,6 @@ export interface Props {
     src: string
     srcPrev: string | null
     srcNext: string | null
-    orientation: ExifOrientation
     photoWork: PhotoWork | null
     toggleMaximized(): void
     setMode(mode: DetailMode): void
@@ -59,6 +58,7 @@ interface State {
     /** The size of the detail body (in px) */
     bodySize: Size
     textureSize: Size | null
+    textureOrientation: ExifOrientation
     boundsRect: Rect | null
     photoPosition: RequestedPhotoPosition
     /** The PhotoWork which is changed in crop mode but not yet saved */
@@ -71,7 +71,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props)
-        bindMany(this, 'onLoadingStateChange', 'onResize', 'onTextureSizeChange', 'setPhotoPosition', 'enterCropMode',
+        bindMany(this, 'onLoadingStateChange', 'onResize', 'onTextureChange', 'setPhotoPosition', 'enterCropMode',
             'onPhotoWorkEdited', 'onCropDone')
         const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
@@ -81,6 +81,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
             loadingState: null,
             bodySize: zeroSize,
             textureSize: null,
+            textureOrientation: ExifOrientation.Up,
             boundsRect: null,
             photoPosition: 'contain',
             editedPhotoWork: null,
@@ -126,9 +127,9 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         if (prevState.textureSize && nextProps.photoWork) {
             const cameraMetrics = cameraMetricsBuilder
                 .setTextureSize(prevState.textureSize)
+                .setTextureOrientation(prevState.textureOrientation)
                 .setDisplaySize(prevState.bodySize, 1 / nextProps.devicePixelRatio)
                 .setBoundsRect(nextBoundsRect)
-                .setExifOrientation(nextProps.orientation)
                 .setPhotoWork(nextEditedPhotoWork || nextProps.photoWork)
                 .setPhotoPosition(nextPhotoPosition)
                 .getCameraMetrics()
@@ -155,10 +156,10 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         }
     }
 
-    private onTextureSizeChange(textureSize: Size | null) {
+    private onTextureChange(textureSize: Size | null, orientation: ExifOrientation) {
         const { state } = this
         if (!isShallowEqual(textureSize, state.textureSize)) {
-            this.setState({ textureSize })
+            this.setState({ textureSize, textureOrientation: orientation })
         }
     }
 
@@ -206,10 +207,9 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     src={props.src}
                     srcPrev={props.srcPrev}
                     srcNext={props.srcNext}
-                    orientation={props.orientation}
                     cameraMetrics={state.cameraMetrics}
                     onLoadingStateChange={this.onLoadingStateChange}
-                    onTextureSizeChange={this.onTextureSizeChange}
+                    onTextureChange={this.onTextureChange}
                 />
                 {props.mode === 'view' &&
                     <ViewModeLayer
@@ -241,7 +241,6 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     <CropModeLayer
                         topBarClassName={props.topBarClassName}
                         bodyClassName={props.bodyClassName}
-                        exifOrientation={props.photo.orientation}
                         photoWork={state.editedPhotoWork || props.photoWork}
                         cameraMetrics={state.cameraMetrics}
                         toggleMaximized={props.toggleMaximized}

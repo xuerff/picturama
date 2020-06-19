@@ -92,7 +92,7 @@ async function renderNext(job: RenderJob): Promise<string> {
         .setCanvasSize(job.maxSize)
         .setAdjustCanvasSize(job.maxSize !== null)
         .setTextureSize({ width: texture.width, height: texture.height })
-        .setExifOrientation(source.type === 'photo' ? source.photo.orientation : ExifOrientation.Up)
+        .setTextureOrientation(texture.orientation)
         .setPhotoWork(source.type === 'photo' ? source.photoWork : {})
         .getCameraMetrics()
 
@@ -100,7 +100,7 @@ async function renderNext(job: RenderJob): Promise<string> {
     if (source.type === 'photo') {
         const { photo } = source
         const { cropRect } = cameraMetrics
-        const switchMasterSides = (photo.orientation == ExifOrientation.Left) || (photo.orientation == ExifOrientation.Right)
+        const switchMasterSides = (texture.orientation == ExifOrientation.Left) || (texture.orientation == ExifOrientation.Right)
         const master_width = switchMasterSides ? texture.height : texture.width
         const master_height = switchMasterSides ? texture.width : texture.height
         const masterSizeIsWrong = photo.master_width !== master_width || photo.master_height !== master_height
