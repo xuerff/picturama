@@ -26,6 +26,7 @@ export default {
     version: npmPackage.version,
     platform,
     acceptedRawExtensions: [ 'raf', 'cr2', 'arw', 'dng' ],
+    acceptedHeicExtensions: [ 'heic', 'heif' ],
     acceptedNonRawExtensions: [ 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp' ],
     watchedFormats: /([$#\w\d]+)-([$#\w\dèé]+)-(\d+)\.(JPEG|JPG|PNG|PPM|TIFF|WEBP)/i,
     workExt: 'webp' as  PhotoRenderFormat,

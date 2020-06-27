@@ -140,6 +140,34 @@ testImportScanner('import jpg',
     })
 
 
+testImportScanner('import heic',
+    async testDir => {
+        await copyFile('test-data/photos/heic/Apple_iPhone_XR_portrait.HEIC', `${testDir}/Apple_iPhone_XR_portrait.HEIC`)
+    },
+    async ({ testDir, storedPhotos }) => {
+        expectPhotos(storedPhotos, [
+            {
+                master_dir: 'dist-test/import_heic',
+                master_filename: 'Apple_iPhone_XR_portrait.HEIC',
+                master_width: 3024,
+                master_height: 4032,
+                master_is_raw: 0,
+                edited_width: 3024,
+                edited_height: 4032,
+                date_section: '2019-07-31',
+                created_at: 1564576474000,
+                camera: 'Apple iPhone XR',
+                exposure_time: 0.000700770847932726,
+                iso: 25,
+                focal_length: 4.25,
+                aperture: 1.8,
+                flag: 0,
+                trashed: 0
+            }
+        ])
+    })
+
+
 testImportScanner('import Picasa crop and tilt',
     async testDir => {
         await Promise.all([

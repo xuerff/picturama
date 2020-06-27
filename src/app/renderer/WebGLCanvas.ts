@@ -1,13 +1,41 @@
 import { mat4 } from 'gl-matrix'
+import heic2any from 'heic2any'
 import exifr from 'exifr'
 
 import Profiler from 'common/util/Profiler'
 import { ExifOrientation } from 'common/CommonTypes'
+import config from 'common/config'
 
 
 const exifrOrientationOptions = {
     translateValues: false,
     pick: [ 'Orientation' ],
+}
+
+
+const heicExtensionRE = new RegExp(`\\.(${config.acceptedHeicExtensions.join('|')})$`, 'i')
+
+
+// Workaround: Prevent tree-shaking from removing `heic2any`.
+heic2any['__dummy'] = 1
+
+function decodeBuffer(buffer: ArrayBuffer): Promise<ImageData[]> {
+	return new Promise((resolve, reject) => {
+		const id = (Math.random() * new Date().getTime()).toString();
+		const message = { id, buffer };
+		((window as any).__heic2any__worker as Worker).postMessage(message);
+		((window as any).__heic2any__worker as Worker).addEventListener(
+			"message",
+			(message) => {
+				if (message.data.id === id) {
+					if (message.data.error) {
+						return reject(message.data.error);
+					}
+					return resolve(message.data.imageDataArr);
+				}
+			}
+		);
+	});
 }
 
 
@@ -71,15 +99,45 @@ export default class WebGLCanvas {
 
         const gl = this.gl
 
-        const image = new Image()
-        await new Promise((resolve, reject) => {
-            image.onload = resolve
-            image.onerror = errorEvt => {
-                reject(new Error(`Loading image failed: ${src}`))
+        let textureSource: HTMLImageElement | Uint8ClampedArray
+        let width: number
+        let height: number
+        let orientation: ExifOrientation
+        if (heicExtensionRE.test(src)) {
+            const encodedHeicBuffer = await (await fetch(src)).arrayBuffer()
+            if (profiler) profiler.addPoint('Fetch encoded heic data')
+            const imageData = await decodeBuffer(encodedHeicBuffer)
+            if (profiler) profiler.addPoint('Decoded heic data')
+
+            textureSource = imageData[0].data
+            width = imageData[0].width
+            height = imageData[0].height
+            orientation = ExifOrientation.Up
+        } else {
+            const image = new Image()
+            let imageSrc = src
+            await new Promise((resolve, reject) => {
+                image.onload = resolve
+                image.onerror = errorEvt => {
+                    reject(new Error(`Loading image failed: ${src}`))
+                }
+                image.src = imageSrc
+            })
+            textureSource = image
+            if (profiler) profiler.addPoint('Loaded image')
+
+            let exifData: any = null
+            try {
+                exifData = await exifr.parse(image, exifrOrientationOptions)
+            } catch (error) {
+                console.warn(`Getting EXIF data failed - continuing without: ${src}: ${error.message}`)
             }
-            image.src = src
-        })
-        if (profiler) profiler.addPoint('Loaded image')
+            orientation = exifData && exifData.Orientation || ExifOrientation.Up
+            const switchSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)
+            width = switchSides ? image.height : image.width
+            height = switchSides ? image.width : image.height
+            if (profiler) profiler.addPoint('Loaded Exif orientation')
+        }
 
         const textureId = this.gl.createTexture()
         if (!textureId) {
@@ -92,22 +150,15 @@ export default class WebGLCanvas {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-        gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, srcFormat, srcType, image)
+        if (textureSource instanceof HTMLImageElement) {
+            gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, srcFormat, srcType, textureSource)
+        } else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureSource)
+        }
+
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
         if (profiler) profiler.addPoint('Created texture')
-
-        let exifData: any = null
-        try {
-            exifData = await exifr.parse(image, exifrOrientationOptions)
-        } catch (error) {
-            console.warn(`Getting EXIF data failed - continuing without: ${src}: ${error.message}`)
-        }
-        const orientation = exifData && exifData.Orientation || ExifOrientation.Up
-        const switchSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)
-        const width = switchSides ? image.height : image.width
-        const height = switchSides ? image.width : image.height
-        if (profiler) profiler.addPoint('Loaded Exif orientation')
 
         return new Texture(gl, textureId, width, height, orientation)
     }

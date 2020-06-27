@@ -18,8 +18,10 @@ import { parseImageDataUrl } from 'background/util/NodeUtil'
 const getImageSize = promisify(getImageSizeWithCallback)
 
 
+const acceptedExtensions = [ ...config.acceptedNonRawExtensions, ...config.acceptedHeicExtensions, ...config.acceptedRawExtensions ]
+
 const acceptedRawExtensionRE = new RegExp(`\\.(${config.acceptedRawExtensions.join('|')})$`, 'i')
-const acceptedExtensionRE = new RegExp(`\\.(${config.acceptedNonRawExtensions.join('|')}|${config.acceptedRawExtensions.join('|')})$`, 'i')
+const acceptedExtensionRE = new RegExp(`\\.(${acceptedExtensions.join('|')})$`, 'i')
 
 const uiUpdateInterval = 200  // In ms
 
