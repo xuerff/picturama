@@ -15,6 +15,7 @@ export type AppState = {
 export type NavigationState = {
     devicePixelRatio: number
     isFullScreen: boolean
+    hasWebGLSupport: boolean
     mainView: MainViewState
 }
 

@@ -39,6 +39,12 @@ function decodeBuffer(buffer: ArrayBuffer): Promise<ImageData[]> {
 }
 
 
+export function hasWebGLSupport(): boolean {
+    const canvas = document.createElement('canvas')
+    return !!canvas.getContext('webgl2')
+}
+
+
 /**
  * A WebGL canvas. Has a more convenient API than using WebGL directly, but it lets you get down to WebGL if you need to.
  *

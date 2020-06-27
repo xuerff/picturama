@@ -7,13 +7,14 @@ import { setLocale } from 'common/i18n/i18n'
 import BackgroundClient from 'app/BackgroundClient'
 import { init as initForegroundService } from 'app/ForegroundService'
 import App from 'app/ui/main/App'
-import { initAction, setDevicePixelRatioAction } from 'app/state/actions'
+import { initAction, setWebGLSupport, setDevicePixelRatioAction } from 'app/state/actions'
 import store from 'app/state/store'
 
 import './entry.less'
 
 import pkgs from '../../package.json'
 import { showError } from 'app/ErrorPresenter'
+import { hasWebGLSupport } from 'app/renderer/WebGLCanvas'
 
 
 if (process.env.PICTURAMA_DEV_MODE) {
@@ -36,6 +37,10 @@ Promise
         store.dispatch(initAction(uiConfig, settings))
 
         detectDevicePixelRatioChanges()
+
+        if (!hasWebGLSupport()) {
+            store.dispatch(setWebGLSupport(false))
+        }
 
         render(
             <Provider store={store}>

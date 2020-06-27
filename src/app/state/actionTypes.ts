@@ -1,5 +1,6 @@
 export const INIT = 'INIT'
 
+export const SET_WEB_GL_SUPPORT = 'SET_WEB_GL_SUPPORT'
 export const SET_DEVICE_PIXEL_RATIO = 'SET_DEVICE_PIXEL_RATIO'
 export const SET_FULL_SCREEN = 'SET_FULL_SCREEN'
 

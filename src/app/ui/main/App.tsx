@@ -1,9 +1,10 @@
 import React, { ReactNode } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Button } from '@blueprintjs/core'
+import { Button, NonIdealState } from '@blueprintjs/core'
 import classNames from 'classnames'
 
+import { msg } from 'common/i18n/i18n'
 import { ImportProgress } from 'common/CommonTypes'
 
 import BackgroundClient from 'app/BackgroundClient'
@@ -27,6 +28,7 @@ interface OwnProps {
 
 interface StateProps {
     isFullScreen: boolean
+    hasWebGLSupport: boolean
     hasNativeTrafficLightButtons: boolean
     mainView: MainViewState
     importProgress: ImportProgress | null
@@ -59,7 +61,17 @@ class App extends React.Component<Props> {
         }
 
         let mainView: ReactNode | null = null
-        if (props.mainView === 'settings') {
+        if (!props.hasWebGLSupport) {
+            mainView = (
+                <div className='App-mainView App-globalError'>
+                    <NonIdealState
+                        icon='media'
+                        title={msg('App_error_noWebGL_title')}
+                        description={msg('App_error_noWebGL_desc')}
+                    />
+                </div>
+            )
+        } else if (props.mainView === 'settings') {
             mainView = <SettingsPane className='App-mainView'/>
         } else if (props.mainView === 'detail') {
             mainView = <PhotoDetailPane className='App-mainView' isActive={!modalView} />
@@ -110,6 +122,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         return {
             ...props,
             isFullScreen: state.navigation.isFullScreen,
+            hasWebGLSupport: state.navigation.hasWebGLSupport,
             hasNativeTrafficLightButtons: state.data.uiConfig.platform === 'darwin' && !state.navigation.isFullScreen,
             mainView: state.navigation.mainView,
             importProgress: state.import && state.import.progress,
