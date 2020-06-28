@@ -7,7 +7,7 @@ const testPhotosDir = 'submodules/test-data/photos'
 
 test('MetaData.readMetadataOfImage', async () => {
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/architecture.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/architecture.jpg`)).toEqual({
         aperture: 5.6,
         camera: 'Nikon D3300',
         createdAt: toDate('2017-03-25T09:22:15.000Z'),
@@ -20,7 +20,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/ice-cubes.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/ice-cubes.jpg`)).toEqual({
         aperture: 11,
         camera: 'FUJIFILM X-T2',
         createdAt: toDate('2018-06-28T17:37:06.000Z'),
@@ -33,7 +33,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/light-bulb.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/light-bulb.jpg`)).toEqual({
         aperture: 4,
         camera: 'SONY ILCE-7',
         createdAt: toDate('2016-01-16T00:14:16.000Z'),
@@ -46,7 +46,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/railway-tracks.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/railway-tracks.jpg`)).toEqual({
         aperture: 6.3,
         camera: 'Olympus E-M10',
         createdAt: toDate('2018-06-01T10:21:18.000Z'),
@@ -59,7 +59,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/rustic.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/rustic.jpg`)).toEqual({
         aperture: 14,
         camera: 'SONY ILCE-6300',
         createdAt: toDate('2018-05-26T21:31:00.000Z'),
@@ -72,7 +72,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/tomatoes.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/tomatoes.jpg`)).toEqual({
         aperture: 2.8,
         camera: 'Canon EOS 450D',
         createdAt: toDate('2017-04-15T07:11:52.000Z'),
@@ -85,7 +85,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/800/water.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/800/water.jpg`)).toEqual({
         aperture: 11,
         camera: 'Nikon D750',
         createdAt: toDate('2016-09-30T12:37:39.000Z'),
@@ -98,7 +98,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/heic/Apple_iPhone_XR_portrait.HEIC`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/heic/Apple_iPhone_XR_portrait.HEIC`)).toEqual({
         aperture: 1.8,
         camera: 'Apple iPhone XR',
         createdAt: toDate('2019-07-31T12:34:34.000Z'),
@@ -111,7 +111,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/jpg/Apple_iPhone_XR_landscape.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/jpg/Apple_iPhone_XR_landscape.jpg`)).toEqual({
         aperture: 1.8,
         camera: 'Apple iPhone XR',
         createdAt: toDate('2019-09-12T16:22:17.000Z'),
@@ -124,7 +124,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/IMG_9700.JPG`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/IMG_9700.JPG`)).toEqual({
         aperture: 5.6,
         camera: 'Canon EOS 700D',
         createdAt: toDate('2016-09-18T16:12:25.000Z'),
@@ -137,13 +137,13 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/landscape.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/landscape.jpg`)).toEqual({
         createdAt: toDate('2020-06-28T09:49:10.811Z'),
         orientation: 1,
         tags: []
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/panorama.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/panorama.jpg`)).toEqual({
         aperture: undefined,
         camera: undefined,
         createdAt: toDate('2018-08-15T13:09:04.000Z'),
@@ -156,7 +156,7 @@ test('MetaData.readMetadataOfImage', async () => {
         tags: [],
     })
 
-    expect(await readMetadataOfImage(`${testPhotosDir}/portrait.jpg`)).toMatchObject({
+    expect(await readMetadataOfImage(`${testPhotosDir}/portrait.jpg`)).toEqual({
         aperture: 8,
         camera: 'SONY DSLR-A850',
         createdAt: toDate('2012-09-24T17:23:35.000Z'),

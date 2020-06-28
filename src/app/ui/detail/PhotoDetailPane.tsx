@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId, ExifData } from 'common/CommonTypes'
+import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId, MetaData, ExifData } from 'common/CommonTypes'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
@@ -46,6 +46,7 @@ interface DispatchProps {
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
     getFileSize(path: string): Promise<number>
+    readMetadataOfImage(imagePath: string): Promise<MetaData>
     getExifData(path: string): Promise<ExifData | null>
     updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
@@ -147,6 +148,7 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
                     getFileSize={props.getFileSize}
+                    readMetadataOfImage={props.readMetadataOfImage}
                     getExifData={props.getExifData}
                     setPhotoTags={props.setPhotoTags}
                 />
@@ -181,6 +183,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         setPreviousDetailPhoto,
         setNextDetailPhoto,
         getFileSize: BackgroundClient.getFileSize,
+        readMetadataOfImage: BackgroundClient.readMetadataOfImage,
         getExifData: BackgroundClient.getExifData,
         updatePhotoWork,
         setPhotosFlagged,

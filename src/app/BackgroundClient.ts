@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig, Settings, PhotoSet, PhotoExportOptions, IpcErrorInfo, ExifData } from 'common/CommonTypes'
+import { UiConfig, Settings, PhotoSet, PhotoExportOptions, IpcErrorInfo, MetaData, ExifData } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { decodeIpcError } from 'common/util/IpcUtil'
@@ -70,6 +70,10 @@ export default {
 
     getFileSize(path: string): Promise<number> {
         return callOnBackground('getFileSize', { path })
+    },
+
+    readMetadataOfImage(imagePath: string): Promise<MetaData> {
+        return callOnBackground('readMetadataOfImage', { imagePath })
     },
 
     getExifData(path: string): Promise<ExifData | null> {

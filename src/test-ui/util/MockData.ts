@@ -1,4 +1,4 @@
-import { PhotoId, Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoDetail, MetaData, ExifData } from 'common/CommonTypes'
 
 
 export const testPhotosDir = '../submodules/test-data/photos'
@@ -24,13 +24,21 @@ export const testBigPhoto: Photo = {
     created_at: 1474222345000,
     updated_at: 1474222345000,
     imported_at: 1565807324226,
-    camera: 'Canon EOS 30D',
-    exposure_time: 0.016666666666666666,
-    iso: 1600,
-    focal_length: 55,
-    aperture: 5.6,
     flag: 0,
     trashed: 0
+}
+
+export const testBigPhotoMetData: MetaData = {
+    aperture: 5.6,
+    camera: 'Canon EOS 700D',
+    createdAt: new Date(2016, 9-1, 18, 16, 12, 25),
+    exposureTime: 0.016666666666666666,
+    focalLength: 55,
+    imgHeight: 3456,
+    imgWidth: 5184,
+    iso: 1600,
+    orientation: 1,
+    tags: [],
 }
 
 export const testLandscapePhoto: Photo = {

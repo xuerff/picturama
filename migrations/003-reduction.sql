@@ -2,6 +2,7 @@
 
 -- Changes on table photos:
 --   - Remove column "orientation"
+--   - Remove meta data columns "camera", "exposure_time", "iso", "focal_length", "aperture"
 
 PRAGMA foreign_keys=OFF;
 
@@ -21,16 +22,11 @@ CREATE TABLE "photos" (
     "created_at"      datetime NOT NULL,
     "updated_at"      datetime NOT NULL,
     "imported_at"     datetime NOT NULL,
-    "camera"          text,
-    "exposure_time"   float,
-    "iso"             integer,
-    "focal_length"    integer,
-    "aperture"        float,
     "flag"            boolean NOT NULL DEFAULT '0',
     "trashed"         boolean NOT NULL DEFAULT '0'
 );
-INSERT INTO photos (id, master_dir, master_filename, master_width, master_height, master_is_raw, edited_width, edited_height, date_section, created_at, updated_at, imported_at, camera, exposure_time, iso, focal_length, aperture, flag, trashed)
-    SELECT          id, master_dir, master_filename, master_width, master_height, master_is_raw, master_width, master_height, date_section, created_at, updated_at, imported_at, camera, exposure_time, iso, focal_length, aperture, flag, trashed
+INSERT INTO photos (id, master_dir, master_filename, master_width, master_height, master_is_raw, edited_width, edited_height, date_section, created_at, updated_at, imported_at, flag, trashed)
+    SELECT          id, master_dir, master_filename, master_width, master_height, master_is_raw, master_width, master_height, date_section, created_at, updated_at, imported_at, flag, trashed
     FROM photos_old;
 DROP TABLE photos_old;
 CREATE INDEX photos_master_dir_index ON photos(master_dir);
@@ -68,8 +64,8 @@ CREATE TABLE "photos" (
     "flag"            boolean NOT NULL DEFAULT '0',
     "trashed"         boolean NOT NULL DEFAULT '0'
 );
-INSERT INTO photos (id, master_dir, master_filename, master_width, master_height, master_is_raw, edited_width, edited_height, date_section, created_at, updated_at, imported_at, orientation, camera, exposure_time, iso, focal_length, aperture, flag, trashed)
-    SELECT          id, master_dir, master_filename, master_width, master_height, master_is_raw, master_width, master_height, date_section, created_at, updated_at, imported_at,           1, camera, exposure_time, iso, focal_length, aperture, flag, trashed
+INSERT INTO photos (id, master_dir, master_filename, master_width, master_height, master_is_raw, edited_width, edited_height, date_section, created_at, updated_at, imported_at, orientation, flag, trashed)
+    SELECT          id, master_dir, master_filename, master_width, master_height, master_is_raw, master_width, master_height, date_section, created_at, updated_at, imported_at,           1, flag, trashed
     FROM photos_old;
 DROP TABLE photos_old;
 CREATE INDEX photos_master_dir_index ON photos(master_dir);

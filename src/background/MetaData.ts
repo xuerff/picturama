@@ -1,23 +1,8 @@
 import exifr from 'exifr'
 
-import { ExifOrientation, ExifData, allExifSegments } from 'common/CommonTypes'
+import { MetaData, ExifData, allExifSegments } from 'common/CommonTypes'
 
 import { fsStat } from 'background/util/FileUtil'
-
-
-export interface MetaData {
-    imgWidth?:     number
-    imgHeight?:    number
-    camera?:       string
-    exposureTime?: number
-    iso?:          number
-    aperture?:     number
-    focalLength?:  number
-    createdAt?:    Date
-    /** Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html */
-    orientation:   ExifOrientation
-    tags:          string[]
-}
 
 
 // exifr can improve performance, if options object is cached

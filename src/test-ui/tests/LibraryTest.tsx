@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@blueprintjs/core'
 
-import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter, ExifData } from 'common/CommonTypes'
+import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter, MetaData, ExifData } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { getNonRawUrl } from 'common/util/DataUtil'
 import { addErrorCode } from 'common/util/LangUtil'
@@ -14,7 +14,7 @@ import { LibraryFilterButton } from 'app/ui/library/LibraryFilterButton'
 import ImportProgressButton from 'app/ui/ImportProgressButton'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
-import { testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'test-ui/util/MockData'
+import { testBigPhotoMetData, testLandscapePhoto, testPanoramaPhoto, testPhotos } from 'test-ui/util/MockData'
 import { createRandomDummyPhoto, createSection, createLayoutForSection } from 'test-ui/util/TestUtil'
 
 
@@ -54,6 +54,7 @@ function createDefaultProps(context: TestContext): Props {
         getGridLayout,
         getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
         getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
+        readMetadataOfImage(imagePath: string): Promise<MetaData> { return Promise.resolve(testBigPhotoMetData) },
         getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(null) },
         createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => {
             if (photo.master_filename === 'dummy') {

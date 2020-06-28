@@ -459,11 +459,6 @@ export default class ImportScanner {
                 created_at: createdAt.getTime(),
                 updated_at: fileStats.mtime.getTime(),
                 imported_at: this.importStartTime,
-                camera: metaData.camera,
-                exposure_time: metaData.exposureTime,
-                iso: metaData.iso,
-                focal_length: metaData.focalLength,
-                aperture: metaData.aperture,
                 flag: photoWork.flagged ? 1 : 0,
                 trashed: 0,
             }

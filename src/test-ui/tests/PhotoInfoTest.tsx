@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
+import { Photo, PhotoDetail, MetaData, ExifData } from 'common/CommonTypes'
 
 import PhotoInfo from 'app/ui/info/PhotoInfo'
 
 import { addSection, action, TestContext } from 'test-ui/core/UiTester'
-import { testBigPhoto, testExifData } from 'test-ui/util/MockData'
+import { testBigPhoto, testBigPhotoMetData, testExifData } from 'test-ui/util/MockData'
 
 
 const baseUrl = 'dist'
@@ -19,6 +19,7 @@ const defaultProps = {
     tags: defaultTags,
     closeInfo: action('closeInfo'),
     getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
+    readMetadataOfImage(imagePath: string): Promise<MetaData> { return Promise.resolve(testBigPhotoMetData) },
     getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(testExifData) },
 }
 

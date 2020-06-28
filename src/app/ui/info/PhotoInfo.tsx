@@ -4,7 +4,7 @@ import React from 'react'
 import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
 import moment from 'moment'
 
-import { Photo, PhotoDetail, ExifData, ExifSegment, allExifSegments } from 'common/CommonTypes'
+import { Photo, PhotoDetail, MetaData, ExifData, ExifSegment, allExifSegments } from 'common/CommonTypes'
 import { msg, hasMsg } from 'common/i18n/i18n'
 import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
@@ -35,6 +35,7 @@ const exifFilters: { [K in ExifSegment]?: string[] } = {
 interface FileInfo {
     state: 'pending' | 'done'
     masterFileSize: number | null
+    metaData: MetaData | null
     exifData: ExifData | null
 }
 
@@ -47,6 +48,7 @@ export interface Props {
     tags: string[]
     closeInfo: () => void
     getFileSize(path: string): Promise<number>
+    readMetadataOfImage(imagePath: string): Promise<MetaData>
     getExifData(path: string): Promise<ExifData | null>
     setPhotoTags(photo: Photo, tags: string[]): void
 }
@@ -65,7 +67,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
         super(props)
         bindMany(this, 'showPhotoInFolder', 'copyPhotoPath', 'copyCoordinates', 'toggleExif')
         this.state = {
-            fileInfo: { state: 'pending', masterFileSize: null, exifData: null },
+            fileInfo: { state: 'pending', masterFileSize: null, metaData: null, exifData: null },
             showExif: false,
             showAllOfExifSegment: {},
         }
@@ -78,7 +80,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         const { props, state } = this
         if (props.photo !== prevProps.photo) {
-            this.setState({ fileInfo: { state: 'pending', masterFileSize: null, exifData: null } })
+            this.setState({ fileInfo: { state: 'pending', masterFileSize: null, metaData: null, exifData: null } })
             if (props.isActive) {
                 this.updateFileInfo()
             }
@@ -88,27 +90,33 @@ export default class PhotoInfo extends React.Component<Props, State> {
     }
 
     private updateFileInfo() {
-        const photo = this.props.photo
+        const { props } = this
+        const { photo } = props
         if (photo && !this.isFetchingFileInfo) {
             this.isFetchingFileInfo = true
             const masterPath = getMasterPath(photo)
             Promise.all(
                 [
-                    this.props.getFileSize(masterPath)
+                    props.getFileSize(masterPath)
                         .catch(error => {
                             console.warn('Fetching master file size failed', error)
                             return null
                         }),
-                    this.props.getExifData(masterPath)
+                    props.readMetadataOfImage(masterPath)
+                        .catch(error => {
+                            console.warn('Fetching meta data failed', error)
+                            return null
+                        }),
+                    props.getExifData(masterPath)
                         .catch(error => {
                             console.warn('Fetching EXIF data failed', error)
                             return null
                         }),
                 ])
-                .then(([ masterFileSize, exifData ]) => {
+                .then(([ masterFileSize, metaData, exifData ]) => {
                     this.isFetchingFileInfo = false
-                    if (photo === this.props.photo) {
-                        this.setState({ fileInfo: { state: 'done', masterFileSize, exifData } })
+                    if (photo === props.photo) {
+                        this.setState({ fileInfo: { state: 'done', masterFileSize, metaData, exifData } })
                     } else {
                         // The photo has changed in the mean time -> Fetch again
                         this.updateFileInfo()
@@ -166,6 +174,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
         const { props, state } = this
         const { photo } = props
         const { fileInfo } = state
+        const { metaData } = fileInfo
         const coordinates = this.getCoordinates()
 
         let body
@@ -212,25 +221,25 @@ export default class PhotoInfo extends React.Component<Props, State> {
                             }
                         </div>
                     </div>
-                    {(photo.camera || photo.aperture || photo.exposure_time || photo.focal_length || photo.iso) &&
+                    {metaData && (metaData.camera || metaData.aperture || metaData.exposureTime || metaData.focalLength || metaData.iso) &&
                         <div className="PhotoInfo-infoRow">
                             <Icon className="PhotoInfo-infoIcon" icon="camera" iconSize={infoIconSize} />
                             <div className="PhotoInfo-infoBody">
-                                {photo.camera &&
-                                    <h1>{photo.camera}</h1>
+                                {metaData.camera &&
+                                    <h1>{metaData.camera}</h1>
                                 }
                                 <div className="PhotoInfo-minorInfo hasColumns">
-                                    {photo.aperture &&
-                                        <div>{`\u0192/${photo.aperture}`}</div>
+                                    {metaData.aperture &&
+                                        <div>{`\u0192/${metaData.aperture}`}</div>
                                     }
-                                    {photo.exposure_time &&
-                                        <div>{formatShutterSpeed(photo.exposure_time)}</div>
+                                    {metaData.exposureTime &&
+                                        <div>{formatShutterSpeed(metaData.exposureTime)}</div>
                                     }
-                                    {photo.focal_length &&
-                                        <div>{`${photo.focal_length} mm`}</div>
+                                    {metaData.focalLength &&
+                                        <div>{`${metaData.focalLength} mm`}</div>
                                     }
-                                    {photo.iso &&
-                                        <div>{`ISO ${photo.iso}`}</div>
+                                    {metaData.iso &&
+                                        <div>{`ISO ${metaData.iso}`}</div>
                                     }
                                 </div>
                             </div>

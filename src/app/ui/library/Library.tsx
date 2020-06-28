@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { ipcRenderer } from 'electron'
 import { Button, NonIdealState, Spinner, MaybeElement, Icon, INonIdealStateProps } from '@blueprintjs/core'
 
-import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, isLoadedPhotoSection, PhotoDetail, PhotoFilterType, ExifData } from 'common/CommonTypes'
+import { PhotoId, Photo, PhotoWork, PhotoSectionId, PhotoSectionById, isLoadedPhotoSection, PhotoDetail, PhotoFilterType, MetaData, ExifData } from 'common/CommonTypes'
 import { msg } from 'common/i18n/i18n'
 import CancelablePromise from 'common/util/CancelablePromise'
 import { bindMany } from 'common/util/LangUtil'
@@ -65,6 +65,7 @@ interface DispatchProps {
     getGridLayout: GetGridLayoutFunction
     getThumbnailSrc: (photo: Photo) => string
     getFileSize(path: string): Promise<number>
+    readMetadataOfImage(imagePath: string): Promise<MetaData>
     getExifData(path: string): Promise<ExifData | null>
     createThumbnail: (sectionId: PhotoSectionId, photo: Photo) => CancelablePromise<string>
     setGridRowHeight: (gridRowHeight: number) => void
@@ -276,6 +277,7 @@ export class Library extends React.Component<Props, State> {
                     tags={props.tags}
                     closeInfo={this.toggleShowInfo}
                     getFileSize={props.getFileSize}
+                    readMetadataOfImage={props.readMetadataOfImage}
                     getExifData={props.getExifData}
                     setPhotoTags={props.setPhotoTags}
                 />
@@ -321,6 +323,7 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         getGridLayout,
         getThumbnailSrc,
         getFileSize: BackgroundClient.getFileSize,
+        readMetadataOfImage: BackgroundClient.readMetadataOfImage,
         getExifData: BackgroundClient.getExifData,
         createThumbnail,
         setDetailPhotoById,

@@ -29,16 +29,6 @@ export interface Photo {
     updated_at: number,
     /** The timestamp when the photo was imported */
     imported_at: number,
-    /** Example: 'SONY DSC-N2' */
-    camera?: string,
-    /** Example: 0.0166 */
-    exposure_time?: number,
-    /** Example: 0 */
-    iso?: number,
-    /** Example: 5 */
-    focal_length?: number,
-    /** Example: 5.6 */
-    aperture?: number,
     /** Whether the image is flagged. */
     flag: 0 | 1,
     /** Example: 0 */
@@ -194,6 +184,26 @@ export interface PhotoExportProgress {
 export interface IpcErrorInfo {
     message: string
     errorCode?: string
+}
+
+
+export interface MetaData {
+    imgWidth?:     number
+    imgHeight?:    number
+    /** Example: 'SONY DSC-N2' */
+    camera?:       string
+    /** Example: 0.0166 */
+    exposureTime?: number
+    /** Example: 200 */
+    iso?:          number
+    /** Example: 5.6 */
+    aperture?:     number
+    /** Example: 5 */
+    focalLength?:  number
+    createdAt?:    Date
+    /** Details on orientation: https://www.impulseadventure.com/photo/exif-orientation.html */
+    orientation:   ExifOrientation
+    tags:          string[]
 }
 
 
