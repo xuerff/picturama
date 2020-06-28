@@ -30,7 +30,7 @@ Build from sources
 
 Prerequirements:
 
-  - Install yarn (Mac OS: `brew install yarn`)
+  - Install yarn (Mac OS: `brew install yarn` or just `npm install -g yarn`)
     - **Note:** It's important to use yarn instead of npm for
       [getting smaller distributable packages](https://github.com/electron-userland/electron-builder/issues/1147#issuecomment-276284477)
   - Mac OS: Install Xcode and start it once. You can close Xcode after the "required components" have been installed.
