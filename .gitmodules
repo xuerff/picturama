@@ -1,6 +1,6 @@
 [submodule "submodules/node-libraw"]
 	path = submodules/node-libraw
 	url = https://github.com/picturama/node-libraw.git
-[submodule "test-data"]
-	path = test-data
+[submodule "submodules/test-data"]
+	path = submodules/test-data
 	url = https://github.com/picturama/test-data.git

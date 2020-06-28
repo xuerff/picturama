@@ -20,7 +20,8 @@ Directory structure
         +-- test-ui/          Code running in renderer electron process of UI Tester
         +-- typings/          TypeScript type definitions
     +-- submodules/           Third-party projects fetched as git submodules
-    +-- test-data/            Data used for testing
+        +-- node-libraw/      Own fork of node-libraw
+        +-- test-data/        Data used for testing
 
 
 

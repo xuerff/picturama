@@ -1,6 +1,10 @@
 import { PhotoId, Photo, PhotoDetail, ExifData } from 'common/CommonTypes'
 
 
+export const testPhotosDir = '../submodules/test-data/photos'
+    // Relative to folder `dist`
+
+
 let nextTestPhotoId: PhotoId = 49
 export function createTestPhotoId(): PhotoId {
     return nextTestPhotoId++
@@ -9,7 +13,7 @@ export function createTestPhotoId(): PhotoId {
 
 export const testBigPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../test-data/photos',
+    master_dir: testPhotosDir,
     master_filename: 'IMG_9700.JPG',
     master_width: 5184,
     master_height: 3456,
@@ -31,7 +35,7 @@ export const testBigPhoto: Photo = {
 
 export const testLandscapePhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../test-data/photos',
+    master_dir: testPhotosDir,
     master_filename: 'landscape.jpg',
     master_width: 800,
     master_height: 530,
@@ -48,7 +52,7 @@ export const testLandscapePhoto: Photo = {
 
 export const testPortraitPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../test-data/photos',
+    master_dir: testPhotosDir,
     master_filename: 'portrait.jpg',
     master_width: 785,
     master_height: 1024,
@@ -65,7 +69,7 @@ export const testPortraitPhoto: Photo = {
 
 export const testPanoramaPhoto: Photo = {
     id: createTestPhotoId(),
-    master_dir: '../test-data/photos',
+    master_dir: testPhotosDir,
     master_filename: 'panorama.jpg',
     master_width: 1024,
     master_height: 225,

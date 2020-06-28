@@ -11,13 +11,14 @@ const mkdir = util.promisify(fs.mkdir)
 const writeFile = util.promisify(fs.writeFile)
 
 
+const testPhotosDir = 'submodules/test-data/photos'
 const testBaseDir = 'dist-test'
 
 
 testImportScanner('simple import',
     async testDir => {
-        await copyFile('test-data/photos/IMG_9700.JPG', `${testDir}/IMG_9700.JPG`)
-        await copyFile('test-data/photos/800/door-knocker.jpg', `${testDir}/door-knocker.jpg`)
+        await copyFile(`${testPhotosDir}/IMG_9700.JPG`, `${testDir}/IMG_9700.JPG`)
+        await copyFile(`${testPhotosDir}/800/door-knocker.jpg`, `${testDir}/door-knocker.jpg`)
     },
     async ({ testDir, storedPhotos, finalProgress }) => {
         expect(finalProgress).toEqual({
@@ -95,8 +96,8 @@ testImportScanner('import png',
 
 testImportScanner('import jpg',
     async testDir => {
-        await copyFile('test-data/photos/jpg/Apple_iPhone_XR_landscape.jpg', `${testDir}/Apple_iPhone_XR_landscape.jpg`)
-        await copyFile('test-data/photos/jpg/Apple_iPhone_XR_portrait.jpg',  `${testDir}/Apple_iPhone_XR_portrait.jpg`)
+        await copyFile(`${testPhotosDir}/jpg/Apple_iPhone_XR_landscape.jpg`, `${testDir}/Apple_iPhone_XR_landscape.jpg`)
+        await copyFile(`${testPhotosDir}/jpg/Apple_iPhone_XR_portrait.jpg`,  `${testDir}/Apple_iPhone_XR_portrait.jpg`)
     },
     async ({ testDir, storedPhotos }) => {
         expectPhotos(storedPhotos, [
@@ -142,7 +143,7 @@ testImportScanner('import jpg',
 
 testImportScanner('import heic',
     async testDir => {
-        await copyFile('test-data/photos/heic/Apple_iPhone_XR_portrait.HEIC', `${testDir}/Apple_iPhone_XR_portrait.HEIC`)
+        await copyFile(`${testPhotosDir}/heic/Apple_iPhone_XR_portrait.HEIC`, `${testDir}/Apple_iPhone_XR_portrait.HEIC`)
     },
     async ({ testDir, storedPhotos }) => {
         expectPhotos(storedPhotos, [
@@ -171,7 +172,7 @@ testImportScanner('import heic',
 testImportScanner('import Picasa crop and tilt',
     async testDir => {
         await Promise.all([
-            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            copyFile(`${testPhotosDir}/800/ice-cubes.jpg`, `${testDir}/ice-cubes.jpg`),
             writeFile(`${testDir}/.picasa.ini`,
                 '[ice-cubes.jpg]\n' +
                 'rotate=rotate(1)\n' +
@@ -214,7 +215,7 @@ testImportScanner('import Picasa originals #1',
 
         await mkdir(`${testDir}/.picasaoriginals`)
         await Promise.all([
-            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/.picasaoriginals/ice-cubes.jpg`),
+            copyFile(`${testPhotosDir}/800/ice-cubes.jpg`, `${testDir}/.picasaoriginals/ice-cubes.jpg`),
             writeFile(`${testDir}/.picasaoriginals/.picasa.ini`,
                 '[ice-cubes.jpg]\n' +
                 'filters=crop64=1,b3d66180e8f5bad5;finetune2=1,0.000000,0.000000,0.480000,00000000,0.000000;\n' +
@@ -223,7 +224,7 @@ testImportScanner('import Picasa originals #1',
                 'width=800\n' +
                 'height=533\n' +
                 'textactive=0\n'),
-            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            copyFile(`${testPhotosDir}/800/ice-cubes.jpg`, `${testDir}/ice-cubes.jpg`),
             writeFile(`${testDir}/.picasa.ini`,
                 '[ice-cubes.jpg]\n' +
                 'backuphash=15177\n'),
@@ -266,7 +267,7 @@ testImportScanner('import Picasa originals #2',
 
         await mkdir(`${testDir}/.picasaoriginals`)
         await Promise.all([
-            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/.picasaoriginals/ice-cubes.jpg`),
+            copyFile(`${testPhotosDir}/800/ice-cubes.jpg`, `${testDir}/.picasaoriginals/ice-cubes.jpg`),
             writeFile(`${testDir}/.picasaoriginals/.picasa.ini`,
                 '[ice-cubes.jpg]\r\n' +
                 'filters=tilt=1,1.000000,0.000000;\r\n' +
@@ -274,7 +275,7 @@ testImportScanner('import Picasa originals #2',
                 'width=800\r\n' +
                 'height=533\r\n' +
                 'textactive=0\r\n'),
-            copyFile('test-data/photos/800/ice-cubes.jpg', `${testDir}/ice-cubes.jpg`),
+            copyFile(`${testPhotosDir}/800/ice-cubes.jpg`, `${testDir}/ice-cubes.jpg`),
             writeFile(`${testDir}/.picasa.ini`,
                 '[ice-cubes.jpg]\r\n' +
                 'backuphash=56337\r\n' +
