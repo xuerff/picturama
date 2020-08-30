@@ -1,0 +1,15 @@
+# GitHub Action to run unit tests
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Install modules
+      run: yarn
+    - name: Run tests
+      run: yarn test
