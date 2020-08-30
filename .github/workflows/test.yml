@@ -6,10 +6,11 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
         submodules: recursive
-    - name: Install modules
+    - name: Install dependencies
       run: yarn
     - name: Run tests
       run: yarn test
