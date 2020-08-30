@@ -86,7 +86,7 @@
     "classnames": "^2.2.6",
     "copy-text-to-clipboard": "^2.2.0",
     "electron": "~9.0.4",
-    "exifr": "^5.0.2",
+    "exifr": "^5.0.3",
     "font-awesome": "^4.7.0",
     "gl-matrix": "^3.1.0",
     "heic2any": "^0.0.3",
