@@ -23,7 +23,7 @@ const defaultPhotos = testPhotos
 const defaultSection = createSection(defaultSectionId, defaultPhotos)
 
 let sharedGridRowHeight = defaultGridRowHeight
-    // Use the same gridRowHeight amoung all tests (so row height doesn't change when changing between tests)
+    // Use the same gridRowHeight among all tests (so row height doesn't change when changing between tests)
 
 function createDefaultProps(context: TestContext): Props {
     return {

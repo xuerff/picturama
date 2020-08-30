@@ -25,7 +25,7 @@ export interface SerialUpdaterOptions<UpdateParameters> {
 
 /**
  * Runs an update if parameters change. There will only be one update running at the same time. If the parameters change
- * during an update, a followup update is done after the currenlty running update is finished.
+ * during an update, a followup update is done after the currently running update is finished.
  */
 export default class SerialUpdater<UpdateParameters> {
 

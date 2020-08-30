@@ -358,7 +358,7 @@ export class StandardShaderProgram<Uniforms extends ShaderParameterMap> extends 
     /**
      * Sets the vertex buffer.
      *
-     * @param vertexBuffer the buffer from which to read vertexes
+     * @param vertexBuffer the buffer from which to read vertices
      * @param subsetSize the number of values to get - if only a subset of the component is needed (e.g. `3` if you need `x, y, z` from `x, y, z, u, v`)
      * @param subsetOffset the offset of the values to get - if only a subset of the component is needed (e.g. `0` if you need `x, y, z` from `x, y, z, u, v`)
      */
@@ -371,7 +371,7 @@ export class StandardShaderProgram<Uniforms extends ShaderParameterMap> extends 
     /**
      * Sets the texture coordinates buffer.
      *
-     * @param textureCoordBuffer the buffer from which to read texture corrdinates
+     * @param textureCoordBuffer the buffer from which to read texture coordinates
      * @param subsetSize the number of values to get - if only a subset of the component is needed (e.g. `2` if you need `u, v` from `x, y, z, u, v`)
      * @param subsetOffset the offset of the values to get - if only a subset of the component is needed (e.g. `3` if you need `u, v` from `x, y, z, u, v`)
      */

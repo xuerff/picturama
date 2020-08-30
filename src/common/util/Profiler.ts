@@ -15,7 +15,7 @@ export default class Profiler {
     /**
      * Constructor.
      *
-     * @param title the titel for the whole measure session
+     * @param title the title for the whole measure session
      */
     constructor(title: string) {
         this.measureList = []
@@ -25,7 +25,7 @@ export default class Profiler {
     /**
      * Starts a new measure.
      *
-     * @param title the titel for the whole measure session
+     * @param title the title for the whole measure session
      */
     startMeasure(title: string) {
         if (logProfilesInstantly) {

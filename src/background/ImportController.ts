@@ -98,7 +98,7 @@ class ImportScannerDelegateImpl implements ImportScannerDelegate {
         if (tempNonRawImgPath) {
             const nonRawPath = getNonRawPath(photo)
             if (nonRawPath === masterFullPath) {
-                // Should not happen - but we check this just to be shure...
+                // Should not happen - but we check this just to be sure...
                 throw new Error(`Expected non-raw path to differ original image path: ${nonRawPath}`)
             }
             await fsRename(tempNonRawImgPath, nonRawPath)

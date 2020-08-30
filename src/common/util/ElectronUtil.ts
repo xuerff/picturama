@@ -11,12 +11,12 @@ export function isRendererProcess(): boolean {
 
 export function assertMainProcess() {
     if (!isMainProcess()) {
-        throw new Error('Expected to run in main process')
+        throw new Error(`Expected to run in main process`)
     }
 }
 
 export function assertRendererProcess() {
     if (!isRendererProcess()) {
-        throw new Error('Expected to run in renderer process')
+        throw new Error(`Expected to run in renderer process`)
     }
 }

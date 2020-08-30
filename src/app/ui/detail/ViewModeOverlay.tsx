@@ -88,7 +88,7 @@ export default class ViewModeOverlay extends React.Component<Props, State> {
             const mouseX = event.clientX - mainRect.left - mainRect.width / 2
             const mouseY = event.clientY - mainRect.top - mainRect.height / 2
 
-            // The photo pixel where the mouse is aiming relativ (in photo pixels, relative to the top/left corner of the photo)
+            // The photo pixel where the mouse is aiming relative (in photo pixels, relative to the top/left corner of the photo)
             const mousePhotoX = photoPosition.centerX + mouseX / cameraMetrics.displayScaling / photoPosition.zoom
             const mousePhotoY = photoPosition.centerY + mouseY / cameraMetrics.displayScaling / photoPosition.zoom
 

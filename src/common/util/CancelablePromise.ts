@@ -143,7 +143,7 @@ function linkChildPromise<ValueType, ChildValueType>(parentPromise: CancelablePr
 
 
 /**
- * Createa an error indicating that a task has been cancelled.
+ * Create an error indicating that a task has been cancelled.
  * You can check for such an error using {@link isCancelError}.
  *
  * @param taskDesc the description of the cancelled task
