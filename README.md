@@ -12,6 +12,7 @@ Please visit the [Picturama website](https://picturama.github.io/).
 
 - Scan local files - Keep your privacy, don't upload your personal photos to a cloud service
 - Non-Destructive - The original images won't be touched (unless you purge the trash)
+- Read various photo formats: JPG, PNG, TIF, WebP, HEIC / HEIF
 - Read raw formats of [a whole bunch of cameras](https://www.libraw.org/supported-cameras) (only on Mac and Linux, see [Issue #25](https://github.com/picturama/picturama/issues/25))
 - Browse photos by dates
 - View photo in detail (zoomable)
