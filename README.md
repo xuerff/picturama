@@ -2,7 +2,7 @@
 
 Digital image organizer powered by the web
 
-[![](doc/picturama-screenshot.jpg)](https://picturama.github.io/)
+[![](https://picturama.github.io/assets/picturama-screenshot.jpg)](https://picturama.github.io/)
 
 ## Download
 
