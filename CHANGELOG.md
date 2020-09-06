@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+v1.2.0 - 2020-09-06
+-------------------
+
+  - Support for HEIC / HEIF
+  - Showing all EXIF data
+  - Showing photo location on a mini map
+  - Support for HiRes displays (#31, thanks to @cxcxcxcx)
+  - 20x faster scanning (#33, thanks to @cxcxcxcx)
+  - Other bugfixes and improvements
+
+
 v1.1.0 - 2019-10-28
 -------------------
 
