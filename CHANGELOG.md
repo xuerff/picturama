@@ -9,7 +9,7 @@ v1.2.0 - 2020-09-06
   - Showing all EXIF data
   - Showing photo location on a mini map
   - Support for HiRes displays (#31, thanks to @cxcxcxcx)
-  - 20x faster scanning (#33, thanks to @cxcxcxcx)
+  - 20x faster scanning (#33, thanks to @cxcxcxcx and @MikeKovarik)
   - Other bugfixes and improvements
 
 
