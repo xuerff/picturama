@@ -3,11 +3,11 @@ export default {
     common_cancel: 'Annuler',
     common_backToLibrary: 'Retour a la librairie.',
     common_ratio: '{0} de {1}',
-    common_error_photoNotExisting: 'Cette photo n'existe pas.',
-    common_error_photoNotExisting_desc: 'Cette photo n'est plus à l'endroit où elle se trouvait lors du dernier scan. Elle a peut-être été déplacée, supprimée ou se trouve sur un disque qui n'est plus connecté',
+    common_error_photoNotExisting: `Cette photo n'existe pas.`,
+    common_error_photoNotExisting_desc: `Cette photo n'est plus à l'endroit où elle se trouvait lors du dernier scan. Elle a peut-être été déplacée, supprimée ou se trouve sur un disque qui n'est plus connecté`,
 
     App_error_noWebGL_title: 'WebGL non supporté.',
-    App_error_noWebGL_desc: 'Pour fonctionner, Picturama a besoin d'une carte graphique avec accélération 3D. Veuillez vérifier dans les paramètres du système si vous pouvez activer l'accélération 3D et redémarrer Picturama.',
+    App_error_noWebGL_desc: `Pour fonctionner, Picturama a besoin d'une carte graphique avec accélération 3D. Veuillez vérifier dans les paramètres du système si vous pouvez activer l'accélération 3D et redémarrer Picturama.`,
 
     CropModeToolbar_aspect_free: 'Libre',
     CropModeToolbar_aspect_original: 'Original',
@@ -44,9 +44,9 @@ export default {
     ExportDialog_customSizeSide_size: 'taille',
     ExportDialog_privacy: 'Vie privée',
     ExportDialog_removeInfo: 'Supprimer les métadonnées',
-    ExportDialog_removeInfo_desc: 'Lorsque cette option est sélectionnée, les métadonnées telles que les EXIF-Tags seront supprimées de la photo exportée. Il s'agit d'informations sur l'appareil photo utilisé, l'endroit où la photo a été prise ou d'autres informations similaires.',
+    ExportDialog_removeInfo_desc: `Lorsque cette option est sélectionnée, les métadonnées telles que les EXIF-Tags seront supprimées de la photo exportée. Il s'agit d'informations sur l'appareil photo utilisé, l'endroit où la photo a été prise ou d'autres informations similaires.`,
     ExportDialog_fileName: 'Nom du fichier',
-    ExportDialog_fileName_likeOriginal: 'Comme l'original',
+    ExportDialog_fileName_likeOriginal: `Comme l'original`,
     ExportDialog_fileName_sequence: 'séquence',
     ExportDialog_fileName_sequencePrefix: 'Préfixe',
     ExportDialog_fileName_sequencePrefixDefault: 'Photo',
@@ -88,7 +88,7 @@ export default {
     LibraryFilterButton_tag_title: 'Avec tag:',
 
     LibraryTopBar_emptyTrashQuestion: 'Vous êtes sûr de vouloir vider les corbeilles ?',
-    LibraryTopBar_moveToTrash: 'Déplacement vers la corbeille du système d'exploitation',
+    LibraryTopBar_moveToTrash: `Déplacement vers la corbeille du système d'exploitation`,
     LibraryTopBar_emptyTrash: 'Videz la corbeille',
 
     Picture_error_createThumbnail: 'La création de la miniature a échoué',
@@ -107,7 +107,7 @@ export default {
 
     PhotoInfo_title: 'Info',
     PhotoInfo_showInFolder: 'Afficher la photo dans le dossier',
-    PhotoInfo_copyPath: 'Copier le chemin d'accès',
+    PhotoInfo_copyPath: `Copier le chemin d'accès`,
     PhotoInfo_copyCoordinates: 'Copier les coordonnées',
     PhotoInfo_noSelection_title: 'Aucune photo sélectionnée',
     PhotoInfo_noSelection_message: 'Veuillez sélectionner une photo à gauche.',
@@ -119,7 +119,7 @@ export default {
     PhotoInfo_andMore: 'et {0} plus',
     PhotoInfo_exifTitle_ifd0: 'Image (IFD0)',
     PhotoInfo_exifTitle_ifd1: 'Miniature (IFD1)',
-    PhotoInfo_noValue: 'La photo n'a pas {0}',
+    PhotoInfo_noValue: `La photo n'a pas {0}`,
     PhotoInfo_error_fetchPhotoSize: 'Obtention de la taille de la photo échouée',
 
     PhotoDetailPane_prevPhoto: 'Photo précédente',
@@ -133,7 +133,7 @@ export default {
     Settings_selectPhotoDirs: 'Veuillez sélectionner les dossiers à scanner pour les images.',
     Settings_photoDirs: 'Dossiers à scanner pour les images:',
     Settings_addPhotoDir: 'Ajouter un dossier de photos',
-    Settings_startScan: 'Recherche d'images',
+    Settings_startScan: `Recherche d'images`,
 
     TagEditor_addTag: 'Ajouter un tag...',
     TagEditor_error_tagExists: 'Veuillez saisir un nouveau tag',
