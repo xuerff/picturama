@@ -124,6 +124,15 @@ UI Tester
 
 
 
+Add missing attributes to localization files
+--------------------------------------------
+
+Add missing attributes to `src/common/i18n/text_*.ts`:
+
+    yarn run i18n
+
+
+
 Build distributable package
 ---------------------------
 

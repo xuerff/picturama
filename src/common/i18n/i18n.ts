@@ -18,8 +18,8 @@ export type I18nKey = keyof typeof text_en
 const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
     de: text_de,
     en: text_en,
-    es: text_es as any,
-    fr: text_fr as any,
+    es: text_es,
+    fr: text_fr,
 }
 
 const msgFormatRe = /\{(\d+)\}/g

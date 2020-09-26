@@ -55,10 +55,11 @@
     "watch": "npm run env NODE_ENV=development -- webpack -w",
     "build": "npm run env NODE_ENV=development -- webpack",
     "build-production": "npm run env NODE_ENV=production -- webpack",
+    "i18n": "node src/script/check-i18n.mjs",
     "start-no-build": "npm run env PICTURAMA_DEV_MODE=true -- electron .",
     "package-dir": "electron-builder --dir",
     "package": "electron-builder",
-    "release": "yarn run clean && yarn run build-production && yarn run package",
+    "release": "yarn run clean && yarn run i18n && yarn run build-production && yarn run package",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:clean": "rm -rf dist-test"
