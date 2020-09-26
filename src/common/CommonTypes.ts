@@ -79,8 +79,16 @@ export interface Settings {
 export interface UiConfig {
     version: string
     platform: NodeJS.Platform
+    windowStyle: WindowStyle
     locale: string
 }
+
+/**
+ * The style of the main window:
+ *   - 'nativeTrafficLight': Window uses native MacOS traffic light buttons (top left corner)
+ *   - 'windowsButtons': Window shows HTML buttons in Windows 10 look (top right corner)
+ */
+export type WindowStyle = 'nativeTrafficLight' | 'windowsButtons'
 
 export type ImportProgress = {
     phase: 'scan-dirs' | 'cleanup' | 'import-photos' | 'error'

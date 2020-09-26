@@ -93,6 +93,7 @@ export default class CropModeToolbar extends React.Component<Props> {
             <Toolbar
                 className={classnames(props.className, 'CropModeToolbar')}
                 isLeft={true}
+                isRight={true}
                 onBackgroundDoubleClick={props.toggleMaximized}
             >
                 <span className='pull-right'>

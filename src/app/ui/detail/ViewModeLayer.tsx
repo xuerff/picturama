@@ -108,6 +108,7 @@ export default class ViewModeLayer extends React.Component<Props> {
                 <Toolbar
                     className={classnames(props.topBarClassName, 'ViewModeLayer-toolbar')}
                     isLeft={true}
+                    isRight={!props.isShowingInfo}
                     onBackgroundDoubleClick={props.toggleMaximized}
                 >
                     <Button onClick={commands.close.onAction}>

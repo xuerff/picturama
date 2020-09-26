@@ -3,6 +3,7 @@ import { app, screen, BrowserWindow } from 'electron'
 import DB, { DBOptions } from 'sqlite3-helper/no-generators'
 import { install as initSourceMapSupport } from 'source-map-support'
 
+import { WindowStyle } from 'common/CommonTypes'
 import config from 'common/config'
 import { setLocale } from 'common/i18n/i18n'
 
@@ -40,6 +41,7 @@ app.on('ready', () => {
     app.setName('Picturama')
 
     const platform = os.platform()
+    const windowStyle: WindowStyle = platform === 'darwin' ? 'nativeTrafficLight' : 'windowsButtons'  // TODO
     let icon: string | undefined = undefined
     if (platform === 'linux') {
         // Workaround for Linux: Setting the icon is buggy in electron-builder
@@ -49,17 +51,22 @@ app.on('ready', () => {
         icon = __dirname + '/icon_128.png'
     }
 
-    mainWindow = new BrowserWindow({
+    const windowOptions: Electron.BrowserWindowConstructorOptions = {
         width: 1356,
         height: 768,
         icon,
         title: 'Picturama',
-        titleBarStyle: 'hiddenInset',
         backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
             nodeIntegration: true,
         }
-    })
+    }
+    if (windowStyle === 'nativeTrafficLight') {
+        windowOptions.titleBarStyle = 'hiddenInset'
+    } else {
+        windowOptions.frame = false
+    }
+    mainWindow = new BrowserWindow(windowOptions)
 
     if (workAreaSize.width <= 1366 && workAreaSize.height <= 768) {
         mainWindow.maximize()
@@ -68,7 +75,7 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Picturama')
     AppWindowController.init(mainWindow)
-    initBackgroundService(mainWindow, { version: config.version, platform, locale })
+    initBackgroundService(mainWindow, { version: config.version, platform, windowStyle, locale })
     ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()

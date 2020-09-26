@@ -60,6 +60,9 @@ export default class LibraryTopBar extends React.Component<Props, State> {
         return (
             <Toolbar
                 className={classNames(props.className, 'LibraryTopBar')}
+                isTopBar={true}
+                isLeft={true}
+                isRight={!props.isShowingInfo}
                 onBackgroundDoubleClick={props.toggleMaximized}
             >
                 {props.leftItem}

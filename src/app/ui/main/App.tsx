@@ -18,6 +18,8 @@ import SettingsPane from 'app/ui/SettingsPane'
 import { openSettingsAction } from 'app/state/actions'
 import { AppState, MainViewState } from 'app/state/StateTypes'
 
+import WindowControls from './WindowControls'
+
 import './App.less'
 
 
@@ -30,6 +32,7 @@ interface StateProps {
     isFullScreen: boolean
     hasWebGLSupport: boolean
     hasNativeTrafficLightButtons: boolean
+    showWindowsButtons: boolean
     mainView: MainViewState
     importProgress: ImportProgress | null
     showExport: boolean
@@ -80,7 +83,7 @@ class App extends React.Component<Props> {
         }
 
         return (
-            <div className={classNames('App', { hasNativeTrafficLightButtons: props.hasNativeTrafficLightButtons })}>
+            <div className={classNames('App', { hasNativeTrafficLightButtons: props.hasNativeTrafficLightButtons, hasWindowsButtons: props.showWindowsButtons })}>
                 <Library
                     className='App-container'
                     topBarLeftItem={
@@ -111,6 +114,11 @@ class App extends React.Component<Props> {
                 />
                 {mainView}
                 {modalView}
+                {props.showWindowsButtons &&
+                    <WindowControls
+                        className='App-windowControls'
+                    />
+                }
             </div>
         );
     }
@@ -123,7 +131,8 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
             ...props,
             isFullScreen: state.navigation.isFullScreen,
             hasWebGLSupport: state.navigation.hasWebGLSupport,
-            hasNativeTrafficLightButtons: state.data.uiConfig.platform === 'darwin' && !state.navigation.isFullScreen,
+            hasNativeTrafficLightButtons: state.data.uiConfig.windowStyle === 'nativeTrafficLight' && !state.navigation.isFullScreen,
+            showWindowsButtons: state.data.uiConfig.windowStyle === 'windowsButtons',
             mainView: state.navigation.mainView,
             importProgress: state.import && state.import.progress,
             showExport: !!state.export,

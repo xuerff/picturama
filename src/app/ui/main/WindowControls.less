@@ -1,0 +1,33 @@
+@import "../../style/variables.less";
+
+
+.WindowControls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: @blue-grey-800;
+}
+
+.WindowControls-button {
+    display: inline-block;
+    width: 46px;
+    height: (@toolbarHeight - 1px);
+    line-height: (@toolbarHeight - 2px);
+    color: white;
+    background-color: transparent;
+    transition: background-color 0.2s ease 0s;
+    text-align: center;
+    
+    svg {
+        vertical-align: baseline;
+        stroke: currentColor;
+        stroke-width: 1px;
+        fill: none;
+    }
+}
+.WindowControls-button:hover {
+    background-color: rgba(196, 196, 196, 0.4);
+}
+.WindowControls-closeButton:hover {
+    background-color: rgb(232, 17, 35);
+}

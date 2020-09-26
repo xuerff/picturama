@@ -14,6 +14,7 @@ interface Props {
     children?: any
     isTopBar?: boolean
     isLeft?: boolean
+    isRight?: boolean
     onBackgroundDoubleClick?: React.MouseEventHandler<HTMLElement>
 }
 
@@ -41,7 +42,7 @@ class Toolbar extends React.Component<Props> {
             <div
                 ref='main'
                 id={props.id}
-                className={classnames(props.className, 'Toolbar bp3-dark', { isTopBar: props.isTopBar, isLeft: props.isLeft })}
+                className={classnames(props.className, 'Toolbar bp3-dark', { isTopBar: props.isTopBar, isLeft: props.isLeft, isRight: props.isRight })}
                 style={props.style}
                 onDoubleClick={this.onDoubleClick}
             >

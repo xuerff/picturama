@@ -9,6 +9,8 @@
     border-bottom: 1px solid transparent;
 
     padding: 0 4px;
+    padding-right: 4px;
+    transition: all @transition-time ease-out;
     line-height: @toolbarHeight - 6px;
 
     -webkit-user-select: none;
@@ -20,6 +22,9 @@
     }
     .App.hasNativeTrafficLightButtons &.isTopBar.isLeft {
         padding-left: @nativeTrafficLightButtons;
+    }
+    .App.hasWindowsButtons &.isTopBar.isRight {
+        padding-right: @windowsButtonsWidth + 12px;
     }
 
     .bp3-button,
