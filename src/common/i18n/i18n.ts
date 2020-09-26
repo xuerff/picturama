@@ -1,13 +1,16 @@
 import moment from 'moment'  // This includes locale 'en'
 import 'moment/locale/de'
+import 'moment/locale/es'
+import 'moment/locale/fr'
 
 import text_de from './text_de'
 import text_en from './text_en'
 import text_es from './text_es'
+import text_fr from './text_fr'
 
 
-export type Locale = 'de' | 'en' | 'es'
-export const locales = [ 'de', 'en', 'es' ]
+export type Locale = 'de' | 'en' | 'es' | 'fr'
+export const locales = [ 'de', 'en', 'es', 'fr' ]
 
 export const fallbackLocale: Locale = 'en'
 export type I18nKey = keyof typeof text_en
@@ -16,6 +19,7 @@ const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
     de: text_de,
     en: text_en,
     es: text_es as any,
+    fr: text_fr as any,
 }
 
 const msgFormatRe = /\{(\d+)\}/g
