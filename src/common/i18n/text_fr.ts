@@ -91,6 +91,19 @@ export default {
     LibraryTopBar_moveToTrash: `Déplacement vers la corbeille du système d'exploitation`,
     LibraryTopBar_emptyTrash: 'Videz la corbeille',
 
+    MainMenu_version: ``,  // TODO: 'Version {0}'
+    MainMenu_settings: 'Paramètres',
+    MainMenu_quit: ``,  // TODO: 'Quit'
+    MainMenu_file: ``,  // TODO: 'File'
+    MainMenu_export: ``,  // TODO: 'Export photos'
+    MainMenu_scan: `Recherche d'images`,
+    MainMenu_view: ``,  // TODO: 'View'
+    MainMenu_toggleFullScreen: ``,  // TODO: 'Toggle Fullscreen'
+    MainMenu_developer: ``,  // TODO: 'Developer'
+    MainMenu_toggleDevTools: ``,  // TODO: 'Toggle development tools'
+    MainMenu_toggleUiTester: ``,  // TODO: 'Toggle UI Tester'
+    MainMenu_reloadUi: ``,  // TODO: 'Reload UI'
+
     Picture_error_createThumbnail: 'La création de la miniature a échoué',
 
     PhotoActionButtons_movedToTrash_one: 'Déplacement de la photo à la corbeille',
@@ -137,5 +150,5 @@ export default {
 
     TagEditor_addTag: 'Ajouter un tag...',
     TagEditor_error_tagExists: 'Veuillez saisir un nouveau tag',
-    
+
 }

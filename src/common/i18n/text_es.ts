@@ -91,6 +91,19 @@ export default {
     LibraryTopBar_moveToTrash: 'Mover a la papelera del sistema operativo',
     LibraryTopBar_emptyTrash: 'Vaciar papelera',
 
+    MainMenu_version: ``,  // TODO: 'Version {0}'
+    MainMenu_settings: 'Ajustes',
+    MainMenu_quit: ``,  // TODO: 'Quit'
+    MainMenu_file: ``,  // TODO: 'File'
+    MainMenu_export: ``,  // TODO: 'Export photos'
+    MainMenu_scan: `Scanear en busca de imágenes`,
+    MainMenu_view: ``,  // TODO: 'View'
+    MainMenu_toggleFullScreen: ``,  // TODO: 'Toggle Fullscreen'
+    MainMenu_developer: ``,  // TODO: 'Developer'
+    MainMenu_toggleDevTools: ``,  // TODO: 'Toggle development tools'
+    MainMenu_toggleUiTester: ``,  // TODO: 'Toggle UI Tester'
+    MainMenu_reloadUi: ``,  // TODO: 'Reload UI'
+
     Picture_error_createThumbnail: ``,  // TODO: 'Creating thumbnail failed'
 
     PhotoActionButtons_movedToTrash_one: 'Mover foto a la papelera',

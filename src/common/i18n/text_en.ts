@@ -91,6 +91,19 @@ export default {
     LibraryTopBar_moveToTrash: 'Move to trash of operating system',
     LibraryTopBar_emptyTrash: 'Empty trash',
 
+    MainMenu_version: 'Version {0}',
+    MainMenu_settings: 'Settings',
+    MainMenu_quit: 'Quit',
+    MainMenu_file: 'File',
+    MainMenu_export: 'Export photos',
+    MainMenu_scan: 'Scan for images',
+    MainMenu_view: 'View',
+    MainMenu_toggleFullScreen: 'Toggle Fullscreen',
+    MainMenu_developer: 'Developer',
+    MainMenu_toggleDevTools: 'Toggle development tools',
+    MainMenu_toggleUiTester: 'Toggle UI Tester',
+    MainMenu_reloadUi: 'Reload UI',
+
     Picture_error_createThumbnail: 'Creating thumbnail failed',
 
     PhotoActionButtons_movedToTrash_one: 'Moved photo to trash',

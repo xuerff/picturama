@@ -1,6 +1,7 @@
 import { ipcMain, Menu, BrowserWindow } from 'electron'
 
 import config from 'common/config'
+import { msg } from 'common/i18n/i18n'
 
 import ForegroundClient from 'background/ForegroundClient'
 import { startImport } from 'background/ImportController'
@@ -24,62 +25,62 @@ class MainMenu {
                 label: 'Picturama',
                 submenu: [
                     {
-                        label: `Version ${config.version}`,
+                        label: msg('MainMenu_version', config.version),
                         enabled: false
                     },
                     {
-                        label: 'Settings',
+                        label: msg('MainMenu_settings'),
                         click: () => ForegroundClient.showSettings()
                     },
                     {
-                        label: 'Quit',
+                        label: msg('MainMenu_quit'),
                         accelerator: 'Cmd+Q',
                         click: () => this.mainWindow.close()
                     }
                 ]
             },
             {
-                label: 'File',
+                label: msg('MainMenu_file'),
                 submenu: [
                     {
                         id: 'export',
-                        label: 'Export picture(s)',
+                        label: msg('MainMenu_export'),
                         accelerator: 'Cmd+Shift+E',
                         enabled: false,
                         click: () => this.mainWindow.webContents.send('exportClicked', true)
                     },
                     {
-                        label: 'Scan',
+                        label: msg('MainMenu_scan'),
                         accelerator: 'Cmd+R',
                         click: startImport
                     }
                 ]
             },
             {
-                label: 'View',
+                label: msg('MainMenu_view'),
                 submenu: [
                     {
-                        label: 'Enter Fullscreen',
+                        label: msg('MainMenu_toggleFullScreen'),
                         accelerator: 'F11',
                         click: () => AppWindowController.toggleFullScreen()
                     }
                 ]
             },
             {
-                label: 'Developer',
+                label: msg('MainMenu_developer'),
                 submenu: [
                     {
-                        label: 'Toggle DevTools',
+                        label: msg('MainMenu_toggleDevTools'),
                         accelerator: 'Cmd+Alt+I',
                         click: () => this.mainWindow.webContents.toggleDevTools()
                     },
                     {
-                        label: 'Toggle UI Tester',
+                        label: msg('MainMenu_toggleUiTester'),
                         accelerator: 'Cmd+Alt+T',
                         click: () => AppWindowController.toggleUiTester()
                     },
                     {
-                        label: 'Reload',
+                        label: msg('MainMenu_reloadUi'),
                         accelerator: 'Shift+Cmd+R',
                         click: () => AppWindowController.reloadUi()
                     }

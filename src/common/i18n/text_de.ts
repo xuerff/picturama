@@ -91,6 +91,19 @@ export default {
     LibraryTopBar_moveToTrash: 'In Betriebsystem-Papierkorb verschieben',
     LibraryTopBar_emptyTrash: 'Papierkorb leeren',
 
+    MainMenu_version: `Version {0}`,
+    MainMenu_settings: 'Einstellungen',
+    MainMenu_quit: `Beenden`,
+    MainMenu_file: `Datei`,
+    MainMenu_export: `Fotos exportieren`,
+    MainMenu_scan: `Nach Fotos scannen`,
+    MainMenu_view: `Ansicht`,
+    MainMenu_toggleFullScreen: `Vollbildmodus wechseln`,
+    MainMenu_developer: `Entwickler`,
+    MainMenu_toggleDevTools: `Entwickler-Tools anzeigen`,
+    MainMenu_toggleUiTester: `UI-Tester anzeigen`,
+    MainMenu_reloadUi: `Oberfläche neu laden`,
+
     Picture_error_createThumbnail: 'Konnte Vorschaubild nicht erstellen',
 
     PhotoActionButtons_movedToTrash_one: 'Foto wurde in den Papierkorb gelegt',
