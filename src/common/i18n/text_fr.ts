@@ -91,18 +91,18 @@ export default {
     LibraryTopBar_moveToTrash: `Déplacement vers la corbeille du système d'exploitation`,
     LibraryTopBar_emptyTrash: 'Videz la corbeille',
 
-    MainMenu_version: ``,  // TODO: 'Version {0}'
+    MainMenu_version: `Version {0}`,
     MainMenu_settings: 'Paramètres',
-    MainMenu_quit: ``,  // TODO: 'Quit'
-    MainMenu_file: ``,  // TODO: 'File'
-    MainMenu_export: ``,  // TODO: 'Export photos'
+    MainMenu_quit: `Quitter`,
+    MainMenu_file: `Fichier`,
+    MainMenu_export: `Exporter des photos`,
     MainMenu_scan: `Recherche d'images`,
-    MainMenu_view: ``,  // TODO: 'View'
-    MainMenu_toggleFullScreen: ``,  // TODO: 'Toggle Fullscreen'
-    MainMenu_developer: ``,  // TODO: 'Developer'
-    MainMenu_toggleDevTools: ``,  // TODO: 'Toggle development tools'
-    MainMenu_toggleUiTester: ``,  // TODO: 'Toggle UI Tester'
-    MainMenu_reloadUi: ``,  // TODO: 'Reload UI'
+    MainMenu_view: `Affichage`,
+    MainMenu_toggleFullScreen: `Basculer en plein écran`,
+    MainMenu_developer: `Développeur`,
+    MainMenu_toggleDevTools: `Activer les outils de développement`,
+    MainMenu_toggleUiTester: `Activer l'interface de test`,
+    MainMenu_reloadUi: `Recharger l'interface`,
 
     Picture_error_createThumbnail: 'La création de la miniature a échoué',
 
