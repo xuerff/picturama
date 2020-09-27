@@ -8,6 +8,8 @@ import { msg } from 'common/i18n/i18n'
 import { ImportProgress } from 'common/CommonTypes'
 
 import BackgroundClient from 'app/BackgroundClient'
+import { createGlobalCommands } from 'app/controller/GlobalCommandController'
+import { addCommandGroup, Command, CommandGroupId, removeCommandGroup } from 'app/controller/HotkeyController'
 import PhotoDetailPane from 'app/ui/detail/PhotoDetailPane'
 import ExportDialog from 'app/ui/export/ExportDialog'
 import Library from 'app/ui/library/Library'
@@ -33,6 +35,7 @@ interface StateProps {
     hasWebGLSupport: boolean
     hasNativeTrafficLightButtons: boolean
     showWindowsButtons: boolean
+    globalCommands: Command[] | null
     mainView: MainViewState
     importProgress: ImportProgress | null
     showExport: boolean
@@ -50,9 +53,21 @@ interface Props extends OwnProps, StateProps, DispatchProps {
 
 class App extends React.Component<Props> {
 
+    private commandGroupId: CommandGroupId | null = null
+
     componentDidMount() {
+        if (this.props.globalCommands) {
+            this.commandGroupId = addCommandGroup(this.props.globalCommands)
+        }
+
         const splashElem = document.getElementById('splash')
         if (splashElem) splashElem.parentNode!.removeChild(splashElem)
+    }
+
+    componentWillUnmount() {
+        if (this.commandGroupId) {
+            removeCommandGroup(this.commandGroupId)
+        }
     }
 
     render() {
@@ -127,12 +142,14 @@ class App extends React.Component<Props> {
 
 const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
     (state, props) => {
+        const { uiConfig } = state.data
         return {
             ...props,
             isFullScreen: state.navigation.isFullScreen,
             hasWebGLSupport: state.navigation.hasWebGLSupport,
-            hasNativeTrafficLightButtons: state.data.uiConfig.windowStyle === 'nativeTrafficLight' && !state.navigation.isFullScreen,
-            showWindowsButtons: state.data.uiConfig.windowStyle === 'windowsButtons',
+            hasNativeTrafficLightButtons: uiConfig.windowStyle === 'nativeTrafficLight' && !state.navigation.isFullScreen,
+            showWindowsButtons: uiConfig.windowStyle === 'windowsButtons',
+            globalCommands: uiConfig.hasNativeMenu ? null : createGlobalCommands(),
             mainView: state.navigation.mainView,
             importProgress: state.import && state.import.progress,
             showExport: !!state.export,

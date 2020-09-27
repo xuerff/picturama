@@ -42,6 +42,8 @@ app.on('ready', () => {
 
     const platform = os.platform()
     const windowStyle: WindowStyle = platform === 'darwin' ? 'nativeTrafficLight' : 'windowsButtons'  // TODO
+    const hasNativeMenu = platform === 'darwin'
+
     let icon: string | undefined = undefined
     if (platform === 'linux') {
         // Workaround for Linux: Setting the icon is buggy in electron-builder
@@ -75,7 +77,7 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + __dirname + '/app.html')
     mainWindow.setTitle('Picturama')
     AppWindowController.init(mainWindow)
-    initBackgroundService(mainWindow, { version: config.version, platform, windowStyle, locale })
+    initBackgroundService(mainWindow, { version: config.version, platform, windowStyle, hasNativeMenu, locale })
     ForegroundClient.init(mainWindow)
 
     //let usb = new Usb()
@@ -97,7 +99,7 @@ app.on('ready', () => {
 
     initDb()
         .then(() => {
-            if (mainWindow) {
+            if (mainWindow && hasNativeMenu) {
                 new MainMenu(mainWindow)
             }
             onBackgroundReady()

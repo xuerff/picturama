@@ -56,6 +56,14 @@ export default {
         return callOnBackground('toggleMaximized')
     },
 
+    toggleUiTester(): Promise<void> {
+        return callOnBackground('toggleUiTester')
+    },
+
+    reloadUi(): Promise<void> {
+        return callOnBackground('reloadUi')
+    },
+
     fetchUiConfig(): Promise<UiConfig> {
         return callOnBackground('fetchUiConfig')
     },

@@ -49,6 +49,12 @@ If you get an error with `node-gyp rebuild` then delete `~/.node-gyp` and try ag
     rm -rf ~/.node-gyp
     yarn
 
+Development hotkeys:
+
+  - Toggle developer tools: `Shift`+`Ctrl`+`I` (On Mac: `Cmd`+`Shift`+`I`)
+  - Toggle UI tester:       `Shift`+`Ctrl`+`T` (On Mac: `Cmd`+`Shift`+`T`)
+  - Reload UI:              `Shift`+`Ctrl`+`R` (On Mac: `Cmd`+`Shift`+`R`)
+
 
 
 Developing main process code

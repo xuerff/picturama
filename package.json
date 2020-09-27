@@ -42,7 +42,6 @@
     "extraResources": {
       "to": "app",
       "filter": [
-        "menus/**",
         "migrations/**"
       ]
     }

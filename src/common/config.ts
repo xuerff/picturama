@@ -19,7 +19,6 @@ if (process.env.PICTURAMA_DEV_MODE) {
     picturamaHomeDir = `${os.homedir()}/.picturama`
 }
 
-const menusFolder = `${picturamaAppDir}/menus`
 const platform = os.platform()
 
 export default {
@@ -33,9 +32,7 @@ export default {
     /** The home directory of version 1.0.0 and before (where Picturama's name was Ansel) */
     anselHomeDir,
     picturamaHomeDir,
-    menusFolder,
     keymapsFolder: `${picturamaAppDir}/keymaps`,
-    menuPath: `${menusFolder}/${platform}.json`,
     dbFile: `${picturamaHomeDir}/db.sqlite3`,
     dbMigrationsFolder: `${picturamaAppDir}/migrations`,
     settings: `${picturamaHomeDir}/settings.json`,

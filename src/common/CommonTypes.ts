@@ -80,6 +80,7 @@ export interface UiConfig {
     version: string
     platform: NodeJS.Platform
     windowStyle: WindowStyle
+    hasNativeMenu: boolean
     locale: string
 }
 
