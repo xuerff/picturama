@@ -2,6 +2,13 @@ Changelog
 =========
 
 
+v1.3.0 - 2020-09-27
+-------------------
+
+  - French translation (thanks to @aelisya)
+  - Compact title bar also on Windows and Linux (#51)
+
+
 v1.2.0 - 2020-09-06
 -------------------
 
