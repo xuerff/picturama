@@ -21,7 +21,6 @@ export interface Props {
     aspectRatioType: AspectRatioType
     isAspectRatioLandscape: boolean
     photoWork: PhotoWork | null
-    toggleMaximized(): void
     setAspectRatio(aspectRatioType: AspectRatioType, isLandscape: boolean | null): void
     onPhotoWorkEdited(photoWork: PhotoWork): void
     onDone(): void
@@ -94,7 +93,6 @@ export default class CropModeToolbar extends React.Component<Props> {
                 className={classnames(props.className, 'CropModeToolbar')}
                 isLeft={true}
                 isRight={true}
-                onBackgroundDoubleClick={props.toggleMaximized}
             >
                 <Toolbar.Spacer/>
                 <Popover

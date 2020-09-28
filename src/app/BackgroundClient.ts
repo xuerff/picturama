@@ -52,10 +52,6 @@ export default {
         return callOnBackground('toggleFullScreen')
     },
 
-    toggleMaximized(): Promise<void> {
-        return callOnBackground('toggleMaximized')
-    },
-
     toggleUiTester(): Promise<void> {
         return callOnBackground('toggleUiTester')
     },

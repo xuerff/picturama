@@ -27,7 +27,6 @@ export interface Props {
     bodyClassName: string
     photoWork: PhotoWork
     cameraMetrics: CameraMetrics
-    toggleMaximized(): void
     onPhotoWorkEdited(photoWork: PhotoWork, boundsRect?: Rect | null): void
     onDone(): void
 }
@@ -329,7 +328,6 @@ export default class CropModeLayer extends React.Component<Props, State> {
                     isAspectRatioLandscape={state.isAspectRatioLandscape}
                     photoWork={props.photoWork}
                     setAspectRatio={this.setAspectRatio}
-                    toggleMaximized={props.toggleMaximized}
                     onPhotoWorkEdited={props.onPhotoWorkEdited}
                     onDone={props.onDone}
                 />

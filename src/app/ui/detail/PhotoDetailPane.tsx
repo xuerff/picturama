@@ -42,7 +42,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-    toggleMaximized(): void
     setPreviousDetailPhoto: () => void
     setNextDetailPhoto: () => void
     getFileSize(path: string): Promise<number>
@@ -126,7 +125,6 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
                     srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
                     photoWork={props.photoWork}
-                    toggleMaximized={props.toggleMaximized}
                     setMode={this.setMode}
                     setPreviousDetailPhoto={props.setPreviousDetailPhoto}
                     setNextDetailPhoto={props.setNextDetailPhoto}
@@ -179,7 +177,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         }
     },
     dispatch => ({
-        toggleMaximized: BackgroundClient.toggleMaximized,
         setPreviousDetailPhoto,
         setNextDetailPhoto,
         getFileSize: BackgroundClient.getFileSize,

@@ -29,7 +29,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-    toggleMaximized(): void
     selectDirectories(): Promise<string[] | undefined>
     onSettingsChange(settings: Settings): void
     onClose(settings: Settings, startImport: boolean): void
@@ -84,7 +83,6 @@ export class SettingsPane extends React.Component<Props> {
                 <Toolbar
                     className="SettingsPane-topBar"
                     isLeft={true}
-                    onBackgroundDoubleClick={props.toggleMaximized}
                 >
                     <Button onClick={this.onClose}>
                         <FaIcon name="chevron-left"/>
@@ -143,7 +141,6 @@ const Connected = connect<StateProps, DispatchProps, OwnProps, AppState>(
         }
     },
     dispatch => ({
-        toggleMaximized: BackgroundClient.toggleMaximized,
         selectDirectories: BackgroundClient.selectScanDirectories,
         onSettingsChange(settings: Settings) {
             dispatch(setSettingsAction(settings))

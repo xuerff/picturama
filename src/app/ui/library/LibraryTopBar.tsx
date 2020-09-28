@@ -21,7 +21,6 @@ interface Props {
     isShowingTrash: boolean
     isShowingInfo: boolean
     photosCount: number
-    toggleMaximized(): void
     openExport: (sectionId: PhotoSectionId, photoIds: PhotoId[]) => void
     updatePhotoWork: (photo: Photo, update: (photoWork: PhotoWork) => void) => void
     setPhotosFlagged: (photos: Photo[], flag: boolean) => void
@@ -63,7 +62,6 @@ export default class LibraryTopBar extends React.Component<Props, State> {
                 isTopBar={true}
                 isLeft={true}
                 isRight={!props.isShowingInfo}
-                onBackgroundDoubleClick={props.toggleMaximized}
             >
                 {props.leftItem}
 

@@ -16,14 +16,6 @@ export default {
         return appWindow
     },
 
-    toggleMaximized() {
-        if (appWindow.isMaximized()) {
-            appWindow.unmaximize()
-        } else {
-            appWindow.maximize()
-        }
-    },
-
     toggleFullScreen() {
         const isFullScreen = !appWindow.isFullScreen()
         ForegroundClient.onFullScreenChange(isFullScreen)

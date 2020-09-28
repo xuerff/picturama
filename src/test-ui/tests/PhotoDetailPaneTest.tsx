@@ -21,7 +21,6 @@ const defaultProps: Props = {
     tags: [],
     isFirst: true,
     isLast: false,
-    toggleMaximized: action('toggleMaximized'),
     setPreviousDetailPhoto: action('setPreviousDetailPhoto'),
     setNextDetailPhoto: action('setNextDetailPhoto'),
     getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },

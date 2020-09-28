@@ -72,7 +72,6 @@ function createDefaultProps(context: TestContext): Props {
         setSelectedPhotos: action('setSelectedPhotos'),
         setDetailPhotoById: action('setDetailPhotoById'),
         setInfoPhoto: action('setInfoPhoto'),
-        toggleMaximized: action('toggleMaximized'),
         openExport: action('openExport'),
         setPhotosFlagged: action('setPhotosFlagged'),
         setPhotoTags: action('setPhotoTags'),
