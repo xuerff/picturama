@@ -90,6 +90,7 @@ export class SettingsPane extends React.Component<Props> {
                         <FaIcon name="chevron-left"/>
                         <span>{msg('common_backToLibrary')}</span>
                     </Button>
+                    <Toolbar.Spacer/>
                 </Toolbar>                
                 <div className='SettingsPane-body'>
                     <div className='SettingsPane-content'>

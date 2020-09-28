@@ -96,28 +96,27 @@ export default class CropModeToolbar extends React.Component<Props> {
                 isRight={true}
                 onBackgroundDoubleClick={props.toggleMaximized}
             >
-                <span className='pull-right'>
-                    <Popover
-                        content={this.renderAspectMenu()}
-                        position={Position.BOTTOM}
-                    >
-                        <Button
-                            minimal={true}
-                            icon={
-                                <MdImageAspectRatio
-                                    color={props.aspectRatioType === 'free' ? undefined : red} className={SVG_ICON_CLASS}
-                                />
-                            }
-                        />
-                    </Popover>
-                    <RotateButtonGroup disabled={!props.photoWork} onRotate={this.onRotate}/>
-                    <Button disabled={!hasGeometryOperations} onClick={this.onReset}>
-                        <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_reset')}</span>
-                    </Button>
-                    <Button intent='success' onClick={props.onDone}>
-                        <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_done')}</span>
-                    </Button>
-                </span>
+                <Toolbar.Spacer/>
+                <Popover
+                    content={this.renderAspectMenu()}
+                    position={Position.BOTTOM}
+                >
+                    <Button
+                        minimal={true}
+                        icon={
+                            <MdImageAspectRatio
+                                color={props.aspectRatioType === 'free' ? undefined : red} className={SVG_ICON_CLASS}
+                            />
+                        }
+                    />
+                </Popover>
+                <RotateButtonGroup disabled={!props.photoWork} onRotate={this.onRotate}/>
+                <Button disabled={!hasGeometryOperations} onClick={this.onReset}>
+                    <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_reset')}</span>
+                </Button>
+                <Button intent='success' onClick={props.onDone}>
+                    <span className={Classes.BUTTON_TEXT}>{msg('CropModeToolbar_done')}</span>
+                </Button>
             </Toolbar>
         )
     }

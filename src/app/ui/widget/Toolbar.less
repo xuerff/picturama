@@ -1,6 +1,8 @@
 @import "../../style/variables.less";
 
 .Toolbar {
+    display: flex;
+    align-items: center;
     height: @toolbarHeight;
     z-index: 2;
     background: @blue-grey-800;
@@ -11,12 +13,10 @@
     padding: 0 4px;
     padding-right: 4px;
     transition: all @transition-time ease-out;
-    line-height: @toolbarHeight - 6px;
 
     -webkit-user-select: none;
 
     &.isTopBar {
-        -webkit-app-region: drag;
         border-top: 1px solid transparent;
         border-bottom: 1px solid @blue-grey-900;
     }
@@ -27,8 +27,23 @@
         padding-right: @windowsButtonsWidth + 12px;
     }
 
-    .bp3-button,
-    .bp3-button-group {
-        vertical-align: middle;
+    .bp3-button {
+        flex: 1 0 auto;
+        white-space: nowrap;
     }
+}
+
+.Toolbar-spacer {
+    height: 100%;
+    flex: 0 1 100%;
+
+    .Toolbar.isTopBar & {
+        -webkit-app-region: drag;
+    }
+
+    .bp3-button + & {
+        // Neutralize the margin-right of a button
+        margin-left: -8px;
+    }
+
 }

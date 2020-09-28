@@ -67,30 +67,30 @@ export default class LibraryTopBar extends React.Component<Props, State> {
             >
                 {props.leftItem}
 
-                <div className="pull-right">
-                    {props.isShowingTrash &&
-                        <Button
-                            className="LibraryTopBar-emptyTrash"
-                            icon="trash"
-                            text={msg('LibraryTopBar_emptyTrash')}
-                            intent={props.photosCount === 0 ? undefined : 'warning'}
-                            disabled={props.photosCount === 0}
-                            onClick={this.onShowEmptyTrashAlert}
-                        />
-                    }
-                    <PhotoActionButtons
-                        selectedSectionId={props.selectedSectionId}
-                        selectedPhotos={props.selectedPhotos}
-                        isShowingTrash={props.isShowingTrash}
-                        isShowingInfo={props.isShowingInfo}
-                        openExport={props.openExport}
-                        updatePhotoWork={props.updatePhotoWork}
-                        setPhotosFlagged={props.setPhotosFlagged}
-                        movePhotosToTrash={props.movePhotosToTrash}
-                        restorePhotosFromTrash={props.restorePhotosFromTrash}
-                        toggleShowInfo={props.toggleShowInfo}
+                <Toolbar.Spacer/>
+
+                {props.isShowingTrash &&
+                    <Button
+                        className="LibraryTopBar-emptyTrash"
+                        icon="trash"
+                        text={msg('LibraryTopBar_emptyTrash')}
+                        intent={props.photosCount === 0 ? undefined : 'warning'}
+                        disabled={props.photosCount === 0}
+                        onClick={this.onShowEmptyTrashAlert}
                     />
-                </div>
+                }
+                <PhotoActionButtons
+                    selectedSectionId={props.selectedSectionId}
+                    selectedPhotos={props.selectedPhotos}
+                    isShowingTrash={props.isShowingTrash}
+                    isShowingInfo={props.isShowingInfo}
+                    openExport={props.openExport}
+                    updatePhotoWork={props.updatePhotoWork}
+                    setPhotosFlagged={props.setPhotosFlagged}
+                    movePhotosToTrash={props.movePhotosToTrash}
+                    restorePhotosFromTrash={props.restorePhotosFromTrash}
+                    toggleShowInfo={props.toggleShowInfo}
+                />
 
                 <Alert
                     className='LibraryTopBar-emptyTrashAlert'

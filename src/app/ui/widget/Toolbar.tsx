@@ -7,6 +7,20 @@ import { bindMany } from 'common/util/LangUtil'
 import './Toolbar.less'
 
 
+interface ToolbarSpacerProps {
+}
+
+class ToolbarSpacer extends React.Component<ToolbarSpacerProps> {
+
+    render() {
+        return (
+            <div className='Toolbar-spacer'/>
+        )
+    }
+
+}
+
+
 interface Props {
     id?: string
     className?: any
@@ -18,7 +32,9 @@ interface Props {
     onBackgroundDoubleClick?: React.MouseEventHandler<HTMLElement>
 }
 
-class Toolbar extends React.Component<Props> {
+export default class Toolbar extends React.Component<Props> {
+
+    static Spacer = ToolbarSpacer
 
     static defaultProps: Partial<Props> = {
         isTopBar: true,
@@ -51,5 +67,3 @@ class Toolbar extends React.Component<Props> {
         )
     }
 }
-
-export default Toolbar

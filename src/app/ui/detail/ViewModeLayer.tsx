@@ -123,36 +123,35 @@ export default class ViewModeLayer extends React.Component<Props> {
                             <FaIcon name="arrow-right"/>
                         </Button>
                     </ButtonGroup>
-                    <span className="pull-right">
-                        <div className='PhotoDetailPane-zoomPane'>
-                            <Slider className='PhotoDetailPane-zoomSlider'
-                                disabled={cameraMetrics === null}
-                                value={zoomSliderValue}
-                                min={0}
-                                max={1}
-                                stepSize={0.000001}
-                                labelRenderer={false}
-                                showTrackFill={false}
-                                onChange={this.onZoomSliderChange}
-                            />
-                            <div className='PhotoDetailPane-zoomValue'>{zoomSliderLabel}</div>
-                        </div>
-                        <Button minimal={true} {...getCommandButtonProps(commands.edit)}>
-                            <FaIcon name='crop'/>
-                        </Button>
-                        <PhotoActionButtons
-                            selectedSectionId={props.sectionId}
-                            selectedPhotos={[ props.photo ]}
-                            isShowingTrash={!!props.photo.trashed}
-                            isShowingInfo={props.isShowingInfo}
-                            openExport={props.openExport}
-                            updatePhotoWork={props.updatePhotoWork}
-                            setPhotosFlagged={props.setPhotosFlagged}
-                            movePhotosToTrash={props.movePhotosToTrash}
-                            restorePhotosFromTrash={props.restorePhotosFromTrash}
-                            toggleShowInfo={props.toggleShowInfo}
+                    <Toolbar.Spacer/>
+                    <div className='PhotoDetailPane-zoomPane'>
+                        <Slider className='PhotoDetailPane-zoomSlider'
+                            disabled={cameraMetrics === null}
+                            value={zoomSliderValue}
+                            min={0}
+                            max={1}
+                            stepSize={0.000001}
+                            labelRenderer={false}
+                            showTrackFill={false}
+                            onChange={this.onZoomSliderChange}
                         />
-                    </span>
+                        <div className='PhotoDetailPane-zoomValue'>{zoomSliderLabel}</div>
+                    </div>
+                    <Button minimal={true} {...getCommandButtonProps(commands.edit)}>
+                        <FaIcon name='crop'/>
+                    </Button>
+                    <PhotoActionButtons
+                        selectedSectionId={props.sectionId}
+                        selectedPhotos={[ props.photo ]}
+                        isShowingTrash={!!props.photo.trashed}
+                        isShowingInfo={props.isShowingInfo}
+                        openExport={props.openExport}
+                        updatePhotoWork={props.updatePhotoWork}
+                        setPhotosFlagged={props.setPhotosFlagged}
+                        movePhotosToTrash={props.movePhotosToTrash}
+                        restorePhotosFromTrash={props.restorePhotosFromTrash}
+                        toggleShowInfo={props.toggleShowInfo}
+                    />
                 </Toolbar>
                 <ViewModeOverlay
                     className={classnames(props.bodyClassName, 'ViewModeLayer-body')}
