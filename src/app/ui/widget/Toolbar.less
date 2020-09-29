@@ -15,6 +15,7 @@
     transition: all @transition-time ease-out;
 
     -webkit-user-select: none;
+    -webkit-app-region: no-drag; // Reset drag region of underlying Toolbar
 
     &.isTopBar {
         border-top: 1px solid transparent;
@@ -41,8 +42,9 @@
         -webkit-app-region: drag;
     }
 
-    .bp3-button + & {
-        // Neutralize the margin-right of a button
+    .bp3-button + &,
+    .bp3-button-group + & {
+            // Neutralize the margin-right of a button (group)
         margin-left: -8px;
     }
 
