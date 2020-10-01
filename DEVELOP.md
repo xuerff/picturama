@@ -195,6 +195,8 @@ I18N
 
 The following files provide I18N:
 
+  - `.github/workflows/codespell.yml` - The `text_*.ts` have to be excluded from codespell checks, since it only checks
+    the English language.
   - `package.json` - Defines languagues available in mac package (see key `electronLanguages`)
   - `src/common/i18n/i18n.ts` - Defines available languages and provides the I18N logic
   - `src/common/i18n/text_*.ts` - Holds the I18N messages for each language

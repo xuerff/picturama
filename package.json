@@ -19,6 +19,7 @@
       "hardenedRuntime": true,
       "entitlements": "src/package/entitlements.mac.plist",
       "electronLanguages": [
+        "cs",
         "de",
         "en",
         "es",
