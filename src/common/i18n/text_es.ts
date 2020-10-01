@@ -3,11 +3,11 @@ export default {
     common_cancel: 'Cancelar',
     common_backToLibrary: 'Volver a la biblioteca',
     common_ratio: '{0} de {1}',
-    common_error_photoNotExisting: ``,  // TODO: 'Photo is no longer there'
-    common_error_photoNotExisting_desc: ``,  // TODO: 'This photo is no longer where it was on the last scan. Maybe it has been moved, deleted or it is on a disk that is no longer connected.'
+    common_error_photoNotExisting: `Foto no encontrada`,
+    common_error_photoNotExisting_desc: `Esta foto ya no se encuentra donde estaba ubicada en el último escaneo. Quizás fue movida, borrada o se encuentra en un disco que no está conectado`,
 
-    App_error_noWebGL_title: ``,  // TODO: 'No WebGL'
-    App_error_noWebGL_desc: ``,  // TODO: 'Picturama needs a graphic card with 3D acceleration in order to function. Please have a look in the system settings whether you can activate 3D acceleration and restart Picturama.'
+    App_error_noWebGL_title: `WebGL deshabilitado`,
+    App_error_noWebGL_desc: `Picturama necesita una tarjeta gráfica con aceleración 3D para poder funcionar. Por favor revisa en la configuración de tu sistema si es posible activar la aceleración 3D y reinicia Picturama.`,
 
     CropModeToolbar_aspect_free: 'Libre',
     CropModeToolbar_aspect_original: 'Original',
@@ -24,37 +24,37 @@ export default {
     ErrorToast_showReport: 'Mostrar informe',
     ErrorToast_copy: 'Copiar',
 
-    ExportDialog_title_one: ``,  // TODO: 'Export photo'
-    ExportDialog_title_more: ``,  // TODO: 'Export {0} photos'
-    ExportDialog_format: ``,  // TODO: 'Format'
-    ExportDialog_quality: ``,  // TODO: 'Quality'
-    ExportDialog_quality_low: ``,  // TODO: 'low ({0}) - smallest size'
-    ExportDialog_quality_medium: ``,  // TODO: 'medium ({0})'
-    ExportDialog_quality_high: ``,  // TODO: 'high ({0})'
-    ExportDialog_quality_max: ``,  // TODO: 'maximum ({0})'
-    ExportDialog_size: ``,  // TODO: 'Size'
-    ExportDialog_size_S: ``,  // TODO: 'small ({0})'
-    ExportDialog_size_M: ``,  // TODO: 'medium ({0})'
-    ExportDialog_size_L: ``,  // TODO: 'large ({0})'
-    ExportDialog_size_original: ``,  // TODO: 'original size'
-    ExportDialog_size_custom: ``,  // TODO: 'custom'
-    ExportDialog_customSizeSettings: ``,  // TODO: 'Maximum {0} of {1} pixels'
-    ExportDialog_customSizeSide_width: ``,  // TODO: 'width'
-    ExportDialog_customSizeSide_height: ``,  // TODO: 'height'
-    ExportDialog_customSizeSide_size: ``,  // TODO: 'size'
-    ExportDialog_privacy: ``,  // TODO: 'Privacy'
-    ExportDialog_removeInfo: ``,  // TODO: 'Remove extra information'
-    ExportDialog_removeInfo_desc: ``,  // TODO: 'When selected, extra information like EXIF-Tags will be removed from the exported photo. This is information about the camera used, the location where the photo was taken or similar.'
-    ExportDialog_fileName: ``,  // TODO: 'File name'
-    ExportDialog_fileName_likeOriginal: ``,  // TODO: 'Like original'
-    ExportDialog_fileName_sequence: ``,  // TODO: 'sequence'
-    ExportDialog_fileName_sequencePrefix: ``,  // TODO: 'Prefix'
-    ExportDialog_fileName_sequencePrefixDefault: ``,  // TODO: 'Photo'
-    ExportDialog_fileName_sequenceExample: ``,  // TODO: 'Example: {0}'
-    ExportDialog_export: ``,  // TODO: 'Export'
-    ExportDialog_exportingTo: ``,  // TODO: 'Exporting to {0}'
-    ExportDialog_done_one: ``,  // TODO: 'Finished exporting photo'
-    ExportDialog_done_more: ``,  // TODO: 'Finished exporting {0} photos'
+    ExportDialog_title_one: `Exportar foto`,
+    ExportDialog_title_more: `Exportar {0} fotos`,
+    ExportDialog_format: `Formato`,
+    ExportDialog_quality: `Calidad`,
+    ExportDialog_quality_low: `baja ({0}) - menor tamaño`,
+    ExportDialog_quality_medium: `media ({0})`,
+    ExportDialog_quality_high: `alta  ({0})`,
+    ExportDialog_quality_max: `máxima  ({0})`,
+    ExportDialog_size: `Tamaño`,
+    ExportDialog_size_S: `pequeño ({0})`,
+    ExportDialog_size_M: `mediano ({0})`,
+    ExportDialog_size_L: `grande ({0})`,
+    ExportDialog_size_original: `tamaño orignal`,
+    ExportDialog_size_custom: `personalizado`,
+    ExportDialog_customSizeSettings: `Máximo {0} de {1} pixeles`,
+    ExportDialog_customSizeSide_width: `ancho`,
+    ExportDialog_customSizeSide_height: `alto`,
+    ExportDialog_customSizeSide_size: `tamaño`,
+    ExportDialog_privacy: `Privacidad`,
+    ExportDialog_removeInfo: `Quitar información extra`,
+    ExportDialog_removeInfo_desc: `Cuando esta opción esté seleccionada, la información extra como las etiquetas EXIF serán quitadas de la foto exportada. Esta información es acerca de la cámara que fue utilizada, la locación de la foto o similares.`,
+    ExportDialog_fileName: `Nombre del archivo`,
+    ExportDialog_fileName_likeOriginal: `Como el original`,
+    ExportDialog_fileName_sequence: `secuencia`,
+    ExportDialog_fileName_sequencePrefix: `Prefijo`,
+    ExportDialog_fileName_sequencePrefixDefault: `Foto`,
+    ExportDialog_fileName_sequenceExample: `Ejemplo: {0}`,
+    ExportDialog_export: `Exportar`,
+    ExportDialog_exportingTo: `Exportando a {0}`,
+    ExportDialog_done_one: `Se terminó de exportar la foto`,
+    ExportDialog_done_more: `Se terminó de exportar {0} fotos`,
 
     ImportProgressButton_phase_scan_dirs: 'Escaneando carpetas',
     ImportProgressButton_phase_cleanup: 'Limpiando',
@@ -91,20 +91,20 @@ export default {
     LibraryTopBar_moveToTrash: 'Mover a la papelera del sistema operativo',
     LibraryTopBar_emptyTrash: 'Vaciar papelera',
 
-    MainMenu_version: ``,  // TODO: 'Version {0}'
+    MainMenu_version: `Version {0}`,
     MainMenu_settings: 'Ajustes',
-    MainMenu_quit: ``,  // TODO: 'Quit'
-    MainMenu_file: ``,  // TODO: 'File'
-    MainMenu_export: ``,  // TODO: 'Export photos'
+    MainMenu_quit: `Salir`,
+    MainMenu_file: `Archivo`,
+    MainMenu_export: `Exportar fotos`,
     MainMenu_scan: `Scanear en busca de imágenes`,
-    MainMenu_view: ``,  // TODO: 'View'
-    MainMenu_toggleFullScreen: ``,  // TODO: 'Toggle Fullscreen'
-    MainMenu_developer: ``,  // TODO: 'Developer'
-    MainMenu_toggleDevTools: ``,  // TODO: 'Toggle development tools'
-    MainMenu_toggleUiTester: ``,  // TODO: 'Toggle UI Tester'
-    MainMenu_reloadUi: ``,  // TODO: 'Reload UI'
+    MainMenu_view: `Ver`,
+    MainMenu_toggleFullScreen: `Mostrar pantalla completa`,
+    MainMenu_developer: `Desarrollador`,
+    MainMenu_toggleDevTools: `Mostrar herramientas de desarrollador`,
+    MainMenu_toggleUiTester: `Mostrar probador de UI`,
+    MainMenu_reloadUi: `Recargar UI`,
 
-    Picture_error_createThumbnail: ``,  // TODO: 'Creating thumbnail failed'
+    Picture_error_createThumbnail: `Falló la creación de la miniatura`,
 
     PhotoActionButtons_movedToTrash_one: 'Mover foto a la papelera',
     PhotoActionButtons_movedToTrash_more: 'Movidas {0} fotos a la papelera',
@@ -121,19 +121,19 @@ export default {
     PhotoInfo_title: 'Info',
     PhotoInfo_showInFolder: 'Mostrar foto en carpeta',
     PhotoInfo_copyPath: 'Copiar ruta',
-    PhotoInfo_copyCoordinates: ``,  // TODO: 'Copy coordinates'
+    PhotoInfo_copyCoordinates: `Copiar coordenadas`,
     PhotoInfo_noSelection_title: 'No hay fotos seleccionadas',
     PhotoInfo_noSelection_message: 'Por favor, selecciona una foto de la izquierda.',
-    PhotoInfo_exifData: ``,  // TODO: 'Exif data'
-    PhotoInfo_show: ``,  // TODO: 'show'
-    PhotoInfo_hide: ``,  // TODO: 'hide'
-    PhotoInfo_showAll: ``,  // TODO: 'show all'
-    PhotoInfo_showLess: ``,  // TODO: 'show less'
-    PhotoInfo_andMore: ``,  // TODO: 'and {0} more'
-    PhotoInfo_exifTitle_ifd0: ``,  // TODO: 'Image (IFD0)'
-    PhotoInfo_exifTitle_ifd1: ``,  // TODO: 'Thumbnail (IFD1)'
-    PhotoInfo_noValue: ``,  // TODO: 'Photo has no {0}'
-    PhotoInfo_error_fetchPhotoSize: ``,  // TODO: 'Getting photo size failed'
+    PhotoInfo_exifData: `Datos Exif`,
+    PhotoInfo_show: `mostrar`,
+    PhotoInfo_hide: `ocultar`,
+    PhotoInfo_showAll: `mostrar todo`,
+    PhotoInfo_showLess: `mostrar menos`,
+    PhotoInfo_andMore: `y {0} más`,
+    PhotoInfo_exifTitle_ifd0: `Imagen (IFD0)`,
+    PhotoInfo_exifTitle_ifd1: `Miniatura (IFD1)`,
+    PhotoInfo_noValue: `La foto no tiene {0}`,
+    PhotoInfo_error_fetchPhotoSize: `No se pudo obtener el tamaño de la foto`,
 
     PhotoDetailPane_prevPhoto: 'Anterior foto',
     PhotoDetailPane_nextPhoto: 'Siguiente foto',
