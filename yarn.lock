@@ -4669,11 +4669,6 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-heic2any@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/heic2any/-/heic2any-0.0.3.tgz#59248665a3646424b1f88c0aaaa1abba3bbd1aae"
-  integrity sha512-1KG0LzZuIPiqyJjwLgGlgrgWd3UBwUE9g5+tOuHy8PbeH2hF0U4gc4ZWT4ChlCmcdISr1xVRimSehsTOPdRXnQ==
-
 hmac-drbg@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/hmac-drbg/-/hmac-drbg-1.0.1.tgz#d2745701025a6c775a6c545793ed502fc0c649a1"
@@ -6888,6 +6883,11 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
+node-addon-api@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.0.2.tgz#04bc7b83fd845ba785bb6eae25bc857e1ef75681"
+  integrity sha512-+D4s2HCnxPd5PjjI0STKwncjXTUKKqm74MDMz9OPXavjsGmjkvwgLtA5yoxJUdmpj52+2u+RrXgPipahKczMKg==
+
 node-dir@^0.1.17:
   version "0.1.17"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.17.tgz#5f5665d93351335caabef8f1c554516cf5f1e4e5"
@@ -6929,6 +6929,14 @@ node-ipc@^9.1.1:
     event-pubsub "4.3.0"
     js-message "1.0.5"
     js-queue "2.0.0"
+
+node-libheif@^1.9.1:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/node-libheif/-/node-libheif-1.9.1.tgz#dd89ae82d135deea88d46a6290f7d2a06dec2a55"
+  integrity sha512-xaobe4pTs/NAHUuYim0WoCHZVZZg6JvyTdPc0C6eXYhrH90OvAUYZ/tRN/EtA0VmkSaXgL+w6W4VPZ8sHhYxgg==
+  dependencies:
+    bindings "^1.5.0"
+    node-addon-api "^3.0.2"
 
 node-libs-browser@^2.2.1:
   version "2.2.1"

@@ -1,10 +1,11 @@
 import { mat4 } from 'gl-matrix'
-import heic2any from 'heic2any'
 import exifr from 'exifr'
 
 import Profiler from 'common/util/Profiler'
 import { ExifOrientation } from 'common/CommonTypes'
 import config from 'common/config'
+
+import BackgroundClient from 'app/BackgroundClient'
 
 
 const exifrOrientationOptions = {
@@ -14,29 +15,6 @@ const exifrOrientationOptions = {
 
 
 const heicExtensionRE = new RegExp(`\\.(${config.acceptedHeicExtensions.join('|')})$`, 'i')
-
-
-// Workaround: Prevent tree-shaking from removing `heic2any`.
-heic2any['__dummy'] = 1
-
-function decodeBuffer(buffer: ArrayBuffer): Promise<ImageData[]> {
-	return new Promise((resolve, reject) => {
-		const id = (Math.random() * new Date().getTime()).toString();
-		const message = { id, buffer };
-		((window as any).__heic2any__worker as Worker).postMessage(message);
-		((window as any).__heic2any__worker as Worker).addEventListener(
-			"message",
-			(message) => {
-				if (message.data.id === id) {
-					if (message.data.error) {
-						return reject(message.data.error);
-					}
-					return resolve(message.data.imageDataArr);
-				}
-			}
-		);
-	});
-}
 
 
 export function hasWebGLSupport(): boolean {
@@ -110,15 +88,17 @@ export default class WebGLCanvas {
         let height: number
         let orientation: ExifOrientation
         if (heicExtensionRE.test(src)) {
-            const encodedHeicBuffer = await (await fetch(src)).arrayBuffer()
-            if (profiler) profiler.addPoint('Fetch encoded heic data')
-            const imageData = await decodeBuffer(encodedHeicBuffer)
-            if (profiler) profiler.addPoint('Decoded heic data')
-
-            textureSource = imageData[0].data
-            width = imageData[0].width
-            height = imageData[0].height
+            if (!src.startsWith('file://')) {
+                throw new Error(`Expected file URL: ${src}`)
+            }
+            const filePath = decodeURIComponent(src.substr('file://'.length))
+            const imageData = await BackgroundClient.loadHeifFile(filePath)
+            if (profiler) profiler.addPoint('Loaded heic image')
+            textureSource = new Uint8ClampedArray(imageData.data)
+            width = imageData.width
+            height = imageData.height
             orientation = ExifOrientation.Up
+            if (profiler) profiler.addPoint('Prepared image data')
         } else {
             const image = new Image()
             let imageSrc = src
@@ -159,7 +139,7 @@ export default class WebGLCanvas {
         if (textureSource instanceof HTMLImageElement) {
             gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, srcFormat, srcType, textureSource)
         } else {
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureSource)
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, textureSource)
         }
 
         gl.generateMipmap(gl.TEXTURE_2D);

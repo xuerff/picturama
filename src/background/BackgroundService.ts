@@ -1,4 +1,6 @@
+import { promises as fs } from 'fs'
 import { BrowserWindow, ipcMain, dialog } from 'electron'
+import { decodeHeifBuffer } from 'node-libheif'
 
 import { UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
@@ -74,6 +76,9 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return readMetadataOfImage(params.imagePath)
     } else if (action === 'getExifData') {
         return getExifData(params.path)
+    } else if (action === 'loadHeifFile') {
+        const buffer = await fs.readFile(params.path)
+        return decodeHeifBuffer(buffer)
     } else if (action === 'selectScanDirectories') {
         const result = await dialog.showOpenDialog(AppWindowController.getAppWindow(), { properties: [ 'openDirectory', 'multiSelections' ] })
         return result.canceled ? undefined : result.filePaths

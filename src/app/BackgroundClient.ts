@@ -84,6 +84,10 @@ export default {
         return callOnBackground('getExifData', { path })
     },
 
+    loadHeifFile(path: string): Promise<{ width: number, height: number, data: Buffer }> {
+        return callOnBackground('loadHeifFile', { path })
+    },
+
     selectScanDirectories(): Promise<string[] | undefined> {
         return callOnBackground('selectScanDirectories')
     },
