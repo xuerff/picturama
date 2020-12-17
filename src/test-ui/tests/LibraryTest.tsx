@@ -3,8 +3,9 @@ import { Button } from '@blueprintjs/core'
 
 import { Photo, PhotoSectionById, PhotoSectionId, LoadedPhotoSection, PhotoFilter, MetaData, ExifData } from 'common/CommonTypes'
 import CancelablePromise from 'common/util/CancelablePromise'
-import { getNonRawUrl } from 'common/util/DataUtil'
+import { getNonRawPath } from 'common/util/DataUtil'
 import { addErrorCode } from 'common/util/LangUtil'
+import { fileUrlFromPath } from 'common/util/TextUtil'
 
 import { defaultGridRowHeight } from 'app/UiConstants'
 import { GridLayout } from 'app/UITypes'
@@ -52,7 +53,7 @@ function createDefaultProps(context: TestContext): Props {
         fetchSections: action('fetchSections'),
         fetchTags: action('fetchTags'),
         getGridLayout,
-        getThumbnailSrc: (photo: Photo) => getNonRawUrl(photo),
+        getThumbnailSrc: (photo: Photo) => fileUrlFromPath(getNonRawPath(photo)),
         getFileSize(path: string): Promise<number> { return Promise.resolve(3380326) },
         readMetadataOfImage(imagePath: string): Promise<MetaData> { return Promise.resolve(testBigPhotoMetData) },
         getExifData(path: string): Promise<ExifData | null> { return Promise.resolve(null) },
@@ -62,7 +63,7 @@ function createDefaultProps(context: TestContext): Props {
             } else if (photo.master_filename === 'error_master-missing') {
                 return new CancelablePromise<string>(Promise.reject(addErrorCode(new Error('test error'), 'master-missing')))
             } else {
-                return new CancelablePromise<string>(Promise.resolve(getNonRawUrl(photo)))
+                return new CancelablePromise<string>(Promise.resolve(fileUrlFromPath(getNonRawPath(photo))))
             }
         },
         setGridRowHeight: (gridRowHeight: number) => {

@@ -85,13 +85,13 @@ export default class PhotoCanvas {
         return this
     }
 
-    loadFromSrc(src: string, profiler: Profiler | null = null): CancelablePromise<void> {
+    loadFromFile(filePath: string, profiler: Profiler | null = null): CancelablePromise<void> {
         if (this.baseTexturePromise !== null) {
             this.baseTexturePromise.cancel()
         }
         this.setBaseTexture(null)
 
-        this.baseTexturePromise = this.createTextureFromSrc(src, profiler)
+        this.baseTexturePromise = this.createTextureFromFile(filePath, profiler)
             .then(texture => {
                 this.baseTexturePromise = null
                 this.setBaseTexture(texture)
@@ -102,8 +102,8 @@ export default class PhotoCanvas {
         return this.baseTexturePromise
     }
 
-    createTextureFromSrc(src: string, profiler: Profiler | null = null): CancelablePromise<Texture> {
-        return new CancelablePromise<Texture>(this.webGlCanvas.createTextureFromSrc(src, undefined, undefined, profiler))
+    createTextureFromFile(filePath: string, profiler: Profiler | null = null): CancelablePromise<Texture> {
+        return new CancelablePromise<Texture>(this.webGlCanvas.createTextureFromFile(filePath, undefined, undefined, profiler))
     }
 
     setBaseTexture(texture: Texture | null, destroyLast = true): this {

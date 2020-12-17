@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, PhotoRenderOptions, IpcErrorInfo } from 'common/CommonTypes'
+import { Tag, ImportProgress, PhotoId, Photo, PhotoWork, PhotoRenderOptions, IpcErrorInfo, BinaryString } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 import { Size } from 'common/util/GeometryTypes'
 import { decodeIpcError } from 'common/util/IpcUtil'
@@ -70,12 +70,12 @@ export default {
         return callOnForeground('onPhotoTrashed', { photoIds, updatedTags })
     },
 
-    async renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions): Promise<string> {
+    async renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions): Promise<BinaryString> {
         return callOnForeground('renderPhoto', { photo, photoWork, maxSize, options })
     },
 
-    async renderImage(imageDataUrl: string, maxSize: Size | null, options: PhotoRenderOptions): Promise<string> {
-        return callOnForeground('renderImage', { imageDataUrl, maxSize, options })
+    async renderImage(imagePath: string, maxSize: Size | null, options: PhotoRenderOptions): Promise<BinaryString> {
+        return callOnForeground('renderImage', { imagePath, maxSize, options })
     },
 }
 

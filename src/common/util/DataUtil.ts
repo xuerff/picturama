@@ -1,5 +1,5 @@
 import config from 'common/config'
-import { PhotoId, Photo, ExifOrientation, PhotoWork } from 'common/CommonTypes'
+import { PhotoId, Photo, ExifOrientation, PhotoWork, BinaryString } from 'common/CommonTypes'
 
 import { fileUrlFromPath } from './TextUtil'
 
@@ -33,10 +33,6 @@ export function getNonRawPath(photo: Photo): string {
     return photo.master_is_raw ? getRenderedRawPath(photo.id) : getMasterPath(photo)
 }
 
-export function getNonRawUrl(photo: Photo): string {
-    return fileUrlFromPath(getNonRawPath(photo))
-}
-
 
 function shortId(id: number): string {
     return id.toString(36)
@@ -51,4 +47,23 @@ export function getTotalRotationTurns(exifOrientation: ExifOrientation, photoWor
         case ExifOrientation.Left:   exifRotationTurns = 3; break
     }
     return (exifRotationTurns + (photoWork.rotationTurns || 0)) % 4
+}
+
+
+function decodeImageDataUrlAsBase64String(dataUrl: string): string {
+    // Example data URL: 'data:image/webp;base64,UklG...'
+    const dataPrefix = 'base64,'
+    return dataUrl.substr(dataUrl.indexOf(dataPrefix) + dataPrefix.length)
+}
+
+export function decodeImageDataUrlAsBinaryString(dataUrl: string): BinaryString {
+    return atob(decodeImageDataUrlAsBase64String(dataUrl))
+}
+
+export function decodeImageDataUrlAsBuffer(dataUrl: string): Buffer {
+    return Buffer.from(decodeImageDataUrlAsBase64String(dataUrl), 'base64')
+}
+
+export function encodeImageDataUrl(mimeType: 'image/jpg' | 'image/png', imageData: Buffer): string {
+    return `data:${mimeType};base64,${imageData.toString('base64')}`
 }

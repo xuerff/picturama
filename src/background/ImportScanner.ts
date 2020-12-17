@@ -12,8 +12,7 @@ import Profiler from 'common/util/Profiler'
 import ForegroundClient from 'background/ForegroundClient'
 import { readMetadataOfImage } from 'background/MetaData'
 import { fetchPhotoWork } from 'background/store/PhotoWorkStore'
-import { fsReadDirWithFileTypes, fsReadFile, fsStat, fsUnlink, fsExists, fsWriteFile } from 'background/util/FileUtil'
-import { parseImageDataUrl } from 'background/util/NodeUtil'
+import { fsReadDirWithFileTypes, fsStat, fsUnlink, fsExists, fsWriteFile } from 'background/util/FileUtil'
 
 const getImageSize = promisify(getImageSizeWithCallback)
 
@@ -386,14 +385,9 @@ export default class ImportScanner {
                 const tempJpgPath = await libraw.extractThumb(masterFullPath, tempRawConversionPaths.tempExtractThumbPath)
                 if (profiler) profiler.addPoint('Extracted non-raw image')
 
-                const jpgBuffer = await fsReadFile(tempJpgPath)
-                const jpgDataUrl = 'data:image/jpg;base64,' + jpgBuffer.toString('base64')
+                const webpBinaryString = await ForegroundClient.renderImage(tempJpgPath, null, { format: config.workExt, quality: 0.9 })
+                await fsWriteFile(tempNonRawImgPath, webpBinaryString, 'binary')
                 await fsUnlink(tempJpgPath)
-                if (profiler) profiler.addPoint('Loaded extracted image')
-
-                const webpDataUrl = await ForegroundClient.renderImage(jpgDataUrl, null, { format: config.workExt, quality: 0.9 })
-                const webpBuffer = parseImageDataUrl(webpDataUrl)
-                await fsWriteFile(tempNonRawImgPath, webpBuffer)
 
                 const imageInfo = await getImageSize(tempNonRawImgPath)
                 if (!imageInfo) {

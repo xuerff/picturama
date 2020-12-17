@@ -7,7 +7,6 @@ import SerialJobQueue from 'common/util/SerialJobQueue'
 
 import ForegroundClient from 'background/ForegroundClient'
 import { fsExists, fsUnlink, fsWriteFile } from 'background/util/FileUtil'
-import { parseImageDataUrl } from 'background/util/NodeUtil'
 
 import { fetchPhotoWorkOfPhoto } from './PhotoWorkStore'
 
@@ -47,9 +46,9 @@ async function processNextCreateThumbnail(job: { photo: Photo }): Promise<void> 
 
     const photoWork = await fetchPhotoWorkOfPhoto(photo)
 
-    const thumbnailDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, maxThumbnailSize, thumbnailRenderOptions)
+    const thumbnailBinaryString = await ForegroundClient.renderPhoto(photo, photoWork, maxThumbnailSize, thumbnailRenderOptions)
 
-    await fsWriteFile(thumbnailPath, parseImageDataUrl(thumbnailDataUrl))
+    await fsWriteFile(thumbnailPath, thumbnailBinaryString, { encoding: 'binary' })
     console.log('Stored ' + thumbnailPath)
 }
 

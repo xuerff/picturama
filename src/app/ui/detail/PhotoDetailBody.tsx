@@ -32,9 +32,9 @@ export interface Props {
     photo: Photo
     isFirst: boolean
     isLast: boolean
-    src: string
-    srcPrev: string | null
-    srcNext: string | null
+    imagePath: string
+    imagePathPrev: string | null
+    imagePathNext: string | null
     photoWork: PhotoWork | null
     setMode(mode: DetailMode): void
     setPreviousDetailPhoto(): void
@@ -51,7 +51,7 @@ export interface Props {
 
 interface State {
     prevMode: DetailMode | null
-    prevSrc: string | null
+    prevImagePath: string | null
     prevPhotoWork: PhotoWork | null
     loadingState: PhotoLayerLoadingState | null
     /** The size of the detail body (in px) */
@@ -75,7 +75,7 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         const cameraMetricsBuilder = new CameraMetricsBuilder()
         this.state = {
             prevMode: null,
-            prevSrc: null,
+            prevImagePath: null,
             prevPhotoWork: null,
             loadingState: null,
             bodySize: zeroSize,
@@ -96,8 +96,8 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
         let nextPhotoPosition = prevState.photoPosition
         let nextEditedPhotoWork = prevState.editedPhotoWork
 
-        if (nextProps.src !== prevState.prevSrc) {
-            nextState = { prevSrc: nextProps.src, textureSize: null, photoPosition: 'contain' }
+        if (nextProps.imagePath !== prevState.prevImagePath) {
+            nextState = { prevImagePath: nextProps.imagePath, textureSize: null, photoPosition: 'contain' }
         }
 
         if (nextProps.mode !== prevState.prevMode) {
@@ -203,9 +203,9 @@ export default class PhotoDetailBody extends React.Component<Props, State> {
                     className={props.bodyClassName}
                     mode={props.mode}
                     bodySize={state.bodySize}
-                    src={props.src}
-                    srcPrev={props.srcPrev}
-                    srcNext={props.srcNext}
+                    imagePath={props.imagePath}
+                    imagePathPrev={props.imagePathPrev}
+                    imagePathNext={props.imagePathNext}
                     cameraMetrics={state.cameraMetrics}
                     onLoadingStateChange={this.onLoadingStateChange}
                     onTextureChange={this.onTextureChange}

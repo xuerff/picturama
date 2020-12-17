@@ -4,6 +4,7 @@ import exifr from 'exifr'
 import Profiler from 'common/util/Profiler'
 import { ExifOrientation } from 'common/CommonTypes'
 import config from 'common/config'
+import { fileUrlFromPath } from 'common/util/TextUtil'
 
 import BackgroundClient from 'app/BackgroundClient'
 
@@ -78,7 +79,7 @@ export default class WebGLCanvas {
         return new GraphicBuffer(gl, bufferId, gl.FLOAT, componentSize, data.length / componentSize)
     }
 
-    async createTextureFromSrc(src: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler | null = null): Promise<Texture> {
+    async createTextureFromFile(filePath: string, srcFormat: number = WebGLRenderingContext.RGB, srcType: number = WebGLRenderingContext.UNSIGNED_BYTE, profiler: Profiler | null = null): Promise<Texture> {
         // For details see: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 
         const gl = this.gl
@@ -87,11 +88,7 @@ export default class WebGLCanvas {
         let width: number
         let height: number
         let orientation: ExifOrientation
-        if (heicExtensionRE.test(src)) {
-            if (!src.startsWith('file://')) {
-                throw new Error(`Expected file URL: ${src}`)
-            }
-            const filePath = decodeURIComponent(src.substr('file://'.length))
+        if (heicExtensionRE.test(filePath)) {
             const imageData = await BackgroundClient.loadHeifFile(filePath)
             if (profiler) profiler.addPoint('Loaded heic image')
             textureSource = new Uint8ClampedArray(imageData.data)
@@ -101,13 +98,12 @@ export default class WebGLCanvas {
             if (profiler) profiler.addPoint('Prepared image data')
         } else {
             const image = new Image()
-            let imageSrc = src
             await new Promise((resolve, reject) => {
                 image.onload = resolve
                 image.onerror = errorEvt => {
-                    reject(new Error(`Loading image failed: ${src}`))
+                    reject(new Error(`Loading image failed: ${filePath}`))
                 }
-                image.src = imageSrc
+                image.src = fileUrlFromPath(filePath)
             })
             textureSource = image
             if (profiler) profiler.addPoint('Loaded image')
@@ -116,7 +112,7 @@ export default class WebGLCanvas {
             try {
                 exifData = await exifr.parse(image, exifrOrientationOptions)
             } catch (error) {
-                console.warn(`Getting EXIF data failed - continuing without: ${src}: ${error.message}`)
+                console.warn(`Getting EXIF data failed - continuing without: ${filePath}: ${error.message}`)
             }
             orientation = exifData && exifData.Orientation || ExifOrientation.Up
             const switchSides = (orientation == ExifOrientation.Left) || (orientation == ExifOrientation.Right)

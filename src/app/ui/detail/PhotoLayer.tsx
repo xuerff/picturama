@@ -3,7 +3,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 
 import { CameraMetrics } from 'common/util/CameraMetrics'
-import { Size, zeroSize } from 'common/util/GeometryTypes'
+import { Size } from 'common/util/GeometryTypes'
 import { bindMany } from 'common/util/LangUtil'
 import { ExifOrientation } from 'common/CommonTypes'
 import { profileDetailView } from 'common/LogConstants'
@@ -26,25 +26,20 @@ export interface Props {
     mode: DetailMode
     /** The size of the detail body (in px) */
     bodySize: Size
-    src: string
-    srcPrev: string | null
-    srcNext: string | null
+    imagePath: string
+    imagePathPrev: string | null
+    imagePathNext: string | null
     cameraMetrics: CameraMetrics | null
     onLoadingStateChange(loadingState: PhotoLayerLoadingState): void
     onTextureChange(textureSize: Size, orientation: ExifOrientation): void
 }
 
-interface State {
-    prevSrc: string | null
-    prevCanvasSize: Size
-}
-
-export default class PhotoLayer extends React.Component<Props, State> {
+export default class PhotoLayer extends React.Component<Props> {
 
     private canvas: PhotoCanvas | null = null
     private textureCache: TextureCache | null = null
 
-    private canvasSrc: string | null = null
+    private canvasImagePath: string | null = null
     private deferredHideCanvasTimeout: NodeJS.Timer | null
 
     private prevLoadingState: PhotoLayerLoadingState | null = null
@@ -53,10 +48,6 @@ export default class PhotoLayer extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         bindMany(this, 'onTextureFetched')
-        this.state = {
-            prevSrc: null,
-            prevCanvasSize: zeroSize,
-        }
     }
 
     componentDidMount() {
@@ -74,7 +65,7 @@ export default class PhotoLayer extends React.Component<Props, State> {
             onTextureFetched: this.onTextureFetched
         })
 
-        this.updateCanvas({}, {})
+        this.updateCanvas({})
     }
 
     componentWillUnmount() {
@@ -85,8 +76,8 @@ export default class PhotoLayer extends React.Component<Props, State> {
         }
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State) {
-        this.updateCanvas(prevProps, prevState)
+    componentDidUpdate(prevProps: Props) {
+        this.updateCanvas(prevProps)
     }
 
     private setLoadingState(loadingState: PhotoLayerLoadingState) {
@@ -96,22 +87,22 @@ export default class PhotoLayer extends React.Component<Props, State> {
         }
     }
 
-    private onTextureFetched(src: string, texture: Texture | null) {
-        if (src === this.props.src && texture) {
+    private onTextureFetched(imagePath: string, texture: Texture | null) {
+        if (imagePath === this.props.imagePath && texture) {
             this.props.onTextureChange({ width: texture.width, height: texture.height }, texture.orientation)
         }
-        this.updateCanvas(this.props, this.state)
+        this.updateCanvas(this.props)
     }
 
-    private updateCanvas(prevProps: Partial<Props>, prevState: Partial<State>) {
-        const { props, state, canvas, textureCache } = this
+    private updateCanvas(prevProps: Partial<Props>) {
+        const { props, canvas, textureCache } = this
         if (!canvas || !textureCache) {
             return
         }
 
-        textureCache.setSourcesToFetch([ props.src, props.srcNext, props.srcPrev ])
+        textureCache.setImagesToFetch([ props.imagePath, props.imagePathNext, props.imagePathPrev ])
 
-        if (textureCache.hasTextureError(props.src)) {
+        if (textureCache.hasTextureError(props.imagePath)) {
             canvas.getElement().style.display = 'none'
             this.setLoadingState('error')
             return
@@ -119,10 +110,10 @@ export default class PhotoLayer extends React.Component<Props, State> {
 
         let canvasChanged = false
 
-        if (this.canvasSrc !== props.src) {
-            let texture = textureCache.getTexture(props.src)
+        if (this.canvasImagePath !== props.imagePath) {
+            let texture = textureCache.getTexture(props.imagePath)
             canvas.setBaseTexture(texture, false)
-            this.canvasSrc = texture ? props.src : null
+            this.canvasImagePath = texture ? props.imagePath : null
             if (texture) {
                 this.props.onTextureChange({ width: texture.width, height: texture.height }, texture.orientation)
             }

@@ -51,9 +51,11 @@ async function executeForegroundAction(action: string, params: any): Promise<any
             setTags(params.updatedTags)
         }
     } else if (action === 'renderPhoto') {
+        // We send the image as binary string (not as node Buffer), because all data is converted to JSON which doesn't support Buffers
         return renderPhoto(params.photo, params.photoWork, params.maxSize, params.options)
     } else if (action === 'renderImage') {
-        return renderImage(params.imageDataUrl, params.maxSize, params.options)
+        // We send the image as binary string (not as node Buffer), because all data is converted to JSON which doesn't support Buffers
+        return renderImage(params.imagePath, params.maxSize, params.options)
     } else {
         throw new Error('Unknown foreground action: ' + action)
     }

@@ -7,7 +7,6 @@ import { Photo, PhotoExportOptions } from 'common/CommonTypes'
 
 import { fetchPhotoWorkOfPhoto } from 'background/store/PhotoWorkStore'
 import { fsExists, fsWriteFile, fsReadFile, fsStat, fsUtimes } from 'background/util/FileUtil'
-import { parseImageDataUrl } from 'background/util/NodeUtil'
 import ForegroundClient from 'background/ForegroundClient'
 
 
@@ -48,7 +47,7 @@ export async function exportPhoto(photo: Photo, photoIndex: number, options: Pho
     }
 
     const photoWork = await fetchPhotoWorkOfPhoto(photo)
-    let imageDataUrl = await ForegroundClient.renderPhoto(photo, photoWork, maxSize, options)
+    let imageBinaryString = await ForegroundClient.renderPhoto(photo, photoWork, maxSize, options)
 
     let exportFileBasePath: string
     switch (options.fileNameStyle) {
@@ -76,10 +75,10 @@ export async function exportPhoto(photo: Photo, photoIndex: number, options: Pho
         const masterImageBuffer = await fsReadFile(masterPath)
         const masterImageData = masterImageBuffer.toString('binary')
         const metaData = piexif.load(masterImageData)
-        imageDataUrl = piexif.insert(piexif.dump(metaData), imageDataUrl)
+        imageBinaryString = piexif.insert(piexif.dump(metaData), imageBinaryString)
     }
 
-    await fsWriteFile(exportFilePath, parseImageDataUrl(imageDataUrl))
+    await fsWriteFile(exportFilePath, imageBinaryString, 'binary')
 
     const masterStat = await fsStat(masterPath)
     await fsUtimes(exportFilePath, masterStat.atime, masterStat.mtime)

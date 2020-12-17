@@ -1,6 +1,6 @@
-import { Photo, PhotoWork, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation } from 'common/CommonTypes'
+import { Photo, PhotoWork, PhotoRenderOptions, PhotoRenderFormat, ExifOrientation, BinaryString } from 'common/CommonTypes'
 import { CameraMetricsBuilder } from 'common/util/CameraMetrics'
-import { getNonRawUrl, getMasterPath } from 'common/util/DataUtil'
+import { decodeImageDataUrlAsBinaryString, getMasterPath, getNonRawPath } from 'common/util/DataUtil'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { Size } from 'common/util/GeometryTypes'
 import { isShallowEqual } from 'common/util/LangUtil'
@@ -23,7 +23,7 @@ type RenderJobSource =
     } |
     {
         type: 'image'
-        imageDataUrl: string
+        imagePath: string
     }
 
 interface RenderJob {
@@ -55,20 +55,20 @@ const mimeTypeByFormat: { [K in PhotoRenderFormat]: string } = {
 
 
 export async function renderPhoto(photo: Photo, photoWork: PhotoWork, maxSize: Size | null, options: PhotoRenderOptions,
-    profiler: Profiler | null = null): Promise<string>
+    profiler: Profiler | null = null): Promise<BinaryString>
 {
     return queue.addJob({ source: { type: 'photo', photo, photoWork }, maxSize, options, profiler })
 }
 
 
-export async function renderImage(imageDataUrl: string, maxSize: Size | null, options: PhotoRenderOptions,
-    profiler: Profiler | null = null): Promise<string>
+export async function renderImage(imagePath: string, maxSize: Size | null, options: PhotoRenderOptions,
+    profiler: Profiler | null = null): Promise<BinaryString>
 {
-    return queue.addJob({ source: { type: 'image', imageDataUrl }, maxSize, options, profiler })
+    return queue.addJob({ source: { type: 'image', imagePath }, maxSize, options, profiler })
 }
 
 
-async function renderNext(job: RenderJob): Promise<string> {
+async function renderNext(job: RenderJob): Promise<BinaryString> {
     const { source, options, profiler } = job
     if (profiler) profiler.addPoint('Waited in queue')
 
@@ -77,15 +77,15 @@ async function renderNext(job: RenderJob): Promise<string> {
         if (profiler) profiler.addPoint('Created canvas')
     }
 
-    let nonRawUrl: string
+    let imagePath: string
     if (source.type === 'photo') {
-        nonRawUrl = getNonRawUrl(source.photo)
+        imagePath = getNonRawPath(source.photo)
     } else if (source.type === 'image') {
-        nonRawUrl = source.imageDataUrl
+        imagePath = source.imagePath
     } else {
         throw new Error(`Unsupported source type: ${source['type']}`)
     }
-    const texture = await canvas.createTextureFromSrc(nonRawUrl, profiler)
+    const texture = await canvas.createTextureFromFile(imagePath, profiler)
 
     // Get camera metrics
     const cameraMetrics = cameraMetricsBuilder
@@ -132,5 +132,7 @@ async function renderNext(job: RenderJob): Promise<string> {
 
     const dataUrl = canvas.getElement().toDataURL(mimeTypeByFormat[options.format], options.quality)
     if (profiler) profiler.addPoint('Encoded thumbnail to data URL')
-    return dataUrl
+    const dataBinaryString = decodeImageDataUrlAsBinaryString(dataUrl)
+    if (profiler) profiler.addPoint('Convert data URL into binary string')
+    return dataBinaryString
 }

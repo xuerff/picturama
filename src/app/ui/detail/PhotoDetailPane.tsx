@@ -4,7 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { PhotoId, Photo as Photo, PhotoDetail, PhotoWork, PhotoSectionId, MetaData, ExifData } from 'common/CommonTypes'
-import { getNonRawUrl } from 'common/util/DataUtil'
+import { getNonRawPath } from 'common/util/DataUtil'
 import { bindMany } from 'common/util/LangUtil'
 
 import PhotoInfo from 'app/ui/info/PhotoInfo'
@@ -121,9 +121,9 @@ export class PhotoDetailPane extends React.Component<Props, State> {
                     photo={props.photo}
                     isFirst={props.isFirst}
                     isLast={props.isLast}
-                    src={getNonRawUrl(props.photo)}
-                    srcPrev={props.photoPrev && getNonRawUrl(props.photoPrev)}
-                    srcNext={props.photoNext && getNonRawUrl(props.photoNext)}
+                    imagePath={getNonRawPath(props.photo)}
+                    imagePathPrev={props.photoPrev && getNonRawPath(props.photoPrev)}
+                    imagePathNext={props.photoNext && getNonRawPath(props.photoNext)}
                     photoWork={props.photoWork}
                     setMode={this.setMode}
                     setPreviousDetailPhoto={props.setPreviousDetailPhoto}

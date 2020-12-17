@@ -6,7 +6,7 @@ import Profiler from 'common/util/Profiler'
 
 
 interface TextureInfo {
-    src: string
+    imagePath: string
     texture: Texture
     lastUse: number
 }
@@ -18,44 +18,44 @@ export interface TextureCacheOptions {
     /**
      * Will be called when a texture was fetched (or fetching failed)
      *
-     * @param src The fetched source
+     * @param imagePath The path of the fetched image
      * @param texture The texture - is `null` if fetching failed
      */
-    onTextureFetched(src: string, texture: Texture | null): void
+    onTextureFetched(imagePath: string, texture: Texture | null): void
 }
 
 export default class TextureCache {
 
-    private sourcesToFetch: (string | null)[]
+    private imagePathsToFetch: (string | null)[]
     private isLoadingTexture = false
     private texturesWithError: { [key: string]: true } = {}
     private textureCache: { [key: string]: TextureInfo } = {}
 
 
     constructor(private options: TextureCacheOptions) {
-        this.sourcesToFetch = []
+        this.imagePathsToFetch = []
     }
 
-    setSourcesToFetch(sourcesToFetch: (string | null)[]) {
-        if (sourcesToFetch.length > this.options.maxCacheSize) {
-            throw new Error(`sourcesToFetch (${sourcesToFetch.length}) exceeds maxCacheSize (${this.options.maxCacheSize})`)
+    setImagesToFetch(imagePathsToFetch: (string | null)[]) {
+        if (imagePathsToFetch.length > this.options.maxCacheSize) {
+            throw new Error(`imagePathsToFetch (${imagePathsToFetch.length}) exceeds maxCacheSize (${this.options.maxCacheSize})`)
         }
 
-        if (isShallowEqual(sourcesToFetch, this.sourcesToFetch)) {
+        if (isShallowEqual(imagePathsToFetch, this.imagePathsToFetch)) {
             return
         }
 
         this.texturesWithError = {}
-        this.sourcesToFetch = sourcesToFetch
+        this.imagePathsToFetch = imagePathsToFetch
         this.tryToFetchTextures()
     }
 
-    hasTextureError(src: string): boolean {
-        return this.texturesWithError[src] || false
+    hasTextureError(imagePath: string): boolean {
+        return this.texturesWithError[imagePath] || false
     }
 
-    getTexture(src: string): Texture | null {
-        const textureInfo = this.textureCache[src]
+    getTexture(imagePath: string): Texture | null {
+        const textureInfo = this.textureCache[imagePath]
         if (textureInfo) {
             textureInfo.lastUse = Date.now()
             return textureInfo.texture
@@ -65,53 +65,53 @@ export default class TextureCache {
     }
 
     private tryToFetchTextures() {
-        for (const src of this.sourcesToFetch) {
-            this.tryToFetchTexture(src)
+        for (const imagePath of this.imagePathsToFetch) {
+            this.tryToFetchTexture(imagePath)
         }
     }
 
-    private tryToFetchTexture(src?: string | null) {
+    private tryToFetchTexture(imagePath?: string | null) {
         const { textureCache } = this
         const { canvas } = this.options
 
-        if (!src || this.isLoadingTexture || textureCache[src] || this.texturesWithError[src]) {
+        if (!imagePath || this.isLoadingTexture || textureCache[imagePath] || this.texturesWithError[imagePath]) {
             return
         }
 
-        const profiler = this.options.profile ? new Profiler(`Fetching texture for ${src}`) : null
+        const profiler = this.options.profile ? new Profiler(`Fetching texture for ${imagePath}`) : null
         this.isLoadingTexture = true
-        canvas.createTextureFromSrc(src, profiler)
+        canvas.createTextureFromFile(imagePath, profiler)
             .then(texture => {
                 if (profiler) profiler.addPoint('Loaded texture')
-                textureCache[src] = { src, texture, lastUse: Date.now() }
+                textureCache[imagePath] = { imagePath, texture, lastUse: Date.now() }
 
-                const cachedSrcs = Object.keys(textureCache)
-                if (cachedSrcs.length > this.options.maxCacheSize) {
+                const cachedImagePaths = Object.keys(textureCache)
+                if (cachedImagePaths.length > this.options.maxCacheSize) {
                     let oldestTextureInfo: TextureInfo | null = null
-                    for (const src of cachedSrcs) {
-                        const textureInfo = textureCache[src]
+                    for (const imagePath of cachedImagePaths) {
+                        const textureInfo = textureCache[imagePath]
                         if (!oldestTextureInfo || textureInfo.lastUse < oldestTextureInfo.lastUse) {
                             oldestTextureInfo = textureInfo
                         }
                     }
                     if (oldestTextureInfo) {
                         oldestTextureInfo.texture.destroy()
-                        delete textureCache[oldestTextureInfo.src]
+                        delete textureCache[oldestTextureInfo.imagePath]
                     }
                     if (profiler) profiler.addPoint('Removed obsolete textures from cache')
                 }
 
                 this.isLoadingTexture = false
-                this.options.onTextureFetched(src, texture)
+                this.options.onTextureFetched(imagePath, texture)
                 if (profiler) profiler.addPoint('Called onTextureProcessed')
 
                 if (profiler) profiler.logResult()
             })
             .catch(error => {
-                console.error(`Loading ${src} failed`, error)
+                console.error(`Loading ${imagePath} failed`, error)
                 this.isLoadingTexture = false
-                this.texturesWithError[src] = true
-                this.options.onTextureFetched(src, null)
+                this.texturesWithError[imagePath] = true
+                this.options.onTextureFetched(imagePath, null)
             })
             .then(() => {
                 this.tryToFetchTextures()
