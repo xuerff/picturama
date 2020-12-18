@@ -230,7 +230,8 @@ export class ExportDialog extends React.Component<Props, State> {
                                 id='removeInfo'
                                 className='ExportDialog-removeInfo'
                                 inline={true}
-                                checked={!exportOptions.withMetadata}
+                                checked={exportOptions.format !== 'jpg' || !exportOptions.withMetadata}
+                                disabled={exportOptions.format !== 'jpg'}
                                 label={msg('ExportDialog_removeInfo')}
                                 onChange={this.toggleWithMetadata}
                             />
@@ -244,7 +245,8 @@ export class ExportDialog extends React.Component<Props, State> {
                         </div>
                         <Collapse isOpen={props.showRemoveInfoDesc}>
                             <div className={classnames(Classes.TEXT_SMALL, Classes.TEXT_MUTED, 'ExportDialog-removeInfoDesc')}>
-                                {msg('ExportDialog_removeInfo_desc')}
+                                <p>{msg('ExportDialog_removeInfo_desc')}</p>
+                                <p>{msg('ExportDialog_removeInfo_jpgOnly')}</p>
                             </div>
                         </Collapse>
                     </div>

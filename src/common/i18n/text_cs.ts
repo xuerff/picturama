@@ -44,7 +44,6 @@ export default {
     ExportDialog_customSizeSide_size: 'velikost',
     ExportDialog_privacy: 'Soukromí',
     ExportDialog_removeInfo: 'Odstranit doplňkové informace',
-    ExportDialog_removeInfo_desc: 'V případě výběru této možnosti budou doplňkové informace, například EXIF-štítky, odstraněny z exportovaných fotografií. Jedná se o informace o použitém fotoaparátu, lokaci pořízení fotografie, apod.',
     ExportDialog_fileName: 'Název souboru',
     ExportDialog_fileName_likeOriginal: 'Jako originál',
     ExportDialog_fileName_sequence: 'sekvence',

@@ -44,7 +44,6 @@ export default {
     ExportDialog_customSizeSide_size: `tamaño`,
     ExportDialog_privacy: `Privacidad`,
     ExportDialog_removeInfo: `Quitar información extra`,
-    ExportDialog_removeInfo_desc: `Cuando esta opción esté seleccionada, la información extra como las etiquetas EXIF serán quitadas de la foto exportada. Esta información es acerca de la cámara que fue utilizada, la locación de la foto o similares.`,
     ExportDialog_fileName: `Nombre del archivo`,
     ExportDialog_fileName_likeOriginal: `Como el original`,
     ExportDialog_fileName_sequence: `secuencia`,

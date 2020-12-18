@@ -10,6 +10,9 @@ import { fsExists, fsWriteFile, fsReadFile, fsStat, fsUtimes } from 'background/
 import ForegroundClient from 'background/ForegroundClient'
 
 
+const jpgExtensionRE = new RegExp(`\\.jpe?g$`, 'i')
+
+
 export async function exportPhoto(photo: Photo, photoIndex: number, options: PhotoExportOptions): Promise<void> {
     const masterPath = getMasterPath(photo)
 
@@ -71,7 +74,7 @@ export async function exportPhoto(photo: Photo, photoIndex: number, options: Pho
         counter++
     } while (await fsExists(exportFilePath))
 
-    if (options.withMetadata) {
+    if (options.withMetadata && options.format === 'jpg' && jpgExtensionRE.test(masterPath)) {
         const masterImageBuffer = await fsReadFile(masterPath)
         const masterImageData = masterImageBuffer.toString('binary')
         const metaData = piexif.load(masterImageData)

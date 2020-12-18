@@ -17,7 +17,7 @@ export const locales = [ 'cs', 'de', 'en', 'es', 'fr' ]
 export const fallbackLocale: Locale = 'en'
 export type I18nKey = keyof typeof text_en
 
-const textsByLang: { [K in Locale]: { [K in I18nKey]: string } } = {
+const textsByLang: { [K in Locale]: { [K in I18nKey]?: string } } = {
     cs: text_cs,
     de: text_de,
     en: text_en,
