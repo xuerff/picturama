@@ -76,6 +76,10 @@ export default {
         return callOnBackground('getFileSize', { path })
     },
 
+    showItemInFolder(fullPath: string): Promise<void>  {
+        return callOnBackground('showItemInFolder', { fullPath })
+    },
+
     readMetadataOfImage(imagePath: string): Promise<MetaData> {
         return callOnBackground('readMetadataOfImage', { imagePath })
     },

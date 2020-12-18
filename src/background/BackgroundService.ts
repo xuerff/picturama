@@ -1,5 +1,6 @@
+import os from 'os'
 import { promises as fs } from 'fs'
-import { BrowserWindow, ipcMain, dialog } from 'electron'
+import { BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { decodeHeifBuffer } from 'node-libheif'
 
 import { UiConfig } from 'common/CommonTypes'
@@ -72,6 +73,15 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
     } else if (action === 'getFileSize') {
         const stat = await fsStat(params.path)
         return stat.size
+    } else if (action === 'showItemInFolder') {
+        // We call `shell.showItemInFolder` in the main process, because when called in a renderer process, the
+        // explorer won't get to the front on Windows.
+        // See: https://github.com/electron/electron/issues/4349
+        let { fullPath } = params
+        if (os.platform() === 'win32') {
+            fullPath = fullPath.replace(/\//g, '\\')
+        }
+        shell.showItemInFolder(fullPath)
     } else if (action === 'readMetadataOfImage') {
         return readMetadataOfImage(params.imagePath)
     } else if (action === 'getExifData') {

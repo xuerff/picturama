@@ -1,4 +1,4 @@
-import { clipboard, shell } from 'electron'
+import { clipboard } from 'electron'
 import classNames from 'classnames'
 import React from 'react'
 import { Button, Icon, NonIdealState, Popover, Position, Classes, Menu, MenuItem } from '@blueprintjs/core'
@@ -10,6 +10,7 @@ import { bindMany } from 'common/util/LangUtil'
 import { getMasterPath } from 'common/util/DataUtil'
 import { formatNumber } from 'common/util/TextUtil'
 
+import BackgroundClient from 'app/BackgroundClient'
 import MiniWorldMap from 'app/ui/widget/MiniWorldMap'
 import Toolbar from 'app/ui/widget/Toolbar'
 import FaIcon from 'app/ui/widget/icon/FaIcon'
@@ -130,7 +131,7 @@ export default class PhotoInfo extends React.Component<Props, State> {
 
     private showPhotoInFolder() {
         if (this.props.photo) {
-            shell.showItemInFolder(getMasterPath(this.props.photo))
+            BackgroundClient.showItemInFolder(getMasterPath(this.props.photo))
         }
     }
 
