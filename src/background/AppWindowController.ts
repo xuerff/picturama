@@ -33,6 +33,7 @@ export default {
             uiTesterWindow = new BrowserWindow({
                 title: 'UI Tester',
                 webPreferences: {
+                    enableRemoteModule: true,
                     nodeIntegration: true,
                 }
             })

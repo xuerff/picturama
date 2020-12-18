@@ -25,7 +25,7 @@ assertMainProcess()
 let uiConfig: UiConfig
 
 let resolveBackgroundReady: () => void
-const waitForBackgroundReadyPromise = new Promise(resolve => resolveBackgroundReady = resolve)
+const waitForBackgroundReadyPromise = new Promise<void>(resolve => resolveBackgroundReady = resolve)
 
 
 export function init(mainWin: BrowserWindow, newUiConfig: UiConfig) {

@@ -56,7 +56,13 @@ const commonConfig = {
 
 const typescriptRule = {
     test: new RegExp('(^' + escapeRegExp(path.resolve(__dirname, 'src')) + '\/.*\.jsx?|\.tsx?)$'),
-    loader: 'awesome-typescript-loader'
+    loader: 'awesome-typescript-loader',
+    options: {
+        useCache: true,
+        reportFiles: [
+            'src/**/*.{ts,tsx}'
+        ]
+    }
 }
 
 

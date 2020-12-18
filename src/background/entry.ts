@@ -60,6 +60,7 @@ app.on('ready', () => {
         title: 'Picturama',
         backgroundColor: '#37474f',  // @blue-grey-800
         webPreferences: {
+            enableRemoteModule: true,
             nodeIntegration: true,
         }
     }

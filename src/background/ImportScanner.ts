@@ -192,7 +192,7 @@ export default class ImportScanner {
     setPaused(paused: boolean) {
         if (paused) {
             if (!this.pausePromise && this.state !== 'idle') {
-                this.pausePromise = new Promise(resolve => this.resolvePause = resolve)
+                this.pausePromise = new Promise<void>(resolve => this.resolvePause = resolve)
                     .then(() => {
                         this.pausePromise = null
                         this.resolvePause = null

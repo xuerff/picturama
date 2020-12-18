@@ -90,7 +90,7 @@ class MainMenu {
         Menu.setApplicationMenu(this.menu)
 
         ipcMain.on('toggleExportMenu', (e, state) => {
-            this.menu.getMenuItemById('export').enabled = state
+            this.menu.getMenuItemById('export')!.enabled = state
         })
     }
 

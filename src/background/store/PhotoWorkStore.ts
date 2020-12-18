@@ -181,7 +181,7 @@ async function fetchPicturamaYml(directoryPath: string): Promise<DirectoryWorkDa
     let result: DirectoryWorkData
     if (await fsExists(picturamaYmlFile)) {
         const ymlString = await fsReadFile(picturamaYmlFile, 'utf8')
-        result = yaml.safeLoad(ymlString)
+        result = yaml.safeLoad(ymlString) as DirectoryWorkData
         console.log('Fetched ' + picturamaYmlFile)
     } else if (await fsExists(anselJsonFile)) {
         // Legacy support: `ansel.json` was used by version 1.0.0 and before (where Picturama's name was Ansel)
