@@ -70,6 +70,7 @@ app.on('ready', () => {
         windowOptions.frame = false
     }
     mainWindow = new BrowserWindow(windowOptions)
+    const mainMenu = hasNativeMenu ? new MainMenu(mainWindow) : null
 
     if (workAreaSize.width <= 1366 && workAreaSize.height <= 768) {
         mainWindow.maximize()
@@ -100,9 +101,7 @@ app.on('ready', () => {
 
     initDb()
         .then(() => {
-            if (mainWindow && hasNativeMenu) {
-                new MainMenu(mainWindow)
-            }
+            mainMenu?.onBackgroundReady()
             onBackgroundReady()
         })
         .catch(error => {

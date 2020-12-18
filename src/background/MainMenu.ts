@@ -29,7 +29,9 @@ class MainMenu {
                         enabled: false
                     },
                     {
+                        id: 'settings',
                         label: msg('MainMenu_settings'),
+                        enabled: false,
                         click: () => ForegroundClient.showSettings()
                     },
                     {
@@ -50,8 +52,10 @@ class MainMenu {
                         click: () => this.mainWindow.webContents.send('exportClicked', true)
                     },
                     {
+                        id: 'scan',
                         label: msg('MainMenu_scan'),
                         accelerator: 'Cmd+R',
+                        enabled: false,
                         click: startImport
                     }
                 ]
@@ -92,6 +96,11 @@ class MainMenu {
         ipcMain.on('toggleExportMenu', (e, state) => {
             this.menu.getMenuItemById('export')!.enabled = state
         })
+    }
+
+    onBackgroundReady() {
+        this.menu.getMenuItemById('settings')!.enabled = true
+        this.menu.getMenuItemById('scan')!.enabled = true
     }
 
     // TODO: Revive Legacy code of 'version' feature
