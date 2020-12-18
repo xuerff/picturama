@@ -44,6 +44,8 @@ export default {
     ExportDialog_customSizeSide_size: 'taille',
     ExportDialog_privacy: 'Vie privée',
     ExportDialog_removeInfo: 'Supprimer les métadonnées',
+    ExportDialog_removeInfo_desc: ``,  // TODO: `This removes extra information like EXIF-Tags from the exported photo. This is information about the camera used, the photo's location or similar.`
+    ExportDialog_removeInfo_jpgOnly: ``,  // TODO: 'Extra information is currently only supported for JPG. I.e. extra information is only exported if both the original photo and the exported photo are JPG.'
     ExportDialog_fileName: 'Nom du fichier',
     ExportDialog_fileName_likeOriginal: `Comme l'original`,
     ExportDialog_fileName_sequence: 'séquence',
