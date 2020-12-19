@@ -1,9 +1,8 @@
 import os from 'os'
 import { promises as fs } from 'fs'
 import { BrowserWindow, ipcMain, dialog, shell } from 'electron'
-import { decodeHeifBuffer } from 'node-libheif'
 
-import { UiConfig } from 'common/CommonTypes'
+import { DecodedHeifImage, UiConfig } from 'common/CommonTypes'
 import { assertMainProcess } from 'common/util/ElectronUtil'
 import { encodeIpcError } from 'common/util/IpcUtil'
 
@@ -18,6 +17,14 @@ import { fetchSettings, storeSettings } from 'background/store/SettingsStore'
 import { fetchTags, storePhotoTags } from 'background/store/TagStore'
 import { createThumbnail, deleteThumbnail } from 'background/store/ThumbnailStore'
 import { fsStat } from 'background/util/FileUtil'
+
+let decodeHeifBuffer: ((buffer: Buffer) => Promise<DecodedHeifImage>) | null = null
+try {
+    const libheif = require('node-libheif')
+    decodeHeifBuffer = libheif.decodeHeifBuffer
+} catch (error) {
+    console.warn('node-libheif is not supported', error)
+}
 
 
 assertMainProcess()
@@ -86,7 +93,12 @@ async function executeBackgroundAction(action: string, params: any): Promise<any
         return readMetadataOfImage(params.imagePath)
     } else if (action === 'getExifData') {
         return getExifData(params.path)
+    } else if (action === 'loadHeifFileSupported') {
+        return !!decodeHeifBuffer
     } else if (action === 'loadHeifFile') {
+        if (!decodeHeifBuffer) {
+            throw new Error('node-libheif is not supported')
+        }
         const buffer = await fs.readFile(params.path)
         return decodeHeifBuffer(buffer)
     } else if (action === 'selectScanDirectories') {

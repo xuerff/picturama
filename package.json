@@ -89,11 +89,11 @@
     "exifr": "^6.0.0",
     "font-awesome": "^4.7.0",
     "gl-matrix": "^3.1.0",
+    "heic2any": "^0.0.3",
     "image-size": "^0.9.3",
     "js-yaml": "^3.14.0",
     "justified-layout": "^4.0.0",
     "moment": "^2.26.0",
-    "node-libheif": "file:../node-libheif",
     "node-notifier": "9.0.0",
     "node-pre-gyp": "^0.17.0",
     "normalize.css": "^8.0.1",
@@ -112,7 +112,8 @@
     "typesafe-actions": "^5.1.0"
   },
   "optionalDependencies": {
-    "libraw": "file:submodules/node-libraw"
+    "libraw": "file:submodules/node-libraw",
+    "node-libheif": "file:../node-libheif"
   },
   "devDependencies": {
     "@jest-runner/electron": "^3.0.0",

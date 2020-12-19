@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import { UiConfig, Settings, PhotoSet, PhotoExportOptions, IpcErrorInfo, MetaData, ExifData } from 'common/CommonTypes'
+import { UiConfig, Settings, PhotoSet, PhotoExportOptions, IpcErrorInfo, MetaData, ExifData, DecodedHeifImage } from 'common/CommonTypes'
 import { PhotoId, Photo, PhotoDetail, PhotoWork, PhotoFilter, PhotoSection, PhotoSectionId, Tag } from 'common/CommonTypes'
 import { assertRendererProcess } from 'common/util/ElectronUtil'
 import { decodeIpcError } from 'common/util/IpcUtil'
@@ -88,7 +88,11 @@ export default {
         return callOnBackground('getExifData', { path })
     },
 
-    loadHeifFile(path: string): Promise<{ width: number, height: number, data: Buffer }> {
+    loadHeifFileSupported(): Promise<boolean> {
+        return callOnBackground('loadHeifFileSupported')
+    },
+
+    loadHeifFile(path: string): Promise<DecodedHeifImage> {
         return callOnBackground('loadHeifFile', { path })
     },
 
