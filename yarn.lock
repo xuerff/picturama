@@ -7135,8 +7135,10 @@ node-ipc@^9.1.1:
     js-message "1.0.5"
     js-queue "2.0.0"
 
-"node-libheif@file:../node-libheif":
+node-libheif@^1.9.1-rc.1:
   version "1.9.1-rc.1"
+  resolved "https://registry.yarnpkg.com/node-libheif/-/node-libheif-1.9.1-rc.1.tgz#b99fd9072ae75ea28f6a19fa76ac5afa814471f8"
+  integrity sha512-SDFBEY9UnBnEAO7uxdP7RlBim3WJf1tA9RiKh63BW6cu7DNGb6Bf2zO1qz2+N2y72KGjUCxbsM35N/iG04NOSQ==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^3.0.2"

@@ -113,7 +113,7 @@
   },
   "optionalDependencies": {
     "libraw": "file:submodules/node-libraw",
-    "node-libheif": "file:../node-libheif"
+    "node-libheif": "^1.9.1-rc.1"
   },
   "devDependencies": {
     "@jest-runner/electron": "^3.0.0",
